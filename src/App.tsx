@@ -16,7 +16,8 @@ import {
   Sun,
   Moon,
   LayoutGrid,
-  Zap
+  Zap,
+  Car
 } from 'lucide-react';
 import { MOTORSPORT_DATA, Category, Team, Driver, Race } from './types';
 import { cn } from './lib/utils';
@@ -26,7 +27,8 @@ const IconMap: Record<string, React.ElementType> = {
   Timer,
   Flag,
   Mountain,
-  Zap
+  Zap,
+  Car
 };
 
 export default function App() {
@@ -60,10 +62,10 @@ export default function App() {
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <div className="w-10 h-10 bg-brand-red rounded-lg flex items-center justify-center rotate-3 shadow-lg shadow-brand-red/20">
-              <Trophy className="text-white w-6 h-6 -rotate-3" />
+              <Car className="text-white w-6 h-6 -rotate-3" />
             </div>
             <span className="text-2xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
-              PITSTOP<span className="text-brand-red">HUB</span>
+              pitstop<span className="text-brand-red">hub</span>
             </span>
           </button>
           
