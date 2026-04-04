@@ -18,6 +18,7 @@ import {
   LayoutGrid,
   Zap,
   Car,
+  Truck,
   Menu,
   X
 } from 'lucide-react';
@@ -30,7 +31,8 @@ const IconMap: Record<string, React.ElementType> = {
   Flag,
   Mountain,
   Zap,
-  Car
+  Car,
+  Truck
 };
 
 export default function App() {
