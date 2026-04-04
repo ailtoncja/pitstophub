@@ -21,7 +21,8 @@ import {
   Car,
   Truck,
   Menu,
-  X
+  X,
+  Languages
 } from 'lucide-react';
 import { MOTORSPORT_DATA, Category, Team, Driver, Race } from './types';
 import { cn } from './lib/utils';
@@ -38,28 +39,120 @@ const IconMap: Record<string, React.ElementType> = {
 
 const NAV_GROUPS = [
   {
-    name: 'Fórmulas',
+    name: { pt: 'Fórmulas', en: 'Formulas' },
     ids: ['f1', 'f2', 'f3', 'f1-academy', 'fe']
   },
   {
-    name: 'Endurance/GT',
+    name: { pt: 'Endurance/GT', en: 'Endurance/GT' },
     ids: ['wec', 'imsa', 'dtm', 'gt-world-challenge']
   },
   {
-    name: 'Americanas',
+    name: { pt: 'Americanas', en: 'American' },
     ids: ['indycar', 'nascar']
   },
   {
-    name: 'Rally',
+    name: { pt: 'Rally', en: 'Rally' },
     ids: ['wrc']
   },
   {
-    name: 'Nacionais',
+    name: { pt: 'Nacionais', en: 'National' },
     ids: ['stock-car', 'formula-truck']
   }
 ];
 
+const UI_TRANSLATIONS = {
+  pt: {
+    home: 'Início',
+    explore: 'Explorar',
+    viewRules: 'Ver Regras',
+    season2026: 'Temporada 2026',
+    viewCalendar: 'Ver Calendário',
+    rulesAndFormat: 'Regras e Formato',
+    nextStage: 'Próxima Etapa',
+    seasonEnd: 'Fim da Temporada',
+    overview: 'Visão Geral',
+    teams: 'Equipes',
+    calendar: 'Calendário',
+    standings: 'Classificação',
+    accessCategory: 'Acessar Categoria',
+    viewSummary: 'Ver Resumo',
+    liveData: 'Dados ao Vivo',
+    tagline: 'Explore os calendários, equipes e pilotos das principais competições do automobilismo mundial em 2026.',
+    drivers: 'Pilotos',
+    constructors: 'Construtores',
+    points: 'Pontos',
+    position: 'Posição',
+    team: 'Equipe',
+    location: 'Local',
+    date: 'Data',
+    circuit: 'Circuito',
+    winner: 'Vencedor',
+    upcoming: 'Próxima',
+    completed: 'Concluída',
+    cancelled: 'Cancelada',
+    result: 'Resultado',
+    event: 'Evento',
+    officialTeams: 'Equipes Oficiais',
+    driversOnGrid: 'Pilotos no Grid',
+    rounds: 'Etapas',
+    racesInSeason: 'Corridas na Temporada',
+    grid2026: 'Grid 2026',
+    driversChampionship: 'Campeonato de Pilotos',
+    constructorsChampionship: 'Campeonato de Construtores',
+    teamsChampionship: 'Campeonato de Equipes',
+    allRightsReserved: 'Todos os direitos reservados.',
+    gotIt: 'Entendido',
+    standingsNotAvailable: 'Pontuação não disponível',
+    standingsNotAvailableDesc: 'As pontuações completas desta categoria não estão disponíveis publicamente no momento.'
+  },
+  en: {
+    home: 'Home',
+    explore: 'Explore',
+    viewRules: 'View Rules',
+    season2026: '2026 Season',
+    viewCalendar: 'View Calendar',
+    rulesAndFormat: 'Rules and Format',
+    nextStage: 'Next Stage',
+    seasonEnd: 'Season End',
+    overview: 'Overview',
+    teams: 'Teams',
+    calendar: 'Calendar',
+    standings: 'Standings',
+    accessCategory: 'Access Category',
+    viewSummary: 'View Summary',
+    liveData: 'Live Data',
+    tagline: 'Explore the calendars, teams and drivers of the world\'s main motorsport competitions in 2026.',
+    drivers: 'Drivers',
+    constructors: 'Constructors',
+    points: 'Points',
+    position: 'Position',
+    team: 'Team',
+    location: 'Location',
+    date: 'Date',
+    circuit: 'Circuit',
+    winner: 'Winner',
+    upcoming: 'Upcoming',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
+    result: 'Result',
+    event: 'Event',
+    officialTeams: 'Official Teams',
+    driversOnGrid: 'Drivers on Grid',
+    rounds: 'Rounds',
+    racesInSeason: 'Races in Season',
+    grid2026: 'Grid 2026',
+    driversChampionship: 'Drivers Championship',
+    constructorsChampionship: 'Constructors Championship',
+    teamsChampionship: 'Teams Championship',
+    allRightsReserved: 'All rights reserved.',
+    gotIt: 'Got it',
+    standingsNotAvailable: 'Standings not available',
+    standingsNotAvailableDesc: 'Full standings for this category are not publicly available at the moment.'
+  }
+};
+
 export default function App() {
+  const [language, setLanguage] = useState<'pt' | 'en'>('pt');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -106,18 +199,20 @@ export default function App() {
     <div className="min-h-screen flex flex-col transition-colors duration-300">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-[var(--card-border)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          <button 
-            onClick={() => {
-              setView('home');
-              setExpandedCategoryId(null);
-            }}
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-          >
-            <span className="text-2xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
-              PitStopHub
-            </span>
-          </button>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center">
+          <div className="flex-1 flex justify-start">
+            <button 
+              onClick={() => {
+                setView('home');
+                setExpandedCategoryId(null);
+              }}
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            >
+              <span className="text-2xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
+                PitStopHub
+              </span>
+            </button>
+          </div>
           
           <nav className="hidden lg:flex items-center gap-6">
             <button
@@ -128,15 +223,15 @@ export default function App() {
               )}
             >
               <LayoutGrid className="w-4 h-4" />
-              Início
+              {UI_TRANSLATIONS[language].home}
             </button>
             <div className="w-px h-6 bg-[var(--card-border)] mx-2" />
             
             {NAV_GROUPS.map((group) => (
               <div 
-                key={group.name}
+                key={group.name.en}
                 className="relative group"
-                onMouseEnter={() => setActiveDropdown(group.name)}
+                onMouseEnter={() => setActiveDropdown(group.name.en)}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
                 <button
@@ -145,17 +240,17 @@ export default function App() {
                     group.ids.includes(selectedCategory.id) && view === 'category' ? "text-brand-red" : "text-gray-500"
                   )}
                 >
-                  {group.name}
-                  <ChevronDown className={cn("w-4 h-4 transition-transform", activeDropdown === group.name && "rotate-180")} />
+                  {language === 'pt' ? group.name.pt : group.name.en}
+                  <ChevronDown className={cn("w-4 h-4 transition-transform", activeDropdown === group.name.en && "rotate-180")} />
                 </button>
 
                 <AnimatePresence>
-                  {activeDropdown === group.name && (
+                  {activeDropdown === group.name.en && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full left-0 mt-2 w-48 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-2xl overflow-hidden py-2"
+                      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-2xl overflow-hidden py-2"
                     >
                       {group.ids.map(id => {
                         const cat = MOTORSPORT_DATA.find(c => c.id === id);
@@ -169,7 +264,7 @@ export default function App() {
                               view === 'category' && selectedCategory.id === cat.id ? "text-brand-red bg-brand-red/5" : "text-gray-500"
                             )}
                           >
-                            {cat.name}
+                            {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
                           </button>
                         );
                       })}
@@ -180,7 +275,27 @@ export default function App() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex-1 flex justify-end items-center gap-3">
+            <div className="flex items-center bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-1 shadow-sm">
+              <button
+                onClick={() => setLanguage('pt')}
+                className={cn(
+                  "px-2 py-1 text-[10px] font-black rounded-lg transition-all",
+                  language === 'pt' ? "bg-brand-red text-white" : "text-gray-500 hover:text-brand-red"
+                )}
+              >
+                PT
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className={cn(
+                  "px-2 py-1 text-[10px] font-black rounded-lg transition-all",
+                  language === 'en' ? "bg-brand-red text-white" : "text-gray-500 hover:text-brand-red"
+                )}
+              >
+                EN
+              </button>
+            </div>
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
               className="p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm"
@@ -189,7 +304,7 @@ export default function App() {
             </button>
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/20">
               <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-tighter text-red-500">Live Data</span>
+              <span className="text-[10px] font-black uppercase tracking-tighter text-red-500">{UI_TRANSLATIONS[language].liveData}</span>
             </div>
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -200,56 +315,84 @@ export default function App() {
           </div>
         </div>
 
-        {/* Mobile Menu */}
         <AnimatePresence>
           {isMobileMenuOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-[var(--header-bg)] border-t border-[var(--card-border)] overflow-hidden"
+              className="lg:hidden bg-[var(--header-bg)] border-t border-[var(--card-border)] overflow-hidden shadow-2xl"
             >
-              <div className="px-4 py-6 space-y-4">
-                <button
-                  onClick={() => {
-                    setView('home');
-                    setExpandedCategoryId(null);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all",
-                    view === 'home' ? "bg-brand-red text-white" : "text-gray-500 hover:bg-white/5"
-                  )}
-                >
-                  <LayoutGrid className="w-4 h-4" />
-                  Início
-                </button>
-                <div className="h-px bg-[var(--card-border)] mx-4" />
-                
-                {NAV_GROUPS.map((group) => (
-                  <div key={group.name} className="space-y-1">
-                    <div className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 opacity-50">
-                      {group.name}
-                    </div>
-                    {group.ids.map(id => {
-                      const cat = MOTORSPORT_DATA.find(c => c.id === id);
-                      if (!cat) return null;
-                      return (
-                        <button
-                          key={cat.id}
-                          onClick={() => handleCategorySelect(cat)}
-                          className={cn(
-                            "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all",
-                            view === 'category' && selectedCategory.id === cat.id ? "text-brand-red bg-brand-red/10" : "text-gray-500 hover:bg-white/5"
-                          )}
-                        >
-                          {cat.name}
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
-                      );
-                    })}
+              <div className="px-4 py-8 space-y-8 max-h-[80vh] overflow-y-auto no-scrollbar">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => {
+                      setView('home');
+                      setExpandedCategoryId(null);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={cn(
+                      "flex flex-col items-center justify-center gap-2 p-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border",
+                      view === 'home' 
+                        ? "bg-brand-red text-white border-brand-red shadow-lg shadow-brand-red/20" 
+                        : "bg-white/5 text-gray-500 border-white/5 hover:bg-white/10"
+                    )}
+                  >
+                    <LayoutGrid className="w-5 h-5" />
+                    {UI_TRANSLATIONS[language].home}
+                  </button>
+                  <div className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-red-500/5 border border-red-500/10 text-red-500">
+                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">{UI_TRANSLATIONS[language].liveData}</span>
                   </div>
-                ))}
+                </div>
+
+                <div className="space-y-6">
+                  {NAV_GROUPS.map((group) => (
+                    <div key={group.name.en} className="space-y-3">
+                      <div className="flex items-center gap-3 px-2">
+                        <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--card-border)]" />
+                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red">
+                          {language === 'pt' ? group.name.pt : group.name.en}
+                        </div>
+                        <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[var(--card-border)]" />
+                      </div>
+                      <div className="grid grid-cols-1 gap-2">
+                        {group.ids.map(id => {
+                          const cat = MOTORSPORT_DATA.find(c => c.id === id);
+                          if (!cat) return null;
+                          const Icon = IconMap[cat.icon];
+                          return (
+                            <button
+                              key={cat.id}
+                              onClick={() => {
+                                handleCategorySelect(cat);
+                                setIsMobileMenuOpen(false);
+                              }}
+                              className={cn(
+                                "w-full flex items-center justify-between px-5 py-4 rounded-2xl text-sm font-bold uppercase tracking-widest transition-all border",
+                                view === 'category' && selectedCategory.id === cat.id 
+                                  ? "bg-brand-red/10 text-brand-red border-brand-red/20" 
+                                  : "bg-white/5 text-gray-400 border-white/5 hover:bg-white/10"
+                              )}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={cn(
+                                  "w-8 h-8 rounded-lg flex items-center justify-center",
+                                  view === 'category' && selectedCategory.id === cat.id ? "bg-brand-red text-white" : "bg-white/10 text-gray-500"
+                                )}>
+                                  <Icon className="w-4 h-4" />
+                                </div>
+                                {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
+                              </div>
+                              <ChevronRight className="w-4 h-4 opacity-50" />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </motion.div>
           )}
@@ -287,32 +430,32 @@ export default function App() {
                 <motion.h1 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-5xl md:text-7xl font-display font-black italic tracking-tighter mb-6 text-[var(--text-main)]"
+                  className="text-4xl sm:text-5xl md:text-7xl font-display font-black italic tracking-tighter mb-6 text-[var(--text-main)]"
                 >
                   PitStopHub
                 </motion.h1>
-                <p className="text-gray-500 max-w-2xl mx-auto text-lg mt-8">
-                  Explore os calendários, equipes e pilotos das principais competições do automobilismo mundial em 2026.
-                </p>
-              </div>
+                  <p className="text-gray-500 max-w-2xl mx-auto text-lg mt-8">
+                    {UI_TRANSLATIONS[language].tagline}
+                  </p>
+                </div>
 
-              <div className="space-y-16">
-                {NAV_GROUPS.map((group, groupIndex) => (
-                  <motion.div 
-                    key={group.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: groupIndex * 0.1 }}
-                  >
-                    <div className="flex items-center gap-4 mb-8">
-                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--card-border)] to-transparent" />
-                      <h2 className="text-sm font-black uppercase tracking-[0.3em] text-brand-red whitespace-nowrap">
-                        {group.name}
-                      </h2>
-                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--card-border)] to-transparent" />
-                    </div>
+                <div className="space-y-16">
+                  {NAV_GROUPS.map((group, groupIndex) => (
+                    <motion.div 
+                      key={group.name.en}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: groupIndex * 0.1 }}
+                    >
+                      <div className="flex items-center gap-4 mb-8">
+                        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--card-border)] to-transparent" />
+                        <h2 className="text-sm font-black uppercase tracking-[0.3em] text-brand-red whitespace-nowrap">
+                          {language === 'pt' ? group.name.pt : group.name.en}
+                        </h2>
+                        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--card-border)] to-transparent" />
+                      </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                       {group.ids.map((id) => {
                         const cat = MOTORSPORT_DATA.find(c => c.id === id);
                         if (!cat) return null;
@@ -357,11 +500,11 @@ export default function App() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h3 className="text-base font-display font-black italic tracking-tighter text-[var(--text-main)] truncate">
-                                  {cat.name}
+                                  {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
                                 </h3>
                                 {!isExpanded && (
                                   <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                                    Ver Resumo
+                                    {UI_TRANSLATIONS[language].viewSummary}
                                   </p>
                                 )}
                               </div>
@@ -389,11 +532,11 @@ export default function App() {
                                   className="overflow-hidden w-full"
                                 >
                                   <p className="text-xs text-gray-500 mb-6 leading-relaxed">
-                                    {cat.description}
+                                    {language === 'pt' ? cat.description : (cat.enDescription || cat.description)}
                                   </p>
                                   <div className="flex items-center justify-between pt-4 border-t border-[var(--card-border)]">
                                     <div className="flex items-center gap-2 text-brand-red font-bold text-[10px] uppercase tracking-widest">
-                                      Acessar Categoria <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                      {UI_TRANSLATIONS[language].accessCategory} <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                                     </div>
                                     <button 
                                       onClick={(e) => {
@@ -402,7 +545,7 @@ export default function App() {
                                         setShowRules(true);
                                       }}
                                       className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-500 hover:text-brand-red transition-all"
-                                      title="Ver Regras"
+                                      title={UI_TRANSLATIONS[language].viewRules}
                                     >
                                       <Info className="w-3 h-3" />
                                     </button>
@@ -443,13 +586,13 @@ export default function App() {
                     <div className="flex-1 text-center md:text-left">
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-red/10 border border-brand-red/20 text-brand-red text-xs font-bold uppercase tracking-widest mb-6">
                         <Timer className="w-3 h-3" />
-                        Temporada 2026
+                        {UI_TRANSLATIONS[language].season2026}
                       </div>
-                      <h1 className="text-6xl md:text-8xl font-display font-black italic tracking-tighter mb-6 text-[var(--text-main)]">
-                        {selectedCategory.name.split(' ')[0]} <span className="text-brand-red">{selectedCategory.name.split(' ').slice(1).join(' ')}</span>
+                      <h1 className="text-4xl sm:text-6xl md:text-8xl font-display font-black italic tracking-tighter mb-6 text-[var(--text-main)]">
+                        {(language === 'pt' ? selectedCategory.name : (selectedCategory.enFullName || selectedCategory.name)).split(' ')[0]} <span className="text-brand-red">{(language === 'pt' ? selectedCategory.name : (selectedCategory.enFullName || selectedCategory.name)).split(' ').slice(1).join(' ')}</span>
                       </h1>
                       <p className="text-gray-500 text-lg max-w-xl mb-10">
-                        {selectedCategory.description}
+                        {language === 'pt' ? selectedCategory.description : (selectedCategory.enDescription || selectedCategory.description)}
                       </p>
                       
                       <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
@@ -462,13 +605,13 @@ export default function App() {
                           }}
                           className="px-8 py-4 bg-brand-red text-white font-bold rounded-xl shadow-xl shadow-brand-red/20 hover:scale-105 transition-all uppercase tracking-widest text-sm"
                         >
-                          Ver Calendário
+                          {UI_TRANSLATIONS[language].viewCalendar}
                         </button>
                         <button 
                           onClick={() => setShowRules(true)}
                           className="px-8 py-4 bg-[var(--card-bg)] text-[var(--text-main)] font-bold rounded-xl border border-[var(--card-border)] hover:bg-white/10 transition-all uppercase tracking-widest text-sm flex items-center gap-2"
                         >
-                          <Info className="w-4 h-4" /> Regras e Formato
+                          <Info className="w-4 h-4" /> {UI_TRANSLATIONS[language].rulesAndFormat}
                         </button>
                       </div>
                     </div>
@@ -476,20 +619,20 @@ export default function App() {
                     <div className="flex-1 relative">
                       <div className="absolute inset-0 bg-brand-red/20 blur-[100px] rounded-full" />
                       <div className="relative glass-card p-8 rotate-3 hover:rotate-0 transition-transform duration-500">
-                        <div className="flex items-center justify-between mb-8">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
                           <div className="flex items-center gap-3">
                             <div className="w-12 h-12 rounded-xl bg-brand-red flex items-center justify-center">
                               {React.createElement(IconMap[selectedCategory.icon], { className: "text-white w-6 h-6" })}
                             </div>
                             <div>
-                              <div className="text-xs text-gray-500 uppercase font-bold tracking-widest">Próxima Etapa</div>
+                              <div className="text-xs text-gray-500 uppercase font-bold tracking-widest">{UI_TRANSLATIONS[language].nextStage}</div>
                               <div className="font-display font-black text-xl text-[var(--text-main)]">
-                                {selectedCategory.calendar.find(r => r.status === 'upcoming')?.name || 'Fim da Temporada'}
+                                {selectedCategory.calendar.find(r => r.status === 'upcoming')?.name || UI_TRANSLATIONS[language].seasonEnd}
                               </div>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="text-xs text-gray-500 uppercase font-bold tracking-widest">Data</div>
+                          <div className="text-left sm:text-right">
+                            <div className="text-xs text-gray-500 uppercase font-bold tracking-widest">{UI_TRANSLATIONS[language].date}</div>
                             <div className="font-mono font-bold text-[var(--text-main)]">
                               {selectedCategory.calendar.find(r => r.status === 'upcoming')?.date.split('-').reverse().join('/') || '--/--/--'}
                             </div>
@@ -504,7 +647,7 @@ export default function App() {
                                 {selectedCategory.calendar.find(r => r.status === 'upcoming')?.location || 'N/A'}
                               </span>
                             </div>
-                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Local</span>
+                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{UI_TRANSLATIONS[language].location}</span>
                           </div>
                           <div className="flex items-center justify-between p-4 rounded-xl bg-black/20 border border-white/5">
                             <div className="flex items-center gap-3">
@@ -513,7 +656,7 @@ export default function App() {
                                 {selectedCategory.calendar.find(r => r.status === 'upcoming')?.circuit || 'N/A'}
                               </span>
                             </div>
-                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Circuito</span>
+                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{UI_TRANSLATIONS[language].circuit}</span>
                           </div>
                         </div>
                       </div>
@@ -527,10 +670,10 @@ export default function App() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="flex items-center justify-start md:justify-center gap-4 mb-12 overflow-x-auto pb-4 no-scrollbar">
                     {[
-                      { id: 'overview', label: 'Visão Geral', icon: Info },
-                      { id: 'teams', label: 'Equipes', icon: Users },
-                      { id: 'calendar', label: 'Calendário', icon: Calendar },
-                      { id: 'standings', label: 'Pontuação', icon: Trophy },
+                      { id: 'overview', label: UI_TRANSLATIONS[language].overview, icon: Info },
+                      { id: 'teams', label: UI_TRANSLATIONS[language].teams, icon: Users },
+                      { id: 'calendar', label: UI_TRANSLATIONS[language].calendar, icon: Calendar },
+                      { id: 'standings', label: UI_TRANSLATIONS[language].standings, icon: Trophy },
                     ].map((tab) => (
                       <button
                         key={tab.id}
@@ -564,46 +707,46 @@ export default function App() {
                       >
                         <div className="glass-card p-8">
                           <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
-                            <Users className="text-brand-red" /> Equipes
+                            <Users className="text-brand-red" /> {UI_TRANSLATIONS[language].teams}
                           </h3>
                           <div className="text-4xl font-display font-black text-brand-red mb-2">
                             {selectedCategory.teams.length}
                           </div>
-                          <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">Equipes Oficiais</p>
+                          <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">{UI_TRANSLATIONS[language].officialTeams}</p>
                         </div>
                         <div className="glass-card p-8">
                           <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
-                            <Flag className="text-brand-red" /> Pilotos
+                            <Flag className="text-brand-red" /> {UI_TRANSLATIONS[language].drivers}
                           </h3>
                           <div className="text-4xl font-display font-black text-brand-red mb-2">
                             {selectedCategory.drivers.length}
                           </div>
-                          <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">Pilotos no Grid</p>
+                          <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">{UI_TRANSLATIONS[language].driversOnGrid}</p>
                         </div>
                         <div className="glass-card p-8">
                           <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
-                            <Calendar className="text-brand-red" /> Etapas
+                            <Calendar className="text-brand-red" /> {UI_TRANSLATIONS[language].rounds}
                           </h3>
                           <div className="text-4xl font-display font-black text-brand-red mb-2">
                             {selectedCategory.calendar.length}
                           </div>
-                          <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">Corridas na Temporada</p>
+                          <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">{UI_TRANSLATIONS[language].racesInSeason}</p>
                         </div>
                         
                         <div className="md:col-span-2 lg:col-span-3 glass-card p-8 relative overflow-hidden group">
                           <div className="absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 bg-brand-red/5 rounded-full group-hover:bg-brand-red/10 transition-colors" />
                           <div className="relative z-10">
                             <h3 className="text-2xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
-                              <Info className="text-brand-red" /> Sobre a Categoria
+                              <Info className="text-brand-red" /> {UI_TRANSLATIONS[language].overview}
                             </h3>
                             <div className="prose prose-invert max-w-none">
                               <p className="text-lg leading-relaxed text-gray-400 font-medium">
-                                {selectedCategory.longDescription}
+                                {language === 'pt' ? selectedCategory.longDescription : (selectedCategory.enLongDescription || selectedCategory.longDescription)}
                               </p>
                             </div>
                             <div className="mt-8 flex flex-wrap gap-4">
                               <div className="px-4 py-2 rounded-full bg-brand-red/10 border border-brand-red/20 text-brand-red text-xs font-black uppercase tracking-widest">
-                                Temporada 2026
+                                {UI_TRANSLATIONS[language].season2026}
                               </div>
                               <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-black uppercase tracking-widest">
                                 FIA Sanctioned
@@ -685,7 +828,7 @@ export default function App() {
                                               </div>
                                               
                                               <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
-                                                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">Grid 2026</div>
+                                                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].grid2026}</div>
                                                 <ChevronRight className="w-4 h-4 text-brand-red opacity-0 group-hover/driver:opacity-100 group-hover/driver:translate-x-1 transition-all" />
                                               </div>
                                             </div>
@@ -709,11 +852,11 @@ export default function App() {
                         className="space-y-4"
                       >
                         <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 text-xs font-bold uppercase tracking-widest text-gray-500">
-                          <div className="col-span-1">Data</div>
-                          <div className="col-span-4">Evento</div>
-                          <div className="col-span-3">Local / Circuito</div>
+                          <div className="col-span-1">{UI_TRANSLATIONS[language].date}</div>
+                          <div className="col-span-4">{UI_TRANSLATIONS[language].event}</div>
+                          <div className="col-span-3">{UI_TRANSLATIONS[language].location} / {UI_TRANSLATIONS[language].circuit}</div>
                           <div className="col-span-2 text-center">Status</div>
-                          <div className="col-span-2 text-right">Resultado</div>
+                          <div className="col-span-2 text-right">{UI_TRANSLATIONS[language].result}</div>
                         </div>
                         
                         <div className="space-y-4">
@@ -727,16 +870,16 @@ export default function App() {
                               )}
                             >
                               <div className="w-full md:col-span-1 flex justify-between md:block items-center">
-                                <span className="md:hidden text-xs font-bold uppercase tracking-widest text-gray-500">Data</span>
+                                <span className="md:hidden text-xs font-bold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].date}</span>
                                 <div className="font-mono text-sm text-[var(--text-main)]">
                                   {race.date.split('-').slice(1).reverse().join('/')}
                                 </div>
                               </div>
                               <div className="w-full md:col-span-4">
-                                <div className="font-bold text-lg text-[var(--text-main)]">{race.name}</div>
+                                <div className="font-bold text-lg text-[var(--text-main)]">{language === 'pt' ? race.name : (race.enName || race.name)}</div>
                               </div>
                               <div className="w-full md:col-span-3">
-                                <div className="text-sm text-gray-400">{race.location}</div>
+                                <div className="text-sm text-gray-400">{language === 'pt' ? race.location : (race.enLocation || race.location)}</div>
                                 <div className="text-xs text-gray-500 italic">{race.circuit}</div>
                               </div>
                               <div className="w-full md:col-span-2 flex justify-between md:justify-center items-center">
@@ -750,12 +893,11 @@ export default function App() {
                                   {race.status === 'completed' && <CheckCircle2 className="w-3 h-3" />}
                                   {race.status === 'cancelled' && <XCircle className="w-3 h-3" />}
                                   {race.status === 'upcoming' && <Timer className="w-3 h-3" />}
-                                  {race.status === 'completed' ? 'Finalizado' : 
-                                   race.status === 'cancelled' ? 'Cancelado' : 'Próximo'}
+                                  {UI_TRANSLATIONS[language][race.status]}
                                 </span>
                               </div>
                               <div className="w-full md:col-span-2 flex justify-between md:justify-end items-center">
-                                <span className="md:hidden text-xs font-bold uppercase tracking-widest text-gray-500">Resultado</span>
+                                <span className="md:hidden text-xs font-bold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].result}</span>
                                 {race.winner ? (
                                   <div className="flex items-center justify-end gap-3">
                                     {selectedCategory.drivers.find(d => d.name === race.winner)?.image && (
@@ -794,15 +936,15 @@ export default function App() {
                             {selectedCategory.standings.drivers && (
                               <div className="space-y-6">
                                 <h3 className="text-2xl font-display font-black italic border-l-4 border-brand-red pl-4 text-[var(--text-main)]">
-                                  Campeonato de Pilotos
+                                  {UI_TRANSLATIONS[language].driversChampionship}
                                 </h3>
                                 <div className="glass-card overflow-x-auto no-scrollbar">
                                   <table className="w-full text-left min-w-[500px]">
                                     <thead>
                                       <tr className="border-b border-[var(--card-border)] bg-white/5">
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Pos</th>
-                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Piloto</th>
-                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Equipe</th>
+                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].drivers}</th>
+                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].team}</th>
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500 text-right">Pts</th>
                                       </tr>
                                     </thead>
@@ -824,14 +966,14 @@ export default function App() {
                             {selectedCategory.standings.constructors && (
                               <div className="space-y-6">
                                 <h3 className="text-2xl font-display font-black italic border-l-4 border-brand-red pl-4 text-[var(--text-main)]">
-                                  Campeonato de Construtores
+                                  {UI_TRANSLATIONS[language].constructorsChampionship}
                                 </h3>
                                 <div className="glass-card overflow-x-auto no-scrollbar">
                                   <table className="w-full text-left min-w-[400px]">
                                     <thead>
                                       <tr className="border-b border-[var(--card-border)] bg-white/5">
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Pos</th>
-                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Construtor</th>
+                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].constructors}</th>
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500 text-right">Pts</th>
                                       </tr>
                                     </thead>
@@ -852,7 +994,7 @@ export default function App() {
                             {selectedCategory.standings.teams && (
                               <div className="space-y-6 lg:col-span-2">
                                 <h3 className="text-2xl font-display font-black italic border-l-4 border-brand-red pl-4 text-[var(--text-main)]">
-                                  Campeonato de Equipes
+                                  {UI_TRANSLATIONS[language].teamsChampionship}
                                 </h3>
                                 <div className="glass-card overflow-x-auto no-scrollbar">
                                   <table className="w-full text-left min-w-[500px]">
@@ -860,7 +1002,7 @@ export default function App() {
                                       <tr className="border-b border-[var(--card-border)] bg-white/5">
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Pos</th>
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">#</th>
-                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Equipe</th>
+                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].team}</th>
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500 text-right">Pts</th>
                                       </tr>
                                     </thead>
@@ -885,10 +1027,10 @@ export default function App() {
                               <Info className="text-gray-500 w-8 h-8" />
                             </div>
                             <h3 className="text-xl font-display font-black italic text-[var(--text-main)] mb-2">
-                              Pontuação não disponível
+                              {UI_TRANSLATIONS[language].standingsNotAvailable}
                             </h3>
                             <p className="text-gray-500">
-                              As pontuações completas desta categoria não estão disponíveis publicamente no momento.
+                              {UI_TRANSLATIONS[language].standingsNotAvailableDesc}
                             </p>
                           </div>
                         )}
@@ -916,10 +1058,10 @@ export default function App() {
             </div>
             
             <div className="text-gray-500 text-sm">
-              © 2026 PitStop Hub. Todos os direitos reservados.
+              © 2026 PitStop Hub. {UI_TRANSLATIONS[language].allRightsReserved}
             </div>
             
-            <div className="flex items-center gap-6">
+            <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-3">
               {MOTORSPORT_DATA.map(cat => (
                 <button 
                   key={cat.id}
@@ -961,10 +1103,10 @@ export default function App() {
                     </div>
                     <div>
                       <h2 className="text-3xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
-                        Regras e Formato
+                        {UI_TRANSLATIONS[language].rulesAndFormat}
                       </h2>
                       <p className="text-brand-red text-xs font-black uppercase tracking-widest">
-                        {selectedCategory.fullName}
+                        {language === 'pt' ? selectedCategory.fullName : (selectedCategory.enFullName || selectedCategory.fullName)}
                       </p>
                     </div>
                   </div>
@@ -976,9 +1118,9 @@ export default function App() {
                   </button>
                 </div>
                 
-                <div className="prose prose-invert max-w-none">
+                <div className="prose prose-invert max-w-none max-h-[60vh] overflow-y-auto pr-4 no-scrollbar">
                   <p className="text-lg leading-relaxed text-gray-400 font-medium whitespace-pre-line">
-                    {selectedCategory.longDescription}
+                    {language === 'pt' ? selectedCategory.longDescription : (selectedCategory.enLongDescription || selectedCategory.longDescription)}
                   </p>
                 </div>
                 
@@ -987,7 +1129,7 @@ export default function App() {
                     onClick={() => setShowRules(false)}
                     className="px-8 py-3 bg-brand-red text-white font-display font-black italic uppercase tracking-widest rounded-xl hover:bg-brand-red/90 transition-all shadow-lg shadow-brand-red/20"
                   >
-                    Entendido
+                    {UI_TRANSLATIONS[language].gotIt}
                   </button>
                 </div>
               </div>
