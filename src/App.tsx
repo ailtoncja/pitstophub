@@ -226,7 +226,12 @@ export default function App() {
                       
                       <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                         <button 
-                          onClick={() => setActiveTab('calendar')}
+                          onClick={() => {
+                            setActiveTab('calendar');
+                            setTimeout(() => {
+                              contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 100);
+                          }}
                           className="px-8 py-4 bg-brand-red text-white font-bold rounded-xl shadow-xl shadow-brand-red/20 hover:scale-105 transition-all uppercase tracking-widest text-sm"
                         >
                           Ver Calendário
@@ -303,11 +308,9 @@ export default function App() {
                         key={tab.id}
                         onClick={() => {
                           setActiveTab(tab.id as any);
-                          if (tab.id === 'calendar') {
-                            setTimeout(() => {
-                              contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }, 100);
-                          }
+                          setTimeout(() => {
+                            contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }, 100);
                         }}
                         className={cn(
                           "flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold uppercase tracking-widest transition-all",
