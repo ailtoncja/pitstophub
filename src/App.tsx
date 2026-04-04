@@ -66,7 +66,7 @@ export default function App() {
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <span className="text-2xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
-              PitStopHub <span className="text-brand-red text-lg font-bold not-italic ml-2 tracking-normal">- Tudo sobre automobilismo.</span>
+              PitStopHub
             </span>
           </button>
           
@@ -133,7 +133,7 @@ export default function App() {
                   animate={{ opacity: 1, y: 0 }}
                   className="text-5xl md:text-7xl font-display font-black italic tracking-tighter mb-6 text-[var(--text-main)]"
                 >
-                  PitStopHub <span className="text-brand-red text-3xl md:text-4xl block not-italic mt-2 font-bold tracking-normal">- Tudo sobre automobilismo.</span>
+                  PitStopHub
                 </motion.h1>
                 <p className="text-gray-500 max-w-2xl mx-auto text-lg mt-8">
                   Explore os calendários, equipes e pilotos das principais competições do automobilismo mundial em 2026.
