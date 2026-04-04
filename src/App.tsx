@@ -174,13 +174,30 @@ export default function App() {
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           {view === 'home' ? (
-            <motion.section
-              key="home"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20"
+            <motion.div 
+              key="home-page"
+              className="relative min-h-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
             >
+              {/* Background GIF for Home Page */}
+              <div 
+                className="absolute inset-0 -z-10 opacity-10 pointer-events-none"
+                style={{
+                  backgroundImage: 'url("https://i.imgur.com/dgLObWa.gif")',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                  filter: 'grayscale(100%)'
+                }}
+              />
+              <motion.section
+                key="home-content"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20"
+              >
               <div className="text-center mb-16">
                 <motion.h1 
                   initial={{ opacity: 0, y: 20 }}
@@ -245,7 +262,8 @@ export default function App() {
                 })}
               </div>
             </motion.section>
-          ) : (
+          </motion.div>
+        ) : (
             <motion.div
               key="category"
               initial={{ opacity: 0 }}
