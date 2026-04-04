@@ -39,11 +39,11 @@ const IconMap: Record<string, React.ElementType> = {
 const NAV_GROUPS = [
   {
     name: 'Fórmulas',
-    ids: ['f1', 'f2', 'f3', 'fe']
+    ids: ['f1', 'f2', 'f3', 'fe', 'f1-academy']
   },
   {
     name: 'Endurance/GT',
-    ids: ['wec', 'imsa', 'dtm']
+    ids: ['wec', 'imsa', 'dtm', 'gt-world-challenge']
   },
   {
     name: 'Americanas',
