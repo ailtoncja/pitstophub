@@ -6,6 +6,7 @@ import {
   Flag, 
   Mountain, 
   ChevronRight, 
+  ChevronDown,
   Calendar, 
   MapPin, 
   Users,
@@ -35,9 +36,33 @@ const IconMap: Record<string, React.ElementType> = {
   Truck
 };
 
+const NAV_GROUPS = [
+  {
+    name: 'Fórmulas',
+    ids: ['f1', 'f2', 'f3', 'fe']
+  },
+  {
+    name: 'Endurance/GT',
+    ids: ['wec', 'imsa', 'dtm']
+  },
+  {
+    name: 'Americanas',
+    ids: ['indycar', 'nascar']
+  },
+  {
+    name: 'Rally',
+    ids: ['wrc']
+  },
+  {
+    name: 'Nacionais',
+    ids: ['stock-car', 'formula-truck']
+  }
+];
+
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<'home' | 'category'>('home');
   const [selectedCategory, setSelectedCategory] = useState<Category>(MOTORSPORT_DATA[0]);
@@ -56,6 +81,8 @@ export default function App() {
     setSelectedCategory(cat);
     setView('category');
     setActiveTab('overview');
+    setIsMobileMenuOpen(false);
+    setActiveDropdown(null);
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 100);
@@ -87,23 +114,52 @@ export default function App() {
               Início
             </button>
             <div className="w-px h-6 bg-[var(--card-border)] mx-2" />
-            {MOTORSPORT_DATA.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => handleCategorySelect(cat)}
-                className={cn(
-                  "relative py-1 text-sm font-bold uppercase tracking-widest transition-colors hover:text-brand-red",
-                  view === 'category' && selectedCategory.id === cat.id ? "text-brand-red" : "text-gray-500"
-                )}
+            
+            {NAV_GROUPS.map((group) => (
+              <div 
+                key={group.name}
+                className="relative group"
+                onMouseEnter={() => setActiveDropdown(group.name)}
+                onMouseLeave={() => setActiveDropdown(null)}
               >
-                {cat.name}
-                {view === 'category' && selectedCategory.id === cat.id && (
-                  <motion.div 
-                    layoutId="nav-underline"
-                    className="absolute -bottom-1 left-0 w-full h-0.5 bg-brand-red"
-                  />
-                )}
-              </button>
+                <button
+                  className={cn(
+                    "flex items-center gap-1 py-2 text-sm font-bold uppercase tracking-widest transition-colors hover:text-brand-red",
+                    group.ids.includes(selectedCategory.id) && view === 'category' ? "text-brand-red" : "text-gray-500"
+                  )}
+                >
+                  {group.name}
+                  <ChevronDown className={cn("w-4 h-4 transition-transform", activeDropdown === group.name && "rotate-180")} />
+                </button>
+
+                <AnimatePresence>
+                  {activeDropdown === group.name && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute top-full left-0 mt-2 w-48 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-2xl overflow-hidden py-2"
+                    >
+                      {group.ids.map(id => {
+                        const cat = MOTORSPORT_DATA.find(c => c.id === id);
+                        if (!cat) return null;
+                        return (
+                          <button
+                            key={cat.id}
+                            onClick={() => handleCategorySelect(cat)}
+                            className={cn(
+                              "w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-brand-red hover:text-white",
+                              view === 'category' && selectedCategory.id === cat.id ? "text-brand-red bg-brand-red/5" : "text-gray-500"
+                            )}
+                          >
+                            {cat.name}
+                          </button>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             ))}
           </nav>
 
@@ -151,21 +207,30 @@ export default function App() {
                   Início
                 </button>
                 <div className="h-px bg-[var(--card-border)] mx-4" />
-                {MOTORSPORT_DATA.map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => {
-                      handleCategorySelect(cat);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={cn(
-                      "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all",
-                      view === 'category' && selectedCategory.id === cat.id ? "text-brand-red bg-brand-red/10" : "text-gray-500 hover:bg-white/5"
-                    )}
-                  >
-                    {cat.name}
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
+                
+                {NAV_GROUPS.map((group) => (
+                  <div key={group.name} className="space-y-1">
+                    <div className="px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 opacity-50">
+                      {group.name}
+                    </div>
+                    {group.ids.map(id => {
+                      const cat = MOTORSPORT_DATA.find(c => c.id === id);
+                      if (!cat) return null;
+                      return (
+                        <button
+                          key={cat.id}
+                          onClick={() => handleCategorySelect(cat)}
+                          className={cn(
+                            "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all",
+                            view === 'category' && selectedCategory.id === cat.id ? "text-brand-red bg-brand-red/10" : "text-gray-500 hover:bg-white/5"
+                          )}
+                        >
+                          {cat.name}
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      );
+                    })}
+                  </div>
                 ))}
               </div>
             </motion.div>
