@@ -99,9 +99,9 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'bottas', name: 'Valtteri Bottas', number: '77', nationality: 'Finlândia', teamId: 'cadillac' },
     ],
     calendar: [
-      { id: 'australia', name: 'GP da Austrália', location: 'Melbourne', date: '2026-03-08', circuit: 'Albert Park', status: 'completed', winner: 'Lando Norris' },
-      { id: 'china', name: 'GP da China', location: 'Xangai', date: '2026-03-15', circuit: 'Shanghai International Circuit', status: 'completed', winner: 'Oscar Piastri' },
-      { id: 'japan', name: 'GP do Japão', location: 'Suzuka', date: '2026-03-29', circuit: 'Suzuka International Racing Course', status: 'completed', winner: 'Max Verstappen' },
+      { id: 'australia', name: 'GP da Austrália', location: 'Melbourne', date: '2026-03-08', circuit: 'Albert Park', status: 'completed', winner: 'George Russell' },
+      { id: 'china', name: 'GP da China', location: 'Xangai', date: '2026-03-15', circuit: 'Shanghai International Circuit', status: 'completed', winner: 'Kimi Antonelli' },
+      { id: 'japan', name: 'GP do Japão', location: 'Suzuka', date: '2026-03-29', circuit: 'Suzuka International Racing Course', status: 'completed', winner: 'Kimi Antonelli' },
       { id: 'bahrain', name: 'GP do Bahrein', location: 'Sakhir', date: '2026-04-12', circuit: 'Bahrain International Circuit', status: 'cancelled' },
       { id: 'saudi', name: 'GP da Arábia Saudita', location: 'Jeddah', date: '2026-04-19', circuit: 'Jeddah Corniche Circuit', status: 'cancelled' },
       { id: 'miami', name: 'GP de Miami', location: 'Miami', date: '2026-05-03', circuit: 'Miami International Autodrome', status: 'upcoming' },

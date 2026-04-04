@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Trophy, 
@@ -33,6 +33,7 @@ const IconMap: Record<string, React.ElementType> = {
 
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<'home' | 'category'>('home');
   const [selectedCategory, setSelectedCategory] = useState<Category>(MOTORSPORT_DATA[0]);
   const [activeTab, setActiveTab] = useState<'overview' | 'teams' | 'calendar' | 'standings'>('overview');
@@ -50,6 +51,9 @@ export default function App() {
     setSelectedCategory(cat);
     setView('category');
     setActiveTab('overview');
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   };
 
   return (
@@ -61,11 +65,8 @@ export default function App() {
             onClick={() => setView('home')}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <div className="w-10 h-10 bg-brand-red rounded-lg flex items-center justify-center rotate-3 shadow-lg shadow-brand-red/20">
-              <Car className="text-white w-6 h-6 -rotate-3" />
-            </div>
             <span className="text-2xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
-              pitstop<span className="text-brand-red">hub</span>
+              PitStopHub <span className="text-brand-red text-lg font-bold not-italic ml-2 tracking-normal">- Tudo sobre automobilismo.</span>
             </span>
           </button>
           
@@ -132,9 +133,9 @@ export default function App() {
                   animate={{ opacity: 1, y: 0 }}
                   className="text-5xl md:text-7xl font-display font-black italic tracking-tighter mb-6 text-[var(--text-main)]"
                 >
-                  ESCOLHA SUA <span className="text-brand-red">CATEGORIA</span>
+                  PitStopHub <span className="text-brand-red text-3xl md:text-4xl block not-italic mt-2 font-bold tracking-normal">- Tudo sobre automobilismo.</span>
                 </motion.h1>
-                <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+                <p className="text-gray-500 max-w-2xl mx-auto text-lg mt-8">
                   Explore os calendários, equipes e pilotos das principais competições do automobilismo mundial em 2026.
                 </p>
               </div>
@@ -289,7 +290,7 @@ export default function App() {
               </section>
 
               {/* Content Tabs */}
-              <section className="py-12 bg-[var(--bg-main)]">
+              <section ref={contentRef} className="py-12 bg-[var(--bg-main)] scroll-mt-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="flex items-center justify-center gap-4 mb-12">
                     {[
@@ -300,7 +301,14 @@ export default function App() {
                     ].map((tab) => (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id as any)}
+                        onClick={() => {
+                          setActiveTab(tab.id as any);
+                          if (tab.id === 'calendar') {
+                            setTimeout(() => {
+                              contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 100);
+                          }
+                        }}
                         className={cn(
                           "flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold uppercase tracking-widest transition-all",
                           activeTab === tab.id 
