@@ -17,7 +17,9 @@ import {
   Moon,
   LayoutGrid,
   Zap,
-  Car
+  Car,
+  Menu,
+  X
 } from 'lucide-react';
 import { MOTORSPORT_DATA, Category, Team, Driver, Race } from './types';
 import { cn } from './lib/utils';
@@ -33,6 +35,7 @@ const IconMap: Record<string, React.ElementType> = {
 
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<'home' | 'category'>('home');
   const [selectedCategory, setSelectedCategory] = useState<Category>(MOTORSPORT_DATA[0]);
@@ -113,8 +116,59 @@ export default function App() {
               <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-tighter text-red-500">Live Data</span>
             </div>
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden bg-[var(--header-bg)] border-t border-[var(--card-border)] overflow-hidden"
+            >
+              <div className="px-4 py-6 space-y-4">
+                <button
+                  onClick={() => {
+                    setView('home');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all",
+                    view === 'home' ? "bg-brand-red text-white" : "text-gray-500 hover:bg-white/5"
+                  )}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  Início
+                </button>
+                <div className="h-px bg-[var(--card-border)] mx-4" />
+                {MOTORSPORT_DATA.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      handleCategorySelect(cat);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={cn(
+                      "w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all",
+                      view === 'category' && selectedCategory.id === cat.id ? "text-brand-red bg-brand-red/10" : "text-gray-500 hover:bg-white/5"
+                    )}
+                  >
+                    {cat.name}
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       <main className="flex-grow">
@@ -297,7 +351,7 @@ export default function App() {
               {/* Content Tabs */}
               <section ref={contentRef} className="py-12 bg-[var(--bg-main)] scroll-mt-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                  <div className="flex items-center justify-center gap-4 mb-12">
+                  <div className="flex items-center justify-start md:justify-center gap-4 mb-12 overflow-x-auto pb-4 no-scrollbar">
                     {[
                       { id: 'overview', label: 'Visão Geral', icon: Info },
                       { id: 'teams', label: 'Equipes', icon: Users },
@@ -313,7 +367,7 @@ export default function App() {
                           }, 100);
                         }}
                         className={cn(
-                          "flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold uppercase tracking-widest transition-all",
+                          "flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold uppercase tracking-widest transition-all whitespace-nowrap",
                           activeTab === tab.id 
                             ? "bg-brand-red text-white shadow-lg shadow-brand-red/20" 
                             : "bg-[var(--card-bg)] text-gray-500 border border-[var(--card-border)] hover:text-brand-red"
@@ -480,7 +534,7 @@ export default function App() {
                         exit={{ opacity: 0, x: -20 }}
                         className="space-y-4"
                       >
-                        <div className="grid grid-cols-12 gap-4 px-6 py-3 text-xs font-bold uppercase tracking-widest text-gray-500">
+                        <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 text-xs font-bold uppercase tracking-widest text-gray-500">
                           <div className="col-span-1">Data</div>
                           <div className="col-span-4">Evento</div>
                           <div className="col-span-3">Local / Circuito</div>
@@ -488,61 +542,68 @@ export default function App() {
                           <div className="col-span-2 text-right">Resultado</div>
                         </div>
                         
-                        {selectedCategory.calendar.map((race) => (
-                          <div 
-                            key={race.id} 
-                            className={cn(
-                              "grid grid-cols-12 gap-4 px-6 py-6 glass-card items-center transition-all hover:bg-white/10",
-                              race.status === 'upcoming' ? "border-l-4 border-l-brand-red" : 
-                              race.status === 'cancelled' ? "border-l-4 border-l-red-500 opacity-60" : ""
-                            )}
-                          >
-                            <div className="col-span-1 font-mono text-sm text-[var(--text-main)]">
-                              {race.date.split('-').slice(1).reverse().join('/')}
-                            </div>
-                            <div className="col-span-4">
-                              <div className="font-bold text-lg text-[var(--text-main)]">{race.name}</div>
-                            </div>
-                            <div className="col-span-3">
-                              <div className="text-sm text-gray-400">{race.location}</div>
-                              <div className="text-xs text-gray-500 italic">{race.circuit}</div>
-                            </div>
-                            <div className="col-span-2 flex justify-center">
-                              <span className={cn(
-                                "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1",
-                                race.status === 'completed' ? "bg-gray-800 text-gray-400" : 
-                                race.status === 'cancelled' ? "bg-red-900/50 text-red-400" :
-                                "bg-brand-red text-white"
-                              )}>
-                                {race.status === 'completed' && <CheckCircle2 className="w-3 h-3" />}
-                                {race.status === 'cancelled' && <XCircle className="w-3 h-3" />}
-                                {race.status === 'upcoming' && <Timer className="w-3 h-3" />}
-                                {race.status === 'completed' ? 'Finalizado' : 
-                                 race.status === 'cancelled' ? 'Cancelado' : 'Próximo'}
-                              </span>
-                            </div>
-                            <div className="col-span-2 text-right">
-                              {race.winner ? (
-                                <div className="flex items-center justify-end gap-3">
-                                  {selectedCategory.drivers.find(d => d.name === race.winner)?.image && (
-                                    <img 
-                                      src={selectedCategory.drivers.find(d => d.name === race.winner)?.image} 
-                                      alt={race.winner} 
-                                      className="w-8 h-8 rounded-full object-cover border border-yellow-500/50"
-                                      referrerPolicy="no-referrer"
-                                    />
-                                  )}
-                                  <div className="flex items-center gap-2 text-yellow-500 font-bold">
-                                    <Trophy className="w-3 h-3" />
-                                    {race.winner}
-                                  </div>
-                                </div>
-                              ) : (
-                                <span className="text-gray-600">—</span>
+                        <div className="space-y-4">
+                          {selectedCategory.calendar.map((race) => (
+                            <div 
+                              key={race.id} 
+                              className={cn(
+                                "flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 glass-card items-center transition-all hover:bg-white/10",
+                                race.status === 'upcoming' ? "border-l-4 border-l-brand-red" : 
+                                race.status === 'cancelled' ? "border-l-4 border-l-red-500 opacity-60" : ""
                               )}
+                            >
+                              <div className="w-full md:col-span-1 flex justify-between md:block items-center">
+                                <span className="md:hidden text-xs font-bold uppercase tracking-widest text-gray-500">Data</span>
+                                <div className="font-mono text-sm text-[var(--text-main)]">
+                                  {race.date.split('-').slice(1).reverse().join('/')}
+                                </div>
+                              </div>
+                              <div className="w-full md:col-span-4">
+                                <div className="font-bold text-lg text-[var(--text-main)]">{race.name}</div>
+                              </div>
+                              <div className="w-full md:col-span-3">
+                                <div className="text-sm text-gray-400">{race.location}</div>
+                                <div className="text-xs text-gray-500 italic">{race.circuit}</div>
+                              </div>
+                              <div className="w-full md:col-span-2 flex justify-between md:justify-center items-center">
+                                <span className="md:hidden text-xs font-bold uppercase tracking-widest text-gray-500">Status</span>
+                                <span className={cn(
+                                  "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1",
+                                  race.status === 'completed' ? "bg-gray-800 text-gray-400" : 
+                                  race.status === 'cancelled' ? "bg-red-900/50 text-red-400" :
+                                  "bg-brand-red text-white"
+                                )}>
+                                  {race.status === 'completed' && <CheckCircle2 className="w-3 h-3" />}
+                                  {race.status === 'cancelled' && <XCircle className="w-3 h-3" />}
+                                  {race.status === 'upcoming' && <Timer className="w-3 h-3" />}
+                                  {race.status === 'completed' ? 'Finalizado' : 
+                                   race.status === 'cancelled' ? 'Cancelado' : 'Próximo'}
+                                </span>
+                              </div>
+                              <div className="w-full md:col-span-2 flex justify-between md:justify-end items-center">
+                                <span className="md:hidden text-xs font-bold uppercase tracking-widest text-gray-500">Resultado</span>
+                                {race.winner ? (
+                                  <div className="flex items-center justify-end gap-3">
+                                    {selectedCategory.drivers.find(d => d.name === race.winner)?.image && (
+                                      <img 
+                                        src={selectedCategory.drivers.find(d => d.name === race.winner)?.image} 
+                                        alt={race.winner} 
+                                        className="w-8 h-8 rounded-full object-cover border border-yellow-500/50"
+                                        referrerPolicy="no-referrer"
+                                      />
+                                    )}
+                                    <div className="flex items-center gap-2 text-yellow-500 font-bold">
+                                      <Trophy className="w-3 h-3" />
+                                      {race.winner}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <span className="text-gray-600">—</span>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </motion.div>
                     )}
 
@@ -561,8 +622,8 @@ export default function App() {
                                 <h3 className="text-2xl font-display font-black italic border-l-4 border-brand-red pl-4 text-[var(--text-main)]">
                                   Campeonato de Pilotos
                                 </h3>
-                                <div className="glass-card overflow-hidden">
-                                  <table className="w-full text-left">
+                                <div className="glass-card overflow-x-auto no-scrollbar">
+                                  <table className="w-full text-left min-w-[500px]">
                                     <thead>
                                       <tr className="border-b border-[var(--card-border)] bg-white/5">
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Pos</th>
@@ -591,8 +652,8 @@ export default function App() {
                                 <h3 className="text-2xl font-display font-black italic border-l-4 border-brand-red pl-4 text-[var(--text-main)]">
                                   Campeonato de Construtores
                                 </h3>
-                                <div className="glass-card overflow-hidden">
-                                  <table className="w-full text-left">
+                                <div className="glass-card overflow-x-auto no-scrollbar">
+                                  <table className="w-full text-left min-w-[400px]">
                                     <thead>
                                       <tr className="border-b border-[var(--card-border)] bg-white/5">
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Pos</th>
@@ -619,8 +680,8 @@ export default function App() {
                                 <h3 className="text-2xl font-display font-black italic border-l-4 border-brand-red pl-4 text-[var(--text-main)]">
                                   Campeonato de Equipes
                                 </h3>
-                                <div className="glass-card overflow-hidden">
-                                  <table className="w-full text-left">
+                                <div className="glass-card overflow-x-auto no-scrollbar">
+                                  <table className="w-full text-left min-w-[500px]">
                                     <thead>
                                       <tr className="border-b border-[var(--card-border)] bg-white/5">
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Pos</th>
