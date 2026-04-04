@@ -39,7 +39,7 @@ const IconMap: Record<string, React.ElementType> = {
 const NAV_GROUPS = [
   {
     name: 'Fórmulas',
-    ids: ['f1', 'f2', 'f3', 'fe', 'f1-academy']
+    ids: ['f1', 'f2', 'f3', 'f1-academy', 'fe']
   },
   {
     name: 'Endurance/GT',
@@ -68,6 +68,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<Category>(MOTORSPORT_DATA[0]);
   const [activeTab, setActiveTab] = useState<'overview' | 'teams' | 'calendar' | 'standings'>('overview');
   const [showRules, setShowRules] = useState(false);
+  const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (isDarkMode) {
@@ -77,7 +78,20 @@ export default function App() {
     }
   }, [isDarkMode]);
 
+  React.useEffect(() => {
+    const handleClickOutside = () => {
+      setExpandedCategoryId(null);
+    };
+    if (expandedCategoryId) {
+      window.addEventListener('click', handleClickOutside);
+    }
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+    };
+  }, [expandedCategoryId]);
+
   const handleCategorySelect = (cat: Category) => {
+    setExpandedCategoryId(null);
     setSelectedCategory(cat);
     setView('category');
     setActiveTab('overview');
@@ -94,7 +108,10 @@ export default function App() {
       <header className="sticky top-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-[var(--card-border)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <button 
-            onClick={() => setView('home')}
+            onClick={() => {
+              setView('home');
+              setExpandedCategoryId(null);
+            }}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <span className="text-2xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
@@ -196,6 +213,7 @@ export default function App() {
                 <button
                   onClick={() => {
                     setView('home');
+                    setExpandedCategoryId(null);
                     setIsMobileMenuOpen(false);
                   }}
                   className={cn(
@@ -278,55 +296,126 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {MOTORSPORT_DATA.map((cat, index) => {
-                  const Icon = IconMap[cat.icon];
-                  return (
-                    <motion.div
-                      key={cat.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      onClick={() => handleCategorySelect(cat)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          handleCategorySelect(cat);
-                        }
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      className="group relative flex flex-col items-start p-8 glass-card hover:scale-[1.02] transition-all text-left overflow-hidden cursor-pointer"
-                    >
-                      <div className="absolute top-0 right-0 p-12 -mr-8 -mt-8 bg-brand-red/5 rounded-full group-hover:bg-brand-red/10 transition-colors" />
-                      <div className="w-14 h-14 rounded-2xl bg-brand-red flex items-center justify-center mb-8 shadow-lg shadow-brand-red/20 group-hover:rotate-6 transition-transform">
-                        <Icon className="text-white w-8 h-8" />
-                      </div>
-                      <h3 className="text-2xl font-display font-black italic tracking-tighter mb-2 text-[var(--text-main)]">
-                        {cat.name}
-                      </h3>
-                      <p className="text-sm text-gray-500 mb-6 line-clamp-2">
-                        {cat.description}
-                      </p>
-                      <div className="mt-auto flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-brand-red font-bold text-sm uppercase tracking-widest">
-                          Explorar <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                        </div>
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedCategory(cat);
-                            setShowRules(true);
-                          }}
-                          className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-500 hover:text-brand-red transition-all"
-                          title="Ver Regras"
-                        >
-                          <Info className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </motion.div>
-                  );
-                })}
+              <div className="space-y-16">
+                {NAV_GROUPS.map((group, groupIndex) => (
+                  <motion.div 
+                    key={group.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: groupIndex * 0.1 }}
+                  >
+                    <div className="flex items-center gap-4 mb-8">
+                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--card-border)] to-transparent" />
+                      <h2 className="text-sm font-black uppercase tracking-[0.3em] text-brand-red whitespace-nowrap">
+                        {group.name}
+                      </h2>
+                      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--card-border)] to-transparent" />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                      {group.ids.map((id) => {
+                        const cat = MOTORSPORT_DATA.find(c => c.id === id);
+                        if (!cat) return null;
+                        const Icon = IconMap[cat.icon];
+                        const isExpanded = expandedCategoryId === cat.id;
+
+                        return (
+                          <motion.div
+                            key={cat.id}
+                            layout
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isExpanded) {
+                                handleCategorySelect(cat);
+                              } else {
+                                setExpandedCategoryId(cat.id);
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                if (isExpanded) {
+                                  handleCategorySelect(cat);
+                                } else {
+                                  setExpandedCategoryId(cat.id);
+                                }
+                              }
+                            }}
+                            role="button"
+                            tabIndex={0}
+                            className={cn(
+                              "group relative flex flex-col items-start p-5 glass-card hover:scale-[1.02] transition-all text-left overflow-hidden cursor-pointer",
+                              isExpanded ? "ring-2 ring-brand-red/50 shadow-2xl shadow-brand-red/10 z-10" : "hover:bg-white/5"
+                            )}
+                          >
+                            <div className="flex items-center gap-4 w-full">
+                              <div className={cn(
+                                "w-10 h-10 rounded-xl bg-brand-red flex items-center justify-center shadow-lg shadow-brand-red/20 transition-transform shrink-0",
+                                isExpanded ? "scale-110" : "group-hover:rotate-6"
+                              )}>
+                                <Icon className="text-white w-5 h-5" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-base font-display font-black italic tracking-tighter text-[var(--text-main)] truncate">
+                                  {cat.name}
+                                </h3>
+                                {!isExpanded && (
+                                  <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                                    Ver Resumo
+                                  </p>
+                                )}
+                              </div>
+                              {isExpanded ? (
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExpandedCategoryId(null);
+                                  }}
+                                  className="p-1.5 rounded-full hover:bg-white/10 text-gray-500 transition-colors"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              ) : (
+                                <ChevronDown className="w-4 h-4 text-gray-500 group-hover:text-brand-red transition-colors" />
+                              )}
+                            </div>
+
+                            <AnimatePresence>
+                              {isExpanded && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                                  animate={{ height: 'auto', opacity: 1, marginTop: 16 }}
+                                  exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                                  className="overflow-hidden w-full"
+                                >
+                                  <p className="text-xs text-gray-500 mb-6 leading-relaxed">
+                                    {cat.description}
+                                  </p>
+                                  <div className="flex items-center justify-between pt-4 border-t border-[var(--card-border)]">
+                                    <div className="flex items-center gap-2 text-brand-red font-bold text-[10px] uppercase tracking-widest">
+                                      Acessar Categoria <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                    </div>
+                                    <button 
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedCategory(cat);
+                                        setShowRules(true);
+                                      }}
+                                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-500 hover:text-brand-red transition-all"
+                                      title="Ver Regras"
+                                    >
+                                      <Info className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             </motion.section>
           </motion.div>
