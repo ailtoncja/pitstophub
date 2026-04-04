@@ -199,89 +199,103 @@ export default function App() {
     <div className="min-h-screen flex flex-col transition-colors duration-300">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-[var(--card-border)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center">
-          <div className="flex-1 flex justify-start">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 grid grid-cols-3 items-center">
+          <div className="flex justify-start">
             <button 
               onClick={() => {
                 setView('home');
                 setExpandedCategoryId(null);
               }}
-              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
             >
+              <div className="w-10 h-10 bg-brand-red rounded-xl flex items-center justify-center rotate-3 group-hover:rotate-0 transition-transform shadow-lg shadow-brand-red/20">
+                <Trophy className="text-white w-6 h-6 -rotate-3 group-hover:rotate-0 transition-transform" />
+              </div>
               <span className="text-2xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
-                PitStopHub
+                PitStop<span className="text-brand-red">Hub</span>
               </span>
             </button>
           </div>
           
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden lg:flex justify-center items-center gap-8">
             <button
               onClick={() => setView('home')}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold uppercase tracking-widest transition-all",
-                view === 'home' ? "bg-brand-red text-white shadow-lg shadow-brand-red/20" : "text-gray-500 hover:text-brand-red"
+                "flex items-center gap-2 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.2em] transition-all",
+                view === 'home' 
+                  ? "bg-brand-red text-white shadow-lg shadow-brand-red/20" 
+                  : "text-gray-500 hover:text-brand-red hover:bg-white/5"
               )}
             >
-              <LayoutGrid className="w-4 h-4" />
+              <LayoutGrid className="w-3.5 h-3.5" />
               {UI_TRANSLATIONS[language].home}
             </button>
-            <div className="w-px h-6 bg-[var(--card-border)] mx-2" />
             
-            {NAV_GROUPS.map((group) => (
-              <div 
-                key={group.name.en}
-                className="relative group"
-                onMouseEnter={() => setActiveDropdown(group.name.en)}
-                onMouseLeave={() => setActiveDropdown(null)}
-              >
-                <button
-                  className={cn(
-                    "flex items-center gap-1 py-2 text-sm font-bold uppercase tracking-widest transition-colors hover:text-brand-red",
-                    group.ids.includes(selectedCategory.id) && view === 'category' ? "text-brand-red" : "text-gray-500"
-                  )}
+            <div className="w-px h-4 bg-[var(--card-border)]" />
+            
+            <div className="flex items-center gap-6">
+              {NAV_GROUPS.map((group) => (
+                <div 
+                  key={group.name.en}
+                  className="relative group"
+                  onMouseEnter={() => setActiveDropdown(group.name.en)}
+                  onMouseLeave={() => setActiveDropdown(null)}
                 >
-                  {language === 'pt' ? group.name.pt : group.name.en}
-                  <ChevronDown className={cn("w-4 h-4 transition-transform", activeDropdown === group.name.en && "rotate-180")} />
-                </button>
+                  <button
+                    className={cn(
+                      "flex items-center gap-1.5 py-2 text-[11px] font-black uppercase tracking-[0.2em] transition-colors hover:text-brand-red",
+                      group.ids.includes(selectedCategory.id) && view === 'category' ? "text-brand-red" : "text-gray-500"
+                    )}
+                  >
+                    {language === 'pt' ? group.name.pt : group.name.en}
+                    <ChevronDown className={cn("w-3 h-3 transition-transform opacity-50", activeDropdown === group.name.en && "rotate-180 opacity-100")} />
+                  </button>
 
-                <AnimatePresence>
-                  {activeDropdown === group.name.en && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-2xl overflow-hidden py-2"
-                    >
-                      {group.ids.map(id => {
-                        const cat = MOTORSPORT_DATA.find(c => c.id === id);
-                        if (!cat) return null;
-                        return (
-                          <button
-                            key={cat.id}
-                            onClick={() => handleCategorySelect(cat)}
-                            className={cn(
-                              "w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-brand-red hover:text-white",
-                              view === 'category' && selectedCategory.id === cat.id ? "text-brand-red bg-brand-red/5" : "text-gray-500"
-                            )}
-                          >
-                            {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
-                          </button>
-                        );
-                      })}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
+                  <AnimatePresence>
+                    {activeDropdown === group.name.en && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl shadow-2xl overflow-hidden py-3 z-50"
+                      >
+                        <div className="px-4 py-2 mb-2 border-b border-[var(--card-border)]">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-brand-red opacity-50">
+                            {language === 'pt' ? group.name.pt : group.name.en}
+                          </span>
+                        </div>
+                        {group.ids.map(id => {
+                          const cat = MOTORSPORT_DATA.find(c => c.id === id);
+                          if (!cat) return null;
+                          return (
+                            <button
+                              key={cat.id}
+                              onClick={() => handleCategorySelect(cat)}
+                              className={cn(
+                                "w-full text-left px-4 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-brand-red hover:text-white flex items-center justify-between group/item",
+                                view === 'category' && selectedCategory.id === cat.id ? "text-brand-red bg-brand-red/5" : "text-gray-500"
+                              )}
+                            >
+                              {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
+                              <ChevronRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity" />
+                            </button>
+                          );
+                        })}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
+            </div>
           </nav>
 
-          <div className="flex-1 flex justify-end items-center gap-3">
+          <div className="flex justify-end items-center gap-4">
             <div className="flex items-center bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-1 shadow-sm">
               <button
                 onClick={() => setLanguage('pt')}
                 className={cn(
-                  "px-2 py-1 text-[10px] font-black rounded-lg transition-all",
-                  language === 'pt' ? "bg-brand-red text-white" : "text-gray-500 hover:text-brand-red"
+                  "px-2.5 py-1.5 text-[10px] font-black rounded-lg transition-all",
+                  language === 'pt' ? "bg-brand-red text-white shadow-md" : "text-gray-500 hover:text-brand-red"
                 )}
               >
                 PT
@@ -289,23 +303,26 @@ export default function App() {
               <button
                 onClick={() => setLanguage('en')}
                 className={cn(
-                  "px-2 py-1 text-[10px] font-black rounded-lg transition-all",
-                  language === 'en' ? "bg-brand-red text-white" : "text-gray-500 hover:text-brand-red"
+                  "px-2.5 py-1.5 text-[10px] font-black rounded-lg transition-all",
+                  language === 'en' ? "bg-brand-red text-white shadow-md" : "text-gray-500 hover:text-brand-red"
                 )}
               >
                 EN
               </button>
             </div>
+            
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm"
+              className="p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm hover:border-brand-red/30"
             >
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/20">
-              <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-tighter text-red-500">{UI_TRANSLATIONS[language].liveData}</span>
+
+            <div className="hidden xl:flex items-center gap-2 px-4 py-2 rounded-full bg-brand-red/10 border border-brand-red/20 group cursor-help relative">
+              <div className="w-2 h-2 rounded-full bg-brand-red animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-brand-red">{UI_TRANSLATIONS[language].liveData}</span>
             </div>
+
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="lg:hidden p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm"
