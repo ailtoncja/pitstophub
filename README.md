@@ -1,20 +1,26 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+﻿# PitStopHub
 
-# Run and deploy your AI Studio app
+Plataforma focada em automobilismo com categorias, equipes, pilotos, calendario e classificacao.
 
-This contains everything you need to run your app locally.
+## Requisitos
 
-View your app in AI Studio: https://ai.studio/apps/893fc1d3-f661-4688-bb56-6e358e13bdb6
+- Node.js 20+
+- npm
 
-## Run Locally
+## Rodar localmente
 
-**Prerequisites:**  Node.js
+1. npm install
+2. npm run dev
+3. Abra http://localhost:3000
 
+## Build
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- npm run build
+- npm run preview
+
+## Deploy na Vercel
+
+1. Suba no GitHub.
+2. Importe o repositorio na Vercel.
+3. Build Command: npm run build
+4. Output Directory: dist
