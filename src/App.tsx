@@ -22,10 +22,12 @@ import {
   Truck,
   Menu,
   X,
-  Languages
+  Languages,
+  Heart
 } from 'lucide-react';
 import { MOTORSPORT_DATA, Category, Team, Driver, Race } from './types';
 import { cn } from './lib/utils';
+import { getUserSettings, saveUserSettings, type AuthUser } from './auth';
 
 const IconMap: Record<string, React.ElementType> = {
   Trophy,
@@ -151,7 +153,13 @@ const UI_TRANSLATIONS = {
   }
 };
 
-export default function App() {
+type AppProps = {
+  currentUser: AuthUser | null;
+  onLogout: () => void;
+  onLoginRequest: () => void;
+};
+
+export default function App({ currentUser, onLogout, onLoginRequest }: AppProps) {
   const [language, setLanguage] = useState<'pt' | 'en'>('pt');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -162,6 +170,37 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'overview' | 'teams' | 'calendar' | 'standings'>('overview');
   const [showRules, setShowRules] = useState(false);
   const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [followedCategoryIds, setFollowedCategoryIds] = useState<string[]>([]);
+  const [followedTeamIds, setFollowedTeamIds] = useState<string[]>([]);
+  const [followedDriverIds, setFollowedDriverIds] = useState<string[]>([]);
+
+  React.useEffect(() => {
+    if (!currentUser) {
+      setSettingsLoaded(true);
+      return;
+    }
+
+    let isMounted = true;
+    (async () => {
+      const settings = await getUserSettings(currentUser.id);
+      if (!isMounted) return;
+      if (settings) {
+        setLanguage(settings.language);
+        setIsDarkMode(settings.theme === 'dark');
+        setFollowedCategoryIds(settings.followedCategoryIds);
+        setFollowedTeamIds(settings.followedTeamIds);
+        setFollowedDriverIds(settings.followedDriverIds);
+        const category = MOTORSPORT_DATA.find((cat) => cat.id === settings.favoriteCategoryId);
+        if (category) setSelectedCategory(category);
+      }
+      setSettingsLoaded(true);
+    })();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentUser]);
 
   React.useEffect(() => {
     if (isDarkMode) {
@@ -170,6 +209,21 @@ export default function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [isDarkMode]);
+
+  React.useEffect(() => {
+    if (!currentUser || !settingsLoaded) return;
+    const t = window.setTimeout(() => {
+      void saveUserSettings(currentUser.id, {
+        theme: isDarkMode ? 'dark' : 'light',
+        language,
+        favoriteCategoryId: selectedCategory.id,
+        followedCategoryIds,
+        followedTeamIds,
+        followedDriverIds,
+      });
+    }, 250);
+    return () => window.clearTimeout(t);
+  }, [currentUser, settingsLoaded, isDarkMode, language, selectedCategory.id, followedCategoryIds, followedTeamIds, followedDriverIds]);
 
   React.useEffect(() => {
     const handleClickOutside = () => {
@@ -193,6 +247,45 @@ export default function App() {
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 100);
+  };
+
+  const followedCategorySet = new Set(followedCategoryIds);
+  const followedTeamSet = new Set(followedTeamIds);
+  const followedDriverSet = new Set(followedDriverIds);
+
+  const upcomingFollowedRaces = React.useMemo(() => {
+    const followedByTeamCategory = new Set(followedTeamIds.map((value) => value.split('::')[0]).filter(Boolean));
+    const followedByDriverCategory = new Set(followedDriverIds.map((value) => value.split('::')[0]).filter(Boolean));
+    const categoriesToShow = new Set<string>([
+      ...followedCategoryIds,
+      ...Array.from(followedByTeamCategory),
+      ...Array.from(followedByDriverCategory),
+    ]);
+
+    return MOTORSPORT_DATA.filter((category) => categoriesToShow.has(category.id))
+      .flatMap((category) =>
+        category.calendar
+          .filter((race) => race.status === 'upcoming')
+          .map((race) => ({ category, race }))
+      )
+      .sort((a, b) => a.race.date.localeCompare(b.race.date));
+  }, [followedCategoryIds, followedTeamIds, followedDriverIds]);
+
+  const toggleFollowCategory = (categoryId: string) => {
+    if (!currentUser) return onLoginRequest();
+    setFollowedCategoryIds((prev) => (prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId]));
+  };
+
+  const toggleFollowTeam = (categoryId: string, teamId: string) => {
+    if (!currentUser) return onLoginRequest();
+    const key = `${categoryId}::${teamId}`;
+    setFollowedTeamIds((prev) => (prev.includes(key) ? prev.filter((id) => id !== key) : [...prev, key]));
+  };
+
+  const toggleFollowDriver = (categoryId: string, driverId: string) => {
+    if (!currentUser) return onLoginRequest();
+    const key = `${categoryId}::${driverId}`;
+    setFollowedDriverIds((prev) => (prev.includes(key) ? prev.filter((id) => id !== key) : [...prev, key]));
   };
 
   return (
@@ -276,6 +369,12 @@ export default function App() {
           </nav>
 
           <div className="flex-1 flex justify-end items-center gap-3">
+            {currentUser && (
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)]">
+                <Users className="w-4 h-4 text-brand-red" />
+                <span className="text-xs font-semibold text-[var(--text-main)]">{currentUser.name}</span>
+              </div>
+            )}
             <div className="flex items-center bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-1 shadow-sm">
               <button
                 onClick={() => setLanguage('pt')}
@@ -312,6 +411,21 @@ export default function App() {
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
+            {currentUser ? (
+              <button
+                onClick={onLogout}
+                className="px-3 py-2 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-brand-red transition-colors"
+              >
+                Sair
+              </button>
+            ) : (
+              <button
+                onClick={onLoginRequest}
+                className="px-3 py-2 rounded-xl bg-brand-red text-white text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-opacity whitespace-nowrap"
+              >
+                Entrar
+              </button>
+            )}
           </div>
         </div>
 
@@ -439,6 +553,31 @@ export default function App() {
                   </p>
                 </div>
 
+                {currentUser && (
+                  <div className="glass-card p-6 mb-10">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-xl font-display font-black italic text-[var(--text-main)]">Proximas corridas que voce segue</h3>
+                      <Heart className="w-5 h-5 text-brand-red" />
+                    </div>
+                    {upcomingFollowedRaces.length === 0 ? (
+                      <p className="text-sm text-gray-500">Voce ainda nao segue categorias/equipes/pilotos.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {upcomingFollowedRaces.slice(0, 6).map(({ category, race }) => (
+                          <div key={`${category.id}-${race.id}`} className="p-3 rounded-lg border border-[var(--card-border)] bg-white/5 flex items-center justify-between gap-3">
+                            <div>
+                              <p className="text-[10px] font-black uppercase tracking-widest text-brand-red">{category.name}</p>
+                              <p className="text-sm font-semibold text-[var(--text-main)]">{race.name}</p>
+                              <p className="text-xs text-gray-500">{race.location} • {race.circuit}</p>
+                            </div>
+                            <span className="font-mono text-xs text-[var(--text-main)]">{race.date.split('-').reverse().join('/')}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="space-y-16">
                   {NAV_GROUPS.map((group, groupIndex) => (
                     <motion.div 
@@ -535,8 +674,25 @@ export default function App() {
                                     {language === 'pt' ? cat.description : (cat.enDescription || cat.description)}
                                   </p>
                                   <div className="flex items-center justify-between pt-4 border-t border-[var(--card-border)]">
-                                    <div className="flex items-center gap-2 text-brand-red font-bold text-[10px] uppercase tracking-widest">
-                                      {UI_TRANSLATIONS[language].accessCategory} <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                    <div className="flex items-center gap-2">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleFollowCategory(cat.id);
+                                        }}
+                                        className={cn(
+                                          "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors",
+                                          followedCategorySet.has(cat.id)
+                                            ? "bg-brand-red/10 border-brand-red/30 text-brand-red"
+                                            : "bg-white/5 border-white/10 text-gray-400 hover:text-brand-red"
+                                        )}
+                                      >
+                                        {followedCategorySet.has(cat.id) ? 'Seguindo' : 'Seguir categoria'}
+                                      </button>
+                                      <span className="text-brand-red font-bold text-[10px] uppercase tracking-widest">
+                                        {UI_TRANSLATIONS[language].accessCategory}
+                                      </span>
+                                      <ChevronRight className="w-3 h-3 text-brand-red group-hover:translate-x-1 transition-transform" />
                                     </div>
                                     <button 
                                       onClick={(e) => {
@@ -596,6 +752,18 @@ export default function App() {
                       </p>
                       
                       <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                        <button
+                          onClick={() => toggleFollowCategory(selectedCategory.id)}
+                          className={cn(
+                            "px-8 py-4 font-bold rounded-xl border transition-all uppercase tracking-widest text-sm flex items-center gap-2",
+                            followedCategorySet.has(selectedCategory.id)
+                              ? "bg-brand-red/10 text-brand-red border-brand-red/30"
+                              : "bg-[var(--card-bg)] text-[var(--text-main)] border-[var(--card-border)] hover:bg-white/10"
+                          )}
+                        >
+                          <Heart className="w-4 h-4" />
+                          {followedCategorySet.has(selectedCategory.id) ? 'Seguindo categoria' : 'Seguir categoria'}
+                        </button>
                         <button 
                           onClick={() => {
                             setActiveTab('calendar');
@@ -786,9 +954,17 @@ export default function App() {
                                             </div>
                                           )}
                                         </div>
-                                        <div className="w-8 h-8 rounded bg-white/5 flex items-center justify-center">
-                                          <Users className="w-4 h-4 text-gray-500" />
-                                        </div>
+                                        <button
+                                          onClick={() => toggleFollowTeam(selectedCategory.id, team.id)}
+                                          className={cn(
+                                            "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors",
+                                            followedTeamSet.has(`${selectedCategory.id}::${team.id}`)
+                                              ? "bg-brand-red/10 border-brand-red/30 text-brand-red"
+                                              : "bg-white/5 border-white/10 text-gray-400 hover:text-brand-red"
+                                          )}
+                                        >
+                                          {followedTeamSet.has(`${selectedCategory.id}::${team.id}`) ? 'Seguindo' : 'Seguir'}
+                                        </button>
                                       </div>
                                       <div className="space-y-3">
                                         {selectedCategory.drivers
@@ -816,7 +992,7 @@ export default function App() {
                                                   </div>
                                                 </div>
                                                 
-                                                <div>
+                                                <div className="min-w-0 flex-1">
                                                   <div className="font-display font-black italic text-lg text-[var(--text-main)] group-hover/driver:text-brand-red transition-colors">
                                                     {driver.name.split(' ')[0]} <span className="text-brand-red group-hover/driver:text-[var(--text-main)]">{driver.name.split(' ').slice(1).join(' ')}</span>
                                                   </div>
@@ -825,6 +1001,20 @@ export default function App() {
                                                     {driver.nationality}
                                                   </div>
                                                 </div>
+                                                <button
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleFollowDriver(selectedCategory.id, driver.id);
+                                                  }}
+                                                  className={cn(
+                                                    "px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border transition-colors shrink-0",
+                                                    followedDriverSet.has(`${selectedCategory.id}::${driver.id}`)
+                                                      ? "bg-brand-red/10 border-brand-red/30 text-brand-red"
+                                                      : "bg-white/5 border-white/10 text-gray-400 hover:text-brand-red"
+                                                  )}
+                                                >
+                                                  {followedDriverSet.has(`${selectedCategory.id}::${driver.id}`) ? 'Seguindo' : 'Seguir'}
+                                                </button>
                                               </div>
                                               
                                               <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
