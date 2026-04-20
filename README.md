@@ -37,6 +37,19 @@ Plataforma focada em automobilismo com categorias, equipes, pilotos, calendario 
 4. Build Command: npm run build
 5. Output Directory: dist
 
+## Deploy na Netlify
+
+1. Suba no GitHub.
+2. Importe o repositorio na Netlify.
+3. A Netlify vai ler `netlify.toml` automaticamente com:
+- Build Command: `npm run build`
+- Publish Directory: `dist`
+- SPA Redirect: `/* -> /index.html (200)`
+4. Configure as variaveis de ambiente na Netlify:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+5. Dispare um novo deploy.
+
 ## Observacao
 
 - Se a confirmacao de email estiver habilitada no Supabase Auth, o cadastro cria a conta e o usuario precisa confirmar email antes de entrar.

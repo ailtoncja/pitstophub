@@ -1,5 +1,5 @@
 import type { User } from '@supabase/supabase-js';
-import { supabase } from './supabase';
+import { isSupabaseConfigured, supabase } from './supabase';
 
 export type AuthUser = {
   id: string;
@@ -32,6 +32,7 @@ function mapUser(user: User): AuthUser {
 }
 
 async function ensureUserSettingsRow(userId: string) {
+  if (!supabase) return;
   await supabase.from('user_settings').upsert(
     {
       user_id: userId,
@@ -48,6 +49,7 @@ async function ensureUserSettingsRow(userId: string) {
 }
 
 export async function getCurrentSession(): Promise<AuthUser | null> {
+  if (!supabase) return null;
   const { data, error } = await supabase.auth.getSession();
   if (error || !data.session?.user) return null;
   return mapUser(data.session.user);
@@ -58,6 +60,13 @@ export async function registerUser(input: {
   email: string;
   password: string;
 }): Promise<{ ok: true; user: AuthUser } | { ok: false; message: string }> {
+  if (!supabase || !isSupabaseConfigured) {
+    return {
+      ok: false,
+      message: 'Login indisponivel no momento. Configure o Supabase no ambiente.',
+    };
+  }
+
   const name = input.name.trim();
   const email = input.email.trim().toLowerCase();
   const password = input.password;
@@ -87,6 +96,13 @@ export async function loginUser(input: {
   email: string;
   password: string;
 }): Promise<{ ok: true; user: AuthUser } | { ok: false; message: string }> {
+  if (!supabase || !isSupabaseConfigured) {
+    return {
+      ok: false,
+      message: 'Login indisponivel no momento. Configure o Supabase no ambiente.',
+    };
+  }
+
   const { data, error } = await supabase.auth.signInWithPassword({
     email: input.email.trim().toLowerCase(),
     password: input.password,
@@ -101,10 +117,12 @@ export async function loginUser(input: {
 }
 
 export async function logoutUser() {
+  if (!supabase) return;
   await supabase.auth.signOut();
 }
 
 export async function getUserSettings(userId: string): Promise<UserSettings | null> {
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from('user_settings')
     .select('theme, language, favorite_category_id, followed_category_ids, followed_team_ids, followed_driver_ids')
@@ -124,6 +142,7 @@ export async function getUserSettings(userId: string): Promise<UserSettings | nu
 }
 
 export async function saveUserSettings(userId: string, settings: UserSettings) {
+  if (!supabase) return;
   const { error } = await supabase.from('user_settings').upsert(
     {
       user_id: userId,
@@ -149,4 +168,3 @@ export function getAuthTheme(): 'dark' | 'light' {
 export function setAuthTheme(theme: 'dark' | 'light') {
   localStorage.setItem(AUTH_THEME_KEY, theme);
 }
-
