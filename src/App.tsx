@@ -105,7 +105,16 @@ const UI_TRANSLATIONS = {
     allRightsReserved: 'Todos os direitos reservados.',
     gotIt: 'Entendido',
     standingsNotAvailable: 'Pontuação não disponível',
-    standingsNotAvailableDesc: 'As pontuações completas desta categoria não estão disponíveis publicamente no momento.'
+    standingsNotAvailableDesc: 'As pontuações completas desta categoria não estão disponíveis publicamente no momento.',
+    login: 'Entrar',
+    logout: 'Sair',
+    follow: 'Seguir',
+    following: 'Seguindo',
+    followCategory: 'Seguir categoria',
+    followingCategory: 'Seguindo categoria',
+    status: 'Status',
+    notAvailableShort: 'N/A',
+    fiaSanctioned: 'Homologado FIA'
   },
   en: {
     home: 'Home',
@@ -149,7 +158,16 @@ const UI_TRANSLATIONS = {
     allRightsReserved: 'All rights reserved.',
     gotIt: 'Got it',
     standingsNotAvailable: 'Standings not available',
-    standingsNotAvailableDesc: 'Full standings for this category are not publicly available at the moment.'
+    standingsNotAvailableDesc: 'Full standings for this category are not publicly available at the moment.',
+    login: 'Login',
+    logout: 'Logout',
+    follow: 'Follow',
+    following: 'Following',
+    followCategory: 'Follow category',
+    followingCategory: 'Following category',
+    status: 'Status',
+    notAvailableShort: 'N/A',
+    fiaSanctioned: 'FIA Sanctioned'
   }
 };
 
@@ -307,7 +325,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             </button>
           </div>
           
-          <nav className="hidden lg:flex items-center gap-3 xl:gap-5 flex-shrink-0">
+          <nav className="hidden 2xl:flex items-center gap-3 xl:gap-5 flex-shrink-0">
             <button
               onClick={() => setView('home')}
               className={cn(
@@ -407,7 +425,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             </div>
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm"
+              className="2xl:hidden p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -416,14 +434,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 onClick={onLogout}
                 className="px-3 py-2 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-xs font-bold uppercase tracking-wide text-gray-500 hover:text-brand-red transition-colors whitespace-nowrap shrink-0"
               >
-                Sair
+                {UI_TRANSLATIONS[language].logout}
               </button>
             ) : (
               <button
                 onClick={onLoginRequest}
                 className="px-3 py-2 rounded-xl bg-brand-red text-white text-xs font-bold uppercase tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
               >
-                Entrar
+                {UI_TRANSLATIONS[language].login}
               </button>
             )}
           </div>
@@ -435,7 +453,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-[var(--header-bg)] border-t border-[var(--card-border)] overflow-hidden shadow-2xl"
+              className="2xl:hidden bg-[var(--header-bg)] border-t border-[var(--card-border)] overflow-hidden shadow-2xl"
             >
               <div className="px-4 py-8 space-y-8 max-h-[80vh] overflow-y-auto no-scrollbar">
                 <div className="grid grid-cols-2 gap-3">
@@ -687,7 +705,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                             : "bg-white/5 border-white/10 text-gray-400 hover:text-brand-red"
                                         )}
                                       >
-                                        {followedCategorySet.has(cat.id) ? 'Seguindo' : 'Seguir categoria'}
+                                        {followedCategorySet.has(cat.id) ? UI_TRANSLATIONS[language].following : UI_TRANSLATIONS[language].followCategory}
                                       </button>
                                       <span className="text-brand-red font-bold text-[10px] uppercase tracking-widest">
                                         {UI_TRANSLATIONS[language].accessCategory}
@@ -762,7 +780,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           )}
                         >
                           <Heart className="w-4 h-4" />
-                          {followedCategorySet.has(selectedCategory.id) ? 'Seguindo categoria' : 'Seguir categoria'}
+                          {followedCategorySet.has(selectedCategory.id) ? UI_TRANSLATIONS[language].followingCategory : UI_TRANSLATIONS[language].followCategory}
                         </button>
                         <button 
                           onClick={() => {
@@ -812,7 +830,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             <div className="flex items-center gap-3">
                               <MapPin className="w-4 h-4 text-brand-red" />
                               <span className="text-sm font-bold text-[var(--text-main)]">
-                                {selectedCategory.calendar.find(r => r.status === 'upcoming')?.location || 'N/A'}
+                                {selectedCategory.calendar.find(r => r.status === 'upcoming')?.location || UI_TRANSLATIONS[language].notAvailableShort}
                               </span>
                             </div>
                             <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{UI_TRANSLATIONS[language].location}</span>
@@ -821,7 +839,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             <div className="flex items-center gap-3">
                               <Calendar className="w-4 h-4 text-brand-red" />
                               <span className="text-sm font-bold text-[var(--text-main)]">
-                                {selectedCategory.calendar.find(r => r.status === 'upcoming')?.circuit || 'N/A'}
+                                {selectedCategory.calendar.find(r => r.status === 'upcoming')?.circuit || UI_TRANSLATIONS[language].notAvailableShort}
                               </span>
                             </div>
                             <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{UI_TRANSLATIONS[language].circuit}</span>
@@ -917,7 +935,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 {UI_TRANSLATIONS[language].season2026}
                               </div>
                               <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-black uppercase tracking-widest">
-                                FIA Sanctioned
+                                {UI_TRANSLATIONS[language].fiaSanctioned}
                               </div>
                             </div>
                           </div>
@@ -963,7 +981,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                               : "bg-white/5 border-white/10 text-gray-400 hover:text-brand-red"
                                           )}
                                         >
-                                          {followedTeamSet.has(`${selectedCategory.id}::${team.id}`) ? 'Seguindo' : 'Seguir'}
+                                          {followedTeamSet.has(`${selectedCategory.id}::${team.id}`) ? UI_TRANSLATIONS[language].following : UI_TRANSLATIONS[language].follow}
                                         </button>
                                       </div>
                                       <div className="space-y-3">
@@ -1013,7 +1031,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                                       : "bg-white/5 border-white/10 text-gray-400 hover:text-brand-red"
                                                   )}
                                                 >
-                                                  {followedDriverSet.has(`${selectedCategory.id}::${driver.id}`) ? 'Seguindo' : 'Seguir'}
+                                                  {followedDriverSet.has(`${selectedCategory.id}::${driver.id}`) ? UI_TRANSLATIONS[language].following : UI_TRANSLATIONS[language].follow}
                                                 </button>
                                               </div>
                                               
@@ -1045,7 +1063,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           <div className="col-span-1">{UI_TRANSLATIONS[language].date}</div>
                           <div className="col-span-4">{UI_TRANSLATIONS[language].event}</div>
                           <div className="col-span-3">{UI_TRANSLATIONS[language].location} / {UI_TRANSLATIONS[language].circuit}</div>
-                          <div className="col-span-2 text-center">Status</div>
+                          <div className="col-span-2 text-center">{UI_TRANSLATIONS[language].status}</div>
                           <div className="col-span-2 text-right">{UI_TRANSLATIONS[language].result}</div>
                         </div>
                         
@@ -1073,7 +1091,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 <div className="text-xs text-gray-500 italic">{race.circuit}</div>
                               </div>
                               <div className="w-full md:col-span-2 flex justify-between md:justify-center items-center">
-                                <span className="md:hidden text-xs font-bold uppercase tracking-widest text-gray-500">Status</span>
+                                <span className="md:hidden text-xs font-bold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].status}</span>
                                 <span className={cn(
                                   "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1",
                                   race.status === 'completed' ? "bg-gray-800 text-gray-400" : 
@@ -1132,10 +1150,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   <table className="w-full text-left min-w-[500px]">
                                     <thead>
                                       <tr className="border-b border-[var(--card-border)] bg-white/5">
-                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Pos</th>
+                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].position}</th>
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].drivers}</th>
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].team}</th>
-                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500 text-right">Pts</th>
+                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500 text-right">{UI_TRANSLATIONS[language].points}</th>
                                       </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[var(--card-border)]">
@@ -1162,9 +1180,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   <table className="w-full text-left min-w-[400px]">
                                     <thead>
                                       <tr className="border-b border-[var(--card-border)] bg-white/5">
-                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Pos</th>
+                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].position}</th>
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].constructors}</th>
-                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500 text-right">Pts</th>
+                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500 text-right">{UI_TRANSLATIONS[language].points}</th>
                                       </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[var(--card-border)]">
@@ -1190,10 +1208,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   <table className="w-full text-left min-w-[500px]">
                                     <thead>
                                       <tr className="border-b border-[var(--card-border)] bg-white/5">
-                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">Pos</th>
+                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].position}</th>
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">#</th>
                                         <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].team}</th>
-                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500 text-right">Pts</th>
+                                        <th className="px-6 py-4 text-xs font-black uppercase tracking-widest text-gray-500 text-right">{UI_TRANSLATIONS[language].points}</th>
                                       </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[var(--card-border)]">
@@ -1330,3 +1348,5 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     </div>
   );
 }
+
+
