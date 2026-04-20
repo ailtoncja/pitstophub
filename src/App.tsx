@@ -292,8 +292,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     <div className="min-h-screen flex flex-col transition-colors duration-300">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-[var(--card-border)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center">
-          <div className="flex-1 flex justify-start">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center gap-3">
+          <div className="flex-1 flex justify-start min-w-0">
             <button 
               onClick={() => {
                 setView('home');
@@ -307,11 +307,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             </button>
           </div>
           
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-3 xl:gap-5 flex-shrink-0">
             <button
               onClick={() => setView('home')}
               className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold uppercase tracking-widest transition-all",
+                "flex items-center gap-2 px-3 xl:px-4 py-2 rounded-full text-xs xl:text-sm leading-none whitespace-nowrap font-bold uppercase tracking-wide transition-all",
                 view === 'home' ? "bg-brand-red text-white shadow-lg shadow-brand-red/20" : "text-gray-500 hover:text-brand-red"
               )}
             >
@@ -329,7 +329,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               >
                 <button
                   className={cn(
-                    "flex items-center gap-1 py-2 text-sm font-bold uppercase tracking-widest transition-colors hover:text-brand-red",
+                    "flex items-center gap-1 py-2 text-xs xl:text-sm leading-none whitespace-nowrap font-bold uppercase tracking-wide transition-colors hover:text-brand-red",
                     group.ids.includes(selectedCategory.id) && view === 'category' ? "text-brand-red" : "text-gray-500"
                   )}
                 >
@@ -368,14 +368,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             ))}
           </nav>
 
-          <div className="flex-1 flex justify-end items-center gap-3">
+          <div className="flex-1 flex justify-end items-center gap-2 xl:gap-3 min-w-0">
             {currentUser && (
-              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)]">
+              <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] shrink-0">
                 <Users className="w-4 h-4 text-brand-red" />
                 <span className="text-xs font-semibold text-[var(--text-main)]">{currentUser.name}</span>
               </div>
             )}
-            <div className="flex items-center bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-1 shadow-sm">
+            <div className="flex items-center bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-1 shadow-sm shrink-0">
               <button
                 onClick={() => setLanguage('pt')}
                 className={cn(
@@ -397,11 +397,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             </div>
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm"
+              className="p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm shrink-0"
             >
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/20">
+            <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 shrink-0">
               <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
               <span className="text-[10px] font-black uppercase tracking-tighter text-red-500">{UI_TRANSLATIONS[language].liveData}</span>
             </div>
@@ -414,14 +414,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             {currentUser ? (
               <button
                 onClick={onLogout}
-                className="px-3 py-2 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-brand-red transition-colors"
+                className="px-3 py-2 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-xs font-bold uppercase tracking-wide text-gray-500 hover:text-brand-red transition-colors whitespace-nowrap shrink-0"
               >
                 Sair
               </button>
             ) : (
               <button
                 onClick={onLoginRequest}
-                className="px-3 py-2 rounded-xl bg-brand-red text-white text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-opacity whitespace-nowrap"
+                className="px-3 py-2 rounded-xl bg-brand-red text-white text-xs font-bold uppercase tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
               >
                 Entrar
               </button>
