@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Trophy, 
@@ -64,33 +64,35 @@ const NAV_GROUPS = [
 
 const UI_TRANSLATIONS = {
   pt: {
-    home: 'Início',
+    home: 'InÃ­cio',
     explore: 'Explorar',
     viewRules: 'Ver Regras',
     season2026: 'Temporada 2026',
-    viewCalendar: 'Ver Calendário',
+    viewCalendar: 'Ver CalendÃ¡rio',
     rulesAndFormat: 'Regras e Formato',
-    nextStage: 'Próxima Etapa',
+    nextStage: 'PrÃ³xima Etapa',
     seasonEnd: 'Fim da Temporada',
-    overview: 'Visão Geral',
+    overview: 'VisÃ£o Geral',
     teams: 'Equipes',
-    calendar: 'Calendário',
-    standings: 'Classificação',
+    calendar: 'CalendÃ¡rio',
+    standings: 'ClassificaÃ§Ã£o',
     accessCategory: 'Acessar Categoria',
     viewSummary: 'Ver Resumo',
     liveData: 'Dados ao Vivo',
-    tagline: 'Explore os calendários, equipes e pilotos das principais competições do automobilismo mundial em 2026.',
+    language: 'Idioma',
+    appearance: 'Tema',
+    tagline: 'Explore os calendÃ¡rios, equipes e pilotos das principais competiÃ§Ãµes do automobilismo mundial em 2026.',
     drivers: 'Pilotos',
     constructors: 'Construtores',
     points: 'Pontos',
-    position: 'Posição',
+    position: 'PosiÃ§Ã£o',
     team: 'Equipe',
     location: 'Local',
     date: 'Data',
     circuit: 'Circuito',
     winner: 'Vencedor',
-    upcoming: 'Próxima',
-    completed: 'Concluída',
+    upcoming: 'PrÃ³xima',
+    completed: 'ConcluÃ­da',
     cancelled: 'Cancelada',
     result: 'Resultado',
     event: 'Evento',
@@ -104,8 +106,8 @@ const UI_TRANSLATIONS = {
     teamsChampionship: 'Campeonato de Equipes',
     allRightsReserved: 'Todos os direitos reservados.',
     gotIt: 'Entendido',
-    standingsNotAvailable: 'Pontuação não disponível',
-    standingsNotAvailableDesc: 'As pontuações completas desta categoria não estão disponíveis publicamente no momento.',
+    standingsNotAvailable: 'PontuaÃ§Ã£o nÃ£o disponÃ­vel',
+    standingsNotAvailableDesc: 'As pontuaÃ§Ãµes completas desta categoria nÃ£o estÃ£o disponÃ­veis publicamente no momento.',
     login: 'Entrar',
     logout: 'Sair',
     follow: 'Seguir',
@@ -132,6 +134,8 @@ const UI_TRANSLATIONS = {
     accessCategory: 'Access Category',
     viewSummary: 'View Summary',
     liveData: 'Live Data',
+    language: 'Language',
+    appearance: 'Theme',
     tagline: 'Explore the calendars, teams and drivers of the world\'s main motorsport competitions in 2026.',
     drivers: 'Drivers',
     constructors: 'Constructors',
@@ -325,7 +329,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             </button>
           </div>
           
-          <nav className="hidden 2xl:flex items-center gap-3 xl:gap-5 flex-shrink-0">
+          <nav className="hidden xl:flex items-center gap-3 xl:gap-5 flex-shrink-0">
             <button
               onClick={() => setView('home')}
               className={cn(
@@ -393,39 +397,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 <span className="text-xs font-semibold text-[var(--text-main)]">{currentUser.name}</span>
               </div>
             )}
-            <div className="flex items-center bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-1 shadow-sm shrink-0">
-              <button
-                onClick={() => setLanguage('pt')}
-                className={cn(
-                  "px-2 py-1 text-[10px] font-black rounded-lg transition-all",
-                  language === 'pt' ? "bg-brand-red text-white" : "text-gray-500 hover:text-brand-red"
-                )}
-              >
-                PT
-              </button>
-              <button
-                onClick={() => setLanguage('en')}
-                className={cn(
-                  "px-2 py-1 text-[10px] font-black rounded-lg transition-all",
-                  language === 'en' ? "bg-brand-red text-white" : "text-gray-500 hover:text-brand-red"
-                )}
-              >
-                EN
-              </button>
-            </div>
-            <button 
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm shrink-0"
-            >
-              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-            </button>
-            <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/10 border border-red-500/20 shrink-0">
-              <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-tighter text-red-500">{UI_TRANSLATIONS[language].liveData}</span>
-            </div>
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="2xl:hidden p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm"
+              className="xl:hidden p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -453,10 +427,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="2xl:hidden bg-[var(--header-bg)] border-t border-[var(--card-border)] overflow-hidden shadow-2xl"
+              className="xl:hidden bg-[var(--header-bg)] border-t border-[var(--card-border)] overflow-hidden shadow-2xl"
             >
               <div className="px-4 py-8 space-y-8 max-h-[80vh] overflow-y-auto no-scrollbar">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3">
                   <button
                     onClick={() => {
                       setView('home');
@@ -473,10 +447,6 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     <LayoutGrid className="w-5 h-5" />
                     {UI_TRANSLATIONS[language].home}
                   </button>
-                  <div className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-red-500/5 border border-red-500/10 text-red-500">
-                    <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-widest">{UI_TRANSLATIONS[language].liveData}</span>
-                  </div>
                 </div>
 
                 <div className="space-y-6">
@@ -586,7 +556,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             <div>
                               <p className="text-[10px] font-black uppercase tracking-widest text-brand-red">{category.name}</p>
                               <p className="text-sm font-semibold text-[var(--text-main)]">{race.name}</p>
-                              <p className="text-xs text-gray-500">{race.location} • {race.circuit}</p>
+                              <p className="text-xs text-gray-500">{race.location} â€¢ {race.circuit}</p>
                             </div>
                             <span className="font-mono text-xs text-[var(--text-main)]">{race.date.split('-').reverse().join('/')}</span>
                           </div>
@@ -1122,7 +1092,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     </div>
                                   </div>
                                 ) : (
-                                  <span className="text-gray-600">—</span>
+                                  <span className="text-gray-600">â€”</span>
                                 )}
                               </div>
                             </div>
@@ -1266,7 +1236,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             </div>
             
             <div className="text-gray-500 text-sm">
-              © 2026 PitStop Hub. {UI_TRANSLATIONS[language].allRightsReserved}
+              (c) 2026 PitStop Hub. {UI_TRANSLATIONS[language].allRightsReserved}
             </div>
             
             <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-3">
@@ -1280,6 +1250,39 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 </button>
               ))}
             </div>
+          </div>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
+              <Languages className="w-4 h-4" />
+              {UI_TRANSLATIONS[language].language}
+            </div>
+            <div className="flex items-center bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-1 shadow-sm">
+              <button
+                onClick={() => setLanguage('pt')}
+                className={cn(
+                  "px-2 py-1 text-[10px] font-black rounded-lg transition-all",
+                  language === 'pt' ? "bg-brand-red text-white" : "text-gray-500 hover:text-brand-red"
+                )}
+              >
+                PT
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className={cn(
+                  "px-2 py-1 text-[10px] font-black rounded-lg transition-all",
+                  language === 'en' ? "bg-brand-red text-white" : "text-gray-500 hover:text-brand-red"
+                )}
+              >
+                EN
+              </button>
+            </div>
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[10px] font-black uppercase tracking-widest text-[var(--text-main)] hover:text-brand-red transition-colors"
+            >
+              {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {UI_TRANSLATIONS[language].appearance}
+            </button>
           </div>
         </div>
       </footer>
