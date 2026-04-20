@@ -64,35 +64,37 @@ const NAV_GROUPS = [
 
 const UI_TRANSLATIONS = {
   pt: {
-    home: 'InÃ­cio',
+    home: 'Início',
     explore: 'Explorar',
     viewRules: 'Ver Regras',
     season2026: 'Temporada 2026',
-    viewCalendar: 'Ver CalendÃ¡rio',
+    viewCalendar: 'Ver Calendário',
     rulesAndFormat: 'Regras e Formato',
-    nextStage: 'PrÃ³xima Etapa',
+    nextStage: 'Próxima Etapa',
     seasonEnd: 'Fim da Temporada',
-    overview: 'VisÃ£o Geral',
+    overview: 'Visão Geral',
     teams: 'Equipes',
-    calendar: 'CalendÃ¡rio',
-    standings: 'ClassificaÃ§Ã£o',
+    calendar: 'Calendário',
+    standings: 'Classificação',
     accessCategory: 'Acessar Categoria',
     viewSummary: 'Ver Resumo',
     liveData: 'Dados ao Vivo',
     language: 'Idioma',
     appearance: 'Tema',
-    tagline: 'Explore os calendÃ¡rios, equipes e pilotos das principais competiÃ§Ãµes do automobilismo mundial em 2026.',
+    followedRacesTitle: 'Próximas corridas que você segue',
+    noFollowedRaces: 'Você ainda não segue categorias, equipes ou pilotos.',
+    tagline: 'Explore os calendários, equipes e pilotos das principais competições do automobilismo mundial em 2026.',
     drivers: 'Pilotos',
     constructors: 'Construtores',
     points: 'Pontos',
-    position: 'PosiÃ§Ã£o',
+    position: 'Posição',
     team: 'Equipe',
     location: 'Local',
     date: 'Data',
     circuit: 'Circuito',
     winner: 'Vencedor',
-    upcoming: 'PrÃ³xima',
-    completed: 'ConcluÃ­da',
+    upcoming: 'Próxima',
+    completed: 'Concluída',
     cancelled: 'Cancelada',
     result: 'Resultado',
     event: 'Evento',
@@ -106,8 +108,8 @@ const UI_TRANSLATIONS = {
     teamsChampionship: 'Campeonato de Equipes',
     allRightsReserved: 'Todos os direitos reservados.',
     gotIt: 'Entendido',
-    standingsNotAvailable: 'PontuaÃ§Ã£o nÃ£o disponÃ­vel',
-    standingsNotAvailableDesc: 'As pontuaÃ§Ãµes completas desta categoria nÃ£o estÃ£o disponÃ­veis publicamente no momento.',
+    standingsNotAvailable: 'Pontuação não disponível',
+    standingsNotAvailableDesc: 'As pontuações completas desta categoria não estão disponíveis publicamente no momento.',
     login: 'Entrar',
     logout: 'Sair',
     follow: 'Seguir',
@@ -136,6 +138,8 @@ const UI_TRANSLATIONS = {
     liveData: 'Live Data',
     language: 'Language',
     appearance: 'Theme',
+    followedRacesTitle: 'Next races from what you follow',
+    noFollowedRaces: 'You are not following any categories, teams, or drivers yet.',
     tagline: 'Explore the calendars, teams and drivers of the world\'s main motorsport competitions in 2026.',
     drivers: 'Drivers',
     constructors: 'Constructors',
@@ -311,10 +315,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   };
 
   return (
-    <div className="min-h-screen flex flex-col transition-colors duration-300">
+    <div className="min-h-screen flex flex-col transition-colors duration-300 overflow-x-hidden">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-[var(--card-border)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center gap-2 sm:gap-3">
           <div className="flex-1 flex justify-start min-w-0">
             <button 
               onClick={() => {
@@ -323,7 +327,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               }}
               className="flex items-center gap-3 hover:opacity-80 transition-opacity"
             >
-              <span className="text-2xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
+              <span className="text-xl sm:text-2xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
                 PitStopHub
               </span>
             </button>
@@ -392,7 +396,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
           <div className="flex-1 flex justify-end items-center gap-2 xl:gap-3 min-w-0">
             {currentUser && (
-              <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] shrink-0">
+              <div className="hidden 2xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] shrink-0">
                 <Users className="w-4 h-4 text-brand-red" />
                 <span className="text-xs font-semibold text-[var(--text-main)]">{currentUser.name}</span>
               </div>
@@ -526,9 +530,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 key="home-content"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20"
+                className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 md:py-20"
               >
-              <div className="text-center mb-16">
+                <div className="text-center mb-10 sm:mb-16">
                 <motion.h1 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -542,21 +546,23 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 </div>
 
                 {currentUser && (
-                  <div className="glass-card p-6 mb-10">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-xl font-display font-black italic text-[var(--text-main)]">Proximas corridas que voce segue</h3>
+                  <div className="glass-card p-4 sm:p-6 mb-8 sm:mb-10">
+                    <div className="flex items-center justify-between gap-3 mb-4">
+                      <h3 className="text-lg sm:text-xl font-display font-black italic text-[var(--text-main)]">
+                        {UI_TRANSLATIONS[language].followedRacesTitle}
+                      </h3>
                       <Heart className="w-5 h-5 text-brand-red" />
                     </div>
                     {upcomingFollowedRaces.length === 0 ? (
-                      <p className="text-sm text-gray-500">Voce ainda nao segue categorias/equipes/pilotos.</p>
+                      <p className="text-sm text-gray-500">{UI_TRANSLATIONS[language].noFollowedRaces}</p>
                     ) : (
                       <div className="space-y-2">
                         {upcomingFollowedRaces.slice(0, 6).map(({ category, race }) => (
-                          <div key={`${category.id}-${race.id}`} className="p-3 rounded-lg border border-[var(--card-border)] bg-white/5 flex items-center justify-between gap-3">
+                          <div key={`${category.id}-${race.id}`} className="p-3 rounded-lg border border-[var(--card-border)] bg-white/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
                             <div>
                               <p className="text-[10px] font-black uppercase tracking-widest text-brand-red">{category.name}</p>
                               <p className="text-sm font-semibold text-[var(--text-main)]">{race.name}</p>
-                              <p className="text-xs text-gray-500">{race.location} â€¢ {race.circuit}</p>
+                              <p className="text-xs text-gray-500">{race.location} • {race.circuit}</p>
                             </div>
                             <span className="font-mono text-xs text-[var(--text-main)]">{race.date.split('-').reverse().join('/')}</span>
                           </div>
@@ -1092,7 +1098,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     </div>
                                   </div>
                                 ) : (
-                                  <span className="text-gray-600">â€”</span>
+                                  <span className="text-gray-600">-</span>
                                 )}
                               </div>
                             </div>

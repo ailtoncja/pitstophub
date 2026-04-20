@@ -30,7 +30,13 @@
   body {
     background-color: var(--bg-main);
     color: var(--text-main);
+    overflow-x: hidden;
     @apply font-sans antialiased transition-colors duration-300;
+  }
+
+  img, video {
+    max-width: 100%;
+    height: auto;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -56,5 +62,12 @@
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+@media (max-width: 768px) {
+  .glass-card {
+    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+  }
 }
 
