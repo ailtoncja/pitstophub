@@ -11,7 +11,6 @@ import {
   MapPin, 
   Users,
   Info,
-  Search,
   XCircle,
   CheckCircle2,
   Sun,
@@ -25,7 +24,7 @@ import {
   Languages,
   Heart
 } from 'lucide-react';
-import { MOTORSPORT_DATA, Category, Team, Driver, Race } from './types';
+import { MOTORSPORT_DATA, Category } from './types';
 import { cn } from './lib/utils';
 import { getUserSettings, saveUserSettings, type AuthUser } from './auth';
 
@@ -314,6 +313,16 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     setFollowedDriverIds((prev) => (prev.includes(key) ? prev.filter((id) => id !== key) : [...prev, key]));
   };
 
+  const nextUpcomingRace = React.useMemo(
+    () => selectedCategory.calendar.find((race) => race.status === 'upcoming') ?? null,
+    [selectedCategory.calendar]
+  );
+
+  const teamClasses = React.useMemo(
+    () => Array.from(new Set(selectedCategory.teams.map((team) => team.class || 'Geral'))),
+    [selectedCategory.teams]
+  );
+
   return (
     <div className="min-h-screen flex flex-col transition-colors duration-300 overflow-x-hidden">
       {/* Header */}
@@ -517,7 +526,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             >
               {/* Background GIF for Home Page */}
               <div 
-                className="absolute inset-0 -z-10 opacity-10 pointer-events-none"
+                className="absolute inset-0 -z-10 opacity-10 pointer-events-none hidden md:block"
                 style={{
                   backgroundImage: 'url("https://i.imgur.com/dgLObWa.gif")',
                   backgroundSize: 'cover',
@@ -789,14 +798,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             <div>
                               <div className="text-xs text-gray-500 uppercase font-bold tracking-widest">{UI_TRANSLATIONS[language].nextStage}</div>
                               <div className="font-display font-black text-xl text-[var(--text-main)]">
-                                {selectedCategory.calendar.find(r => r.status === 'upcoming')?.name || UI_TRANSLATIONS[language].seasonEnd}
+                                {nextUpcomingRace?.name || UI_TRANSLATIONS[language].seasonEnd}
                               </div>
                             </div>
                           </div>
                           <div className="text-left sm:text-right">
                             <div className="text-xs text-gray-500 uppercase font-bold tracking-widest">{UI_TRANSLATIONS[language].date}</div>
                             <div className="font-mono font-bold text-[var(--text-main)]">
-                              {selectedCategory.calendar.find(r => r.status === 'upcoming')?.date.split('-').reverse().join('/') || '--/--/--'}
+                              {nextUpcomingRace?.date.split('-').reverse().join('/') || '--/--/--'}
                             </div>
                           </div>
                         </div>
@@ -806,7 +815,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             <div className="flex items-center gap-3">
                               <MapPin className="w-4 h-4 text-brand-red" />
                               <span className="text-sm font-bold text-[var(--text-main)]">
-                                {selectedCategory.calendar.find(r => r.status === 'upcoming')?.location || UI_TRANSLATIONS[language].notAvailableShort}
+                                {nextUpcomingRace?.location || UI_TRANSLATIONS[language].notAvailableShort}
                               </span>
                             </div>
                             <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{UI_TRANSLATIONS[language].location}</span>
@@ -815,7 +824,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             <div className="flex items-center gap-3">
                               <Calendar className="w-4 h-4 text-brand-red" />
                               <span className="text-sm font-bold text-[var(--text-main)]">
-                                {selectedCategory.calendar.find(r => r.status === 'upcoming')?.circuit || UI_TRANSLATIONS[language].notAvailableShort}
+                                {nextUpcomingRace?.circuit || UI_TRANSLATIONS[language].notAvailableShort}
                               </span>
                             </div>
                             <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{UI_TRANSLATIONS[language].circuit}</span>
@@ -927,7 +936,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         exit={{ opacity: 0, x: -20 }}
                         className="space-y-12"
                       >
-                        {Array.from(new Set(selectedCategory.teams.map(t => t.class || 'Geral'))).map(className => (
+                        {teamClasses.map(className => (
                           <div key={className} className="space-y-6">
                             <h3 className="text-2xl font-display font-black italic border-l-4 border-brand-red pl-4 text-[var(--text-main)]">
                               {className}
@@ -975,6 +984,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                                       alt={driver.name} 
                                                       className="w-16 h-16 rounded-xl object-cover border-2 border-brand-red/30 shadow-lg"
                                                       referrerPolicy="no-referrer"
+                                                      loading="lazy"
+                                                      decoding="async"
                                                     />
                                                   ) : (
                                                     <div className="w-16 h-16 rounded-xl bg-brand-red/10 flex items-center justify-center border-2 border-brand-red/30">
@@ -1044,7 +1055,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         </div>
                         
                         <div className="space-y-4">
-                          {selectedCategory.calendar.map((race) => (
+                          {selectedCategory.calendar.map((race) => {
+                            const winnerDriver = selectedCategory.drivers.find((driver) => driver.name === race.winner);
+                            return (
                             <div 
                               key={race.id} 
                               className={cn(
@@ -1084,12 +1097,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 <span className="md:hidden text-xs font-bold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].result}</span>
                                 {race.winner ? (
                                   <div className="flex items-center justify-end gap-3">
-                                    {selectedCategory.drivers.find(d => d.name === race.winner)?.image && (
+                                    {winnerDriver?.image && (
                                       <img 
-                                        src={selectedCategory.drivers.find(d => d.name === race.winner)?.image} 
+                                        src={winnerDriver.image} 
                                         alt={race.winner} 
                                         className="w-8 h-8 rounded-full object-cover border border-yellow-500/50"
                                         referrerPolicy="no-referrer"
+                                        loading="lazy"
+                                        decoding="async"
                                       />
                                     )}
                                     <div className="flex items-center gap-2 text-yellow-500 font-bold">
@@ -1102,7 +1117,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 )}
                               </div>
                             </div>
-                          ))}
+                          )})}
                         </div>
                       </motion.div>
                     )}
