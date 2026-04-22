@@ -13,4 +13,16 @@ export default defineConfig(() => ({
   server: {
     hmr: process.env.DISABLE_HMR !== 'true',
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom'],
+          'motion': ['motion/react'],
+          'icons': ['lucide-react'],
+          'supabase': ['@supabase/supabase-js'],
+        },
+      },
+    },
+  },
 }));
