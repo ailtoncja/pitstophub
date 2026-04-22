@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Trophy, 
@@ -37,6 +37,11 @@ const IconMap: Record<string, React.ElementType> = {
   Car,
   Truck
 };
+
+const SPRING = { type: 'spring' as const, stiffness: 380, damping: 32 };
+const SPRING_SOFT = { type: 'spring' as const, stiffness: 280, damping: 28 };
+
+const CATEGORY_BY_ID = new Map(MOTORSPORT_DATA.map(c => [c.id, c]));
 
 const NAV_GROUPS = [
   {
@@ -216,7 +221,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         setFollowedCategoryIds(settings.followedCategoryIds);
         setFollowedTeamIds(settings.followedTeamIds);
         setFollowedDriverIds(settings.followedDriverIds);
-        const category = MOTORSPORT_DATA.find((cat) => cat.id === settings.favoriteCategoryId);
+        const category = CATEGORY_BY_ID.get(settings.favoriteCategoryId);
         if (category) setSelectedCategory(category);
       }
       setSettingsLoaded(true);
@@ -262,133 +267,143 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     };
   }, [expandedCategoryId]);
 
-  const handleCategorySelect = (cat: Category) => {
+  const handleCategorySelect = useCallback((cat: Category) => {
     setExpandedCategoryId(null);
     setSelectedCategory(cat);
     setView('category');
     setActiveTab('overview');
     setIsMobileMenuOpen(false);
     setActiveDropdown(null);
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 100);
-  };
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  }, []);
 
-  const followedCategorySet = new Set(followedCategoryIds);
-  const followedTeamSet = new Set(followedTeamIds);
-  const followedDriverSet = new Set(followedDriverIds);
+  const followedCategorySet = useMemo(() => new Set(followedCategoryIds), [followedCategoryIds]);
+  const followedTeamSet = useMemo(() => new Set(followedTeamIds), [followedTeamIds]);
+  const followedDriverSet = useMemo(() => new Set(followedDriverIds), [followedDriverIds]);
 
-  const upcomingFollowedRaces = React.useMemo(() => {
-    const followedByTeamCategory = new Set(followedTeamIds.map((value) => value.split('::')[0]).filter(Boolean));
-    const followedByDriverCategory = new Set(followedDriverIds.map((value) => value.split('::')[0]).filter(Boolean));
+  const upcomingFollowedRaces = useMemo(() => {
     const categoriesToShow = new Set<string>([
       ...followedCategoryIds,
-      ...Array.from(followedByTeamCategory),
-      ...Array.from(followedByDriverCategory),
+      ...followedTeamIds.map(v => v.split('::')[0]).filter(Boolean),
+      ...followedDriverIds.map(v => v.split('::')[0]).filter(Boolean),
     ]);
 
-    return MOTORSPORT_DATA.filter((category) => categoriesToShow.has(category.id))
-      .flatMap((category) =>
+    return Array.from(categoriesToShow)
+      .map(id => CATEGORY_BY_ID.get(id))
+      .filter((cat): cat is NonNullable<typeof cat> => cat != null)
+      .flatMap(category =>
         category.calendar
-          .filter((race) => race.status === 'upcoming')
-          .map((race) => ({ category, race }))
+          .filter(race => race.status === 'upcoming')
+          .map(race => ({ category, race }))
       )
       .sort((a, b) => a.race.date.localeCompare(b.race.date));
   }, [followedCategoryIds, followedTeamIds, followedDriverIds]);
 
-  const toggleFollowCategory = (categoryId: string) => {
+  const toggleFollowCategory = useCallback((categoryId: string) => {
     if (!currentUser) return onLoginRequest();
-    setFollowedCategoryIds((prev) => (prev.includes(categoryId) ? prev.filter((id) => id !== categoryId) : [...prev, categoryId]));
-  };
+    setFollowedCategoryIds(prev => prev.includes(categoryId) ? prev.filter(id => id !== categoryId) : [...prev, categoryId]);
+  }, [currentUser, onLoginRequest]);
 
-  const toggleFollowTeam = (categoryId: string, teamId: string) => {
+  const toggleFollowTeam = useCallback((categoryId: string, teamId: string) => {
     if (!currentUser) return onLoginRequest();
     const key = `${categoryId}::${teamId}`;
-    setFollowedTeamIds((prev) => (prev.includes(key) ? prev.filter((id) => id !== key) : [...prev, key]));
-  };
+    setFollowedTeamIds(prev => prev.includes(key) ? prev.filter(id => id !== key) : [...prev, key]);
+  }, [currentUser, onLoginRequest]);
 
-  const toggleFollowDriver = (categoryId: string, driverId: string) => {
+  const toggleFollowDriver = useCallback((categoryId: string, driverId: string) => {
     if (!currentUser) return onLoginRequest();
     const key = `${categoryId}::${driverId}`;
-    setFollowedDriverIds((prev) => (prev.includes(key) ? prev.filter((id) => id !== key) : [...prev, key]));
-  };
+    setFollowedDriverIds(prev => prev.includes(key) ? prev.filter(id => id !== key) : [...prev, key]);
+  }, [currentUser, onLoginRequest]);
 
-  const nextUpcomingRace = React.useMemo(
-    () => selectedCategory.calendar.find((race) => race.status === 'upcoming') ?? null,
+  const nextUpcomingRace = useMemo(
+    () => selectedCategory.calendar.find(race => race.status === 'upcoming') ?? null,
     [selectedCategory.calendar]
   );
 
-  const teamClasses = React.useMemo(
-    () => Array.from(new Set(selectedCategory.teams.map((team) => team.class || 'Geral'))),
+  const teamClasses = useMemo(
+    () => Array.from(new Set(selectedCategory.teams.map(team => team.class || 'Geral'))),
     [selectedCategory.teams]
+  );
+
+  const driversByTeamId = useMemo(() => {
+    const map = new Map<string, (typeof selectedCategory.drivers)[number][]>();
+    for (const driver of selectedCategory.drivers) {
+      const list = map.get(driver.teamId) ?? [];
+      list.push(driver);
+      map.set(driver.teamId, list);
+    }
+    return map;
+  }, [selectedCategory.drivers]);
+
+  const driverByName = useMemo(
+    () => new Map(selectedCategory.drivers.map(d => [d.name, d])),
+    [selectedCategory.drivers]
   );
 
   return (
     <div className="min-h-screen flex flex-col transition-colors duration-300 overflow-x-hidden">
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-[var(--card-border)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center gap-2 sm:gap-3">
-          <div className="flex-1 flex justify-start min-w-0">
-            <button 
-              onClick={() => {
-                setView('home');
-                setExpandedCategoryId(null);
-              }}
-              className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-            >
-              <span className="text-xl sm:text-2xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
-                PitStopHub
-              </span>
-            </button>
-          </div>
-          
-          <nav className="hidden xl:flex items-center gap-3 xl:gap-5 flex-shrink-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center">
+
+          <button
+            onClick={() => { setView('home'); setExpandedCategoryId(null); }}
+            className="shrink-0 flex items-center hover:opacity-80 transition-opacity"
+          >
+            <span className="text-xl sm:text-2xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
+              PitStopHub
+            </span>
+          </button>
+
+          <nav className="hidden xl:flex flex-1 items-center justify-center gap-1">
             <button
               onClick={() => setView('home')}
               className={cn(
-                "flex items-center gap-2 px-3 xl:px-4 py-2 rounded-full text-xs xl:text-sm leading-none whitespace-nowrap font-bold uppercase tracking-wide transition-all",
+                "flex items-center gap-2 px-3 py-2 rounded-full text-xs font-bold uppercase tracking-wide transition-all whitespace-nowrap",
                 view === 'home' ? "bg-brand-red text-white shadow-lg shadow-brand-red/20" : "text-gray-500 hover:text-brand-red"
               )}
             >
               <LayoutGrid className="w-4 h-4" />
               {UI_TRANSLATIONS[language].home}
             </button>
-            <div className="w-px h-6 bg-[var(--card-border)] mx-2" />
-            
+
+            <div className="w-px h-5 bg-[var(--card-border)] mx-3 shrink-0" />
+
             {NAV_GROUPS.map((group) => (
-              <div 
+              <div
                 key={group.name.en}
-                className="relative group"
+                className="relative"
                 onMouseEnter={() => setActiveDropdown(group.name.en)}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
                 <button
                   className={cn(
-                    "flex items-center gap-1 py-2 text-xs xl:text-sm leading-none whitespace-nowrap font-bold uppercase tracking-wide transition-colors hover:text-brand-red",
+                    "flex items-center gap-1 px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors hover:text-brand-red whitespace-nowrap",
                     group.ids.includes(selectedCategory.id) && view === 'category' ? "text-brand-red" : "text-gray-500"
                   )}
                 >
                   {language === 'pt' ? group.name.pt : group.name.en}
-                  <ChevronDown className={cn("w-4 h-4 transition-transform", activeDropdown === group.name.en && "rotate-180")} />
+                  <ChevronDown className={cn("w-3.5 h-3.5 shrink-0 transition-transform", activeDropdown === group.name.en && "rotate-180")} />
                 </button>
 
                 <AnimatePresence>
                   {activeDropdown === group.name.en && (
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-2xl overflow-hidden py-2"
+                      initial={{ opacity: 0, y: 6, scale: 0.97 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 6, scale: 0.97 }}
+                      transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute top-full left-0 mt-2 w-48 z-[200] bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-2xl py-2"
                     >
                       {group.ids.map(id => {
-                        const cat = MOTORSPORT_DATA.find(c => c.id === id);
+                        const cat = CATEGORY_BY_ID.get(id);
                         if (!cat) return null;
                         return (
                           <button
                             key={cat.id}
                             onClick={() => handleCategorySelect(cat)}
                             className={cn(
-                              "w-full text-left px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-brand-red hover:text-white",
+                              "w-full text-left px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-brand-red hover:text-white",
                               view === 'category' && selectedCategory.id === cat.id ? "text-brand-red bg-brand-red/5" : "text-gray-500"
                             )}
                           >
@@ -403,34 +418,38 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             ))}
           </nav>
 
-          <div className="flex-1 flex justify-end items-center gap-2 xl:gap-3 min-w-0">
-            {currentUser && (
-              <div className="hidden 2xl:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] shrink-0">
-                <Users className="w-4 h-4 text-brand-red" />
-                <span className="text-xs font-semibold text-[var(--text-main)]">{currentUser.name}</span>
+          <div className="ml-auto xl:ml-0 flex items-center gap-2 shrink-0">
+            {currentUser ? (
+              <div className="hidden xl:flex items-center gap-2">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)]">
+                  <div className="w-6 h-6 rounded-full bg-brand-red flex items-center justify-center text-white text-[10px] font-black shrink-0 select-none">
+                    {currentUser.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-xs font-semibold text-[var(--text-main)] max-w-[120px] truncate">
+                    {currentUser.name}
+                  </span>
+                </div>
+                <button
+                  onClick={onLogout}
+                  className="px-3 py-2 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-xs font-bold uppercase tracking-wide text-gray-500 hover:text-brand-red transition-colors whitespace-nowrap"
+                >
+                  {UI_TRANSLATIONS[language].logout}
+                </button>
               </div>
+            ) : (
+              <button
+                onClick={onLoginRequest}
+                className="hidden xl:flex px-4 py-2 rounded-xl bg-brand-red text-white text-xs font-bold uppercase tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap"
+              >
+                {UI_TRANSLATIONS[language].login}
+              </button>
             )}
-            <button 
+            <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="xl:hidden p-2.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] hover:scale-110 transition-all shadow-sm"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            {currentUser ? (
-              <button
-                onClick={onLogout}
-                className="px-3 py-2 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-xs font-bold uppercase tracking-wide text-gray-500 hover:text-brand-red transition-colors whitespace-nowrap shrink-0"
-              >
-                {UI_TRANSLATIONS[language].logout}
-              </button>
-            ) : (
-              <button
-                onClick={onLoginRequest}
-                className="px-3 py-2 rounded-xl bg-brand-red text-white text-xs font-bold uppercase tracking-wide hover:opacity-90 transition-opacity whitespace-nowrap shrink-0"
-              >
-                {UI_TRANSLATIONS[language].login}
-              </button>
-            )}
           </div>
         </div>
 
@@ -440,67 +459,86 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="xl:hidden bg-[var(--header-bg)] border-t border-[var(--card-border)] overflow-hidden shadow-2xl"
+              transition={SPRING_SOFT}
+              className="xl:hidden border-t border-[var(--card-border)] overflow-hidden"
             >
-              <div className="px-4 py-8 space-y-8 max-h-[80vh] overflow-y-auto no-scrollbar">
-                <div className="grid grid-cols-1 gap-3">
+              <div className="bg-[var(--header-bg)] px-4 py-6 space-y-6 max-h-[80vh] overflow-y-auto no-scrollbar">
+                {currentUser ? (
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-full bg-brand-red flex items-center justify-center text-white text-sm font-black shrink-0 select-none">
+                        {currentUser.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-bold text-[var(--text-main)] truncate">{currentUser.name}</div>
+                        <div className="text-[10px] text-gray-500 uppercase tracking-widest">{currentUser.email}</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => { onLogout(); setIsMobileMenuOpen(false); }}
+                      className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-brand-red transition-colors shrink-0 ml-3"
+                    >
+                      {UI_TRANSLATIONS[language].logout}
+                    </button>
+                  </div>
+                ) : (
                   <button
-                    onClick={() => {
-                      setView('home');
-                      setExpandedCategoryId(null);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={cn(
-                      "flex flex-col items-center justify-center gap-2 p-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border",
-                      view === 'home' 
-                        ? "bg-brand-red text-white border-brand-red shadow-lg shadow-brand-red/20" 
-                        : "bg-white/5 text-gray-500 border-white/5 hover:bg-white/10"
-                    )}
+                    onClick={() => { onLoginRequest(); setIsMobileMenuOpen(false); }}
+                    className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl bg-brand-red text-white text-sm font-black uppercase tracking-widest shadow-lg shadow-brand-red/20 active:scale-95 transition-transform"
                   >
-                    <LayoutGrid className="w-5 h-5" />
-                    {UI_TRANSLATIONS[language].home}
+                    {UI_TRANSLATIONS[language].login}
                   </button>
-                </div>
+                )}
+
+                <button
+                  onClick={() => { setView('home'); setExpandedCategoryId(null); setIsMobileMenuOpen(false); }}
+                  className={cn(
+                    "w-full flex items-center justify-center gap-2 p-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border",
+                    view === 'home'
+                      ? "bg-brand-red text-white border-brand-red shadow-lg shadow-brand-red/20"
+                      : "bg-white/5 text-gray-500 border-white/5 hover:bg-white/10"
+                  )}
+                >
+                  <LayoutGrid className="w-5 h-5" />
+                  {UI_TRANSLATIONS[language].home}
+                </button>
 
                 <div className="space-y-6">
                   {NAV_GROUPS.map((group) => (
                     <div key={group.name.en} className="space-y-3">
                       <div className="flex items-center gap-3 px-2">
                         <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--card-border)]" />
-                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red shrink-0">
                           {language === 'pt' ? group.name.pt : group.name.en}
-                        </div>
+                        </span>
                         <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[var(--card-border)]" />
                       </div>
-                      <div className="grid grid-cols-1 gap-2">
+                      <div className="space-y-2">
                         {group.ids.map(id => {
-                          const cat = MOTORSPORT_DATA.find(c => c.id === id);
+                          const cat = CATEGORY_BY_ID.get(id);
                           if (!cat) return null;
                           const Icon = IconMap[cat.icon];
                           return (
                             <button
                               key={cat.id}
-                              onClick={() => {
-                                handleCategorySelect(cat);
-                                setIsMobileMenuOpen(false);
-                              }}
+                              onClick={() => { handleCategorySelect(cat); setIsMobileMenuOpen(false); }}
                               className={cn(
                                 "w-full flex items-center justify-between px-5 py-4 rounded-2xl text-sm font-bold uppercase tracking-widest transition-all border",
-                                view === 'category' && selectedCategory.id === cat.id 
-                                  ? "bg-brand-red/10 text-brand-red border-brand-red/20" 
+                                view === 'category' && selectedCategory.id === cat.id
+                                  ? "bg-brand-red/10 text-brand-red border-brand-red/20"
                                   : "bg-white/5 text-gray-400 border-white/5 hover:bg-white/10"
                               )}
                             >
                               <div className="flex items-center gap-3">
                                 <div className={cn(
-                                  "w-8 h-8 rounded-lg flex items-center justify-center",
+                                  "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
                                   view === 'category' && selectedCategory.id === cat.id ? "bg-brand-red text-white" : "bg-white/10 text-gray-500"
                                 )}>
                                   <Icon className="w-4 h-4" />
                                 </div>
                                 {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
                               </div>
-                              <ChevronRight className="w-4 h-4 opacity-50" />
+                              <ChevronRight className="w-4 h-4 opacity-50 shrink-0" />
                             </button>
                           );
                         })}
@@ -517,34 +555,26 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       <main className="flex-grow">
         <AnimatePresence mode="wait">
           {view === 'home' ? (
-            <motion.div 
+            <motion.div
               key="home-page"
               className="relative min-h-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={SPRING}
             >
-              {/* Background GIF for Home Page */}
-              <div 
-                className="absolute inset-0 -z-10 opacity-10 pointer-events-none hidden md:block"
-                style={{
-                  backgroundImage: 'url("https://i.imgur.com/dgLObWa.gif")',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                  filter: 'grayscale(100%)'
-                }}
-              />
               <motion.section
                 key="home-content"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
+                transition={SPRING}
                 className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 md:py-20"
               >
                 <div className="text-center mb-10 sm:mb-16">
-                <motion.h1 
-                  initial={{ opacity: 0, y: 20 }}
+                <motion.h1
+                  initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
+                  transition={SPRING}
                   className="text-4xl sm:text-5xl md:text-7xl font-display font-black italic tracking-tighter mb-6 text-[var(--text-main)]"
                 >
                   PitStopHub
@@ -583,11 +613,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                 <div className="space-y-16">
                   {NAV_GROUPS.map((group, groupIndex) => (
-                    <motion.div 
+                    <motion.div
                       key={group.name.en}
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 24 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: groupIndex * 0.1 }}
+                      transition={{ type: 'spring', stiffness: 350, damping: 30, delay: groupIndex * 0.07 }}
                     >
                       <div className="flex items-center gap-4 mb-8">
                         <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--card-border)] to-transparent" />
@@ -599,15 +629,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                       {group.ids.map((id) => {
-                        const cat = MOTORSPORT_DATA.find(c => c.id === id);
+                        const cat = CATEGORY_BY_ID.get(id);
                         if (!cat) return null;
                         const Icon = IconMap[cat.icon];
                         const isExpanded = expandedCategoryId === cat.id;
 
                         return (
-                          <motion.div
+                          <div
                             key={cat.id}
-                            layout
                             onClick={(e) => {
                               e.stopPropagation();
                               if (isExpanded) {
@@ -629,8 +658,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             role="button"
                             tabIndex={0}
                             className={cn(
-                              "group relative flex flex-col items-start p-5 glass-card hover:scale-[1.02] transition-all text-left overflow-hidden cursor-pointer",
-                              isExpanded ? "ring-2 ring-brand-red/50 shadow-2xl shadow-brand-red/10 z-10" : "hover:bg-white/5"
+                              "group relative flex flex-col items-start p-5 glass-card text-left overflow-hidden cursor-pointer",
+                              isExpanded
+                                ? "ring-2 ring-brand-red/50 shadow-2xl shadow-brand-red/10 z-20"
+                                : "hover:scale-[1.02] active:scale-[0.98] hover:bg-white/5 transition-transform duration-200"
                             )}
                           >
                             <div className="flex items-center gap-4 w-full">
@@ -671,6 +702,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   initial={{ height: 0, opacity: 0, marginTop: 0 }}
                                   animate={{ height: 'auto', opacity: 1, marginTop: 16 }}
                                   exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                                  transition={SPRING_SOFT}
                                   className="overflow-hidden w-full"
                                 >
                                   <p className="text-xs text-gray-500 mb-6 leading-relaxed">
@@ -712,7 +744,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 </motion.div>
                               )}
                             </AnimatePresence>
-                          </motion.div>
+                          </div>
                         );
                       })}
                     </div>
@@ -724,11 +756,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         ) : (
             <motion.div
               key="category"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={SPRING}
             >
-              {/* Hero Section */}
               <section className="relative py-12 md:py-20 overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
                   <div className="absolute inset-0 bg-gradient-to-b from-brand-red/20 to-transparent" />
@@ -739,7 +771,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     key={selectedCategory.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
+                    transition={SPRING_SOFT}
                     className="flex flex-col md:flex-row items-center gap-12"
                   >
                     <div className="flex-1 text-center md:text-left">
@@ -774,7 +806,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                             }, 100);
                           }}
-                          className="px-8 py-4 bg-brand-red text-white font-bold rounded-xl shadow-xl shadow-brand-red/20 hover:scale-105 transition-all uppercase tracking-widest text-sm"
+                          className="px-8 py-4 bg-brand-red text-white font-bold rounded-xl shadow-xl shadow-brand-red/20 hover:scale-105 active:scale-100 transition-all uppercase tracking-widest text-sm"
                         >
                           {UI_TRANSLATIONS[language].viewCalendar}
                         </button>
@@ -836,7 +868,6 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 </div>
               </section>
 
-              {/* Content Tabs */}
               <section ref={contentRef} className="py-12 bg-[var(--bg-main)] scroll-mt-24">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="flex items-center justify-start md:justify-center gap-4 mb-12 overflow-x-auto pb-4 no-scrollbar">
@@ -871,9 +902,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     {activeTab === 'overview' && (
                       <motion.div
                         key="overview"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 20 }}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={SPRING}
                         className="grid grid-cols-1 md:grid-cols-3 gap-8"
                       >
                         <div className="glass-card p-8">
@@ -931,9 +963,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     {activeTab === 'teams' && (
                       <motion.div
                         key="teams"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={SPRING}
                         className="space-y-12"
                       >
                         {teamClasses.map(className => (
@@ -970,8 +1003,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                         </button>
                                       </div>
                                       <div className="space-y-3">
-                                        {selectedCategory.drivers
-                                          .filter(d => d.teamId === team.id)
+                                        {(driversByTeamId.get(team.id) ?? [])
                                           .map(driver => (
                                             <div key={driver.id} className="relative flex flex-col p-4 rounded-2xl bg-black/20 hover:bg-black/30 transition-all group/driver overflow-hidden border border-white/5">
                                               <div className="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 bg-brand-red/5 rounded-full group-hover/driver:bg-brand-red/10 transition-colors" />
@@ -1041,9 +1073,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     {activeTab === 'calendar' && (
                       <motion.div
                         key="calendar"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={SPRING}
                         className="space-y-4"
                       >
                         <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 text-xs font-bold uppercase tracking-widest text-gray-500">
@@ -1056,7 +1089,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         
                         <div className="space-y-4">
                           {selectedCategory.calendar.map((race) => {
-                            const winnerDriver = selectedCategory.drivers.find((driver) => driver.name === race.winner);
+                            const winnerDriver = race.winner ? driverByName.get(race.winner) : undefined;
                             return (
                             <div 
                               key={race.id} 
@@ -1125,9 +1158,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     {activeTab === 'standings' && (
                       <motion.div
                         key="standings"
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={SPRING}
                         className="space-y-12"
                       >
                         {selectedCategory.standings ? (
@@ -1243,7 +1277,6 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         </AnimatePresence>
       </main>
 
-      {/* Footer */}
       <footer className="bg-[var(--bg-main)] py-12 border-t border-[var(--card-border)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
@@ -1308,7 +1341,6 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         </div>
       </footer>
 
-      {/* Rules Modal */}
       <AnimatePresence>
         {showRules && selectedCategory && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -1320,9 +1352,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.94, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              exit={{ opacity: 0, scale: 0.94, y: 16 }}
+              transition={SPRING}
               className="relative w-full max-w-2xl glass-card p-8 md:p-12 overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 bg-brand-red/10 rounded-full" />
