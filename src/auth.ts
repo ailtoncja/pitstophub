@@ -23,6 +23,7 @@ type AuthSuccess =
 
 const AUTH_THEME_KEY = 'pitstophub_auth_theme_v1';
 const SUPABASE_REQUEST_TIMEOUT_MS = 8000;
+export const MIN_PASSWORD_LENGTH = 10;
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs = SUPABASE_REQUEST_TIMEOUT_MS): Promise<T> {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -53,6 +54,14 @@ function mapAuthErrorMessage(message: string, mode: 'login' | 'register') {
     return 'Este email ja esta cadastrado. Tente entrar na conta em vez de criar outra.';
   }
 
+  if (normalized.includes('password should be at least')) {
+    return `A senha deve ter no minimo ${MIN_PASSWORD_LENGTH} caracteres.`;
+  }
+
+  if (normalized.includes('password') && normalized.includes('weak')) {
+    return 'Escolha uma senha mais forte para proteger sua conta.';
+  }
+
   return message;
 }
 
@@ -70,19 +79,25 @@ function mapUser(user: User): AuthUser {
 
 async function ensureUserSettingsRow(userId: string) {
   if (!supabase) return;
-  await supabase.from('user_settings').upsert(
-    {
-      user_id: userId,
-      theme: 'dark',
-      language: 'pt',
-      favorite_category_id: 'f1',
-      followed_category_ids: [],
-      followed_team_ids: [],
-      followed_driver_ids: [],
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'user_id', ignoreDuplicates: true }
-  );
+  try {
+    await withTimeout(Promise.resolve(
+      supabase.from('user_settings').upsert(
+        {
+          user_id: userId,
+          theme: 'dark',
+          language: 'pt',
+          favorite_category_id: 'f1',
+          followed_category_ids: [],
+          followed_team_ids: [],
+          followed_driver_ids: [],
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id', ignoreDuplicates: true }
+      )
+    ));
+  } catch (error) {
+    console.error('Falha ao garantir a linha de configuracoes do usuario.', error);
+  }
 }
 
 export async function getCurrentSession(): Promise<AuthUser | null> {
@@ -115,13 +130,15 @@ export async function registerUser(input: {
 
   if (name.length < 2) return { ok: false, message: 'Nome deve ter pelo menos 2 caracteres.' };
   if (!email.includes('@') || email.length < 5) return { ok: false, message: 'Email invalido.' };
-  if (password.length < 6) return { ok: false, message: 'Senha deve ter no minimo 6 caracteres.' };
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return { ok: false, message: `Senha deve ter no minimo ${MIN_PASSWORD_LENGTH} caracteres.` };
+  }
 
-  const { data, error } = await supabase.auth.signUp({
+  const { data, error } = await withTimeout(supabase.auth.signUp({
     email,
     password,
     options: { data: { display_name: name } },
-  });
+  }));
 
   if (error) return { ok: false, message: mapAuthErrorMessage(error.message, 'register') };
   if (!data.user) return { ok: false, message: 'Nao foi possivel criar a conta.' };
@@ -149,10 +166,10 @@ export async function loginUser(input: {
     };
   }
 
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await withTimeout(supabase.auth.signInWithPassword({
     email: input.email.trim().toLowerCase(),
     password: input.password,
-  });
+  }));
 
   if (error || !data.user) {
     if (error) {
@@ -167,7 +184,7 @@ export async function loginUser(input: {
 
 export async function logoutUser() {
   if (!supabase) return;
-  await supabase.auth.signOut();
+  await withTimeout(supabase.auth.signOut());
 }
 
 export async function getUserSettings(userId: string): Promise<UserSettings | null> {
@@ -200,19 +217,21 @@ export async function getUserSettings(userId: string): Promise<UserSettings | nu
 
 export async function saveUserSettings(userId: string, settings: UserSettings) {
   if (!supabase) return;
-  const { error } = await supabase.from('user_settings').upsert(
-    {
-      user_id: userId,
-      theme: settings.theme,
-      language: settings.language,
-      favorite_category_id: settings.favoriteCategoryId,
-      followed_category_ids: settings.followedCategoryIds,
-      followed_team_ids: settings.followedTeamIds,
-      followed_driver_ids: settings.followedDriverIds,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'user_id' }
-  );
+  const { error } = await withTimeout(Promise.resolve(
+    supabase.from('user_settings').upsert(
+      {
+        user_id: userId,
+        theme: settings.theme,
+        language: settings.language,
+        favorite_category_id: settings.favoriteCategoryId,
+        followed_category_ids: settings.followedCategoryIds,
+        followed_team_ids: settings.followedTeamIds,
+        followed_driver_ids: settings.followedDriverIds,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' }
+    )
+  ));
 
   if (error) throw error;
 }

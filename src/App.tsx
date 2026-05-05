@@ -22,7 +22,8 @@ import {
   Menu,
   X,
   Languages,
-  Heart
+  Heart,
+  Download
 } from 'lucide-react';
 import { MOTORSPORT_DATA, Category } from './types';
 import { cn } from './lib/utils';
@@ -122,7 +123,9 @@ const UI_TRANSLATIONS = {
     followingCategory: 'Seguindo categoria',
     status: 'Status',
     notAvailableShort: 'N/A',
-    fiaSanctioned: 'Homologado FIA'
+    fiaSanctioned: 'Homologado FIA',
+    installApp: 'Instalar App',
+    installingApp: 'Instalando...'
   },
   en: {
     home: 'Home',
@@ -179,7 +182,9 @@ const UI_TRANSLATIONS = {
     followingCategory: 'Following category',
     status: 'Status',
     notAvailableShort: 'N/A',
-    fiaSanctioned: 'FIA Sanctioned'
+    fiaSanctioned: 'FIA Sanctioned',
+    installApp: 'Install App',
+    installingApp: 'Installing...'
   }
 };
 
@@ -187,6 +192,11 @@ type AppProps = {
   currentUser: AuthUser | null;
   onLogout: () => void;
   onLoginRequest: () => void;
+};
+
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 };
 
 export default function App({ currentUser, onLogout, onLoginRequest }: AppProps) {
@@ -204,6 +214,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [followedCategoryIds, setFollowedCategoryIds] = useState<string[]>([]);
   const [followedTeamIds, setFollowedTeamIds] = useState<string[]>([]);
   const [followedDriverIds, setFollowedDriverIds] = useState<string[]>([]);
+  const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [installingApp, setInstallingApp] = useState(false);
 
   React.useEffect(() => {
     if (!currentUser) {
@@ -218,6 +230,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     }
 
     let isMounted = true;
+    setSettingsLoaded(false);
     (async () => {
       try {
         const settings = await getUserSettings(currentUser.id);
@@ -263,10 +276,32 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         followedCategoryIds,
         followedTeamIds,
         followedDriverIds,
+      }).catch((error) => {
+        console.error('Falha ao salvar configuracoes do usuario.', error);
       });
     }, 250);
     return () => window.clearTimeout(t);
   }, [currentUser, settingsLoaded, isDarkMode, language, selectedCategory.id, followedCategoryIds, followedTeamIds, followedDriverIds]);
+
+  React.useEffect(() => {
+    const handleBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setDeferredInstallPrompt(event as BeforeInstallPromptEvent);
+    };
+
+    const handleAppInstalled = () => {
+      setDeferredInstallPrompt(null);
+      setInstallingApp(false);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
 
   React.useEffect(() => {
     const handleClickOutside = () => {
@@ -328,6 +363,21 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     const key = `${categoryId}::${driverId}`;
     setFollowedDriverIds(prev => prev.includes(key) ? prev.filter(id => id !== key) : [...prev, key]);
   }, [currentUser, onLoginRequest]);
+
+  const handleInstallApp = useCallback(async () => {
+    if (!deferredInstallPrompt) return;
+
+    setInstallingApp(true);
+    try {
+      await deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+    } catch (error) {
+      console.error('Falha ao iniciar a instalacao do app.', error);
+    } finally {
+      setDeferredInstallPrompt(null);
+      setInstallingApp(false);
+    }
+  }, [deferredInstallPrompt]);
 
   const nextUpcomingRace = useMemo(
     () => selectedCategory.calendar.find(race => race.status === 'upcoming') ?? null,
@@ -432,6 +482,15 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
           </nav>
 
           <div className="ml-auto xl:ml-0 flex items-center gap-2 shrink-0">
+            {deferredInstallPrompt && (
+              <button
+                onClick={() => { void handleInstallApp(); }}
+                disabled={installingApp}
+                className="hidden md:flex px-4 py-2 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] text-xs font-bold uppercase tracking-wide text-[var(--text-main)] hover:text-brand-red transition-colors disabled:opacity-60 whitespace-nowrap"
+              >
+                {installingApp ? UI_TRANSLATIONS[language].installingApp : UI_TRANSLATIONS[language].installApp}
+              </button>
+            )}
             {currentUser ? (
               <div className="hidden xl:flex items-center gap-2">
                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)]">
@@ -500,6 +559,17 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl bg-brand-red text-white text-sm font-black uppercase tracking-widest shadow-lg shadow-brand-red/20 active:scale-95 transition-transform"
                   >
                     {UI_TRANSLATIONS[language].login}
+                  </button>
+                )}
+
+                {deferredInstallPrompt && (
+                  <button
+                    onClick={() => { void handleInstallApp(); setIsMobileMenuOpen(false); }}
+                    disabled={installingApp}
+                    className="w-full flex items-center justify-center gap-2 p-4 rounded-2xl bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-main)] text-sm font-black uppercase tracking-widest disabled:opacity-60"
+                  >
+                    <Download className="w-4 h-4" />
+                    {installingApp ? UI_TRANSLATIONS[language].installingApp : UI_TRANSLATIONS[language].installApp}
                   </button>
                 )}
 
@@ -1319,6 +1389,16 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             </div>
           </div>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            {deferredInstallPrompt && (
+              <button
+                onClick={() => { void handleInstallApp(); }}
+                disabled={installingApp}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-brand-red text-white text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-60"
+              >
+                <Download className="w-4 h-4" />
+                {installingApp ? UI_TRANSLATIONS[language].installingApp : UI_TRANSLATIONS[language].installApp}
+              </button>
+            )}
             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-500">
               <Languages className="w-4 h-4" />
               {UI_TRANSLATIONS[language].language}
