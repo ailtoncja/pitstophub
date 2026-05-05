@@ -1,7 +1,8 @@
 {
-  "name": "react-example",
+  "name": "pitstophub",
   "private": true,
   "version": "0.0.0",
+  "description": "PitStopHub PWA para acompanhar categorias, equipes, pilotos e calendarios do automobilismo.",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import App from './App';
-import { AuthUser, getCurrentSession, loginUser, logoutUser, registerUser } from './auth';
+import { AuthUser, getCurrentSession, loginUser, logoutUser, MIN_PASSWORD_LENGTH, registerUser } from './auth';
 import { supabase } from './supabase';
 
 type AuthMode = 'login' | 'register';
@@ -188,10 +188,10 @@ export default function AuthGate() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="******"
+                  placeholder={`Minimo de ${MIN_PASSWORD_LENGTH} caracteres`}
                   className="w-full rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] px-4 py-3 outline-none focus:ring-2 focus:ring-brand-red/40"
                   required
-                  minLength={6}
+                  minLength={MIN_PASSWORD_LENGTH}
                 />
               </div>
 
