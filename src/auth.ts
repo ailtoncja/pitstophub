@@ -22,7 +22,8 @@ type AuthSuccess =
   | { ok: true; status: 'pending_verification'; message: string };
 
 const AUTH_THEME_KEY = 'pitstophub_auth_theme_v1';
-const SUPABASE_REQUEST_TIMEOUT_MS = 8000;
+const SETTINGS_CACHE_PREFIX = 'pitstophub_settings_v2_';
+const SUPABASE_REQUEST_TIMEOUT_MS = 5000;
 export const MIN_PASSWORD_LENGTH = 10;
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs = SUPABASE_REQUEST_TIMEOUT_MS): Promise<T> {
@@ -65,7 +66,7 @@ function mapAuthErrorMessage(message: string, mode: 'login' | 'register') {
   return message;
 }
 
-function mapUser(user: User): AuthUser {
+export function mapAuthUser(user: User): AuthUser {
   const email = user.email ?? '';
   const metadataName = typeof user.user_metadata?.display_name === 'string' ? user.user_metadata.display_name : '';
   const name = metadataName || email.split('@')[0] || 'Usuario';
@@ -105,7 +106,7 @@ export async function getCurrentSession(): Promise<AuthUser | null> {
   try {
     const { data, error } = await withTimeout(supabase.auth.getSession());
     if (error || !data.session?.user) return null;
-    return mapUser(data.session.user);
+    return mapAuthUser(data.session.user);
   } catch (error) {
     console.error('Falha ao carregar sessao atual.', error);
     return null;
@@ -151,8 +152,8 @@ export async function registerUser(input: {
     };
   }
 
-  await ensureUserSettingsRow(data.user.id);
-  return { ok: true, status: 'authenticated', user: mapUser(data.user) };
+  void ensureUserSettingsRow(data.user.id);
+  return { ok: true, status: 'authenticated', user: mapAuthUser(data.user) };
 }
 
 export async function loginUser(input: {
@@ -178,8 +179,8 @@ export async function loginUser(input: {
     return { ok: false, message: 'Email ou senha invalidos.' };
   }
 
-  await ensureUserSettingsRow(data.user.id);
-  return { ok: true, status: 'authenticated', user: mapUser(data.user) };
+  void ensureUserSettingsRow(data.user.id);
+  return { ok: true, status: 'authenticated', user: mapAuthUser(data.user) };
 }
 
 export async function logoutUser() {
@@ -188,7 +189,19 @@ export async function logoutUser() {
 }
 
 export async function getUserSettings(userId: string): Promise<UserSettings | null> {
+  const cacheKey = `${SETTINGS_CACHE_PREFIX}${userId}`;
+
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    try {
+      return JSON.parse(cached) as UserSettings;
+    } catch {
+      localStorage.removeItem(cacheKey);
+    }
+  }
+
   if (!supabase) return null;
+
   try {
     const response = await withTimeout(Promise.resolve(
       supabase
@@ -201,7 +214,7 @@ export async function getUserSettings(userId: string): Promise<UserSettings | nu
 
     if (error || !data) return null;
 
-    return {
+    const settings: UserSettings = {
       theme: data.theme === 'light' ? 'light' : 'dark',
       language: data.language === 'en' ? 'en' : 'pt',
       favoriteCategoryId: data.favorite_category_id ?? 'f1',
@@ -209,6 +222,8 @@ export async function getUserSettings(userId: string): Promise<UserSettings | nu
       followedTeamIds: Array.isArray(data.followed_team_ids) ? data.followed_team_ids : [],
       followedDriverIds: Array.isArray(data.followed_driver_ids) ? data.followed_driver_ids : [],
     };
+    localStorage.setItem(cacheKey, JSON.stringify(settings));
+    return settings;
   } catch (requestError) {
     console.error('Falha ao carregar configuracoes do usuario.', requestError);
     return null;
@@ -216,6 +231,7 @@ export async function getUserSettings(userId: string): Promise<UserSettings | nu
 }
 
 export async function saveUserSettings(userId: string, settings: UserSettings) {
+  localStorage.setItem(`${SETTINGS_CACHE_PREFIX}${userId}`, JSON.stringify(settings));
   if (!supabase) return;
   const { error } = await withTimeout(Promise.resolve(
     supabase.from('user_settings').upsert(
