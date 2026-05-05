@@ -7,5 +7,7 @@ coverage/
 .env*
 !.env.example
 .claude/
-.netlify/
+.vercel/
 supabase/.temp/
+
+.vercel
