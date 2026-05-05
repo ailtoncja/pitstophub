@@ -22,10 +22,17 @@ export default function AuthGate() {
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const sessionUser = await getCurrentSession();
-      if (!mounted) return;
-      setUser(sessionUser);
-      setBootLoading(false);
+      try {
+        const sessionUser = await getCurrentSession();
+        if (!mounted) return;
+        setUser(sessionUser);
+      } catch (error) {
+        console.error('Falha ao inicializar autenticacao.', error);
+      } finally {
+        if (mounted) {
+          setBootLoading(false);
+        }
+      }
     })();
     return () => {
       mounted = false;

@@ -73,9 +73,14 @@ async function ensureUserSettingsRow(userId: string) {
 
 export async function getCurrentSession(): Promise<AuthUser | null> {
   if (!supabase) return null;
-  const { data, error } = await supabase.auth.getSession();
-  if (error || !data.session?.user) return null;
-  return mapUser(data.session.user);
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    if (error || !data.session?.user) return null;
+    return mapUser(data.session.user);
+  } catch (error) {
+    console.error('Falha ao carregar sessao atual.', error);
+    return null;
+  }
 }
 
 export async function registerUser(input: {
