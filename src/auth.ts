@@ -85,7 +85,7 @@ export async function registerUser(input: {
   if (!data.user) return { ok: false, message: 'Nao foi possivel criar a conta.' };
 
   if (!data.session) {
-    return { ok: false, message: 'Conta criada. Confirme o email para entrar.' };
+    return { ok: false, message: 'Conta criada, mas nao foi possivel iniciar sessao. Tente fazer login.' };
   }
 
   await ensureUserSettingsRow(data.user.id);
