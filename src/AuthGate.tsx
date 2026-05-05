@@ -14,6 +14,7 @@ export default function AuthGate() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState(false);
 
   const title = useMemo(() => (mode === 'login' ? 'Entrar no PitStopHub' : 'Criar conta no PitStopHub'), [mode]);
@@ -38,6 +39,7 @@ export default function AuthGate() {
         const sessionUser = await getCurrentSession();
         setUser(sessionUser);
         setError('');
+        setNotice('');
         setAuthOpen(false);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
@@ -49,6 +51,7 @@ export default function AuthGate() {
   const closeAuth = () => {
     setAuthOpen(false);
     setError('');
+    setNotice('');
     setPassword('');
   };
 
@@ -56,15 +59,24 @@ export default function AuthGate() {
     e.preventDefault();
     setBusy(true);
     setError('');
+    setNotice('');
 
     const result =
       mode === 'login'
         ? await loginUser({ email, password })
         : await registerUser({ name, email, password });
 
-    if (!result.ok) {
+    if ('message' in result && !result.ok) {
       setError(result.message);
       setBusy(false);
+      return;
+    }
+
+    if (result.status === 'pending_verification') {
+      setNotice(result.message);
+      setBusy(false);
+      setMode('login');
+      setPassword('');
       return;
     }
 
@@ -117,6 +129,7 @@ export default function AuthGate() {
                 onClick={() => {
                   setMode('login');
                   setError('');
+                  setNotice('');
                 }}
                 className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${mode === 'login' ? 'bg-brand-red text-white' : 'text-gray-500'}`}
                 type="button"
@@ -127,6 +140,7 @@ export default function AuthGate() {
                 onClick={() => {
                   setMode('register');
                   setError('');
+                  setNotice('');
                 }}
                 className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${mode === 'register' ? 'bg-brand-red text-white' : 'text-gray-500'}`}
                 type="button"
@@ -174,6 +188,7 @@ export default function AuthGate() {
                 />
               </div>
 
+              {notice && <p className="text-sm text-emerald-500">{notice}</p>}
               {error && <p className="text-sm text-red-500">{error}</p>}
 
               <button

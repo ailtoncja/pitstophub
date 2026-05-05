@@ -17,7 +17,30 @@ export type UserSettings = {
   followedDriverIds: string[];
 };
 
+type AuthSuccess =
+  | { ok: true; status: 'authenticated'; user: AuthUser }
+  | { ok: true; status: 'pending_verification'; message: string };
+
 const AUTH_THEME_KEY = 'pitstophub_auth_theme_v1';
+
+function mapAuthErrorMessage(message: string, mode: 'login' | 'register') {
+  const normalized = message.toLowerCase();
+
+  if (
+    normalized.includes('email rate limit exceeded') ||
+    normalized.includes('over_email_send_rate_limit') ||
+    normalized.includes('security purposes') ||
+    normalized.includes('too many requests')
+  ) {
+    return 'Muitas tentativas de envio de email em pouco tempo. Aguarde alguns minutos antes de tentar novamente.';
+  }
+
+  if (mode === 'register' && normalized.includes('user already registered')) {
+    return 'Este email ja esta cadastrado. Tente entrar na conta em vez de criar outra.';
+  }
+
+  return message;
+}
 
 function mapUser(user: User): AuthUser {
   const email = user.email ?? '';
@@ -59,7 +82,7 @@ export async function registerUser(input: {
   name: string;
   email: string;
   password: string;
-}): Promise<{ ok: true; user: AuthUser } | { ok: false; message: string }> {
+}): Promise<AuthSuccess | { ok: false; message: string }> {
   if (!supabase || !isSupabaseConfigured) {
     return {
       ok: false,
@@ -81,21 +104,25 @@ export async function registerUser(input: {
     options: { data: { display_name: name } },
   });
 
-  if (error) return { ok: false, message: error.message };
+  if (error) return { ok: false, message: mapAuthErrorMessage(error.message, 'register') };
   if (!data.user) return { ok: false, message: 'Nao foi possivel criar a conta.' };
 
   if (!data.session) {
-    return { ok: false, message: 'Conta criada, mas nao foi possivel iniciar sessao. Tente fazer login.' };
+    return {
+      ok: true,
+      status: 'pending_verification',
+      message: 'Conta criada. Verifique seu email para confirmar o cadastro antes de entrar.',
+    };
   }
 
   await ensureUserSettingsRow(data.user.id);
-  return { ok: true, user: mapUser(data.user) };
+  return { ok: true, status: 'authenticated', user: mapUser(data.user) };
 }
 
 export async function loginUser(input: {
   email: string;
   password: string;
-}): Promise<{ ok: true; user: AuthUser } | { ok: false; message: string }> {
+}): Promise<AuthSuccess | { ok: false; message: string }> {
   if (!supabase || !isSupabaseConfigured) {
     return {
       ok: false,
@@ -109,11 +136,14 @@ export async function loginUser(input: {
   });
 
   if (error || !data.user) {
+    if (error) {
+      return { ok: false, message: mapAuthErrorMessage(error.message, 'login') };
+    }
     return { ok: false, message: 'Email ou senha invalidos.' };
   }
 
   await ensureUserSettingsRow(data.user.id);
-  return { ok: true, user: mapUser(data.user) };
+  return { ok: true, status: 'authenticated', user: mapUser(data.user) };
 }
 
 export async function logoutUser() {
