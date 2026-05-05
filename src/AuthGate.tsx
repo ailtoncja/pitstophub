@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import App from './App';
 import { AuthUser, getCurrentSession, loginUser, logoutUser, registerUser } from './auth';
+import { supabase } from './supabase';
 
 type AuthMode = 'login' | 'register';
 
@@ -28,6 +29,21 @@ export default function AuthGate() {
     return () => {
       mounted = false;
     };
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        const sessionUser = await getCurrentSession();
+        setUser(sessionUser);
+        setError('');
+        setAuthOpen(false);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+      }
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   const closeAuth = () => {
