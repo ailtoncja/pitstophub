@@ -1,5 +1,5 @@
 import type { User } from '@supabase/supabase-js';
-import { isSupabaseConfigured, supabase } from './supabase';
+import { isSupabaseConfigured, supabase, SUPABASE_STORAGE_KEY } from './supabase';
 
 export type AuthUser = {
   id: string;
@@ -64,6 +64,18 @@ function mapAuthErrorMessage(message: string, mode: 'login' | 'register') {
   }
 
   return message;
+}
+
+export function getStoredUser(): AuthUser | null {
+  try {
+    const raw = localStorage.getItem(SUPABASE_STORAGE_KEY);
+    if (!raw) return null;
+    const session = JSON.parse(raw) as { user?: User };
+    if (!session?.user) return null;
+    return mapAuthUser(session.user);
+  } catch {
+    return null;
+  }
 }
 
 export function mapAuthUser(user: User): AuthUser {

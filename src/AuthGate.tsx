@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import App from './App';
-import { AuthUser, loginUser, logoutUser, mapAuthUser, MIN_PASSWORD_LENGTH, registerUser } from './auth';
+import { AuthUser, getStoredUser, loginUser, logoutUser, mapAuthUser, MIN_PASSWORD_LENGTH, registerUser } from './auth';
 import { supabase } from './supabase';
 
 type AuthMode = 'login' | 'register';
 
 export default function AuthGate() {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [bootLoading, setBootLoading] = useState(true);
+  const [user, setUser] = useState<AuthUser | null>(getStoredUser);
   const [authOpen, setAuthOpen] = useState(false);
   const [mode, setMode] = useState<AuthMode>('login');
   const [name, setName] = useState('');
@@ -20,21 +19,17 @@ export default function AuthGate() {
   const title = useMemo(() => (mode === 'login' ? 'Entrar no PitStopHub' : 'Criar conta no PitStopHub'), [mode]);
 
   useEffect(() => {
-    if (!supabase) {
-      setBootLoading(false);
-      return;
-    }
+    if (!supabase) return;
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'INITIAL_SESSION') {
-        if (session?.user) setUser(mapAuthUser(session.user));
-        setBootLoading(false);
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      if (event === 'SIGNED_IN') {
         if (session?.user) {
           setUser(mapAuthUser(session.user));
           setError('');
           setNotice('');
           setAuthOpen(false);
         }
+      } else if (event === 'TOKEN_REFRESHED') {
+        if (session?.user) setUser(mapAuthUser(session.user));
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
       }
@@ -78,14 +73,6 @@ export default function AuthGate() {
     setBusy(false);
     closeAuth();
   };
-
-  if (bootLoading) {
-    return (
-      <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] flex items-center justify-center">
-        <p className="text-sm text-gray-500">Carregando...</p>
-      </div>
-    );
-  }
 
   return (
     <>

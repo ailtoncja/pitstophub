@@ -12,6 +12,8 @@ if (!isSupabaseConfigured) {
   console.warn('Supabase configurado sem HTTPS. Isso reduz a seguranca da sessao e das credenciais.');
 }
 
+export const SUPABASE_STORAGE_KEY = 'pitstophub.auth.token';
+
 export const supabase: SupabaseClient | null =
   isSupabaseConfigured && supabaseUrl && supabaseAnonKey && isSecureSupabaseUrl
     ? createClient(supabaseUrl, supabaseAnonKey, {
@@ -19,7 +21,7 @@ export const supabase: SupabaseClient | null =
           autoRefreshToken: true,
           persistSession: true,
           detectSessionInUrl: false,
-          storageKey: 'pitstophub.auth.token',
+          storageKey: SUPABASE_STORAGE_KEY,
         },
       })
     : null;
