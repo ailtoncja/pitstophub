@@ -22,6 +22,20 @@ type AuthSuccess =
   | { ok: true; status: 'pending_verification'; message: string };
 
 const AUTH_THEME_KEY = 'pitstophub_auth_theme_v1';
+const SUPABASE_REQUEST_TIMEOUT_MS = 8000;
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs = SUPABASE_REQUEST_TIMEOUT_MS): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(`Tempo limite excedido apos ${timeoutMs}ms.`)), timeoutMs);
+  });
+
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+}
 
 function mapAuthErrorMessage(message: string, mode: 'login' | 'register') {
   const normalized = message.toLowerCase();
@@ -74,7 +88,7 @@ async function ensureUserSettingsRow(userId: string) {
 export async function getCurrentSession(): Promise<AuthUser | null> {
   if (!supabase) return null;
   try {
-    const { data, error } = await supabase.auth.getSession();
+    const { data, error } = await withTimeout(supabase.auth.getSession());
     if (error || !data.session?.user) return null;
     return mapUser(data.session.user);
   } catch (error) {
@@ -158,22 +172,30 @@ export async function logoutUser() {
 
 export async function getUserSettings(userId: string): Promise<UserSettings | null> {
   if (!supabase) return null;
-  const { data, error } = await supabase
-    .from('user_settings')
-    .select('theme, language, favorite_category_id, followed_category_ids, followed_team_ids, followed_driver_ids')
-    .eq('user_id', userId)
-    .maybeSingle();
+  try {
+    const response = await withTimeout(Promise.resolve(
+      supabase
+        .from('user_settings')
+        .select('theme, language, favorite_category_id, followed_category_ids, followed_team_ids, followed_driver_ids')
+        .eq('user_id', userId)
+        .maybeSingle()
+    ));
+    const { data, error } = response;
 
-  if (error || !data) return null;
+    if (error || !data) return null;
 
-  return {
-    theme: data.theme === 'light' ? 'light' : 'dark',
-    language: data.language === 'en' ? 'en' : 'pt',
-    favoriteCategoryId: data.favorite_category_id ?? 'f1',
-    followedCategoryIds: Array.isArray(data.followed_category_ids) ? data.followed_category_ids : [],
-    followedTeamIds: Array.isArray(data.followed_team_ids) ? data.followed_team_ids : [],
-    followedDriverIds: Array.isArray(data.followed_driver_ids) ? data.followed_driver_ids : [],
-  };
+    return {
+      theme: data.theme === 'light' ? 'light' : 'dark',
+      language: data.language === 'en' ? 'en' : 'pt',
+      favoriteCategoryId: data.favorite_category_id ?? 'f1',
+      followedCategoryIds: Array.isArray(data.followed_category_ids) ? data.followed_category_ids : [],
+      followedTeamIds: Array.isArray(data.followed_team_ids) ? data.followed_team_ids : [],
+      followedDriverIds: Array.isArray(data.followed_driver_ids) ? data.followed_driver_ids : [],
+    };
+  } catch (requestError) {
+    console.error('Falha ao carregar configuracoes do usuario.', requestError);
+    return null;
+  }
 }
 
 export async function saveUserSettings(userId: string, settings: UserSettings) {

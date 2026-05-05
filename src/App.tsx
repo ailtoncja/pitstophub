@@ -207,24 +207,37 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
   React.useEffect(() => {
     if (!currentUser) {
+      setLanguage('pt');
+      setIsDarkMode(true);
+      setFollowedCategoryIds([]);
+      setFollowedTeamIds([]);
+      setFollowedDriverIds([]);
+      setSelectedCategory(MOTORSPORT_DATA[0]);
       setSettingsLoaded(true);
       return;
     }
 
     let isMounted = true;
     (async () => {
-      const settings = await getUserSettings(currentUser.id);
-      if (!isMounted) return;
-      if (settings) {
-        setLanguage(settings.language);
-        setIsDarkMode(settings.theme === 'dark');
-        setFollowedCategoryIds(settings.followedCategoryIds);
-        setFollowedTeamIds(settings.followedTeamIds);
-        setFollowedDriverIds(settings.followedDriverIds);
-        const category = CATEGORY_BY_ID.get(settings.favoriteCategoryId);
-        if (category) setSelectedCategory(category);
+      try {
+        const settings = await getUserSettings(currentUser.id);
+        if (!isMounted) return;
+        if (settings) {
+          setLanguage(settings.language);
+          setIsDarkMode(settings.theme === 'dark');
+          setFollowedCategoryIds(settings.followedCategoryIds);
+          setFollowedTeamIds(settings.followedTeamIds);
+          setFollowedDriverIds(settings.followedDriverIds);
+          const category = CATEGORY_BY_ID.get(settings.favoriteCategoryId);
+          if (category) setSelectedCategory(category);
+        }
+      } catch (error) {
+        console.error('Falha ao aplicar configuracoes do usuario.', error);
+      } finally {
+        if (isMounted) {
+          setSettingsLoaded(true);
+        }
       }
-      setSettingsLoaded(true);
     })();
 
     return () => {
