@@ -42,7 +42,7 @@ export default function AuthGate() {
   useEffect(() => {
     if (!supabase) return;
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
+      if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
         const sessionUser = await getCurrentSession();
         setUser(sessionUser);
         setError('');
