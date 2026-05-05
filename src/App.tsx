@@ -256,7 +256,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     return () => {
       isMounted = false;
     };
-  }, [currentUser]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?.id]);
 
   React.useEffect(() => {
     if (isDarkMode) {

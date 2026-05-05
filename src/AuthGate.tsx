@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import App from './App';
-import { AuthUser, getCurrentSession, loginUser, logoutUser, MIN_PASSWORD_LENGTH, registerUser } from './auth';
+import { AuthUser, loginUser, logoutUser, mapAuthUser, MIN_PASSWORD_LENGTH, registerUser } from './auth';
 import { supabase } from './supabase';
 
 type AuthMode = 'login' | 'register';
@@ -20,34 +20,21 @@ export default function AuthGate() {
   const title = useMemo(() => (mode === 'login' ? 'Entrar no PitStopHub' : 'Criar conta no PitStopHub'), [mode]);
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const sessionUser = await getCurrentSession();
-        if (!mounted) return;
-        setUser(sessionUser);
-      } catch (error) {
-        console.error('Falha ao inicializar autenticacao.', error);
-      } finally {
-        if (mounted) {
-          setBootLoading(false);
+    if (!supabase) {
+      setBootLoading(false);
+      return;
+    }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'INITIAL_SESSION') {
+        if (session?.user) setUser(mapAuthUser(session.user));
+        setBootLoading(false);
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (session?.user) {
+          setUser(mapAuthUser(session.user));
+          setError('');
+          setNotice('');
+          setAuthOpen(false);
         }
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!supabase) return;
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
-        const sessionUser = await getCurrentSession();
-        setUser(sessionUser);
-        setError('');
-        setNotice('');
-        setAuthOpen(false);
       } else if (event === 'SIGNED_OUT') {
         setUser(null);
       }
@@ -87,8 +74,7 @@ export default function AuthGate() {
       return;
     }
 
-    const sessionUser = await getCurrentSession();
-    setUser(sessionUser ?? result.user);
+    setUser(result.user);
     setBusy(false);
     closeAuth();
   };
