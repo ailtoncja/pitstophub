@@ -1,138 +1,93 @@
 import type { Category, CategoryStandings, Driver, Race, Team } from './types';
 
-const API_BASE_URL = 'https://www.thesportsdb.com/api/v1/json/123';
+const OPEN_F1_API_BASE_URL = 'https://api.openf1.org/v1';
 const API_REQUEST_TIMEOUT_MS = 8000;
 const SUMMARY_CACHE_TTL_MS = 5 * 60 * 1000;
 const DETAIL_CACHE_TTL_MS = 10 * 60 * 1000;
-const RESULTS_CACHE_TTL_MS = 10 * 60 * 1000;
-
-const CATEGORY_LEAGUE_IDS: Partial<Record<Category['id'], number>> = {
-  f1: 4370,
-  'formula-e': 4371,
-  f2: 4486,
-  f3: 4487,
-  'f1-academy': 5382,
-  wec: 4413,
-  imsa: 4488,
-  dtm: 4438,
-  indy: 4373,
-  nascar: 4393,
-  wrc: 4409,
-  'gt-world-challenge': 4439,
-};
-
-const CATEGORY_TEAM_SEARCH_ALIASES: Partial<Record<Category['id'], string[]>> = {
-  f1: ['Formula 1'],
-  f2: ['Formula 2', 'FIA Formula 2 Championship'],
-  f3: ['Formula 3', 'FIA Formula 3 Championship'],
-  'f1-academy': ['F1 Academy'],
-  'formula-e': ['Formula E'],
-  wec: ['WEC', 'World Endurance Championship'],
-  imsa: ['IMSA', 'IMSA SportsCar Championship', 'IMSA WeatherTech SportsCar Championship', 'WeatherTech SportsCar Championship'],
-  dtm: ['DTM'],
-  indy: ['IndyCar Series', 'IndyCar'],
-  nascar: ['NASCAR Cup Series', 'NASCAR'],
-  wrc: ['WRC', 'World Rally Championship'],
-  'gt-world-challenge': ['GT World Challenge Europe', 'GT World Challenge', 'GT Series Endurance Cup', 'GT World Challenge Europe Endurance Cup'],
-};
+const SUPPORTED_CATEGORY_IDS = new Set(['f1']);
+const TEAM_NAME_ALIASES = new Map<string, string>([
+  ['mercedes-amg petronas', 'mercedes'],
+  ['mercedes amg petronas', 'mercedes'],
+  ['scuderia ferrari hp', 'ferrari'],
+  ['mclaren formula 1', 'mclaren'],
+  ['moneygram haas f1 team', 'haas f1 team'],
+  ['bwt alpine f1 team', 'alpine'],
+  ['oracle red bull racing', 'red bull racing'],
+  ['red bull', 'red bull racing'],
+  ['visa cash app rb', 'racing bulls'],
+  ['visa cash app racing bulls', 'racing bulls'],
+  ['rb', 'racing bulls'],
+  ['williams racing', 'williams'],
+  ['audi f1 team', 'audi'],
+  ['cadillac racing', 'cadillac'],
+  ['aston martin aramco', 'aston martin'],
+]);
 
 export type LiveCoverageTier = 'supported' | 'local';
-
-const CATEGORY_LIVE_COVERAGE: Record<Category['id'], LiveCoverageTier> = {
-  f1: 'supported',
-  f2: 'supported',
-  f3: 'supported',
-  'formula-e': 'supported',
-  indy: 'supported',
-  nascar: 'supported',
-  wec: 'supported',
-  wrc: 'supported',
-  dtm: 'supported',
-  'f1-academy': 'supported',
-  imsa: 'supported',
-  'gt-world-challenge': 'supported',
-  'stock-car': 'local',
-  'formula-truck': 'local',
-};
 
 type CacheEntry<T> = {
   expiresAt: number;
   value: Promise<T>;
 };
 
-type SportsDbLeague = {
-  strCurrentSeason?: string | null;
-  strDescriptionEN?: string | null;
-  strDescriptionPT?: string | null;
+type OpenF1Meeting = {
+  circuit_short_name?: string | null;
+  country_name?: string | null;
+  date_end?: string | null;
+  date_start?: string | null;
+  is_cancelled?: boolean | null;
+  location?: string | null;
+  meeting_key?: number | null;
+  meeting_name?: string | null;
+  meeting_official_name?: string | null;
+  year?: number | null;
 };
 
-type SportsDbLeagueResponse = {
-  leagues?: SportsDbLeague[] | null;
+type OpenF1Session = {
+  circuit_short_name?: string | null;
+  country_name?: string | null;
+  date_end?: string | null;
+  date_start?: string | null;
+  is_cancelled?: boolean | null;
+  location?: string | null;
+  meeting_key?: number | null;
+  session_key?: number | null;
+  session_name?: string | null;
+  session_type?: string | null;
+  year?: number | null;
 };
 
-type SportsDbTeam = {
-  idTeam?: string | null;
-  strTeam?: string | null;
-  strColour1?: string | null;
-  strBadge?: string | null;
-  strEquipment?: string | null;
+type OpenF1Driver = {
+  driver_number?: number | null;
+  full_name?: string | null;
+  headshot_url?: string | null;
+  team_colour?: string | null;
+  team_name?: string | null;
 };
 
-type SportsDbTeamsResponse = {
-  teams?: SportsDbTeam[] | null;
+type OpenF1DriverStanding = {
+  driver_number?: number | null;
+  points_current?: number | null;
+  position_current?: number | null;
 };
 
-type SportsDbPlayer = {
-  idPlayer?: string | null;
-  strPlayer?: string | null;
-  strNumber?: string | null;
-  strNationality?: string | null;
-  strThumb?: string | null;
-  strCutout?: string | null;
-  strRender?: string | null;
+type OpenF1TeamStanding = {
+  points_current?: number | null;
+  position_current?: number | null;
+  team_name?: string | null;
 };
 
-type SportsDbPlayersResponse = {
-  player?: SportsDbPlayer[] | null;
+type OpenF1SessionResult = {
+  driver_number?: number | null;
+  position?: number | null;
 };
 
-type SportsDbPlayerSearchResponse = {
-  player?: SportsDbPlayer[] | null;
-};
-
-type SportsDbEvent = {
-  idEvent?: string | null;
-  strEvent?: string | null;
-  strEventAlternate?: string | null;
-  dateEvent?: string | null;
-  strVenue?: string | null;
-  strCity?: string | null;
-  strCountry?: string | null;
-  strStatus?: string | null;
-  strPostponed?: string | null;
-  intRound?: string | null;
-};
-
-type SportsDbEventsResponse = {
-  events?: SportsDbEvent[] | null;
-};
-
-type SportsDbResult = {
-  idPlayer?: string | null;
-  strPlayer?: string | null;
-  idTeam?: string | null;
-  intPoints?: string | null;
-  intPosition?: string | null;
-};
-
-type SportsDbResultsResponse = {
-  results?: SportsDbResult[] | null;
-};
-
-type SportsDbCalendarOverlay = {
-  calendar: Race[];
-  matchedCount: number;
-  apiEventsByRaceId: Map<string, SportsDbEvent & { idEvent: string; strEvent: string; dateEvent: string }>;
+type F1SeasonContext = {
+  latestCompletedRaceSession: OpenF1Session | null;
+  latestKnownSession: OpenF1Session | null;
+  meetings: OpenF1Meeting[];
+  raceSessionsByMeetingKey: Map<number, OpenF1Session>;
+  year: string;
 };
 
 export type SportsDbLiveEvent = {
@@ -161,18 +116,17 @@ export type SportsDbCategoryData = {
 
 const summaryCache = new Map<string, CacheEntry<SportsDbCategoryData | null>>();
 const detailCache = new Map<string, CacheEntry<SportsDbCategoryData | null>>();
-const resultsCache = new Map<string, CacheEntry<SportsDbResult[]>>();
 
 export function isCategoryLiveSupported(categoryId: Category['id']) {
-  return getCategoryLiveCoverage(categoryId) === 'supported' && categoryId in CATEGORY_LEAGUE_IDS;
+  return getCategoryLiveCoverage(categoryId) === 'supported';
 }
 
 export function getSupportedLiveCategoryIds() {
-  return (Object.keys(CATEGORY_LIVE_COVERAGE) as Category['id'][]).filter((categoryId) => isCategoryLiveSupported(categoryId));
+  return Array.from(SUPPORTED_CATEGORY_IDS);
 }
 
 export function getCategoryLiveCoverage(categoryId: Category['id']): LiveCoverageTier {
-  return CATEGORY_LIVE_COVERAGE[categoryId] ?? 'local';
+  return SUPPORTED_CATEGORY_IDS.has(categoryId) ? 'supported' : 'local';
 }
 
 export function mergeCategoryWithLiveData(category: Category, liveData: SportsDbCategoryData | null): Category {
@@ -190,223 +144,297 @@ export function mergeCategoryWithLiveData(category: Category, liveData: SportsDb
     teams: mergedTeams,
     drivers: mergedDrivers,
     calendar: liveData.calendar?.length ? liveData.calendar : category.calendar,
+    standings: liveData.standings || category.standings,
   };
 }
 
 export async function fetchCategoryLiveSummary(category: Category, force = false): Promise<SportsDbCategoryData | null> {
-  return getCached(summaryCache, `${category.id}:summary`, SUMMARY_CACHE_TTL_MS, force, () => fetchCategoryLiveSummaryUncached(category));
+  return getCached(summaryCache, `${category.id}:summary`, SUMMARY_CACHE_TTL_MS, force, async () => {
+    if (category.id !== 'f1') {
+      return null;
+    }
+
+    const context = await fetchF1SeasonContext(category);
+    const calendar = await fetchF1Calendar(category, context);
+    const nextEvent = getNextUpcomingRace(calendar);
+    const lastEvent = getLastCompletedRace(calendar);
+
+    return {
+      currentSeason: context.year,
+      calendar,
+      nextEvent: nextEvent ? mapRaceToLiveEvent(nextEvent) : null,
+      lastEvent: lastEvent ? mapRaceToLiveEvent(lastEvent) : null,
+      matchedCalendarCount: calendar.length,
+    };
+  });
 }
 
 export async function fetchCategoryLiveData(category: Category, force = false): Promise<SportsDbCategoryData | null> {
-  return getCached(detailCache, `${category.id}:detail`, DETAIL_CACHE_TTL_MS, force, () => fetchCategoryLiveDataUncached(category));
+  return getCached(detailCache, `${category.id}:detail`, DETAIL_CACHE_TTL_MS, force, async () => {
+    if (category.id !== 'f1') {
+      return null;
+    }
+
+    const context = await fetchF1SeasonContext(category);
+    const [calendar, teams, drivers, standings] = await Promise.all([
+      fetchF1Calendar(category, context),
+      fetchF1Teams(category, context),
+      fetchF1Drivers(category, context),
+      fetchF1Standings(context),
+    ]);
+
+    const mergedTeams = teams.length ? mergeTeamsByName(category.teams, teams) : category.teams;
+    const mergedDrivers = drivers.length ? mergeDriversByName(category.drivers, drivers) : category.drivers;
+    const normalizedCalendar = normalizeCalendarWinners(calendar, mergedDrivers);
+    const nextEvent = getNextUpcomingRace(normalizedCalendar);
+    const lastEvent = getLastCompletedRace(normalizedCalendar);
+
+    return {
+      currentSeason: context.year,
+      teams,
+      drivers,
+      calendar: normalizedCalendar,
+      standings,
+      nextEvent: nextEvent ? mapRaceToLiveEvent(nextEvent) : null,
+      lastEvent: lastEvent ? mapRaceToLiveEvent(lastEvent) : null,
+      matchedTeamCount: countMatchedTeams(category.teams, mergedTeams),
+      matchedDriverCount: countMatchedDrivers(category.drivers, mergedDrivers),
+      matchedCalendarCount: normalizedCalendar.length,
+    };
+  });
 }
 
-async function fetchCategoryLiveSummaryUncached(category: Category): Promise<SportsDbCategoryData | null> {
-  const leagueId = CATEGORY_LEAGUE_IDS[category.id];
-  if (!leagueId) {
-    return null;
-  }
-
-  const [leagueResponse, seasonEventsResponse] = await Promise.all([
-    fetchJson<SportsDbLeagueResponse>(`lookupleague.php?id=${leagueId}`).catch(() => ({ leagues: null })),
-    fetchJson<SportsDbEventsResponse>(`eventsseason.php?id=${leagueId}&s=${getCategorySeason(category)}`).catch(() => ({ events: null })),
+async function fetchF1SeasonContext(category: Category): Promise<F1SeasonContext> {
+  const year = getCategorySeason(category);
+  const [meetings, sessions] = await Promise.all([
+    fetchOpenF1Json<OpenF1Meeting[]>(`/meetings?year=${year}`),
+    fetchOpenF1Json<OpenF1Session[]>(`/sessions?year=${year}`),
   ]);
 
-  const league = leagueResponse.leagues?.[0];
-  const overlay = buildCalendarOverlay(category, seasonEventsResponse.events ?? []);
-  const nextEvent = getNextUpcomingRace(overlay.calendar);
-  const lastEvent = getLastCompletedRace(overlay.calendar);
+  const filteredMeetings = meetings
+    .filter((meeting) => isGrandPrixMeeting(meeting))
+    .sort((left, right) => (left.date_start || left.date_end || '').localeCompare(right.date_start || right.date_end || ''));
+
+  const raceSessionsByMeetingKey = new Map<number, OpenF1Session>();
+  const raceSessions = sessions
+    .filter((session) => session.meeting_key != null && isMainRaceSession(session))
+    .sort((left, right) => (left.date_start || '').localeCompare(right.date_start || ''));
+
+  for (const session of raceSessions) {
+    raceSessionsByMeetingKey.set(session.meeting_key!, session);
+  }
+
+  const now = new Date();
+  const latestCompletedRaceSession = [...raceSessionsByMeetingKey.values()]
+    .filter((session) => session.date_end && new Date(session.date_end) <= now)
+    .sort((left, right) => (right.date_end || '').localeCompare(left.date_end || ''))[0] ?? null;
+
+  const latestKnownSession = [...sessions]
+    .filter((session) => session.session_key != null)
+    .sort((left, right) => (right.date_start || '').localeCompare(left.date_start || ''))[0] ?? null;
 
   return {
-    currentSeason: league?.strCurrentSeason || getCategorySeason(category),
-    longDescription: league?.strDescriptionPT || category.longDescription,
-    enLongDescription: league?.strDescriptionEN || category.enLongDescription || category.longDescription,
-    calendar: overlay.matchedCount > 0 ? overlay.calendar : undefined,
-    nextEvent: nextEvent ? mapRaceToLiveEvent(nextEvent) : null,
-    lastEvent: lastEvent ? mapRaceToLiveEvent(lastEvent) : null,
-    matchedCalendarCount: overlay.matchedCount,
+    latestCompletedRaceSession,
+    latestKnownSession,
+    meetings: filteredMeetings,
+    raceSessionsByMeetingKey,
+    year,
   };
 }
 
-async function fetchCategoryLiveDataUncached(category: Category): Promise<SportsDbCategoryData | null> {
-  const leagueId = CATEGORY_LEAGUE_IDS[category.id];
-  if (!leagueId) {
-    return null;
-  }
+async function fetchF1Calendar(category: Category, context: F1SeasonContext): Promise<Race[]> {
+  const driverMap = await fetchDriverIndexForWinners(context);
+  const winnerPromises = context.meetings.map(async (meeting) => {
+    const meetingKey = meeting.meeting_key;
+    const raceSession = meetingKey != null ? context.raceSessionsByMeetingKey.get(meetingKey) : undefined;
+    if (!raceSession?.session_key || !raceSession.date_end || new Date(raceSession.date_end) > new Date()) {
+      return [meetingKey ?? -1, null] as const;
+    }
 
-  const [leagueResponse, seasonEventsResponse, recentPastEventsResponse, teamsResponse] = await Promise.all([
-    fetchJson<SportsDbLeagueResponse>(`lookupleague.php?id=${leagueId}`).catch(() => ({ leagues: null })),
-    fetchJson<SportsDbEventsResponse>(`eventsseason.php?id=${leagueId}&s=${getCategorySeason(category)}`).catch(() => ({ events: null })),
-    fetchJson<SportsDbEventsResponse>(`eventspastleague.php?id=${leagueId}`).catch(() => ({ events: null })),
-    fetchTeamsForCategory(category),
-  ]);
-
-  const league = leagueResponse.leagues?.[0];
-  const overlay = buildCalendarOverlay(
-    category,
-    mergeSportsDbEvents(seasonEventsResponse.events ?? [], recentPastEventsResponse.events ?? []),
-  );
-  const calendarWithWinners = await syncWinnersIntoCalendar(overlay.calendar);
-
-  const fallbackTeams = new Map(category.teams.map((team) => [normalizeText(team.name), team]));
-  const mappedTeams = (teamsResponse.teams ?? [])
-    .filter((team): team is SportsDbTeam & { idTeam: string; strTeam: string } => Boolean(team.idTeam && team.strTeam))
-    .map((team) => mapTeam(team, fallbackTeams.get(normalizeText(team.strTeam))));
-
-  const rosterDrivers = mappedTeams.length ? await fetchDriversForTeams(mappedTeams) : [];
-  const drivers = await resolveCategoryDrivers(category, rosterDrivers);
-  const normalizedCalendar = canonicalizeCalendarWinners(calendarWithWinners, drivers);
-  const nextEvent = getNextUpcomingRace(normalizedCalendar);
-  const lastEvent = getLastCompletedRace(normalizedCalendar);
-
-  return {
-    currentSeason: league?.strCurrentSeason || getCategorySeason(category),
-    longDescription: league?.strDescriptionPT || category.longDescription,
-    enLongDescription: league?.strDescriptionEN || category.enLongDescription || category.longDescription,
-    teams: mappedTeams.length ? mappedTeams : undefined,
-    drivers: drivers.length ? drivers : undefined,
-    calendar: overlay.matchedCount > 0 ? normalizedCalendar : undefined,
-    nextEvent: nextEvent ? mapRaceToLiveEvent(nextEvent) : null,
-    lastEvent: lastEvent ? mapRaceToLiveEvent(lastEvent) : null,
-    matchedTeamCount: countMatchedTeams(category.teams, mappedTeams),
-    matchedDriverCount: countMatchedDrivers(category.drivers, drivers),
-    matchedCalendarCount: overlay.matchedCount,
-  };
-}
-
-async function fetchTeamsForCategory(category: Category): Promise<SportsDbTeamsResponse> {
-  const candidateNames = uniqueStrings([
-    ...(CATEGORY_TEAM_SEARCH_ALIASES[category.id] ?? []),
-    category.fullName,
-    category.enFullName,
-    category.name,
-  ]);
-
-  for (const candidate of candidateNames) {
     try {
-      const response = await fetchJson<SportsDbTeamsResponse>(`search_all_teams.php?l=${encodeURIComponent(candidate)}`);
-      if (response.teams?.length) {
-        return response;
-      }
+      const results = await fetchOpenF1Json<OpenF1SessionResult[]>(`/session_result?session_key=${raceSession.session_key}`);
+      const winner = results.find((entry) => entry.position === 1);
+      return [meetingKey ?? -1, winner?.driver_number ? driverMap.get(winner.driver_number) ?? null : null] as const;
     } catch {
-      // Try the next alias when the current one is unsupported or rate-limited.
+      return [meetingKey ?? -1, null] as const;
     }
-  }
-
-  return { teams: null };
-}
-
-async function fetchDriversForTeams(teams: Team[]) {
-  const responses = await Promise.allSettled(
-    teams.map(async (team) => {
-      const payload = await fetchJson<SportsDbPlayersResponse>(`lookup_all_players.php?id=${team.id}`);
-      return (payload.player ?? [])
-        .filter((player): player is SportsDbPlayer & { idPlayer: string; strPlayer: string } => Boolean(player.idPlayer && player.strPlayer))
-        .map((player) => mapDriver(player, team.id));
-    }),
-  );
-
-  return responses.flatMap((response) => (response.status === 'fulfilled' ? response.value : []));
-}
-
-async function resolveCategoryDrivers(category: Category, rosterDrivers: Driver[]) {
-  const mergedDrivers = mergeDriversByName(category.drivers, rosterDrivers);
-  const driversMissingPhoto = mergedDrivers.filter((driver) => !driver.image);
-
-  if (!driversMissingPhoto.length) {
-    return mergedDrivers;
-  }
-
-  const imageResults = await Promise.allSettled(
-    driversMissingPhoto.map(async (driver) => {
-      const payload = await fetchJson<SportsDbPlayerSearchResponse>(`searchplayers.php?p=${encodeURIComponent(driver.name)}`);
-      const bestMatch = (payload.player ?? []).find((player) => normalizeText(player.strPlayer || '') === normalizeText(driver.name))
-        ?? payload.player?.[0];
-
-      return [
-        normalizeText(driver.name),
-        bestMatch ? {
-          image: bestMatch.strThumb || bestMatch.strCutout || bestMatch.strRender || undefined,
-          nationality: bestMatch.strNationality || undefined,
-          number: bestMatch.strNumber || undefined,
-        } : null,
-      ] as const;
-    }),
-  );
-
-  const imageByDriverName = new Map<string, { image?: string; nationality?: string; number?: string }>();
-  for (const result of imageResults) {
-    if (result.status === 'fulfilled' && result.value[1] != null) {
-      imageByDriverName.set(result.value[0], result.value[1]);
-    }
-  }
-
-  const enrichedDrivers = mergedDrivers.map((driver) => {
-    const fallback = imageByDriverName.get(normalizeText(driver.name));
-    if (!fallback) {
-      return driver;
-    }
-
-    return {
-      ...driver,
-      image: driver.image || fallback.image,
-      nationality: driver.nationality === 'N/A' ? (fallback.nationality || driver.nationality) : driver.nationality,
-      number: driver.number === '--' ? (fallback.number || driver.number) : driver.number,
-    };
   });
 
-  return canonicalizeDriversAgainstBase(category.drivers, enrichedDrivers);
-}
+  const winnerEntries = await Promise.all(winnerPromises);
+  const winnerByMeetingKey = new Map<number, string | null>(winnerEntries);
 
-async function syncWinnersIntoCalendar(calendar: Race[]) {
-  const winnerTargets = getWinnerSyncTargets(calendar);
-  const resultsByRaceId = await fetchResultsForRaces(winnerTargets);
-  return calendar.map((race) => {
-    const results = resultsByRaceId.get(race.id) ?? [];
-    const winner = results
-      .find((result) => Number(result.intPosition || '999') === 1)
-      ?.strPlayer;
+  return context.meetings.map((meeting, index) => {
+    const raceSession = meeting.meeting_key != null ? context.raceSessionsByMeetingKey.get(meeting.meeting_key) : undefined;
+    const matchedBaseRace = findBestBaseRace(category.calendar, meeting, raceSession);
+    const date = extractDate(raceSession?.date_start || meeting.date_end || meeting.date_start) || matchedBaseRace?.date || '';
+    const status = getMeetingStatus(meeting, raceSession, date);
 
     return {
-      ...race,
-      winner: winner || race.winner,
+      id: matchedBaseRace?.id || createRaceId(meeting, index),
+      name: matchedBaseRace?.name || formatRaceNamePt(meeting.meeting_name),
+      enName: matchedBaseRace?.enName || meeting.meeting_name || undefined,
+      location: matchedBaseRace?.location || meeting.location || meeting.country_name || 'N/A',
+      enLocation: matchedBaseRace?.enLocation || meeting.location || meeting.country_name || undefined,
+      date,
+      circuit: matchedBaseRace?.circuit || raceSession?.circuit_short_name || meeting.circuit_short_name || 'N/A',
+      status,
+      winner: meeting.meeting_key != null ? winnerByMeetingKey.get(meeting.meeting_key) || matchedBaseRace?.winner : matchedBaseRace?.winner,
     };
   });
 }
 
-async function fetchResultsForRaces(raceIds: string[]) {
-  const validRaceIds = uniqueStrings(raceIds.filter((raceId) => /^\d+$/.test(raceId)));
-  const resultsByRaceId = new Map<string, SportsDbResult[]>();
+async function fetchF1Teams(category: Category, context: F1SeasonContext): Promise<Team[]> {
+  const sessionKey = context.latestCompletedRaceSession?.session_key ?? context.latestKnownSession?.session_key;
+  if (!sessionKey) {
+    return [];
+  }
 
-  const responses = await Promise.allSettled(
-    validRaceIds.map(async (raceId) => {
-      const results = await getCached(resultsCache, `result:${raceId}`, RESULTS_CACHE_TTL_MS, false, async () => {
-        const payload = await fetchJson<SportsDbResultsResponse>(`eventresults.php?id=${raceId}`);
-        return payload.results ?? [];
-      });
-      return [raceId, results] as const;
-    }),
-  );
+  const drivers = await fetchOpenF1Json<OpenF1Driver[]>(`/drivers?session_key=${sessionKey}`);
+  const baseTeamMap = new Map(category.teams.map((team) => [normalizeText(team.name), team]));
+  const teamByName = new Map<string, Team>();
 
-  for (const response of responses) {
-    if (response.status === 'fulfilled') {
-      resultsByRaceId.set(response.value[0], response.value[1]);
+  for (const driver of drivers) {
+    const teamName = driver.team_name?.trim();
+    if (!teamName) {
+      continue;
+    }
+
+    const fallback = findBestTeamMatch(teamName, baseTeamMap);
+    const normalizedName = normalizeText(teamName);
+    if (teamByName.has(normalizedName)) {
+      continue;
+    }
+
+    teamByName.set(normalizedName, {
+      id: fallback?.id || slugify(teamName),
+      name: fallback?.name || teamName,
+      color: formatHexColor(driver.team_colour) || fallback?.color || '#e10600',
+      car: fallback?.car,
+      logo: fallback?.logo,
+      class: fallback?.class,
+    });
+  }
+
+  return [...teamByName.values()];
+}
+
+async function fetchF1Drivers(category: Category, context: F1SeasonContext): Promise<Driver[]> {
+  const sessionKey = context.latestCompletedRaceSession?.session_key ?? context.latestKnownSession?.session_key;
+  if (!sessionKey) {
+    return [];
+  }
+
+  const liveDrivers = await fetchOpenF1Json<OpenF1Driver[]>(`/drivers?session_key=${sessionKey}`);
+  const baseDriverMap = new Map(category.drivers.map((driver) => [normalizeText(driver.name), driver]));
+  const baseTeamMap = new Map(category.teams.map((team) => [normalizeText(team.name), team]));
+
+  return liveDrivers
+    .filter((driver) => driver.full_name?.trim())
+    .map((driver) => {
+      const fullName = toTitleCase(driver.full_name!.trim());
+      const fallbackDriver = findBestDriverMatch(fullName, baseDriverMap);
+      const fallbackTeam = findBestTeamMatch(driver.team_name || '', baseTeamMap);
+
+      return {
+        id: fallbackDriver?.id || slugify(fullName),
+        name: fallbackDriver?.name || fullName,
+        number: driver.driver_number != null ? String(driver.driver_number) : (fallbackDriver?.number || '--'),
+        nationality: fallbackDriver?.nationality || 'N/A',
+        teamId: fallbackDriver?.teamId || fallbackTeam?.id || slugify(driver.team_name || 'team'),
+        image: driver.headshot_url || fallbackDriver?.image,
+      };
+    });
+}
+
+async function fetchF1Standings(context: F1SeasonContext): Promise<CategoryStandings | undefined> {
+  const raceSessionKey = context.latestCompletedRaceSession?.session_key;
+  if (!raceSessionKey) {
+    return undefined;
+  }
+
+  const [drivers, teams, roster] = await Promise.all([
+    fetchOpenF1Json<OpenF1DriverStanding[]>(`/championship_drivers?session_key=${raceSessionKey}`).catch(() => []),
+    fetchOpenF1Json<OpenF1TeamStanding[]>(`/championship_teams?session_key=${raceSessionKey}`).catch(() => []),
+    fetchOpenF1Json<OpenF1Driver[]>(`/drivers?session_key=${raceSessionKey}`).catch(() => []),
+  ]);
+
+  const driverByNumber = new Map<number, OpenF1Driver>();
+  for (const driver of roster) {
+    if (driver.driver_number != null) {
+      driverByNumber.set(driver.driver_number, driver);
     }
   }
 
-  return resultsByRaceId;
+  const driverStandings = drivers
+    .filter((entry): entry is OpenF1DriverStanding & { driver_number: number; points_current: number; position_current: number } => (
+      entry.driver_number != null && entry.points_current != null && entry.position_current != null
+    ))
+    .sort((left, right) => left.position_current - right.position_current)
+    .map((entry) => {
+      const rosterDriver = driverByNumber.get(entry.driver_number);
+      return {
+        position: entry.position_current,
+        name: rosterDriver?.full_name ? toTitleCase(rosterDriver.full_name) : `#${entry.driver_number}`,
+        points: entry.points_current,
+        team: rosterDriver?.team_name || undefined,
+      };
+    });
+
+  const constructorStandings = teams
+    .filter((entry): entry is OpenF1TeamStanding & { points_current: number; position_current: number; team_name: string } => (
+      entry.points_current != null && entry.position_current != null && Boolean(entry.team_name?.trim())
+    ))
+    .sort((left, right) => left.position_current - right.position_current)
+    .map((entry) => ({
+      position: entry.position_current,
+      name: entry.team_name.trim(),
+      points: entry.points_current,
+    }));
+
+  if (!driverStandings.length && !constructorStandings.length) {
+    return undefined;
+  }
+
+  return {
+    drivers: driverStandings.length ? driverStandings : undefined,
+    constructors: constructorStandings.length ? constructorStandings : undefined,
+  };
 }
 
-async function fetchJson<T>(path: string): Promise<T> {
+async function fetchDriverIndexForWinners(context: F1SeasonContext) {
+  const sessionKey = context.latestCompletedRaceSession?.session_key ?? context.latestKnownSession?.session_key;
+  if (!sessionKey) {
+    return new Map<number, string>();
+  }
+
+  const drivers = await fetchOpenF1Json<OpenF1Driver[]>(`/drivers?session_key=${sessionKey}`).catch(() => []);
+  return new Map(
+    drivers
+      .filter((driver): driver is OpenF1Driver & { driver_number: number; full_name: string } => (
+        driver.driver_number != null && Boolean(driver.full_name?.trim())
+      ))
+      .map((driver) => [driver.driver_number, toTitleCase(driver.full_name.trim())]),
+  );
+}
+
+async function fetchOpenF1Json<T>(path: string, attempt = 0): Promise<T> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), API_REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetch(`${API_BASE_URL}/${path}`, { signal: controller.signal });
-    if (!response.ok) {
-      throw new Error(`TheSportsDB request failed with status ${response.status}`);
+    const response = await fetch(`${OPEN_F1_API_BASE_URL}${path}`, { signal: controller.signal });
+
+    if ((response.status === 429 || response.status >= 500) && attempt < 2) {
+      clearTimeout(timeoutId);
+      await new Promise<void>((resolve) => setTimeout(resolve, 1500 * (attempt + 1)));
+      return fetchOpenF1Json(path, attempt + 1);
     }
-    return response.json() as Promise<T>;
+
+    if (!response.ok) {
+      throw new Error(`OpenF1 HTTP ${response.status}`);
+    }
+
+    return await response.json() as T;
   } finally {
     clearTimeout(timeoutId);
   }
@@ -432,308 +460,70 @@ async function getCached<T>(
     cache.delete(key);
     throw error;
   });
+
   cache.set(key, { expiresAt: now + ttlMs, value });
   return value;
 }
 
-function buildCalendarOverlay(category: Category, events: SportsDbEvent[]): SportsDbCalendarOverlay {
-  const apiMainEvents = mapCalendar(events, category);
-  const matchedApiEvents = new Set<string>();
-  const calendar = category.calendar.map((baseRace) => {
-    const matchedRace = findBestApiRaceForBaseRace(baseRace, apiMainEvents.filter((race) => !matchedApiEvents.has(race.id)));
-    if (!matchedRace) {
-      return baseRace;
+function mergeTeamsByName(baseTeams: Team[], liveTeams: Team[]) {
+  const merged = new Map(baseTeams.map((team) => [team.id, team]));
+  const baseTeamMap = new Map(baseTeams.map((team) => [normalizeTeamLookupKey(team.name), team]));
+
+  for (const liveTeam of liveTeams) {
+    const matched = findBestTeamMatch(liveTeam.name, baseTeamMap);
+    if (matched) {
+      merged.set(matched.id, { ...matched, ...liveTeam, id: matched.id, name: matched.name, car: liveTeam.car || matched.car });
+      continue;
     }
 
-    matchedApiEvents.add(matchedRace.id);
-    return {
-      ...baseRace,
-      id: matchedRace.id,
-      enName: matchedRace.enName || baseRace.enName,
-      location: matchedRace.location || baseRace.location,
-      enLocation: matchedRace.enLocation || baseRace.enLocation || matchedRace.location,
-      circuit: matchedRace.circuit || baseRace.circuit,
-      status: baseRace.status === 'cancelled' ? 'cancelled' : matchedRace.status,
-      winner: matchedRace.winner || baseRace.winner,
-    };
-  });
-
-  return {
-    calendar,
-    matchedCount: matchedApiEvents.size,
-    apiEventsByRaceId: new Map(
-      apiMainEvents
-        .filter((race) => matchedApiEvents.has(race.id))
-        .map((race) => [
-          race.id,
-          {
-            idEvent: race.id,
-            strEvent: race.enName || race.name,
-            dateEvent: race.date,
-          } as SportsDbEvent & { idEvent: string; strEvent: string; dateEvent: string },
-        ]),
-    ),
-  };
-}
-
-function findBestApiRaceForBaseRace(baseRace: Race, candidates: Race[]) {
-  let bestMatch: Race | null = null;
-  let bestScore = -1;
-
-  for (const candidate of candidates) {
-    const score = scoreRaceMatch(baseRace, candidate);
-    if (score > bestScore) {
-      bestScore = score;
-      bestMatch = candidate;
-    }
+    merged.set(liveTeam.id, liveTeam);
   }
 
-  return bestScore >= 30 ? bestMatch : null;
-}
-
-function namesLikelyMatch(baseRace: Race, candidate: Race) {
-  const baseNames = [baseRace.name, baseRace.enName].filter(Boolean).map((value) => normalizeText(value!));
-  const candidateNames = [candidate.name, candidate.enName].filter(Boolean).map((value) => normalizeText(value!));
-
-  return baseNames.some((baseName) =>
-    candidateNames.some((candidateName) =>
-      baseName === candidateName
-      || baseName.includes(candidateName)
-      || candidateName.includes(baseName),
-    ),
-  );
-}
-
-function scoreRaceMatch(baseRace: Race, candidate: Race) {
-  const baseNames = [baseRace.name, baseRace.enName];
-  const candidateNames = [candidate.name, candidate.enName];
-  const basePlaces = [baseRace.location, baseRace.enLocation, baseRace.circuit];
-  const candidatePlaces = [candidate.location, candidate.enLocation, candidate.circuit];
-
-  let score = 0;
-
-  if (baseRace.date === candidate.date) {
-    score += 100;
-  } else {
-    const dateDistance = getDateDistanceInDays(baseRace.date, candidate.date);
-    if (dateDistance <= 1) {
-      score += 55;
-    } else if (dateDistance <= 3) {
-      score += 35;
-    } else if (dateDistance <= 7) {
-      score += 15;
-    }
-  }
-
-  if (namesLikelyMatch(baseRace, candidate)) {
-    score += 45;
-  }
-
-  const sharedNameTokens = countSharedTokens(baseNames, candidateNames);
-  const sharedPlaceTokens = countSharedTokens(basePlaces, candidatePlaces);
-  const nameToPlaceTokens = countSharedTokens(baseNames, candidatePlaces) + countSharedTokens(candidateNames, basePlaces);
-
-  score += sharedNameTokens * 10;
-  score += sharedPlaceTokens * 8;
-  score += nameToPlaceTokens * 6;
-
-  return score;
-}
-
-function mapTeam(team: SportsDbTeam & { idTeam: string; strTeam: string }, fallback?: Team): Team {
-  return {
-    id: team.idTeam,
-    name: fallback?.name || team.strTeam,
-    color: team.strColour1 || fallback?.color || '#e10600',
-    car: fallback?.car,
-    logo: team.strBadge || team.strEquipment || fallback?.logo,
-    class: fallback?.class,
-  };
-}
-
-function mapDriver(player: SportsDbPlayer & { idPlayer: string; strPlayer: string }, teamId: string): Driver {
-  return {
-    id: player.idPlayer,
-    name: player.strPlayer,
-    number: player.strNumber || '',
-    nationality: player.strNationality || '',
-    teamId,
-    image: player.strThumb || player.strCutout || player.strRender || undefined,
-  };
+  return [...merged.values()];
 }
 
 function mergeDriversByName(baseDrivers: Driver[], liveDrivers: Driver[]) {
-  const merged = new Map<string, Driver>();
+  const merged = new Map(baseDrivers.map((driver) => [driver.id, driver]));
 
-  for (const driver of baseDrivers) {
-    merged.set(normalizeText(driver.name), driver);
-  }
-
-  for (const driver of liveDrivers) {
-    const key = findBestDriverKey(driver, merged) ?? normalizeText(driver.name);
-    const current = merged.get(key);
-    if (!current && baseDrivers.length > 0 && key === normalizeText(driver.name)) {
+  for (const liveDriver of liveDrivers) {
+    const matched = findBestDriverMatch(liveDriver.name, new Map(baseDrivers.map((driver) => [normalizeText(driver.name), driver])));
+    if (matched) {
+      merged.set(matched.id, { ...matched, ...liveDriver, id: matched.id, name: matched.name, teamId: liveDriver.teamId || matched.teamId });
       continue;
     }
 
-    merged.set(key, {
-      ...(current ?? driver),
-      ...driver,
-      name: current?.name || driver.name,
-      teamId: current?.teamId || driver.teamId || '',
-      image: driver.image || current?.image,
-      nationality: driver.nationality || current?.nationality || 'N/A',
-      number: driver.number || current?.number || '--',
-    });
+    merged.set(liveDriver.id, liveDriver);
   }
 
-  return Array.from(merged.values());
+  return [...merged.values()];
 }
 
-function canonicalizeDriversAgainstBase(baseDrivers: Driver[], drivers: Driver[]) {
-  const baseMap = new Map(baseDrivers.map((driver) => [normalizeText(driver.name), driver]));
+function findBestBaseRace(baseCalendar: Race[], meeting: OpenF1Meeting, raceSession?: OpenF1Session) {
+  const targetDate = extractDate(raceSession?.date_start || meeting.date_end || meeting.date_start);
+  const targetNames = [meeting.meeting_name, meeting.meeting_official_name, raceSession?.location, meeting.location, meeting.country_name];
+  let bestMatch: Race | null = null;
+  let bestScore = -1;
 
-  return drivers.map((driver) => {
-    const matchedKey = findBestDriverKey(driver, baseMap);
-    const baseDriver = matchedKey ? baseMap.get(matchedKey) : undefined;
-    if (!baseDriver) {
-      return driver;
+  for (const race of baseCalendar) {
+    let score = 0;
+    if (targetDate && race.date === targetDate) {
+      score += 100;
     }
 
-    return {
-      ...driver,
-      id: baseDriver.id,
-      name: baseDriver.name,
-      number: driver.number || baseDriver.number,
-      nationality: driver.nationality || baseDriver.nationality,
-      teamId: baseDriver.teamId || driver.teamId,
-      image: driver.image || baseDriver.image,
-    };
-  });
-}
-
-function mergeTeamsByName(baseTeams: Team[], liveTeams: Team[]) {
-  const merged = new Map<string, Team>();
-
-  for (const team of baseTeams) {
-    merged.set(normalizeText(team.name), team);
-  }
-
-  for (const team of liveTeams) {
-    const key = findBestTeamKey(team, merged) ?? normalizeText(team.name);
-    const current = merged.get(key);
-    if (!current && baseTeams.length > 0 && key === normalizeText(team.name)) {
-      continue;
+    if (countSharedTokens([race.name, race.enName, race.location, race.circuit], targetNames) > 0) {
+      score += countSharedTokens([race.name, race.enName, race.location, race.circuit], targetNames) * 12;
     }
 
-    merged.set(key, {
-      ...(current ?? team),
-      ...team,
-      id: current?.id || team.id,
-      name: current?.name || team.name,
-      color: team.color || current?.color || '#e10600',
-      car: current?.car || team.car,
-      logo: team.logo || current?.logo,
-      class: current?.class || team.class,
-    });
-  }
-
-  return Array.from(merged.values());
-}
-
-function mapCalendar(events: SportsDbEvent[], category: Category): Race[] {
-  if (!events.length) {
-    return [];
-  }
-
-  const grouped = new Map<string, SportsDbEvent[]>();
-  for (const event of events) {
-    if (!event.idEvent || !event.strEvent || !event.dateEvent) continue;
-    const groupKey = event.intRound?.trim() || event.dateEvent;
-    const current = grouped.get(groupKey) ?? [];
-    current.push(event);
-    grouped.set(groupKey, current);
-  }
-
-  return Array.from(grouped.values())
-    .map((group) => group.sort((a, b) => scoreEvent(a.strEvent || '', category) - scoreEvent(b.strEvent || '', category))[0])
-    .filter((event): event is SportsDbEvent & { idEvent: string; strEvent: string; dateEvent: string } => Boolean(event?.idEvent && event.strEvent && event.dateEvent))
-    .sort((a, b) => a.dateEvent.localeCompare(b.dateEvent))
-    .map((event) => mapEventToRace(event, category));
-}
-
-function mergeSportsDbEvents(primary: SportsDbEvent[], secondary: SportsDbEvent[]) {
-  const merged = new Map<string, SportsDbEvent>();
-
-  for (const event of [...primary, ...secondary]) {
-    const key = event.idEvent || `${event.dateEvent || ''}:${event.strEvent || ''}:${event.intRound || ''}`;
-    if (!key.trim()) {
-      continue;
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = race;
     }
-    merged.set(key, event);
   }
 
-  return Array.from(merged.values());
+  return bestScore >= 12 ? bestMatch : null;
 }
 
-function mapEventToRace(event: SportsDbEvent & { idEvent: string; strEvent: string; dateEvent: string }, category: Category): Race {
-  const fallbackRace = findFallbackRace(category, event);
-  const location = [event.strCity, event.strCountry].filter(Boolean).join(', ') || fallbackRace?.location || 'TBC';
-
-  return {
-    id: event.idEvent,
-    name: fallbackRace?.name || event.strEvent,
-    enName: event.strEvent,
-    location,
-    enLocation: location,
-    date: event.dateEvent,
-    circuit: event.strVenue || fallbackRace?.circuit || 'TBC',
-    status: getEventStatus(event),
-    winner: fallbackRace?.winner,
-  };
-}
-
-function findFallbackRace(category: Category, event: SportsDbEvent) {
-  const normalizedEventName = normalizeText(event.strEvent || '');
-  return category.calendar.find((race) => {
-    if (race.date === event.dateEvent) {
-      return true;
-    }
-    return normalizedEventName.includes(normalizeText(race.enName || race.name))
-      || normalizeText(race.enName || race.name).includes(normalizedEventName);
-  });
-}
-
-function mapRaceToLiveEvent(race: Race): SportsDbLiveEvent {
-  return {
-    id: race.id,
-    name: race.enName || race.name,
-    date: race.date,
-    circuit: race.circuit,
-    location: race.enLocation || race.location,
-    status: race.status,
-  };
-}
-
-function getNextUpcomingRace(calendar: Race[]) {
-  return calendar.find((race) => race.status === 'upcoming') ?? null;
-}
-
-function getLastCompletedRace(calendar: Race[]) {
-  return [...calendar].reverse().find((race) => race.status === 'completed') ?? null;
-}
-
-function getDateDistanceInDays(left: string, right: string) {
-  const leftTime = Date.parse(left);
-  const rightTime = Date.parse(right);
-  if (Number.isNaN(leftTime) || Number.isNaN(rightTime)) {
-    return Number.POSITIVE_INFINITY;
-  }
-
-  return Math.abs(leftTime - rightTime) / (1000 * 60 * 60 * 24);
-}
-
-function countSharedTokens(leftValues: Array<string | undefined>, rightValues: Array<string | undefined>) {
+function countSharedTokens(leftValues: Array<string | null | undefined>, rightValues: Array<string | null | undefined>) {
   const leftTokens = extractMeaningfulTokens(leftValues);
   const rightTokens = extractMeaningfulTokens(rightValues);
   let matches = 0;
@@ -747,29 +537,20 @@ function countSharedTokens(leftValues: Array<string | undefined>, rightValues: A
   return matches;
 }
 
-function extractMeaningfulTokens(values: Array<string | undefined>) {
+function extractMeaningfulTokens(values: Array<string | null | undefined>) {
   const ignoredTokens = new Set([
     'gp',
     'grand',
     'prix',
-    'e',
-    'prix',
-    'round',
-    'rodada',
+    'formula',
+    'world',
+    'championship',
     'race',
-    'feature',
-    'sprint',
-    'the',
-    'of',
     'de',
     'do',
     'da',
-    'del',
-    'city',
-    'international',
-    'circuit',
-    'autodrome',
-    'autodromo',
+    'the',
+    'las',
   ]);
 
   const tokens = new Set<string>();
@@ -786,13 +567,82 @@ function extractMeaningfulTokens(values: Array<string | undefined>) {
   return tokens;
 }
 
-function canonicalizeCalendarWinners(calendar: Race[], drivers: Driver[]) {
+function findBestDriverMatch(name: string, baseDriverMap: Map<string, Driver>) {
+  const normalizedName = normalizeText(name);
+  if (baseDriverMap.has(normalizedName)) {
+    return baseDriverMap.get(normalizedName) || null;
+  }
+
+  const nameWords = normalizedName.split(' ').filter(Boolean);
+  const lastName = nameWords[nameWords.length - 1];
+
+  for (const driver of baseDriverMap.values()) {
+    const normalizedBase = normalizeText(driver.name);
+    if (normalizedBase === normalizedName) {
+      return driver;
+    }
+
+    const baseWords = normalizedBase.split(' ').filter(Boolean);
+    if (lastName && baseWords[baseWords.length - 1] === lastName) {
+      return driver;
+    }
+  }
+
+  return null;
+}
+
+function findBestTeamMatch(name: string, baseTeamMap: Map<string, Team>) {
+  const normalizedName = normalizeText(name);
+  const canonicalName = normalizeTeamLookupKey(name);
+
+  if (baseTeamMap.has(canonicalName)) {
+    return baseTeamMap.get(canonicalName) || null;
+  }
+
+  if (baseTeamMap.has(normalizedName)) {
+    return baseTeamMap.get(normalizedName) || null;
+  }
+
+  const aliasedName = TEAM_NAME_ALIASES.get(normalizedName);
+  if (aliasedName && baseTeamMap.has(aliasedName)) {
+    return baseTeamMap.get(aliasedName) || null;
+  }
+
+  for (const team of baseTeamMap.values()) {
+    const normalizedBase = normalizeText(team.name);
+    const normalizedBaseAlias = normalizeTeamLookupKey(team.name);
+    if (
+      normalizedBase.includes(normalizedName)
+      || normalizedName.includes(normalizedBase)
+      || normalizedBaseAlias === normalizedName
+      || normalizedBaseAlias === canonicalName
+      || aliasedName === normalizedBase
+      || countSharedTokens([team.name], [name]) >= 2
+    ) {
+      return team;
+    }
+  }
+
+  return null;
+}
+
+function countMatchedTeams(baseTeams: Team[], mergedTeams: Team[]) {
+  const baseTeamMap = new Map(baseTeams.map((team) => [normalizeTeamLookupKey(team.name), team]));
+  return mergedTeams.reduce((count, team) => count + (findBestTeamMatch(team.name, baseTeamMap) ? 1 : 0), 0);
+}
+
+function countMatchedDrivers(baseDrivers: Driver[], mergedDrivers: Driver[]) {
+  const baseDriverMap = new Map(baseDrivers.map((driver) => [normalizeText(driver.name), driver]));
+  return mergedDrivers.reduce((count, driver) => count + (findBestDriverMatch(driver.name, baseDriverMap) ? 1 : 0), 0);
+}
+
+function normalizeCalendarWinners(calendar: Race[], drivers: Driver[]) {
   return calendar.map((race) => {
     if (!race.winner) {
       return race;
     }
 
-    const matchedDriver = drivers.find((driver) => namesLikelyReferToSameDriver(driver.name, race.winner!));
+    const matchedDriver = drivers.find((driver) => normalizeText(driver.name) === normalizeText(race.winner!));
     return {
       ...race,
       winner: matchedDriver?.name || race.winner,
@@ -800,145 +650,87 @@ function canonicalizeCalendarWinners(calendar: Race[], drivers: Driver[]) {
   });
 }
 
-function countMatchedTeams(baseTeams: Team[], liveTeams: Team[]) {
-  const baseMap = new Map(baseTeams.map((team) => [normalizeText(team.name), team]));
-  return liveTeams.reduce((total, team) => {
-    const matchedKey = findBestTeamKey(team, baseMap);
-    return total + (matchedKey != null ? 1 : 0);
-  }, 0);
+function normalizeTeamLookupKey(name: string) {
+  const normalizedName = normalizeText(name);
+  return TEAM_NAME_ALIASES.get(normalizedName) || normalizedName;
 }
 
-function countMatchedDrivers(baseDrivers: Driver[], liveDrivers: Driver[]) {
-  const baseDriverMap = new Map(baseDrivers.map((driver) => [normalizeText(driver.name), driver]));
-  return liveDrivers.reduce((total, driver) => total + (findBestDriverKey(driver, baseDriverMap) ? 1 : 0), 0);
-}
-
-
-function getEventStatus(event: SportsDbEvent): Race['status'] {
-  if (event.strPostponed && event.strPostponed !== 'no') {
+function getMeetingStatus(meeting: OpenF1Meeting, raceSession: OpenF1Session | undefined, date: string): Race['status'] {
+  if (meeting.is_cancelled || raceSession?.is_cancelled) {
     return 'cancelled';
   }
 
-  if ((event.strStatus || '').toLowerCase().includes('finished')) {
-    return 'completed';
-  }
-
-  const today = new Date().toISOString().slice(0, 10);
-  if (event.dateEvent < today) {
+  const reference = raceSession?.date_end || `${date}T23:59:59Z`;
+  if (reference && new Date(reference) < new Date()) {
     return 'completed';
   }
 
   return 'upcoming';
 }
 
-function scoreEvent(name: string, category: Category) {
-  const normalized = normalizeText(name);
-
-  if (normalized.includes('testing') || normalized.includes('practice') || normalized.includes('qualifying')) {
-    return 100;
-  }
-
-  if (normalized.includes('sprint qualifying') || normalized.includes('duel')) {
-    return 90;
-  }
-
-  if (normalized.includes('feature race')) {
-    return 1;
-  }
-
-  if (normalized.includes('race 2')) {
-    return 2;
-  }
-
-  if (normalized.includes('grand prix') || normalized.includes('e prix') || normalized.includes('500') || normalized.includes('6 hours') || normalized.includes('24 hours')) {
-    return 0;
-  }
-
-  if (normalized.includes('sprint')) {
-    return category.id === 'f2' || category.id === 'f3' ? 5 : 50;
-  }
-
-  if (normalized.includes('race 1')) {
-    return 6;
-  }
-
-  return 10;
+function getNextUpcomingRace(calendar: Race[]) {
+  return calendar
+    .filter((race) => race.status === 'upcoming')
+    .sort((left, right) => left.date.localeCompare(right.date))[0] ?? null;
 }
 
-function getWinnerSyncTargets(calendar: Race[]) {
-  const completed = calendar
+function getLastCompletedRace(calendar: Race[]) {
+  return calendar
     .filter((race) => race.status === 'completed')
-    .sort((left, right) => right.date.localeCompare(left.date));
-
-  return uniqueStrings([
-    ...completed.filter((race) => !race.winner).map((race) => race.id),
-    ...completed.slice(0, 5).map((race) => race.id),
-  ]).filter((raceId) => /^\d+$/.test(raceId));
+    .sort((left, right) => right.date.localeCompare(left.date))[0] ?? null;
 }
 
-function findBestDriverKey(driver: Driver, merged: Map<string, Driver>) {
-  const normalizedName = normalizeText(driver.name);
-  if (merged.has(normalizedName)) {
-    return normalizedName;
-  }
-
-  for (const [key, current] of merged.entries()) {
-    if (current.teamId && driver.teamId && current.teamId !== driver.teamId) {
-      continue;
-    }
-
-    if (namesLikelyReferToSameDriver(current.name, driver.name)) {
-      return key;
-    }
-  }
-
-  return null;
+function mapRaceToLiveEvent(race: Race): SportsDbLiveEvent {
+  return {
+    id: race.id,
+    name: race.enName || race.name,
+    date: race.date,
+    circuit: race.circuit,
+    location: race.enLocation || race.location,
+    status: race.status,
+  };
 }
 
-function findBestTeamKey(team: Team, merged: Map<string, Team>) {
-  const normalizedName = normalizeText(team.name);
-  if (merged.has(normalizedName)) {
-    return normalizedName;
-  }
-
-  for (const [key, current] of merged.entries()) {
-    if (namesLikelyReferToSameTeam(current.name, team.name)) {
-      return key;
-    }
-  }
-
-  return null;
+function isGrandPrixMeeting(meeting: OpenF1Meeting) {
+  const name = `${meeting.meeting_name || ''} ${meeting.meeting_official_name || ''}`.toLowerCase();
+  return name.includes('grand prix') && !name.includes('testing');
 }
 
-function namesLikelyReferToSameDriver(left: string, right: string) {
-  const normalizedLeft = normalizeText(left);
-  const normalizedRight = normalizeText(right);
-  if (normalizedLeft === normalizedRight) {
-    return true;
-  }
-
-  const leftWords = normalizedLeft.split(' ').filter(Boolean);
-  const rightWords = normalizedRight.split(' ').filter(Boolean);
-  const leftLast = leftWords[leftWords.length - 1];
-  const rightLast = rightWords[rightWords.length - 1];
-
-  return Boolean(leftLast && rightLast && leftLast === rightLast);
+function isMainRaceSession(session: OpenF1Session) {
+  const sessionName = (session.session_name || '').toLowerCase();
+  const sessionType = (session.session_type || '').toLowerCase();
+  return sessionName === 'race' || sessionType === 'race';
 }
 
-function namesLikelyReferToSameTeam(left: string, right: string) {
-  const normalizedLeft = normalizeText(left);
-  const normalizedRight = normalizeText(right);
-  if (normalizedLeft === normalizedRight) {
-    return true;
+function formatRaceNamePt(meetingName?: string | null) {
+  if (!meetingName) {
+    return 'Grande Prêmio';
   }
 
-  return normalizedLeft.includes(normalizedRight)
-    || normalizedRight.includes(normalizedLeft)
-    || countSharedTokens([left], [right]) >= 2;
+  return meetingName
+    .replace(/^(.+?) Grand Prix$/i, (_, location: string) => `GP de ${location}`)
+    .replace(/^São Paulo Grand Prix$/i, 'GP de São Paulo');
+}
+
+function formatHexColor(value?: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value.replace('#', '').trim();
+  return /^[0-9a-fA-F]{6}$/.test(normalized) ? `#${normalized}` : null;
+}
+
+function createRaceId(meeting: OpenF1Meeting, index: number) {
+  return slugify(meeting.meeting_name || meeting.location || meeting.country_name || `race-${index + 1}`);
+}
+
+function extractDate(value?: string | null) {
+  return value ? value.slice(0, 10) : '';
 }
 
 function getCategorySeason(category: Category) {
-  return category.calendar[0]?.date.slice(0, 4) || '2026';
+  return category.calendar[0]?.date.slice(0, 4) || String(new Date().getFullYear());
 }
 
 function normalizeText(value: string) {
@@ -950,6 +742,15 @@ function normalizeText(value: string) {
     .toLowerCase();
 }
 
-function uniqueStrings(values: Array<string | undefined>) {
-  return Array.from(new Set(values.filter((value): value is string => Boolean(value?.trim()))));
+function slugify(value: string) {
+  return normalizeText(value).replace(/\s+/g, '-');
+}
+
+function toTitleCase(value: string) {
+  return value
+    .toLowerCase()
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 }
