@@ -35,8 +35,8 @@ import {
   getSupportedLiveCategoryIds,
   isCategoryLiveSupported,
   mergeCategoryWithLiveData,
-  type OpenF1CategoryData,
-} from './openf1';
+  type JolpicaCategoryData,
+} from './jolpica';
 
 const IconMap: Record<string, React.ElementType> = {
   Trophy,
@@ -268,8 +268,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [showIOSBanner, setShowIOSBanner] = useState(
     () => getIsIOSInstallable() && localStorage.getItem('pitstophub_ios_install_dismissed') !== '1'
   );
-  const [liveCategorySummaries, setLiveCategorySummaries] = useState<Partial<Record<Category['id'], OpenF1CategoryData | null>>>({});
-  const [liveCategoryData, setLiveCategoryData] = useState<OpenF1CategoryData | null>(null);
+  const [liveCategorySummaries, setLiveCategorySummaries] = useState<Partial<Record<Category['id'], JolpicaCategoryData | null>>>({});
+  const [liveCategoryData, setLiveCategoryData] = useState<JolpicaCategoryData | null>(null);
   const [liveCategoryState, setLiveCategoryState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
 
   React.useEffect(() => {
@@ -428,7 +428,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         setLiveCategoryState('ready');
         setLiveCategorySummaries((prev) => ({ ...prev, [selectedCategoryBase.id]: data }));
       } catch (error) {
-        console.error('Falha ao sincronizar dados da OpenF1.', error);
+        console.error('Falha ao sincronizar dados da Jolpica F1.', error);
         if (!isMounted) return;
         setLiveCategoryData(null);
         setLiveCategoryState('error');
