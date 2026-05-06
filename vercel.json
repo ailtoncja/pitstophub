@@ -7,7 +7,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; connect-src 'self' https://gftsrdshhxavybwcztuh.supabase.co wss://gftsrdshhxavybwcztuh.supabase.co https://www.thesportsdb.com; font-src 'self' https://fonts.gstatic.com data:; frame-ancestors 'none'; img-src 'self' data: blob: https://r2.thesportsdb.com https://www.thesportsdb.com; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; form-action 'self'; worker-src 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; base-uri 'self'; connect-src 'self' https://gftsrdshhxavybwcztuh.supabase.co wss://gftsrdshhxavybwcztuh.supabase.co https://www.thesportsdb.com https://api.openf1.org; font-src 'self' https://fonts.gstatic.com data:; frame-ancestors 'none'; img-src 'self' data: blob: https://r2.thesportsdb.com https://www.thesportsdb.com https://www.formula1.com; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; form-action 'self'; worker-src 'self'; upgrade-insecure-requests"
         },
         {
           "key": "Cross-Origin-Opener-Policy",
