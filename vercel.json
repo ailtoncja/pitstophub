@@ -60,8 +60,8 @@
   ],
   "rewrites": [
     {
-      "source": "/api/openf1/:path*",
-      "destination": "https://api.openf1.org/v1/:path*"
+      "source": "/api/f1/:path*",
+      "destination": "https://api.jolpi.ca/ergast/f1/:path*"
     },
     {
       "source": "/(.*)",
