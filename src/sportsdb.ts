@@ -341,7 +341,7 @@ async function resolveCategoryDrivers(category: Category, rosterDrivers: Driver[
     }
   }
 
-  return mergedDrivers.map((driver) => {
+  const enrichedDrivers = mergedDrivers.map((driver) => {
     const fallback = imageByDriverName.get(normalizeText(driver.name));
     if (!fallback) {
       return driver;
@@ -354,6 +354,8 @@ async function resolveCategoryDrivers(category: Category, rosterDrivers: Driver[
       number: driver.number === '--' ? (fallback.number || driver.number) : driver.number,
     };
   });
+
+  return canonicalizeDriversAgainstBase(category.drivers, enrichedDrivers);
 }
 
 async function syncWinnersIntoCalendar(calendar: Race[]) {
@@ -586,6 +588,28 @@ function mergeDriversByName(baseDrivers: Driver[], liveDrivers: Driver[]) {
   }
 
   return Array.from(merged.values());
+}
+
+function canonicalizeDriversAgainstBase(baseDrivers: Driver[], drivers: Driver[]) {
+  const baseMap = new Map(baseDrivers.map((driver) => [normalizeText(driver.name), driver]));
+
+  return drivers.map((driver) => {
+    const matchedKey = findBestDriverKey(driver, baseMap);
+    const baseDriver = matchedKey ? baseMap.get(matchedKey) : undefined;
+    if (!baseDriver) {
+      return driver;
+    }
+
+    return {
+      ...driver,
+      id: baseDriver.id,
+      name: baseDriver.name,
+      number: driver.number || baseDriver.number,
+      nationality: driver.nationality || baseDriver.nationality,
+      teamId: baseDriver.teamId || driver.teamId,
+      image: driver.image || baseDriver.image,
+    };
+  });
 }
 
 function mergeTeamsByName(baseTeams: Team[], liveTeams: Team[]) {
