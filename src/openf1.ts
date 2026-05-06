@@ -90,7 +90,7 @@ type F1SeasonContext = {
   year: string;
 };
 
-export type SportsDbLiveEvent = {
+export type OpenF1LiveEvent = {
   id: string;
   name: string;
   date: string;
@@ -99,7 +99,7 @@ export type SportsDbLiveEvent = {
   status: 'upcoming' | 'completed' | 'cancelled';
 };
 
-export type SportsDbCategoryData = {
+export type OpenF1CategoryData = {
   currentSeason?: string;
   longDescription?: string;
   enLongDescription?: string;
@@ -107,15 +107,15 @@ export type SportsDbCategoryData = {
   drivers?: Driver[];
   calendar?: Race[];
   standings?: CategoryStandings;
-  nextEvent?: SportsDbLiveEvent | null;
-  lastEvent?: SportsDbLiveEvent | null;
+  nextEvent?: OpenF1LiveEvent | null;
+  lastEvent?: OpenF1LiveEvent | null;
   matchedTeamCount?: number;
   matchedDriverCount?: number;
   matchedCalendarCount?: number;
 };
 
-const summaryCache = new Map<string, CacheEntry<SportsDbCategoryData | null>>();
-const detailCache = new Map<string, CacheEntry<SportsDbCategoryData | null>>();
+const summaryCache = new Map<string, CacheEntry<OpenF1CategoryData | null>>();
+const detailCache = new Map<string, CacheEntry<OpenF1CategoryData | null>>();
 
 export function isCategoryLiveSupported(categoryId: Category['id']) {
   return getCategoryLiveCoverage(categoryId) === 'supported';
@@ -129,7 +129,7 @@ export function getCategoryLiveCoverage(categoryId: Category['id']): LiveCoverag
   return SUPPORTED_CATEGORY_IDS.has(categoryId) ? 'supported' : 'local';
 }
 
-export function mergeCategoryWithLiveData(category: Category, liveData: SportsDbCategoryData | null): Category {
+export function mergeCategoryWithLiveData(category: Category, liveData: OpenF1CategoryData | null): Category {
   if (!liveData) {
     return category;
   }
@@ -148,7 +148,7 @@ export function mergeCategoryWithLiveData(category: Category, liveData: SportsDb
   };
 }
 
-export async function fetchCategoryLiveSummary(category: Category, force = false): Promise<SportsDbCategoryData | null> {
+export async function fetchCategoryLiveSummary(category: Category, force = false): Promise<OpenF1CategoryData | null> {
   return getCached(summaryCache, `${category.id}:summary`, SUMMARY_CACHE_TTL_MS, force, async () => {
     if (category.id !== 'f1') {
       return null;
@@ -169,7 +169,7 @@ export async function fetchCategoryLiveSummary(category: Category, force = false
   });
 }
 
-export async function fetchCategoryLiveData(category: Category, force = false): Promise<SportsDbCategoryData | null> {
+export async function fetchCategoryLiveData(category: Category, force = false): Promise<OpenF1CategoryData | null> {
   return getCached(detailCache, `${category.id}:detail`, DETAIL_CACHE_TTL_MS, force, async () => {
     if (category.id !== 'f1') {
       return null;
@@ -660,7 +660,7 @@ function getMeetingStatus(meeting: OpenF1Meeting, raceSession: OpenF1Session | u
     return 'cancelled';
   }
 
-  const reference = raceSession?.date_end || `${date}T23:59:59Z`;
+  const reference = raceSession?.date_end || (date ? `${date}T23:59:59Z` : null);
   if (reference && new Date(reference) < new Date()) {
     return 'completed';
   }
@@ -680,7 +680,7 @@ function getLastCompletedRace(calendar: Race[]) {
     .sort((left, right) => right.date.localeCompare(left.date))[0] ?? null;
 }
 
-function mapRaceToLiveEvent(race: Race): SportsDbLiveEvent {
+function mapRaceToLiveEvent(race: Race): OpenF1LiveEvent {
   return {
     id: race.id,
     name: race.enName || race.name,
@@ -736,7 +736,7 @@ function getCategorySeason(category: Category) {
 function normalizeText(value: string) {
   return value
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-zA-Z0-9]+/g, ' ')
     .trim()
     .toLowerCase();

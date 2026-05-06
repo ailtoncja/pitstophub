@@ -35,8 +35,8 @@ import {
   getSupportedLiveCategoryIds,
   isCategoryLiveSupported,
   mergeCategoryWithLiveData,
-  type SportsDbCategoryData,
-} from './sportsdb';
+  type OpenF1CategoryData,
+} from './openf1';
 
 const IconMap: Record<string, React.ElementType> = {
   Trophy,
@@ -268,8 +268,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [showIOSBanner, setShowIOSBanner] = useState(
     () => getIsIOSInstallable() && localStorage.getItem('pitstophub_ios_install_dismissed') !== '1'
   );
-  const [liveCategorySummaries, setLiveCategorySummaries] = useState<Partial<Record<Category['id'], SportsDbCategoryData | null>>>({});
-  const [liveCategoryData, setLiveCategoryData] = useState<SportsDbCategoryData | null>(null);
+  const [liveCategorySummaries, setLiveCategorySummaries] = useState<Partial<Record<Category['id'], OpenF1CategoryData | null>>>({});
+  const [liveCategoryData, setLiveCategoryData] = useState<OpenF1CategoryData | null>(null);
   const [liveCategoryState, setLiveCategoryState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
 
   React.useEffect(() => {
