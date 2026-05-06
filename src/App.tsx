@@ -52,6 +52,10 @@ const SPRING = { type: 'spring' as const, stiffness: 380, damping: 32 };
 const SPRING_SOFT = { type: 'spring' as const, stiffness: 280, damping: 28 };
 
 const CATEGORY_BY_ID = new Map(MOTORSPORT_DATA.map(c => [c.id, c]));
+const F1_STATIC_FALLBACK: Partial<Category> = {
+  calendar: [],
+  standings: undefined,
+};
 
 const NAV_GROUPS = [
   {
@@ -82,6 +86,7 @@ const UI_TRANSLATIONS = {
     explore: 'Explorar',
     viewRules: 'Ver Regras',
     season2026: 'Temporada 2026',
+    seasonLabel: 'Temporada',
     viewCalendar: 'Ver Calendário',
     rulesAndFormat: 'Regras e Formato',
     nextStage: 'Próxima Etapa',
@@ -143,13 +148,16 @@ const UI_TRANSLATIONS = {
     liveDataFallback: 'Esta categoria segue usando a base local por enquanto.',
     liveNextEvent: 'Proximo evento ao vivo',
     liveLastResult: 'Ultimo resultado',
-    liveSource: 'Fonte: TheSportsDB API'
+    liveSource: 'Fonte: OpenF1 API',
+    championshipLeader: 'Lider do campeonato',
+    constructorsLeader: 'Lider entre equipes'
   },
   en: {
     home: 'Home',
     explore: 'Explore',
     viewRules: 'View Rules',
     season2026: '2026 Season',
+    seasonLabel: 'Season',
     viewCalendar: 'View Calendar',
     rulesAndFormat: 'Rules and Format',
     nextStage: 'Next Stage',
@@ -211,7 +219,9 @@ const UI_TRANSLATIONS = {
     liveDataFallback: 'This category is still using the local dataset for now.',
     liveNextEvent: 'Next live event',
     liveLastResult: 'Latest result',
-    liveSource: 'Source: TheSportsDB API'
+    liveSource: 'Source: OpenF1 API',
+    championshipLeader: 'Championship leader',
+    constructorsLeader: 'Team leader'
   }
 };
 
@@ -418,7 +428,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         setLiveCategoryState('ready');
         setLiveCategorySummaries((prev) => ({ ...prev, [selectedCategoryBase.id]: data }));
       } catch (error) {
-        console.error('Falha ao sincronizar dados do TheSportsDB.', error);
+        console.error('Falha ao sincronizar dados da OpenF1.', error);
         if (!isMounted) return;
         setLiveCategoryData(null);
         setLiveCategoryState('error');
@@ -451,9 +461,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
   const allCategories = useMemo(
     () => MOTORSPORT_DATA.map((category) => {
+      const normalizedCategory = category.id === 'f1'
+        ? { ...category, ...F1_STATIC_FALLBACK }
+        : category;
       const summaryData = liveCategorySummaries[category.id] ?? null;
       const detailData = selectedCategoryBase.id === category.id ? liveCategoryData : null;
-      return mergeCategoryWithLiveData(mergeCategoryWithLiveData(category, summaryData), detailData);
+      return mergeCategoryWithLiveData(mergeCategoryWithLiveData(normalizedCategory, summaryData), detailData);
     }),
     [liveCategorySummaries, selectedCategoryBase.id, liveCategoryData]
   );
@@ -541,6 +554,26 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     () => selectedCategory.calendar.find(race => race.status === 'upcoming') ?? null,
     [selectedCategory.calendar]
   );
+
+  const lastCompletedRace = useMemo(
+    () => [...selectedCategory.calendar].reverse().find(race => race.status === 'completed') ?? null,
+    [selectedCategory.calendar]
+  );
+
+  const currentSeasonLabel = useMemo(
+    () => liveCategoryData?.currentSeason || selectedCategory.calendar[0]?.date.slice(0, 4) || '2026',
+    [liveCategoryData?.currentSeason, selectedCategory.calendar]
+  );
+
+  const seasonBadgeLabel = useMemo(
+    () => currentSeasonLabel === '2026'
+      ? UI_TRANSLATIONS[language].season2026
+      : `${UI_TRANSLATIONS[language].seasonLabel} ${currentSeasonLabel}`,
+    [currentSeasonLabel, language]
+  );
+
+  const championshipLeader = selectedCategory.standings?.drivers?.[0] ?? null;
+  const constructorsLeader = selectedCategory.standings?.constructors?.[0] ?? selectedCategory.standings?.teams?.[0] ?? null;
 
   const teamClasses = useMemo(
     () => Array.from(new Set(selectedCategory.teams.map(team => team.class || 'Geral'))),
@@ -1018,7 +1051,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     <div className="flex-1 text-center md:text-left">
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-red/10 border border-brand-red/20 text-brand-red text-xs font-bold uppercase tracking-widest mb-6">
                         <Timer className="w-3 h-3" />
-                        {UI_TRANSLATIONS[language].season2026}
+                        {seasonBadgeLabel}
                       </div>
                       <h1 className="text-4xl sm:text-6xl md:text-8xl font-display font-black italic tracking-tighter mb-6 text-[var(--text-main)]">
                         {(language === 'pt' ? selectedCategory.name : (selectedCategory.enFullName || selectedCategory.name)).split(' ')[0]} <span className="text-brand-red">{(language === 'pt' ? selectedCategory.name : (selectedCategory.enFullName || selectedCategory.name)).split(' ').slice(1).join(' ')}</span>
@@ -1190,14 +1223,71 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             </div>
                             <div className="mt-8 flex flex-wrap gap-4">
                               <div className="px-4 py-2 rounded-full bg-brand-red/10 border border-brand-red/20 text-brand-red text-xs font-black uppercase tracking-widest">
-                                {UI_TRANSLATIONS[language].season2026}
+                                {seasonBadgeLabel}
                               </div>
                               <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-black uppercase tracking-widest">
                                 {UI_TRANSLATIONS[language].fiaSanctioned}
                               </div>
+                              {selectedCategory.id === 'f1' && (
+                                <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-black uppercase tracking-widest">
+                                  {UI_TRANSLATIONS[language].liveSource}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
+
+                        {selectedCategory.id === 'f1' && (
+                          <>
+                            <div className="glass-card p-8">
+                              <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
+                                <Timer className="text-brand-red" /> {UI_TRANSLATIONS[language].liveNextEvent}
+                              </h3>
+                              <div className="text-2xl font-display font-black text-brand-red mb-2">
+                                {nextUpcomingRace?.name || '--'}
+                              </div>
+                              <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">
+                                {nextUpcomingRace ? `${nextUpcomingRace.location} • ${nextUpcomingRace.date.split('-').reverse().join('/')}` : UI_TRANSLATIONS[language].notAvailableShort}
+                              </p>
+                            </div>
+
+                            <div className="glass-card p-8">
+                              <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
+                                <Trophy className="text-brand-red" /> {UI_TRANSLATIONS[language].liveLastResult}
+                              </h3>
+                              <div className="text-2xl font-display font-black text-brand-red mb-2">
+                                {lastCompletedRace?.winner || '--'}
+                              </div>
+                              <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">
+                                {lastCompletedRace ? `${lastCompletedRace.name} • ${lastCompletedRace.date.split('-').reverse().join('/')}` : UI_TRANSLATIONS[language].notAvailableShort}
+                              </p>
+                            </div>
+
+                            <div className="glass-card p-8">
+                              <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
+                                <Flag className="text-brand-red" /> {UI_TRANSLATIONS[language].championshipLeader}
+                              </h3>
+                              <div className="text-2xl font-display font-black text-brand-red mb-2">
+                                {championshipLeader?.name || '--'}
+                              </div>
+                              <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">
+                                {championshipLeader ? `${championshipLeader.points} ${UI_TRANSLATIONS[language].points}` : UI_TRANSLATIONS[language].notAvailableShort}
+                              </p>
+                            </div>
+
+                            <div className="glass-card p-8">
+                              <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
+                                <Users className="text-brand-red" /> {UI_TRANSLATIONS[language].constructorsLeader}
+                              </h3>
+                              <div className="text-2xl font-display font-black text-brand-red mb-2">
+                                {constructorsLeader?.name || '--'}
+                              </div>
+                              <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">
+                                {constructorsLeader ? `${constructorsLeader.points} ${UI_TRANSLATIONS[language].points}` : UI_TRANSLATIONS[language].notAvailableShort}
+                              </p>
+                            </div>
+                          </>
+                        )}
 
                       </motion.div>
                     )}
