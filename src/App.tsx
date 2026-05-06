@@ -23,11 +23,20 @@ import {
   X,
   Languages,
   Heart,
-  Download
+  Download,
+  Share2
 } from 'lucide-react';
 import { MOTORSPORT_DATA, Category } from './types';
 import { cn } from './lib/utils';
 import { getUserSettings, saveUserSettings, type AuthUser } from './auth';
+import {
+  fetchCategoryLiveData,
+  fetchCategoryLiveSummary,
+  getSupportedLiveCategoryIds,
+  isCategoryLiveSupported,
+  mergeCategoryWithLiveData,
+  type SportsDbCategoryData,
+} from './sportsdb';
 
 const IconMap: Record<string, React.ElementType> = {
   Trophy,
@@ -125,7 +134,16 @@ const UI_TRANSLATIONS = {
     notAvailableShort: 'N/A',
     fiaSanctioned: 'Homologado FIA',
     installApp: 'Instalar App',
-    installingApp: 'Instalando...'
+    installingApp: 'Instalando...',
+    iosInstallTitle: 'Instalar PitStopHub',
+    iosInstallDesc: "Toque em Compartilhar e depois em 'Adicionar à Tela de Início'",
+    iosInstallDismiss: 'Agora não',
+    liveDataLoading: 'Sincronizando dados ao vivo...',
+    liveDataError: 'Nao foi possivel carregar dados ao vivo agora.',
+    liveDataFallback: 'Esta categoria segue usando a base local por enquanto.',
+    liveNextEvent: 'Proximo evento ao vivo',
+    liveLastResult: 'Ultimo resultado',
+    liveSource: 'Fonte: TheSportsDB API'
   },
   en: {
     home: 'Home',
@@ -184,9 +202,30 @@ const UI_TRANSLATIONS = {
     notAvailableShort: 'N/A',
     fiaSanctioned: 'FIA Sanctioned',
     installApp: 'Install App',
-    installingApp: 'Installing...'
+    installingApp: 'Installing...',
+    iosInstallTitle: 'Install PitStopHub',
+    iosInstallDesc: "Tap Share then 'Add to Home Screen'",
+    iosInstallDismiss: 'Not now',
+    liveDataLoading: 'Syncing live data...',
+    liveDataError: 'Unable to load live data right now.',
+    liveDataFallback: 'This category is still using the local dataset for now.',
+    liveNextEvent: 'Next live event',
+    liveLastResult: 'Latest result',
+    liveSource: 'Source: TheSportsDB API'
   }
 };
+
+function getIsIOSInstallable(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const isIOS =
+    /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!isIOS) return false;
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    ('standalone' in navigator && (navigator as unknown as { standalone: boolean }).standalone === true);
+  return !isStandalone;
+}
 
 type AppProps = {
   currentUser: AuthUser | null;
@@ -206,7 +245,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState<'home' | 'category'>('home');
-  const [selectedCategory, setSelectedCategory] = useState<Category>(MOTORSPORT_DATA[0]);
+  const [selectedCategoryBase, setSelectedCategoryBase] = useState<Category>(MOTORSPORT_DATA[0]);
   const [activeTab, setActiveTab] = useState<'overview' | 'teams' | 'calendar' | 'standings'>('overview');
   const [showRules, setShowRules] = useState(false);
   const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
@@ -216,6 +255,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [followedDriverIds, setFollowedDriverIds] = useState<string[]>([]);
   const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installingApp, setInstallingApp] = useState(false);
+  const [showIOSBanner, setShowIOSBanner] = useState(
+    () => getIsIOSInstallable() && localStorage.getItem('pitstophub_ios_install_dismissed') !== '1'
+  );
+  const [liveCategorySummaries, setLiveCategorySummaries] = useState<Partial<Record<Category['id'], SportsDbCategoryData | null>>>({});
+  const [liveCategoryData, setLiveCategoryData] = useState<SportsDbCategoryData | null>(null);
+  const [liveCategoryState, setLiveCategoryState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
 
   React.useEffect(() => {
     if (!currentUser) {
@@ -224,7 +269,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       setFollowedCategoryIds([]);
       setFollowedTeamIds([]);
       setFollowedDriverIds([]);
-      setSelectedCategory(MOTORSPORT_DATA[0]);
+      setSelectedCategoryBase(MOTORSPORT_DATA[0]);
       setSettingsLoaded(true);
       return;
     }
@@ -242,7 +287,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
           setFollowedTeamIds(settings.followedTeamIds);
           setFollowedDriverIds(settings.followedDriverIds);
           const category = CATEGORY_BY_ID.get(settings.favoriteCategoryId);
-          if (category) setSelectedCategory(category);
+          if (category) setSelectedCategoryBase(category);
         }
       } catch (error) {
         console.error('Falha ao aplicar configuracoes do usuario.', error);
@@ -273,7 +318,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       void saveUserSettings(currentUser.id, {
         theme: isDarkMode ? 'dark' : 'light',
         language,
-        favoriteCategoryId: selectedCategory.id,
+        favoriteCategoryId: selectedCategoryBase.id,
         followedCategoryIds,
         followedTeamIds,
         followedDriverIds,
@@ -282,7 +327,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       });
     }, 250);
     return () => window.clearTimeout(t);
-  }, [currentUser, settingsLoaded, isDarkMode, language, selectedCategory.id, followedCategoryIds, followedTeamIds, followedDriverIds]);
+  }, [currentUser, settingsLoaded, isDarkMode, language, selectedCategoryBase.id, followedCategoryIds, followedTeamIds, followedDriverIds]);
 
   React.useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
@@ -316,9 +361,115 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     };
   }, [expandedCategoryId]);
 
+  React.useEffect(() => {
+    let isMounted = true;
+
+    const syncSummaries = async (force = false) => {
+      for (const categoryId of getSupportedLiveCategoryIds()) {
+        const category = CATEGORY_BY_ID.get(categoryId);
+        if (!category) continue;
+
+        try {
+          const data = await fetchCategoryLiveSummary(category, force);
+          if (!isMounted) return;
+          setLiveCategorySummaries((prev) => ({ ...prev, [categoryId]: data }));
+        } catch (error) {
+          console.error(`Falha ao sincronizar resumo ao vivo de ${categoryId}.`, error);
+        }
+      }
+    };
+
+    void syncSummaries();
+
+    const intervalId = window.setInterval(() => {
+      void syncSummaries(true);
+    }, 5 * 60 * 1000);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void syncSummaries(true);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    let isMounted = true;
+
+    if (!isCategoryLiveSupported(selectedCategoryBase.id)) {
+      setLiveCategoryData(null);
+      setLiveCategoryState('idle');
+      return;
+    }
+
+    const syncCategoryDetail = async (force = false) => {
+      try {
+        const data = await fetchCategoryLiveData(selectedCategoryBase, force);
+        if (!isMounted) return;
+        setLiveCategoryData(data);
+        setLiveCategoryState('ready');
+        setLiveCategorySummaries((prev) => ({ ...prev, [selectedCategoryBase.id]: data }));
+      } catch (error) {
+        console.error('Falha ao sincronizar dados do TheSportsDB.', error);
+        if (!isMounted) return;
+        setLiveCategoryData(null);
+        setLiveCategoryState('error');
+      }
+    };
+
+    setLiveCategoryState('loading');
+    void syncCategoryDetail();
+
+    const intervalId = window.setInterval(() => {
+      if (view === 'category') {
+        void syncCategoryDetail(true);
+      }
+    }, 10 * 60 * 1000);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && view === 'category') {
+        void syncCategoryDetail(true);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [selectedCategoryBase, view]);
+
+  const allCategories = useMemo(
+    () => MOTORSPORT_DATA.map((category) => {
+      const summaryData = liveCategorySummaries[category.id] ?? null;
+      const detailData = selectedCategoryBase.id === category.id ? liveCategoryData : null;
+      return mergeCategoryWithLiveData(mergeCategoryWithLiveData(category, summaryData), detailData);
+    }),
+    [liveCategorySummaries, selectedCategoryBase.id, liveCategoryData]
+  );
+
+  const allCategoriesById = useMemo(
+    () => new Map(allCategories.map((category) => [category.id, category])),
+    [allCategories]
+  );
+
+  const selectedCategory = useMemo(
+    () => allCategoriesById.get(selectedCategoryBase.id) ?? selectedCategoryBase,
+    [allCategoriesById, selectedCategoryBase]
+  );
+
   const handleCategorySelect = useCallback((cat: Category) => {
     setExpandedCategoryId(null);
-    setSelectedCategory(cat);
+    setSelectedCategoryBase(cat);
     setView('category');
     setActiveTab('overview');
     setIsMobileMenuOpen(false);
@@ -338,7 +489,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     ]);
 
     return Array.from(categoriesToShow)
-      .map(id => CATEGORY_BY_ID.get(id))
+      .map(id => allCategoriesById.get(id))
       .filter((cat): cat is NonNullable<typeof cat> => cat != null)
       .flatMap(category =>
         category.calendar
@@ -346,7 +497,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
           .map(race => ({ category, race }))
       )
       .sort((a, b) => a.race.date.localeCompare(b.race.date));
-  }, [followedCategoryIds, followedTeamIds, followedDriverIds]);
+  }, [allCategoriesById, followedCategoryIds, followedTeamIds, followedDriverIds]);
 
   const toggleFollowCategory = useCallback((categoryId: string) => {
     if (!currentUser) return onLoginRequest();
@@ -364,6 +515,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     const key = `${categoryId}::${driverId}`;
     setFollowedDriverIds(prev => prev.includes(key) ? prev.filter(id => id !== key) : [...prev, key]);
   }, [currentUser, onLoginRequest]);
+
+  const handleDismissIOSBanner = useCallback(() => {
+    localStorage.setItem('pitstophub_ios_install_dismissed', '1');
+    setShowIOSBanner(false);
+  }, []);
 
   const handleInstallApp = useCallback(async () => {
     if (!deferredInstallPrompt) return;
@@ -460,7 +616,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       className="absolute top-full left-0 mt-2 w-48 z-[200] bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-2xl py-2"
                     >
                       {group.ids.map(id => {
-                        const cat = CATEGORY_BY_ID.get(id);
+                        const cat = allCategoriesById.get(id);
                         if (!cat) return null;
                         return (
                           <button
@@ -599,7 +755,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       </div>
                       <div className="space-y-2">
                         {group.ids.map(id => {
-                          const cat = CATEGORY_BY_ID.get(id);
+                          const cat = allCategoriesById.get(id);
                           if (!cat) return null;
                           const Icon = IconMap[cat.icon];
                           return (
@@ -713,7 +869,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                       {group.ids.map((id) => {
-                        const cat = CATEGORY_BY_ID.get(id);
+                        const cat = allCategoriesById.get(id);
                         if (!cat) return null;
                         const Icon = IconMap[cat.icon];
                         const isExpanded = expandedCategoryId === cat.id;
@@ -816,7 +972,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     <button 
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        setSelectedCategory(cat);
+                                        setSelectedCategoryBase(cat);
                                         setShowRules(true);
                                       }}
                                       className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-500 hover:text-brand-red transition-all"
@@ -1040,6 +1196,74 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               </div>
                             </div>
                           </div>
+                        </div>
+
+                        <div className="md:col-span-2 lg:col-span-3 glass-card p-8">
+                          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                            <div>
+                              <h3 className="text-2xl font-display font-black italic mb-2 flex items-center gap-2 text-[var(--text-main)]">
+                                <Zap className="text-brand-red" /> {UI_TRANSLATIONS[language].liveData}
+                              </h3>
+                              <p className="text-xs font-black uppercase tracking-widest text-gray-500">
+                                {UI_TRANSLATIONS[language].liveSource}
+                              </p>
+                            </div>
+                            {liveCategoryData?.currentSeason && (
+                              <div className="px-4 py-2 rounded-full bg-brand-red/10 border border-brand-red/20 text-brand-red text-xs font-black uppercase tracking-widest">
+                                {liveCategoryData.currentSeason}
+                              </div>
+                            )}
+                          </div>
+
+                          {liveCategoryState === 'loading' && (
+                            <p className="mt-6 text-sm font-semibold text-gray-400">
+                              {UI_TRANSLATIONS[language].liveDataLoading}
+                            </p>
+                          )}
+
+                          {liveCategoryState === 'error' && (
+                            <p className="mt-6 text-sm font-semibold text-red-400">
+                              {UI_TRANSLATIONS[language].liveDataError}
+                            </p>
+                          )}
+
+                          {liveCategoryState === 'idle' && (
+                            <p className="mt-6 text-sm font-semibold text-gray-400">
+                              {UI_TRANSLATIONS[language].liveDataFallback}
+                            </p>
+                          )}
+
+                          {liveCategoryData && (
+                            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="rounded-2xl border border-[var(--card-border)] bg-black/20 p-6">
+                                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-3">
+                                  {UI_TRANSLATIONS[language].liveNextEvent}
+                                </div>
+                                <div className="text-xl font-display font-black italic text-[var(--text-main)]">
+                                  {liveCategoryData.nextEvent?.name || UI_TRANSLATIONS[language].notAvailableShort}
+                                </div>
+                                <div className="mt-4 space-y-2 text-sm text-gray-400">
+                                  <div>{liveCategoryData.nextEvent?.date || '--/--/--'}</div>
+                                  <div>{liveCategoryData.nextEvent?.location || UI_TRANSLATIONS[language].notAvailableShort}</div>
+                                  <div>{liveCategoryData.nextEvent?.circuit || UI_TRANSLATIONS[language].notAvailableShort}</div>
+                                </div>
+                              </div>
+
+                              <div className="rounded-2xl border border-[var(--card-border)] bg-black/20 p-6">
+                                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-3">
+                                  {UI_TRANSLATIONS[language].liveLastResult}
+                                </div>
+                                <div className="text-xl font-display font-black italic text-[var(--text-main)]">
+                                  {liveCategoryData.lastEvent?.name || UI_TRANSLATIONS[language].notAvailableShort}
+                                </div>
+                                <div className="mt-4 space-y-2 text-sm text-gray-400">
+                                  <div>{liveCategoryData.lastEvent?.date || '--/--/--'}</div>
+                                  <div>{liveCategoryData.lastEvent?.location || UI_TRANSLATIONS[language].notAvailableShort}</div>
+                                  <div>{liveCategoryData.lastEvent?.circuit || UI_TRANSLATIONS[language].notAvailableShort}</div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </motion.div>
                     )}
@@ -1378,7 +1602,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             </div>
             
             <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-3">
-              {MOTORSPORT_DATA.map(cat => (
+              {allCategories.map(cat => (
                 <button 
                   key={cat.id}
                   onClick={() => handleCategorySelect(cat)}
@@ -1494,6 +1718,41 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               </div>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showIOSBanner && (
+          <motion.div
+            initial={{ y: '100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 340, damping: 34 }}
+            className="fixed bottom-0 left-0 right-0 z-[110] pb-safe"
+          >
+            <div className="mx-4 mb-4 glass-card border border-[var(--card-border)] p-4 flex items-center gap-4 shadow-2xl">
+              <div className="w-12 h-12 rounded-xl bg-brand-red flex items-center justify-center shrink-0 shadow-lg shadow-brand-red/20">
+                <Trophy className="text-white w-6 h-6" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-black text-[var(--text-main)] leading-snug">
+                  {UI_TRANSLATIONS[language].iosInstallTitle}
+                </p>
+                <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1 flex-wrap">
+                  {language === 'pt' ? 'Toque em' : 'Tap'}
+                  <Share2 className="w-3.5 h-3.5 text-brand-red shrink-0" />
+                  {language === 'pt' ? "e depois em 'Adicionar à Tela de Início'" : "then 'Add to Home Screen'"}
+                </p>
+              </div>
+              <button
+                onClick={handleDismissIOSBanner}
+                className="shrink-0 p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-500 hover:text-[var(--text-main)] transition-colors"
+                aria-label="Fechar"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

@@ -73,6 +73,10 @@ button, [role="button"] {
   scrollbar-width: none;
 }
 
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 @media (max-width: 768px) {
   .glass-card {
     border-radius: 1rem;
