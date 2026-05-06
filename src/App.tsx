@@ -365,18 +365,19 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     let isMounted = true;
 
     const syncSummaries = async (force = false) => {
-      for (const categoryId of getSupportedLiveCategoryIds()) {
-        const category = CATEGORY_BY_ID.get(categoryId);
-        if (!category) continue;
-
-        try {
-          const data = await fetchCategoryLiveSummary(category, force);
-          if (!isMounted) return;
-          setLiveCategorySummaries((prev) => ({ ...prev, [categoryId]: data }));
-        } catch (error) {
-          console.error(`Falha ao sincronizar resumo ao vivo de ${categoryId}.`, error);
-        }
-      }
+      await Promise.allSettled(
+        getSupportedLiveCategoryIds().map(async (categoryId) => {
+          const category = CATEGORY_BY_ID.get(categoryId);
+          if (!category) return;
+          try {
+            const data = await fetchCategoryLiveSummary(category, force);
+            if (!isMounted) return;
+            setLiveCategorySummaries((prev) => ({ ...prev, [categoryId]: data }));
+          } catch (error) {
+            console.error(`Falha ao sincronizar resumo ao vivo de ${categoryId}.`, error);
+          }
+        }),
+      );
     };
 
     void syncSummaries();
