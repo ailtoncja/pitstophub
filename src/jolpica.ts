@@ -1,6 +1,6 @@
 import type { Category, CategoryStandings, Driver, Race, StandingItem, Team } from './types';
 
-const API_BASE = '/api/f1';
+const API_BASE = 'https://api.jolpi.ca/ergast/f1';
 const TIMEOUT_MS = 10000;
 const SUMMARY_TTL_MS = 5 * 60 * 1000;
 const DETAIL_TTL_MS = 10 * 60 * 1000;

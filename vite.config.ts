@@ -69,13 +69,6 @@ export default defineConfig(() => ({
   },
   server: {
     hmr: process.env.DISABLE_HMR !== 'true',
-    proxy: {
-      '/api/f1': {
-        target: 'https://api.jolpi.ca',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/f1/, '/ergast/f1'),
-      },
-    },
   },
   build: {
     rollupOptions: {
