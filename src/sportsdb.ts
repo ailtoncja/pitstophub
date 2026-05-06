@@ -1,6 +1,6 @@
 import type { Category, CategoryStandings, Driver, Race, Team } from './types';
 
-const OPEN_F1_API_BASE_URL = 'https://api.openf1.org/v1';
+const OPEN_F1_API_BASE_URL = '/api/openf1';
 const API_REQUEST_TIMEOUT_MS = 8000;
 const SUMMARY_CACHE_TTL_MS = 5 * 60 * 1000;
 const DETAIL_CACHE_TTL_MS = 10 * 60 * 1000;
