@@ -1,4 +1,4 @@
-import type { Category, CategoryStandings, Driver, Race, StandingItem, Team } from './types';
+import type { Category, Driver, Race, Team } from './types';
 
 const API_BASE_URL = 'https://www.thesportsdb.com/api/v1/json/123';
 const API_REQUEST_TIMEOUT_MS = 8000;
@@ -28,12 +28,31 @@ const CATEGORY_TEAM_SEARCH_ALIASES: Partial<Record<Category['id'], string[]>> = 
   'f1-academy': ['F1 Academy'],
   fe: ['Formula E'],
   wec: ['WEC', 'World Endurance Championship'],
-  imsa: ['IMSA', 'IMSA SportsCar Championship', 'IMSA WeatherTech SportsCar Championship'],
+  imsa: ['IMSA', 'IMSA SportsCar Championship', 'IMSA WeatherTech SportsCar Championship', 'WeatherTech SportsCar Championship'],
   dtm: ['DTM'],
   indycar: ['IndyCar Series', 'IndyCar'],
   nascar: ['NASCAR Cup Series', 'NASCAR'],
   wrc: ['WRC', 'World Rally Championship'],
-  'gt-world-challenge': ['GT World Challenge Europe', 'GT World Challenge'],
+  'gt-world-challenge': ['GT World Challenge Europe', 'GT World Challenge', 'GT Series Endurance Cup', 'GT World Challenge Europe Endurance Cup'],
+};
+
+export type LiveCoverageTier = 'good' | 'partial' | 'local';
+
+const CATEGORY_LIVE_COVERAGE: Record<Category['id'], LiveCoverageTier> = {
+  f1: 'good',
+  f2: 'good',
+  f3: 'good',
+  fe: 'good',
+  indycar: 'good',
+  nascar: 'good',
+  wec: 'good',
+  wrc: 'good',
+  dtm: 'good',
+  'f1-academy': 'good',
+  imsa: 'good',
+  'gt-world-challenge': 'good',
+  'stock-car': 'local',
+  'formula-truck': 'local',
 };
 
 type CacheEntry<T> = {
@@ -141,11 +160,15 @@ const detailCache = new Map<string, CacheEntry<SportsDbCategoryData | null>>();
 const resultsCache = new Map<string, CacheEntry<SportsDbResult[]>>();
 
 export function isCategoryLiveSupported(categoryId: Category['id']) {
-  return categoryId in CATEGORY_LEAGUE_IDS;
+  return getCategoryLiveCoverage(categoryId) !== 'local' && categoryId in CATEGORY_LEAGUE_IDS;
 }
 
 export function getSupportedLiveCategoryIds() {
-  return Object.keys(CATEGORY_LEAGUE_IDS) as Category['id'][];
+  return (Object.keys(CATEGORY_LIVE_COVERAGE) as Category['id'][]).filter((categoryId) => isCategoryLiveSupported(categoryId));
+}
+
+export function getCategoryLiveCoverage(categoryId: Category['id']): LiveCoverageTier {
+  return CATEGORY_LIVE_COVERAGE[categoryId] ?? 'local';
 }
 
 export function mergeCategoryWithLiveData(category: Category, liveData: SportsDbCategoryData | null): Category {
@@ -153,14 +176,15 @@ export function mergeCategoryWithLiveData(category: Category, liveData: SportsDb
     return category;
   }
 
+  const coverage = getCategoryLiveCoverage(category.id);
+
   return {
     ...category,
     longDescription: liveData.longDescription || category.longDescription,
     enLongDescription: liveData.enLongDescription || category.enLongDescription || category.longDescription,
-    teams: liveData.teams?.length ? liveData.teams : category.teams,
-    drivers: liveData.drivers?.length ? liveData.drivers : category.drivers,
-    calendar: liveData.calendar?.length ? liveData.calendar : category.calendar,
-    standings: liveData.standings ? mergeStandings(category.standings, liveData.standings) : category.standings,
+    teams: coverage !== 'local' && liveData.teams?.length ? liveData.teams : category.teams,
+    drivers: coverage !== 'local' && liveData.drivers?.length ? liveData.drivers : category.drivers,
+    calendar: coverage === 'good' && liveData.calendar?.length ? liveData.calendar : category.calendar,
   };
 }
 
@@ -204,14 +228,18 @@ async function fetchCategoryLiveDataUncached(category: Category): Promise<Sports
     return null;
   }
 
-  const [leagueResponse, seasonEventsResponse, teamsResponse] = await Promise.all([
+  const [leagueResponse, seasonEventsResponse, recentPastEventsResponse, teamsResponse] = await Promise.all([
     fetchJson<SportsDbLeagueResponse>(`lookupleague.php?id=${leagueId}`).catch(() => ({ leagues: null })),
     fetchJson<SportsDbEventsResponse>(`eventsseason.php?id=${leagueId}&s=${getCategorySeason(category)}`).catch(() => ({ events: null })),
+    fetchJson<SportsDbEventsResponse>(`eventspastleague.php?id=${leagueId}`).catch(() => ({ events: null })),
     fetchTeamsForCategory(category),
   ]);
 
   const league = leagueResponse.leagues?.[0];
-  const overlay = buildCalendarOverlay(category, seasonEventsResponse.events ?? []);
+  const overlay = buildCalendarOverlay(
+    category,
+    mergeSportsDbEvents(seasonEventsResponse.events ?? [], recentPastEventsResponse.events ?? []),
+  );
   const calendarWithWinners = await syncWinnersIntoCalendar(overlay.calendar);
 
   const fallbackTeams = new Map(category.teams.map((team) => [normalizeText(team.name), team]));
@@ -222,7 +250,6 @@ async function fetchCategoryLiveDataUncached(category: Category): Promise<Sports
   const rosterDrivers = mappedTeams.length ? await fetchDriversForTeams(mappedTeams) : [];
   const drivers = await resolveCategoryDrivers(category, rosterDrivers);
   const normalizedCalendar = canonicalizeCalendarWinners(calendarWithWinners, drivers);
-  const standings = await buildLiveStandings(category, normalizedCalendar, drivers, mappedTeams, forceNumericRaceIds(normalizedCalendar));
   const nextEvent = normalizedCalendar.find((race) => race.status === 'upcoming') ?? null;
   const lastEvent = [...normalizedCalendar].reverse().find((race) => race.status === 'completed') ?? null;
 
@@ -233,7 +260,6 @@ async function fetchCategoryLiveDataUncached(category: Category): Promise<Sports
     teams: mappedTeams.length ? mappedTeams : undefined,
     drivers: drivers.length ? drivers : undefined,
     calendar: normalizedCalendar,
-    standings,
     nextEvent: nextEvent ? mapRaceToLiveEvent(nextEvent) : null,
     lastEvent: lastEvent ? mapRaceToLiveEvent(lastEvent) : null,
   };
@@ -322,7 +348,8 @@ async function resolveCategoryDrivers(category: Category, rosterDrivers: Driver[
 }
 
 async function syncWinnersIntoCalendar(calendar: Race[]) {
-  const resultsByRaceId = await fetchResultsForRaces(forceNumericRaceIds(calendar));
+  const winnerTargets = getWinnerSyncTargets(calendar);
+  const resultsByRaceId = await fetchResultsForRaces(winnerTargets);
   return calendar.map((race) => {
     const results = resultsByRaceId.get(race.id) ?? [];
     const winner = results
@@ -334,87 +361,6 @@ async function syncWinnersIntoCalendar(calendar: Race[]) {
       winner: winner || race.winner,
     };
   });
-}
-
-async function buildLiveStandings(
-  category: Category,
-  calendar: Race[],
-  drivers: Driver[],
-  teams: Team[],
-  eligibleRaceIds: string[],
-) {
-  const baseDriverCount = category.standings?.drivers?.length ?? 0;
-  const baseConstructorCount = category.standings?.constructors?.length ?? category.standings?.teams?.length ?? 0;
-
-  if (!baseDriverCount && !baseConstructorCount) {
-    return undefined;
-  }
-
-  const completedRaces = calendar.filter((race) => race.status === 'completed' && eligibleRaceIds.includes(race.id));
-  if (!completedRaces.length) {
-    return undefined;
-  }
-
-  const resultsByRaceId = await fetchResultsForRaces(completedRaces.map((race) => race.id));
-  const resultSets = Array.from(resultsByRaceId.values()).filter((results) => results.length > 0);
-  if (!resultSets.length) {
-    return undefined;
-  }
-
-  const averageRows = resultSets.reduce((total, results) => total + results.length, 0) / resultSets.length;
-  const uniqueDrivers = new Set(
-    resultSets.flatMap((results) => results.map((result) => normalizeText(result.strPlayer || '')).filter(Boolean)),
-  ).size;
-
-  const minDriverCoverage = Math.min(Math.max(6, Math.ceil(baseDriverCount * 0.45)), baseDriverCount || 6);
-  if (averageRows < 6 || uniqueDrivers < minDriverCoverage) {
-    return undefined;
-  }
-
-  const pointsByDriver = new Map<string, { name: string; points: number; teamName?: string }>();
-  const pointsByTeam = new Map<string, { name: string; points: number }>();
-
-  for (const results of resultSets) {
-    for (const result of results) {
-      if (!result.strPlayer) continue;
-
-      const driverKey = normalizeText(result.strPlayer);
-      const teamName = findTeamName(result.idTeam, teams, drivers, result.strPlayer);
-      const driverEntry = pointsByDriver.get(driverKey) ?? { name: result.strPlayer, points: 0, teamName };
-      driverEntry.points += Number(result.intPoints || '0');
-      driverEntry.teamName = driverEntry.teamName || teamName;
-      pointsByDriver.set(driverKey, driverEntry);
-
-      if (teamName) {
-        const teamKey = normalizeText(teamName);
-        const teamEntry = pointsByTeam.get(teamKey) ?? { name: teamName, points: 0 };
-        teamEntry.points += Number(result.intPoints || '0');
-        pointsByTeam.set(teamKey, teamEntry);
-      }
-    }
-  }
-
-  const driverStandings = toStandingItems(
-    Array.from(pointsByDriver.values())
-      .sort((a, b) => b.points - a.points || a.name.localeCompare(b.name))
-      .map((entry) => ({ name: entry.name, points: entry.points, team: entry.teamName })),
-  );
-
-  const teamStandings = toStandingItems(
-    Array.from(pointsByTeam.values())
-      .sort((a, b) => b.points - a.points || a.name.localeCompare(b.name))
-      .map((entry) => ({ name: entry.name, points: entry.points })),
-  );
-
-  if (!driverStandings.length && !teamStandings.length) {
-    return undefined;
-  }
-
-  return {
-    drivers: driverStandings.length ? driverStandings : undefined,
-    constructors: category.standings?.constructors?.length ? teamStandings : undefined,
-    teams: category.standings?.teams?.length ? teamStandings : undefined,
-  } satisfies CategoryStandings;
 }
 
 async function fetchResultsForRaces(raceIds: string[]) {
@@ -496,7 +442,7 @@ function buildCalendarOverlay(category: Category, events: SportsDbEvent[]): Spor
       location: matchedRace.location || baseRace.location,
       enLocation: matchedRace.enLocation || baseRace.enLocation || matchedRace.location,
       circuit: matchedRace.circuit || baseRace.circuit,
-      status: matchedRace.status,
+      status: baseRace.status === 'cancelled' ? 'cancelled' : matchedRace.status,
       winner: matchedRace.winner || baseRace.winner,
     };
   });
@@ -519,9 +465,18 @@ function buildCalendarOverlay(category: Category, events: SportsDbEvent[]): Spor
 }
 
 function findBestApiRaceForBaseRace(baseRace: Race, candidates: Race[]) {
-  return candidates.find((candidate) => candidate.date === baseRace.date)
-    ?? candidates.find((candidate) => namesLikelyMatch(baseRace, candidate))
-    ?? null;
+  let bestMatch: Race | null = null;
+  let bestScore = -1;
+
+  for (const candidate of candidates) {
+    const score = scoreRaceMatch(baseRace, candidate);
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = candidate;
+    }
+  }
+
+  return bestScore >= 30 ? bestMatch : null;
 }
 
 function namesLikelyMatch(baseRace: Race, candidate: Race) {
@@ -535,6 +490,42 @@ function namesLikelyMatch(baseRace: Race, candidate: Race) {
       || candidateName.includes(baseName),
     ),
   );
+}
+
+function scoreRaceMatch(baseRace: Race, candidate: Race) {
+  const baseNames = [baseRace.name, baseRace.enName];
+  const candidateNames = [candidate.name, candidate.enName];
+  const basePlaces = [baseRace.location, baseRace.enLocation, baseRace.circuit];
+  const candidatePlaces = [candidate.location, candidate.enLocation, candidate.circuit];
+
+  let score = 0;
+
+  if (baseRace.date === candidate.date) {
+    score += 100;
+  } else {
+    const dateDistance = getDateDistanceInDays(baseRace.date, candidate.date);
+    if (dateDistance <= 1) {
+      score += 55;
+    } else if (dateDistance <= 3) {
+      score += 35;
+    } else if (dateDistance <= 7) {
+      score += 15;
+    }
+  }
+
+  if (namesLikelyMatch(baseRace, candidate)) {
+    score += 45;
+  }
+
+  const sharedNameTokens = countSharedTokens(baseNames, candidateNames);
+  const sharedPlaceTokens = countSharedTokens(basePlaces, candidatePlaces);
+  const nameToPlaceTokens = countSharedTokens(baseNames, candidatePlaces) + countSharedTokens(candidateNames, basePlaces);
+
+  score += sharedNameTokens * 10;
+  score += sharedPlaceTokens * 8;
+  score += nameToPlaceTokens * 6;
+
+  return score;
 }
 
 function mapTeam(team: SportsDbTeam & { idTeam: string; strTeam: string }, fallback?: Team): Team {
@@ -608,6 +599,20 @@ function mapCalendar(events: SportsDbEvent[], category: Category): Race[] {
     .map((event) => mapEventToRace(event, category));
 }
 
+function mergeSportsDbEvents(primary: SportsDbEvent[], secondary: SportsDbEvent[]) {
+  const merged = new Map<string, SportsDbEvent>();
+
+  for (const event of [...primary, ...secondary]) {
+    const key = event.idEvent || `${event.dateEvent || ''}:${event.strEvent || ''}:${event.intRound || ''}`;
+    if (!key.trim()) {
+      continue;
+    }
+    merged.set(key, event);
+  }
+
+  return Array.from(merged.values());
+}
+
 function mapEventToRace(event: SportsDbEvent & { idEvent: string; strEvent: string; dateEvent: string }, category: Category): Race {
   const fallbackRace = findFallbackRace(category, event);
   const location = [event.strCity, event.strCountry].filter(Boolean).join(', ') || fallbackRace?.location || 'TBC';
@@ -647,6 +652,69 @@ function mapRaceToLiveEvent(race: Race): SportsDbLiveEvent {
   };
 }
 
+function getDateDistanceInDays(left: string, right: string) {
+  const leftTime = Date.parse(left);
+  const rightTime = Date.parse(right);
+  if (Number.isNaN(leftTime) || Number.isNaN(rightTime)) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  return Math.abs(leftTime - rightTime) / (1000 * 60 * 60 * 24);
+}
+
+function countSharedTokens(leftValues: Array<string | undefined>, rightValues: Array<string | undefined>) {
+  const leftTokens = extractMeaningfulTokens(leftValues);
+  const rightTokens = extractMeaningfulTokens(rightValues);
+  let matches = 0;
+
+  for (const token of leftTokens) {
+    if (rightTokens.has(token)) {
+      matches += 1;
+    }
+  }
+
+  return matches;
+}
+
+function extractMeaningfulTokens(values: Array<string | undefined>) {
+  const ignoredTokens = new Set([
+    'gp',
+    'grand',
+    'prix',
+    'e',
+    'prix',
+    'round',
+    'rodada',
+    'race',
+    'feature',
+    'sprint',
+    'the',
+    'of',
+    'de',
+    'do',
+    'da',
+    'del',
+    'city',
+    'international',
+    'circuit',
+    'autodrome',
+    'autodromo',
+  ]);
+
+  const tokens = new Set<string>();
+  for (const value of values) {
+    const normalized = normalizeText(value || '');
+    for (const token of normalized.split(' ')) {
+      if (token.length < 3 || ignoredTokens.has(token)) {
+        continue;
+      }
+      tokens.add(token);
+    }
+  }
+
+  return tokens;
+}
+
 function canonicalizeCalendarWinners(calendar: Race[], drivers: Driver[]) {
   return calendar.map((race) => {
     if (!race.winner) {
@@ -661,64 +729,6 @@ function canonicalizeCalendarWinners(calendar: Race[], drivers: Driver[]) {
   });
 }
 
-function findTeamName(resultTeamId: string | null | undefined, teams: Team[], drivers: Driver[], driverName: string) {
-  if (resultTeamId) {
-    const team = teams.find((entry) => entry.id === resultTeamId);
-    if (team) {
-      return team.name;
-    }
-  }
-
-  const driver = drivers.find((entry) => normalizeText(entry.name) === normalizeText(driverName));
-  if (!driver) {
-    return undefined;
-  }
-
-  return teams.find((entry) => entry.id === driver.teamId)?.name
-    || driver.teamId;
-}
-
-function toStandingItems(items: Array<{ name: string; points: number; team?: string }>): StandingItem[] {
-  return items.map((item, index) => ({
-    position: index + 1,
-    name: item.name,
-    points: item.points,
-    team: item.team,
-  }));
-}
-
-function mergeStandings(base: CategoryStandings | undefined, live: CategoryStandings): CategoryStandings {
-  return {
-    drivers: mergeStandingList(base?.drivers, live.drivers),
-    constructors: mergeStandingList(base?.constructors, live.constructors),
-    teams: mergeStandingList(base?.teams, live.teams),
-  };
-}
-
-function mergeStandingList(base: StandingItem[] | undefined, live: StandingItem[] | undefined) {
-  if (!live?.length) {
-    return base;
-  }
-
-  if (!base?.length) {
-    return live;
-  }
-
-  const byName = new Map(base.map((item) => [normalizeText(item.name), item]));
-  for (const liveItem of live) {
-    byName.set(normalizeText(liveItem.name), {
-      ...byName.get(normalizeText(liveItem.name)),
-      ...liveItem,
-    });
-  }
-
-  return Array.from(byName.values())
-    .sort((a, b) => b.points - a.points || a.position - b.position || a.name.localeCompare(b.name))
-    .map((item, index) => ({
-      ...item,
-      position: index + 1,
-    }));
-}
 
 function getEventStatus(event: SportsDbEvent): Race['status'] {
   if (event.strPostponed && event.strPostponed !== 'no') {
@@ -775,6 +785,17 @@ function forceNumericRaceIds(calendar: Race[]) {
   return calendar
     .map((race) => race.id)
     .filter((raceId) => /^\d+$/.test(raceId));
+}
+
+function getWinnerSyncTargets(calendar: Race[]) {
+  const completed = calendar
+    .filter((race) => race.status === 'completed')
+    .sort((left, right) => right.date.localeCompare(left.date));
+
+  return uniqueStrings([
+    ...completed.filter((race) => !race.winner).map((race) => race.id),
+    ...completed.slice(0, 5).map((race) => race.id),
+  ]).filter((raceId) => /^\d+$/.test(raceId));
 }
 
 function normalizeBaseRaceStatus(race: Race): Race {
