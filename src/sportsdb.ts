@@ -1,4 +1,4 @@
-import type { Category, Driver, Race, Team } from './types';
+import type { Category, CategoryStandings, Driver, Race, Team } from './types';
 
 const API_BASE_URL = 'https://www.thesportsdb.com/api/v1/json/123';
 const API_REQUEST_TIMEOUT_MS = 8000;
@@ -8,14 +8,14 @@ const RESULTS_CACHE_TTL_MS = 10 * 60 * 1000;
 
 const CATEGORY_LEAGUE_IDS: Partial<Record<Category['id'], number>> = {
   f1: 4370,
-  fe: 4371,
+  'formula-e': 4371,
   f2: 4486,
   f3: 4487,
   'f1-academy': 5382,
   wec: 4413,
   imsa: 4488,
   dtm: 4438,
-  indycar: 4373,
+  indy: 4373,
   nascar: 4393,
   wrc: 4409,
   'gt-world-challenge': 4439,
@@ -26,31 +26,31 @@ const CATEGORY_TEAM_SEARCH_ALIASES: Partial<Record<Category['id'], string[]>> = 
   f2: ['Formula 2', 'FIA Formula 2 Championship'],
   f3: ['Formula 3', 'FIA Formula 3 Championship'],
   'f1-academy': ['F1 Academy'],
-  fe: ['Formula E'],
+  'formula-e': ['Formula E'],
   wec: ['WEC', 'World Endurance Championship'],
   imsa: ['IMSA', 'IMSA SportsCar Championship', 'IMSA WeatherTech SportsCar Championship', 'WeatherTech SportsCar Championship'],
   dtm: ['DTM'],
-  indycar: ['IndyCar Series', 'IndyCar'],
+  indy: ['IndyCar Series', 'IndyCar'],
   nascar: ['NASCAR Cup Series', 'NASCAR'],
   wrc: ['WRC', 'World Rally Championship'],
   'gt-world-challenge': ['GT World Challenge Europe', 'GT World Challenge', 'GT Series Endurance Cup', 'GT World Challenge Europe Endurance Cup'],
 };
 
-export type LiveCoverageTier = 'good' | 'partial' | 'local';
+export type LiveCoverageTier = 'supported' | 'local';
 
 const CATEGORY_LIVE_COVERAGE: Record<Category['id'], LiveCoverageTier> = {
-  f1: 'good',
-  f2: 'good',
-  f3: 'good',
-  fe: 'good',
-  indycar: 'good',
-  nascar: 'good',
-  wec: 'good',
-  wrc: 'good',
-  dtm: 'good',
-  'f1-academy': 'good',
-  imsa: 'good',
-  'gt-world-challenge': 'good',
+  f1: 'supported',
+  f2: 'supported',
+  f3: 'supported',
+  'formula-e': 'supported',
+  indy: 'supported',
+  nascar: 'supported',
+  wec: 'supported',
+  wrc: 'supported',
+  dtm: 'supported',
+  'f1-academy': 'supported',
+  imsa: 'supported',
+  'gt-world-challenge': 'supported',
   'stock-car': 'local',
   'formula-truck': 'local',
 };
@@ -131,6 +131,7 @@ type SportsDbResultsResponse = {
 
 type SportsDbCalendarOverlay = {
   calendar: Race[];
+  matchedCount: number;
   apiEventsByRaceId: Map<string, SportsDbEvent & { idEvent: string; strEvent: string; dateEvent: string }>;
 };
 
@@ -153,6 +154,9 @@ export type SportsDbCategoryData = {
   standings?: CategoryStandings;
   nextEvent?: SportsDbLiveEvent | null;
   lastEvent?: SportsDbLiveEvent | null;
+  matchedTeamCount?: number;
+  matchedDriverCount?: number;
+  matchedCalendarCount?: number;
 };
 
 const summaryCache = new Map<string, CacheEntry<SportsDbCategoryData | null>>();
@@ -160,7 +164,7 @@ const detailCache = new Map<string, CacheEntry<SportsDbCategoryData | null>>();
 const resultsCache = new Map<string, CacheEntry<SportsDbResult[]>>();
 
 export function isCategoryLiveSupported(categoryId: Category['id']) {
-  return getCategoryLiveCoverage(categoryId) !== 'local' && categoryId in CATEGORY_LEAGUE_IDS;
+  return getCategoryLiveCoverage(categoryId) === 'supported' && categoryId in CATEGORY_LEAGUE_IDS;
 }
 
 export function getSupportedLiveCategoryIds() {
@@ -176,15 +180,16 @@ export function mergeCategoryWithLiveData(category: Category, liveData: SportsDb
     return category;
   }
 
-  const coverage = getCategoryLiveCoverage(category.id);
+  const mergedTeams = liveData.teams?.length ? mergeTeamsByName(category.teams, liveData.teams) : category.teams;
+  const mergedDrivers = liveData.drivers?.length ? mergeDriversByName(category.drivers, liveData.drivers) : category.drivers;
 
   return {
     ...category,
     longDescription: liveData.longDescription || category.longDescription,
     enLongDescription: liveData.enLongDescription || category.enLongDescription || category.longDescription,
-    teams: coverage !== 'local' && liveData.teams?.length ? liveData.teams : category.teams,
-    drivers: coverage !== 'local' && liveData.drivers?.length ? liveData.drivers : category.drivers,
-    calendar: coverage === 'good' && liveData.calendar?.length ? liveData.calendar : category.calendar,
+    teams: mergedTeams,
+    drivers: mergedDrivers,
+    calendar: liveData.calendar?.length ? liveData.calendar : category.calendar,
   };
 }
 
@@ -209,16 +214,17 @@ async function fetchCategoryLiveSummaryUncached(category: Category): Promise<Spo
 
   const league = leagueResponse.leagues?.[0];
   const overlay = buildCalendarOverlay(category, seasonEventsResponse.events ?? []);
-  const nextEvent = overlay.calendar.find((race) => race.status === 'upcoming') ?? null;
-  const lastEvent = [...overlay.calendar].reverse().find((race) => race.status === 'completed') ?? null;
+  const nextEvent = getNextUpcomingRace(overlay.calendar);
+  const lastEvent = getLastCompletedRace(overlay.calendar);
 
   return {
     currentSeason: league?.strCurrentSeason || getCategorySeason(category),
     longDescription: league?.strDescriptionPT || category.longDescription,
     enLongDescription: league?.strDescriptionEN || category.enLongDescription || category.longDescription,
-    calendar: overlay.calendar,
+    calendar: overlay.matchedCount > 0 ? overlay.calendar : undefined,
     nextEvent: nextEvent ? mapRaceToLiveEvent(nextEvent) : null,
     lastEvent: lastEvent ? mapRaceToLiveEvent(lastEvent) : null,
+    matchedCalendarCount: overlay.matchedCount,
   };
 }
 
@@ -250,8 +256,8 @@ async function fetchCategoryLiveDataUncached(category: Category): Promise<Sports
   const rosterDrivers = mappedTeams.length ? await fetchDriversForTeams(mappedTeams) : [];
   const drivers = await resolveCategoryDrivers(category, rosterDrivers);
   const normalizedCalendar = canonicalizeCalendarWinners(calendarWithWinners, drivers);
-  const nextEvent = normalizedCalendar.find((race) => race.status === 'upcoming') ?? null;
-  const lastEvent = [...normalizedCalendar].reverse().find((race) => race.status === 'completed') ?? null;
+  const nextEvent = getNextUpcomingRace(normalizedCalendar);
+  const lastEvent = getLastCompletedRace(normalizedCalendar);
 
   return {
     currentSeason: league?.strCurrentSeason || getCategorySeason(category),
@@ -259,9 +265,12 @@ async function fetchCategoryLiveDataUncached(category: Category): Promise<Sports
     enLongDescription: league?.strDescriptionEN || category.enLongDescription || category.longDescription,
     teams: mappedTeams.length ? mappedTeams : undefined,
     drivers: drivers.length ? drivers : undefined,
-    calendar: normalizedCalendar,
+    calendar: overlay.matchedCount > 0 ? normalizedCalendar : undefined,
     nextEvent: nextEvent ? mapRaceToLiveEvent(nextEvent) : null,
     lastEvent: lastEvent ? mapRaceToLiveEvent(lastEvent) : null,
+    matchedTeamCount: countMatchedTeams(category.teams, mappedTeams),
+    matchedDriverCount: countMatchedDrivers(category.drivers, drivers),
+    matchedCalendarCount: overlay.matchedCount,
   };
 }
 
@@ -431,7 +440,7 @@ function buildCalendarOverlay(category: Category, events: SportsDbEvent[]): Spor
   const calendar = category.calendar.map((baseRace) => {
     const matchedRace = findBestApiRaceForBaseRace(baseRace, apiMainEvents.filter((race) => !matchedApiEvents.has(race.id)));
     if (!matchedRace) {
-      return normalizeBaseRaceStatus(baseRace);
+      return baseRace;
     }
 
     matchedApiEvents.add(matchedRace.id);
@@ -449,6 +458,7 @@ function buildCalendarOverlay(category: Category, events: SportsDbEvent[]): Spor
 
   return {
     calendar,
+    matchedCount: matchedApiEvents.size,
     apiEventsByRaceId: new Map(
       apiMainEvents
         .filter((race) => matchedApiEvents.has(race.id))
@@ -531,7 +541,7 @@ function scoreRaceMatch(baseRace: Race, candidate: Race) {
 function mapTeam(team: SportsDbTeam & { idTeam: string; strTeam: string }, fallback?: Team): Team {
   return {
     id: team.idTeam,
-    name: team.strTeam,
+    name: fallback?.name || team.strTeam,
     color: team.strColour1 || fallback?.color || '#e10600',
     car: fallback?.car,
     logo: team.strBadge || team.strEquipment || fallback?.logo,
@@ -543,8 +553,8 @@ function mapDriver(player: SportsDbPlayer & { idPlayer: string; strPlayer: strin
   return {
     id: player.idPlayer,
     name: player.strPlayer,
-    number: player.strNumber || '--',
-    nationality: player.strNationality || 'N/A',
+    number: player.strNumber || '',
+    nationality: player.strNationality || '',
     teamId,
     image: player.strThumb || player.strCutout || player.strRender || undefined,
   };
@@ -568,10 +578,39 @@ function mergeDriversByName(baseDrivers: Driver[], liveDrivers: Driver[]) {
       ...(current ?? driver),
       ...driver,
       name: current?.name || driver.name,
-      teamId: driver.teamId || current?.teamId || '',
+      teamId: current?.teamId || driver.teamId || '',
       image: driver.image || current?.image,
       nationality: driver.nationality || current?.nationality || 'N/A',
       number: driver.number || current?.number || '--',
+    });
+  }
+
+  return Array.from(merged.values());
+}
+
+function mergeTeamsByName(baseTeams: Team[], liveTeams: Team[]) {
+  const merged = new Map<string, Team>();
+
+  for (const team of baseTeams) {
+    merged.set(normalizeText(team.name), team);
+  }
+
+  for (const team of liveTeams) {
+    const key = findBestTeamKey(team, merged) ?? normalizeText(team.name);
+    const current = merged.get(key);
+    if (!current && baseTeams.length > 0 && key === normalizeText(team.name)) {
+      continue;
+    }
+
+    merged.set(key, {
+      ...(current ?? team),
+      ...team,
+      id: current?.id || team.id,
+      name: current?.name || team.name,
+      color: team.color || current?.color || '#e10600',
+      car: current?.car || team.car,
+      logo: team.logo || current?.logo,
+      class: current?.class || team.class,
     });
   }
 
@@ -652,6 +691,14 @@ function mapRaceToLiveEvent(race: Race): SportsDbLiveEvent {
   };
 }
 
+function getNextUpcomingRace(calendar: Race[]) {
+  return calendar.find((race) => race.status === 'upcoming') ?? null;
+}
+
+function getLastCompletedRace(calendar: Race[]) {
+  return [...calendar].reverse().find((race) => race.status === 'completed') ?? null;
+}
+
 function getDateDistanceInDays(left: string, right: string) {
   const leftTime = Date.parse(left);
   const rightTime = Date.parse(right);
@@ -729,6 +776,19 @@ function canonicalizeCalendarWinners(calendar: Race[], drivers: Driver[]) {
   });
 }
 
+function countMatchedTeams(baseTeams: Team[], liveTeams: Team[]) {
+  const baseMap = new Map(baseTeams.map((team) => [normalizeText(team.name), team]));
+  return liveTeams.reduce((total, team) => {
+    const matchedKey = findBestTeamKey(team, baseMap);
+    return total + (matchedKey != null ? 1 : 0);
+  }, 0);
+}
+
+function countMatchedDrivers(baseDrivers: Driver[], liveDrivers: Driver[]) {
+  const baseDriverMap = new Map(baseDrivers.map((driver) => [normalizeText(driver.name), driver]));
+  return liveDrivers.reduce((total, driver) => total + (findBestDriverKey(driver, baseDriverMap) ? 1 : 0), 0);
+}
+
 
 function getEventStatus(event: SportsDbEvent): Race['status'] {
   if (event.strPostponed && event.strPostponed !== 'no') {
@@ -781,12 +841,6 @@ function scoreEvent(name: string, category: Category) {
   return 10;
 }
 
-function forceNumericRaceIds(calendar: Race[]) {
-  return calendar
-    .map((race) => race.id)
-    .filter((raceId) => /^\d+$/.test(raceId));
-}
-
 function getWinnerSyncTargets(calendar: Race[]) {
   const completed = calendar
     .filter((race) => race.status === 'completed')
@@ -796,22 +850,6 @@ function getWinnerSyncTargets(calendar: Race[]) {
     ...completed.filter((race) => !race.winner).map((race) => race.id),
     ...completed.slice(0, 5).map((race) => race.id),
   ]).filter((raceId) => /^\d+$/.test(raceId));
-}
-
-function normalizeBaseRaceStatus(race: Race): Race {
-  if (race.status !== 'upcoming') {
-    return race;
-  }
-
-  const today = new Date().toISOString().slice(0, 10);
-  if (race.date < today) {
-    return {
-      ...race,
-      status: 'completed',
-    };
-  }
-
-  return race;
 }
 
 function findBestDriverKey(driver: Driver, merged: Map<string, Driver>) {
@@ -833,6 +871,21 @@ function findBestDriverKey(driver: Driver, merged: Map<string, Driver>) {
   return null;
 }
 
+function findBestTeamKey(team: Team, merged: Map<string, Team>) {
+  const normalizedName = normalizeText(team.name);
+  if (merged.has(normalizedName)) {
+    return normalizedName;
+  }
+
+  for (const [key, current] of merged.entries()) {
+    if (namesLikelyReferToSameTeam(current.name, team.name)) {
+      return key;
+    }
+  }
+
+  return null;
+}
+
 function namesLikelyReferToSameDriver(left: string, right: string) {
   const normalizedLeft = normalizeText(left);
   const normalizedRight = normalizeText(right);
@@ -846,6 +899,18 @@ function namesLikelyReferToSameDriver(left: string, right: string) {
   const rightLast = rightWords[rightWords.length - 1];
 
   return Boolean(leftLast && rightLast && leftLast === rightLast);
+}
+
+function namesLikelyReferToSameTeam(left: string, right: string) {
+  const normalizedLeft = normalizeText(left);
+  const normalizedRight = normalizeText(right);
+  if (normalizedLeft === normalizedRight) {
+    return true;
+  }
+
+  return normalizedLeft.includes(normalizedRight)
+    || normalizedRight.includes(normalizedLeft)
+    || countSharedTokens([left], [right]) >= 2;
 }
 
 function getCategorySeason(category: Category) {

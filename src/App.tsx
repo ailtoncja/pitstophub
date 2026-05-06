@@ -56,7 +56,7 @@ const CATEGORY_BY_ID = new Map(MOTORSPORT_DATA.map(c => [c.id, c]));
 const NAV_GROUPS = [
   {
     name: { pt: 'Fórmulas', en: 'Formulas' },
-    ids: ['f1', 'f2', 'f3', 'f1-academy', 'fe']
+    ids: ['f1', 'f2', 'f3', 'f1-academy', 'formula-e']
   },
   {
     name: { pt: 'Endurance/GT', en: 'Endurance/GT' },
@@ -64,7 +64,7 @@ const NAV_GROUPS = [
   },
   {
     name: { pt: 'Americanas', en: 'American' },
-    ids: ['indycar', 'nascar']
+    ids: ['indy', 'nascar']
   },
   {
     name: { pt: 'Rally', en: 'Rally' },
