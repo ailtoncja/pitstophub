@@ -37,6 +37,10 @@ import {
   mergeCategoryWithLiveData,
   type JolpicaCategoryData,
 } from './jolpica';
+import {
+  fetchTheSportsDbCalendar,
+  getTheSportsDbCategoryIds,
+} from './thesportsdb';
 
 const IconMap: Record<string, React.ElementType> = {
   Trophy,
@@ -375,8 +379,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     let isMounted = true;
 
     const syncSummaries = async (force = false) => {
-      await Promise.allSettled(
-        getSupportedLiveCategoryIds().map(async (categoryId) => {
+      await Promise.allSettled([
+        ...getSupportedLiveCategoryIds().map(async (categoryId) => {
           const category = CATEGORY_BY_ID.get(categoryId);
           if (!category) return;
           try {
@@ -387,7 +391,18 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             console.error(`Falha ao sincronizar resumo ao vivo de ${categoryId}.`, error);
           }
         }),
-      );
+        ...getTheSportsDbCategoryIds().map(async (categoryId) => {
+          const category = CATEGORY_BY_ID.get(categoryId);
+          if (!category) return;
+          try {
+            const data = await fetchTheSportsDbCalendar(category, force);
+            if (!isMounted) return;
+            setLiveCategorySummaries((prev) => ({ ...prev, [categoryId]: data }));
+          } catch (error) {
+            console.error(`Falha ao sincronizar calendário de ${categoryId}.`, error);
+          }
+        }),
+      ]);
     };
 
     void syncSummaries();
