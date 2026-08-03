@@ -84,3 +84,26 @@ button, [role="button"] {
   }
 }
 
+.hero-bg-lines {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--text-main) 0px,
+    var(--text-main) 1px,
+    transparent 1px,
+    transparent 28px
+  );
+  opacity: 0.04;
+  animation: hero-drift 40s linear infinite;
+}
+
+@keyframes hero-drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 120px 120px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-bg-lines {
+    animation: none;
+  }
+}
+
