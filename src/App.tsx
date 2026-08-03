@@ -57,6 +57,24 @@ const F1_STATIC_FALLBACK: Partial<Category> = {
   standings: undefined,
 };
 
+const CATEGORY_ACCENTS: Record<string, string> = {
+  f1: '#e10600',
+  f2: '#0093CC',
+  f3: '#FF8700',
+  'f1-academy': '#E91E8C',
+  wec: '#00A19B',
+  imsa: '#FFC107',
+  dtm: '#6C63FF',
+  'gt-world-challenge': '#2ECC71',
+  indy: '#003DA5',
+  nascar: '#D62828',
+  wrc: '#2E7D32',
+  'stock-car': '#F4A300',
+  'formula-truck': '#8B5E3C',
+};
+
+const getCategoryAccent = (id: string) => CATEGORY_ACCENTS[id] ?? '#e10600';
+
 const NAV_GROUPS = [
   {
     name: { pt: 'Fórmulas', en: 'Formulas' },
@@ -150,7 +168,15 @@ const UI_TRANSLATIONS = {
     liveLastResult: 'Ultimo resultado',
     liveSource: 'Fonte: OpenF1 API',
     championshipLeader: 'Lider do campeonato',
-    constructorsLeader: 'Lider entre equipes'
+    constructorsLeader: 'Lider entre equipes',
+    upNext: 'Próxima Largada',
+    daysToGo: 'dias para a corrida',
+    raceToday: 'É hoje!',
+    noUpcomingRace: 'Nenhuma corrida agendada no momento.',
+    featuredTitle: 'Destaques',
+    latestWinner: 'Último Vencedor',
+    seasonPanorama: 'Panorama 2026',
+    categoriesLabel: 'Categorias'
   },
   en: {
     home: 'Home',
@@ -221,7 +247,15 @@ const UI_TRANSLATIONS = {
     liveLastResult: 'Latest result',
     liveSource: 'Source: OpenF1 API',
     championshipLeader: 'Championship leader',
-    constructorsLeader: 'Team leader'
+    constructorsLeader: 'Team leader',
+    upNext: 'Up Next',
+    daysToGo: 'days to go',
+    raceToday: 'Race day!',
+    noUpcomingRace: 'No races scheduled right now.',
+    featuredTitle: 'Highlights',
+    latestWinner: 'Latest Winner',
+    seasonPanorama: '2026 Overview',
+    categoriesLabel: 'Categories'
   }
 };
 
@@ -258,7 +292,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [selectedCategoryBase, setSelectedCategoryBase] = useState<Category>(MOTORSPORT_DATA[0]);
   const [activeTab, setActiveTab] = useState<'overview' | 'teams' | 'calendar' | 'standings'>('overview');
   const [showRules, setShowRules] = useState(false);
-  const [expandedCategoryId, setExpandedCategoryId] = useState<string | null>(null);
+  const [activeHomeGroup, setActiveHomeGroup] = useState<string>(NAV_GROUPS[0].name.en);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [followedCategoryIds, setFollowedCategoryIds] = useState<string[]>([]);
   const [followedTeamIds, setFollowedTeamIds] = useState<string[]>([]);
@@ -358,18 +392,6 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
-
-  React.useEffect(() => {
-    const handleClickOutside = () => {
-      setExpandedCategoryId(null);
-    };
-    if (expandedCategoryId) {
-      window.addEventListener('click', handleClickOutside);
-    }
-    return () => {
-      window.removeEventListener('click', handleClickOutside);
-    };
-  }, [expandedCategoryId]);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -482,7 +504,6 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   );
 
   const handleCategorySelect = useCallback((cat: Category) => {
-    setExpandedCategoryId(null);
     setSelectedCategoryBase(cat);
     setView('category');
     setActiveTab('overview');
@@ -575,6 +596,43 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const championshipLeader = selectedCategory.standings?.drivers?.[0] ?? null;
   const constructorsLeader = selectedCategory.standings?.constructors?.[0] ?? selectedCategory.standings?.teams?.[0] ?? null;
 
+  const [now, setNow] = useState(() => new Date());
+  React.useEffect(() => {
+    const intervalId = window.setInterval(() => setNow(new Date()), 60 * 1000);
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  const heroNextRace = useMemo(() => {
+    return allCategories
+      .flatMap((category) => category.calendar
+        .filter((race) => race.status === 'upcoming')
+        .map((race) => ({ category, race })))
+      .sort((a, b) => a.race.date.localeCompare(b.race.date))[0] ?? null;
+  }, [allCategories]);
+
+  const heroCountdownDays = useMemo(() => {
+    if (!heroNextRace) return null;
+    const raceDate = new Date(`${heroNextRace.race.date}T00:00:00`);
+    const diffMs = raceDate.getTime() - now.getTime();
+    return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+  }, [heroNextRace, now]);
+
+  const lastGlobalResult = useMemo(() => {
+    return allCategories
+      .flatMap((category) => category.calendar
+        .filter((race) => race.status === 'completed' && race.winner)
+        .map((race) => ({ category, race })))
+      .sort((a, b) => b.race.date.localeCompare(a.race.date))[0] ?? null;
+  }, [allCategories]);
+
+  const overviewStats = useMemo(() => ({
+    categories: allCategories.length,
+    races: allCategories.reduce((sum, category) => sum + category.calendar.length, 0),
+    teams: allCategories.reduce((sum, category) => sum + category.teams.length, 0),
+  }), [allCategories]);
+
+  const f1Leader = allCategoriesById.get('f1')?.standings?.drivers?.[0] ?? null;
+
   const teamClasses = useMemo(
     () => Array.from(new Set(selectedCategory.teams.map(team => team.class || 'Geral'))),
     [selectedCategory.teams]
@@ -601,7 +659,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center">
 
           <button
-            onClick={() => { setView('home'); setExpandedCategoryId(null); }}
+            onClick={() => setView('home')}
             className="shrink-0 flex items-center hover:opacity-80 transition-opacity"
           >
             <span className="text-xl sm:text-2xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
@@ -765,7 +823,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 )}
 
                 <button
-                  onClick={() => { setView('home'); setExpandedCategoryId(null); setIsMobileMenuOpen(false); }}
+                  onClick={() => { setView('home'); setIsMobileMenuOpen(false); }}
                   className={cn(
                     "w-full flex items-center justify-center gap-2 p-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all border",
                     view === 'home'
@@ -831,12 +889,26 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
           {view === 'home' ? (
             <motion.div
               key="home-page"
-              className="relative min-h-full"
+              className="relative min-h-full overflow-hidden"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={SPRING}
             >
+              <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+                <div className="hero-bg-lines absolute inset-0" />
+                <motion.div
+                  className="absolute -top-32 -left-32 w-96 h-96 rounded-full blur-[120px] bg-brand-red/20"
+                  animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
+                  transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <motion.div
+                  className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] rounded-full blur-[130px] bg-blue-500/10"
+                  animate={{ x: [0, -30, 0], y: [0, 40, 0] }}
+                  transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+                />
+              </div>
+
               <motion.section
                 key="home-content"
                 initial={{ opacity: 0, y: 20 }}
@@ -844,18 +916,147 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 transition={SPRING}
                 className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 md:py-20"
               >
-                <div className="text-center mb-10 sm:mb-16">
-                <motion.h1
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={SPRING}
-                  className="text-4xl sm:text-5xl md:text-7xl font-display font-black italic tracking-tighter mb-6 text-[var(--text-main)]"
-                >
-                  PitStopHub
-                </motion.h1>
-                  <p className="text-gray-500 max-w-2xl mx-auto text-lg mt-8">
-                    {UI_TRANSLATIONS[language].tagline}
-                  </p>
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center mb-10 sm:mb-16">
+                  <div className="lg:col-span-3 text-center lg:text-left">
+                    <motion.h1
+                      initial={{ opacity: 0, y: 24 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={SPRING}
+                      className="text-4xl sm:text-5xl md:text-7xl font-display font-black italic tracking-tighter mb-6 text-[var(--text-main)]"
+                    >
+                      PitStopHub
+                    </motion.h1>
+                    <p className="text-gray-500 max-w-2xl mx-auto lg:mx-0 text-lg mt-8">
+                      {UI_TRANSLATIONS[language].tagline}
+                    </p>
+                  </div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 24, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={SPRING}
+                    className="lg:col-span-2 glass-card p-6 sm:p-8 relative overflow-hidden"
+                  >
+                    {heroNextRace ? (
+                      <>
+                        <div className="flex items-center gap-2 mb-5">
+                          <span className="w-2 h-2 rounded-full bg-brand-red animate-pulse" />
+                          <span className="text-[10px] font-black uppercase tracking-widest text-brand-red">
+                            {UI_TRANSLATIONS[language].upNext}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div
+                            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: getCategoryAccent(heroNextRace.category.id) }}
+                          >
+                            {React.createElement(IconMap[heroNextRace.category.icon] ?? Trophy, { className: 'text-white w-5 h-5' })}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 truncate">
+                              {language === 'pt' ? heroNextRace.category.name : (heroNextRace.category.enFullName || heroNextRace.category.name)}
+                            </div>
+                            <div className="font-display font-black italic text-lg text-[var(--text-main)] truncate">
+                              {language === 'pt' ? heroNextRace.race.name : (heroNextRace.race.enName || heroNextRace.race.name)}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-end justify-between gap-4 mb-5">
+                          <div>
+                            {heroCountdownDays === 0 ? (
+                              <Flag className="w-9 h-9 text-brand-red" />
+                            ) : (
+                              <div className="text-5xl font-display font-black italic text-brand-red leading-none">
+                                {heroCountdownDays}
+                              </div>
+                            )}
+                            <div className="text-[10px] font-black uppercase tracking-widest text-gray-500 mt-1">
+                              {heroCountdownDays === 0 ? UI_TRANSLATIONS[language].raceToday : UI_TRANSLATIONS[language].daysToGo}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-bold text-[var(--text-main)]">
+                              {language === 'pt' ? heroNextRace.race.location : (heroNextRace.race.enLocation || heroNextRace.race.location)}
+                            </div>
+                            <div className="text-xs text-gray-500">{heroNextRace.race.date.split('-').reverse().join('/')}</div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleCategorySelect(heroNextRace.category)}
+                          className="w-full py-3 rounded-xl bg-brand-red text-white font-bold uppercase tracking-widest text-xs hover:opacity-90 transition-opacity"
+                        >
+                          {UI_TRANSLATIONS[language].viewCalendar}
+                        </button>
+                      </>
+                    ) : (
+                      <p className="text-gray-500 text-sm">{UI_TRANSLATIONS[language].noUpcomingRace}</p>
+                    )}
+                  </motion.div>
+                </div>
+
+                <div className="mb-10 sm:mb-16">
+                  <div className="flex items-center gap-3 mb-6">
+                    <h2 className="text-xs font-black uppercase tracking-[0.3em] text-gray-500 whitespace-nowrap">
+                      {UI_TRANSLATIONS[language].featuredTitle}
+                    </h2>
+                    <div className="h-px flex-1 bg-gradient-to-r from-[var(--card-border)] to-transparent" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="glass-card p-6">
+                      <div className="flex items-center gap-2 mb-4 text-brand-red">
+                        <Trophy className="w-4 h-4" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">
+                          {UI_TRANSLATIONS[language].championshipLeader}
+                        </span>
+                      </div>
+                      <div className="text-2xl font-display font-black italic text-[var(--text-main)] mb-1 truncate">
+                        {f1Leader?.name || '--'}
+                      </div>
+                      <div className="text-xs text-gray-500 uppercase tracking-widest font-bold truncate">
+                        {f1Leader ? `${f1Leader.team} • ${f1Leader.points} ${UI_TRANSLATIONS[language].points}` : UI_TRANSLATIONS[language].notAvailableShort}
+                      </div>
+                    </div>
+
+                    <div className="glass-card p-6">
+                      <div className="flex items-center gap-2 mb-4 text-brand-red">
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">
+                          {UI_TRANSLATIONS[language].latestWinner}
+                        </span>
+                      </div>
+                      <div className="text-2xl font-display font-black italic text-[var(--text-main)] mb-1 truncate">
+                        {lastGlobalResult?.race.winner || '--'}
+                      </div>
+                      <div className="text-xs text-gray-500 uppercase tracking-widest font-bold truncate">
+                        {lastGlobalResult
+                          ? `${lastGlobalResult.category.name} • ${language === 'pt' ? lastGlobalResult.race.name : (lastGlobalResult.race.enName || lastGlobalResult.race.name)}`
+                          : UI_TRANSLATIONS[language].notAvailableShort}
+                      </div>
+                    </div>
+
+                    <div className="glass-card p-6">
+                      <div className="flex items-center gap-2 mb-4 text-brand-red">
+                        <LayoutGrid className="w-4 h-4" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">
+                          {UI_TRANSLATIONS[language].seasonPanorama}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <div>
+                          <div className="text-xl font-display font-black italic text-[var(--text-main)]">{overviewStats.categories}</div>
+                          <div className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">{UI_TRANSLATIONS[language].categoriesLabel}</div>
+                        </div>
+                        <div>
+                          <div className="text-xl font-display font-black italic text-[var(--text-main)]">{overviewStats.races}</div>
+                          <div className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">{UI_TRANSLATIONS[language].racesInSeason}</div>
+                        </div>
+                        <div>
+                          <div className="text-xl font-display font-black italic text-[var(--text-main)]">{overviewStats.teams}</div>
+                          <div className="text-[9px] text-gray-500 uppercase tracking-widest font-bold">{UI_TRANSLATIONS[language].teams}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {currentUser && (
@@ -885,146 +1086,95 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   </div>
                 )}
 
-                <div className="space-y-16">
-                  {NAV_GROUPS.map((group, groupIndex) => (
-                    <motion.div
-                      key={group.name.en}
-                      initial={{ opacity: 0, y: 24 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ type: 'spring', stiffness: 350, damping: 30, delay: groupIndex * 0.07 }}
-                    >
-                      <div className="flex items-center gap-4 mb-8">
-                        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--card-border)] to-transparent" />
-                        <h2 className="text-sm font-black uppercase tracking-[0.3em] text-brand-red whitespace-nowrap">
+                <div className="mb-16">
+                  <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 mb-8">
+                    {NAV_GROUPS.map((group) => {
+                      const isActiveGroup = activeHomeGroup === group.name.en;
+                      return (
+                        <button
+                          key={group.name.en}
+                          onClick={() => setActiveHomeGroup(group.name.en)}
+                          className={cn(
+                            "px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all border shrink-0",
+                            isActiveGroup
+                              ? "bg-brand-red text-white border-brand-red shadow-lg shadow-brand-red/20"
+                              : "bg-[var(--card-bg)] text-gray-500 border-[var(--card-border)] hover:text-brand-red"
+                          )}
+                        >
                           {language === 'pt' ? group.name.pt : group.name.en}
-                        </h2>
-                        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--card-border)] to-transparent" />
-                      </div>
+                        </button>
+                      );
+                    })}
+                  </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                      {group.ids.map((id) => {
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeHomeGroup}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={SPRING}
+                      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+                    >
+                      {(NAV_GROUPS.find((group) => group.name.en === activeHomeGroup) ?? NAV_GROUPS[0]).ids.map((id) => {
                         const cat = allCategoriesById.get(id);
                         if (!cat) return null;
                         const Icon = IconMap[cat.icon];
-                        const isExpanded = expandedCategoryId === cat.id;
+                        const accent = getCategoryAccent(cat.id);
+                        const isFollowed = followedCategorySet.has(cat.id);
 
                         return (
                           <div
                             key={cat.id}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (isExpanded) {
-                                handleCategorySelect(cat);
-                              } else {
-                                setExpandedCategoryId(cat.id);
-                              }
-                            }}
+                            onClick={() => handleCategorySelect(cat)}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter' || e.key === ' ') {
                                 e.preventDefault();
-                                if (isExpanded) {
-                                  handleCategorySelect(cat);
-                                } else {
-                                  setExpandedCategoryId(cat.id);
-                                }
+                                handleCategorySelect(cat);
                               }
                             }}
                             role="button"
                             tabIndex={0}
-                            className={cn(
-                              "group relative flex flex-col items-start p-5 glass-card text-left overflow-hidden cursor-pointer",
-                              isExpanded
-                                ? "ring-2 ring-brand-red/50 shadow-2xl shadow-brand-red/10 z-20"
-                                : "hover:scale-[1.02] active:scale-[0.98] hover:bg-white/5 transition-transform duration-200"
-                            )}
+                            className="group relative flex items-center gap-3 p-4 glass-card text-left overflow-hidden cursor-pointer hover:scale-[1.02] active:scale-[0.98] hover:bg-white/5 transition-transform duration-200"
                           >
-                            <div className="flex items-center gap-4 w-full">
-                              <div className={cn(
-                                "w-10 h-10 rounded-xl bg-brand-red flex items-center justify-center shadow-lg shadow-brand-red/20 transition-transform shrink-0",
-                                isExpanded ? "scale-110" : "group-hover:rotate-6"
-                              )}>
-                                <Icon className="text-white w-5 h-5" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h3 className="text-base font-display font-black italic tracking-tighter text-[var(--text-main)] truncate">
-                                  {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
-                                </h3>
-                                {!isExpanded && (
-                                  <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                                    {UI_TRANSLATIONS[language].viewSummary}
-                                  </p>
-                                )}
-                              </div>
-                              {isExpanded ? (
-                                <button 
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setExpandedCategoryId(null);
-                                  }}
-                                  className="p-1.5 rounded-full hover:bg-white/10 text-gray-500 transition-colors"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              ) : (
-                                <ChevronDown className="w-4 h-4 text-gray-500 group-hover:text-brand-red transition-colors" />
-                              )}
+                            <div
+                              className="absolute top-0 right-0 w-20 h-20 -mr-8 -mt-8 rounded-full transition-colors"
+                              style={{ backgroundColor: `${accent}14` }}
+                            />
+                            <div
+                              className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-transform shrink-0 group-hover:rotate-6"
+                              style={{ backgroundColor: accent, boxShadow: `0 10px 20px -8px ${accent}66` }}
+                            >
+                              <Icon className="text-white w-5 h-5" />
                             </div>
-
-                            <AnimatePresence>
-                              {isExpanded && (
-                                <motion.div
-                                  initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                                  animate={{ height: 'auto', opacity: 1, marginTop: 16 }}
-                                  exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                                  transition={SPRING_SOFT}
-                                  className="overflow-hidden w-full"
-                                >
-                                  <p className="text-xs text-gray-500 mb-6 leading-relaxed">
-                                    {language === 'pt' ? cat.description : (cat.enDescription || cat.description)}
-                                  </p>
-                                  <div className="flex items-center justify-between pt-4 border-t border-[var(--card-border)]">
-                                    <div className="flex items-center gap-2">
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          toggleFollowCategory(cat.id);
-                                        }}
-                                        className={cn(
-                                          "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors",
-                                          followedCategorySet.has(cat.id)
-                                            ? "bg-brand-red/10 border-brand-red/30 text-brand-red"
-                                            : "bg-white/5 border-white/10 text-gray-400 hover:text-brand-red"
-                                        )}
-                                      >
-                                        {followedCategorySet.has(cat.id) ? UI_TRANSLATIONS[language].following : UI_TRANSLATIONS[language].followCategory}
-                                      </button>
-                                      <span className="text-brand-red font-bold text-[10px] uppercase tracking-widest">
-                                        {UI_TRANSLATIONS[language].accessCategory}
-                                      </span>
-                                      <ChevronRight className="w-3 h-3 text-brand-red group-hover:translate-x-1 transition-transform" />
-                                    </div>
-                                    <button 
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedCategoryBase(cat);
-                                        setShowRules(true);
-                                      }}
-                                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-500 hover:text-brand-red transition-all"
-                                      title={UI_TRANSLATIONS[language].viewRules}
-                                    >
-                                      <Info className="w-3 h-3" />
-                                    </button>
-                                  </div>
-                                </motion.div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-sm font-display font-black italic tracking-tighter text-[var(--text-main)] truncate">
+                                {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
+                              </h3>
+                              <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold truncate">
+                                {cat.teams.length} {UI_TRANSLATIONS[language].teams} • {cat.calendar.length} {UI_TRANSLATIONS[language].rounds}
+                              </p>
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFollowCategory(cat.id);
+                              }}
+                              className={cn(
+                                "p-1.5 rounded-full transition-colors shrink-0",
+                                isFollowed ? "text-brand-red" : "text-gray-500 hover:text-brand-red"
                               )}
-                            </AnimatePresence>
+                              title={isFollowed ? UI_TRANSLATIONS[language].followingCategory : UI_TRANSLATIONS[language].followCategory}
+                            >
+                              <Heart className={cn("w-4 h-4", isFollowed && "fill-brand-red")} />
+                            </button>
+                            <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-brand-red group-hover:translate-x-1 transition-all shrink-0" />
                           </div>
                         );
                       })}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
             </motion.section>
           </motion.div>
         ) : (
