@@ -92,9 +92,7 @@ async function main() {
 }
 
 async function syncCategory(categoryId, leagueId) {
-  const league = await fetchJson(`/lookupleague.php?id=${leagueId}`);
-  const season = league?.leagues?.[0]?.strCurrentSeason;
-  if (!season) throw new Error('temporada atual nao encontrada');
+  const season = await resolveCurrentSeason(leagueId);
 
   const rows = [];
   let latestStandings = null;
@@ -125,6 +123,22 @@ async function syncCategory(categoryId, leagueId) {
   }
 
   return { rows, standings: latestStandings, standingsRound: latestStandingsRound };
+}
+
+// lookupleague.php->strCurrentSeason fica desatualizado para varias ligas (viu
+// "2025" com a temporada 2026 ja em andamento). O evento passado mais recente
+// e um sinal mais confiavel de qual temporada esta rodando agora.
+async function resolveCurrentSeason(leagueId) {
+  await sleep(REQUEST_DELAY_MS);
+  const past = await fetchJson(`/eventspastleague.php?id=${leagueId}`);
+  const seasonFromPast = past?.events?.[0]?.strSeason;
+  if (seasonFromPast) return seasonFromPast;
+
+  await sleep(REQUEST_DELAY_MS);
+  const league = await fetchJson(`/lookupleague.php?id=${leagueId}`);
+  const season = league?.leagues?.[0]?.strCurrentSeason;
+  if (!season) throw new Error('temporada atual nao encontrada');
+  return season;
 }
 
 function pickMainEvent(events) {
@@ -171,23 +185,34 @@ function getStatus(event) {
 
 // O texto de resultado da TheSportsDB nao segue um formato unico entre ligas
 // (F2/F3/DTM/IndyCar usam "posicao\t/piloto\t/equipe\t/tempo", NASCAR usa os
-// mesmos campos sem a barra, WEC/IMSA/GT World Challenge usam texto corrido
-// ou tabelas por classe). So extraimos o vencedor quando a 1a linha bate com
-// o padrao tabulado "posicao 1"; caso contrario preferimos deixar em branco
-// a arriscar um nome errado.
+// mesmos campos sem a barra e as vezes com uma linha de cabecalho antes dos
+// dados, WEC usa "posicao /equipe #carro /tempo" sem tabs). IMSA e GT World
+// Challenge usam texto corrido em prosa (varia a cada corrida) - nunca da pra
+// extrair com seguranca, entao essas linhas nunca batem com o padrao abaixo e
+// o vencedor fica em branco de propósito. Percorremos as linhas ate achar uma
+// que bata exatamente com "posicao 1"; caso contrario preferimos deixar em
+// branco a arriscar um nome errado.
 function parseWinner(strResult) {
   if (!strResult) return null;
-  const firstLine = strResult.split(/\r?\n/).find((line) => line.trim().length > 0);
-  if (!firstLine) return null;
+  const lines = strResult.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
 
-  const fields = firstLine.split('\t').map((f) => f.replace(/^\//, '').trim()).filter(Boolean);
-  if (fields.length < 2) return null;
+  for (const line of lines) {
+    const fields = splitResultFields(line);
+    if (fields.length < 2) continue;
 
-  const position = fields[0].replace(/^0+(?=\d)/, '');
-  if (position !== '1') return null;
+    const position = fields[0].replace(/^0+(?=\d)/, '');
+    if (position !== '1') continue;
 
-  const name = fields.slice(1).find((f) => /[a-zA-Z]{3,}/.test(f) && !/^[\d:.+\s]+$/.test(f));
-  return name ?? null;
+    const name = fields.slice(1).find((f) => /[a-zA-Z]{3,}/.test(f) && !/^[\d:.+\s]+$/.test(f));
+    if (name) return name;
+  }
+
+  return null;
+}
+
+function splitResultFields(line) {
+  const raw = line.includes('\t') ? line.split('\t') : line.split('/');
+  return raw.map((f) => f.replace(/^\//, '').trim()).filter(Boolean);
 }
 
 // Alguns eventos trazem um bloco extra tipo "Driver Standings after X" ou
@@ -205,14 +230,29 @@ function parseStandings(strResult) {
   for (const rawLine of tail.split(/\r?\n/)) {
     const line = rawLine.trim();
     if (!line) continue;
-    const match = line.match(/^(\d{1,2})\s*\/\s*([^/]+?)\s*\/\s*([^/]+?)\s*\/\s*([\d.]+)\s*$/);
-    if (!match) continue;
-    rows.push({
-      position: parseInt(match[1], 10),
-      name: match[2].trim(),
-      team: match[3].trim(),
-      points: parseFloat(match[4]),
-    });
+
+    const withTeam = line.match(/^(\d{1,2})\s*\/\s*([^/]+?)\s*\/\s*([^/]+?)\s*\/\s*([\d.]+)\s*$/);
+    if (withTeam) {
+      rows.push({
+        position: parseInt(withTeam[1], 10),
+        name: withTeam[2].trim(),
+        team: withTeam[3].trim(),
+        points: parseFloat(withTeam[4]),
+      });
+      continue;
+    }
+
+    // Algumas ligas (ex: WRC) nao trazem equipe na classificacao de pilotos:
+    // so "posicao /piloto /pontos".
+    const noTeam = line.match(/^(\d{1,2})\s*\/\s*([^/]+?)\s*\/\s*([\d.]+)\s*$/);
+    if (noTeam) {
+      rows.push({
+        position: parseInt(noTeam[1], 10),
+        name: noTeam[2].trim(),
+        team: null,
+        points: parseFloat(noTeam[3]),
+      });
+    }
   }
 
   if (rows.length === 0) return null;
