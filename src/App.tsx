@@ -538,6 +538,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     [allCategoriesById, selectedCategoryBase]
   );
 
+  const categoryAccent = getCategoryAccent(selectedCategory.id);
+
   const handleCategorySelect = useCallback((cat: Category) => {
     setSelectedCategoryBase(cat);
     setView('category');
@@ -1279,11 +1281,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     </div>
                     
                     <div className="flex-1 relative">
-                      <div className="absolute inset-0 bg-brand-red/20 blur-[100px] rounded-full" />
+                      <div className="absolute inset-0 blur-[100px] rounded-full" style={{ backgroundColor: `${categoryAccent}33` }} />
                       <div className="relative glass-card p-8 rotate-3 hover:rotate-0 transition-transform duration-500">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-xl bg-brand-red flex items-center justify-center">
+                            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: categoryAccent }}>
                               {React.createElement(IconMap[selectedCategory.icon], { className: "text-white w-6 h-6" })}
                             </div>
                             <div>
