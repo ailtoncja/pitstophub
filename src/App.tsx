@@ -77,6 +77,16 @@ const CATEGORY_ACCENTS: Record<string, string> = {
 
 const getCategoryAccent = (id: string) => CATEGORY_ACCENTS[id] ?? '#e10600';
 
+// Decide se texto branco ou escuro le melhor em cima da cor da categoria
+// (algumas, como o amarelo da IMSA, sao claras demais pra texto branco).
+function getAccentTextColor(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 150 ? '#12121a' : '#ffffff';
+}
+
 const NAV_GROUPS = [
   {
     name: { pt: 'Fórmulas', en: 'Formulas' },
@@ -539,6 +549,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   );
 
   const categoryAccent = getCategoryAccent(selectedCategory.id);
+  const categoryAccentInk = getAccentTextColor(categoryAccent);
 
   const handleCategorySelect = useCallback((cat: Category) => {
     setSelectedCategoryBase(cat);
@@ -691,7 +702,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   );
 
   return (
-    <div className="min-h-screen flex flex-col transition-colors duration-300 overflow-x-hidden">
+    <div
+      className="min-h-screen flex flex-col transition-colors duration-300 overflow-x-hidden"
+      style={{ '--cat-accent': categoryAccent, '--cat-accent-ink': categoryAccentInk } as React.CSSProperties}
+    >
       <header className="sticky top-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-[var(--card-border)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center">
 
@@ -1224,7 +1238,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             >
               <section className="relative py-12 md:py-20 overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
-                  <div className="absolute inset-0 bg-gradient-to-b from-brand-red/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-[var(--cat-accent)]/20 to-transparent" />
                 </div>
                 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1236,12 +1250,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     className="flex flex-col md:flex-row items-center gap-12"
                   >
                     <div className="flex-1 text-center md:text-left">
-                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-red/10 border border-brand-red/20 text-brand-red text-xs font-bold uppercase tracking-widest mb-6">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--cat-accent)]/10 border border-[var(--cat-accent)]/20 text-[var(--cat-accent)] text-xs font-bold uppercase tracking-widest mb-6">
                         <Timer className="w-3 h-3" />
                         {seasonBadgeLabel}
                       </div>
                       <h1 className="text-4xl sm:text-6xl md:text-8xl font-display font-black italic tracking-tighter mb-6 text-[var(--text-main)]">
-                        {(language === 'pt' ? selectedCategory.name : (selectedCategory.enFullName || selectedCategory.name)).split(' ')[0]} <span className="text-brand-red">{(language === 'pt' ? selectedCategory.name : (selectedCategory.enFullName || selectedCategory.name)).split(' ').slice(1).join(' ')}</span>
+                        {(language === 'pt' ? selectedCategory.name : (selectedCategory.enFullName || selectedCategory.name)).split(' ')[0]} <span className="text-[var(--cat-accent)]">{(language === 'pt' ? selectedCategory.name : (selectedCategory.enFullName || selectedCategory.name)).split(' ').slice(1).join(' ')}</span>
                       </h1>
                       <p className="text-gray-500 text-lg max-w-xl mb-10">
                         {language === 'pt' ? selectedCategory.description : (selectedCategory.enDescription || selectedCategory.description)}
@@ -1253,7 +1267,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           className={cn(
                             "px-8 py-4 font-bold rounded-xl border transition-all uppercase tracking-widest text-sm flex items-center gap-2",
                             followedCategorySet.has(selectedCategory.id)
-                              ? "bg-brand-red/10 text-brand-red border-brand-red/30"
+                              ? "bg-[var(--cat-accent)]/10 text-[var(--cat-accent)] border-[var(--cat-accent)]/30"
                               : "bg-[var(--card-bg)] text-[var(--text-main)] border-[var(--card-border)] hover:bg-white/10"
                           )}
                         >
@@ -1267,7 +1281,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                             }, 100);
                           }}
-                          className="px-8 py-4 bg-brand-red text-white font-bold rounded-xl shadow-xl shadow-brand-red/20 hover:scale-105 active:scale-100 transition-all uppercase tracking-widest text-sm"
+                          className="px-8 py-4 bg-[var(--cat-accent)] text-[var(--cat-accent-ink)] font-bold rounded-xl shadow-xl shadow-[var(--cat-accent)]/20 hover:scale-105 active:scale-100 transition-all uppercase tracking-widest text-sm"
                         >
                           {UI_TRANSLATIONS[language].viewCalendar}
                         </button>
@@ -1286,7 +1300,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
                           <div className="flex items-center gap-3">
                             <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: categoryAccent }}>
-                              {React.createElement(IconMap[selectedCategory.icon], { className: "text-white w-6 h-6" })}
+                              {React.createElement(IconMap[selectedCategory.icon], { className: "w-6 h-6", style: { color: categoryAccentInk } })}
                             </div>
                             <div>
                               <div className="text-xs text-gray-500 uppercase font-bold tracking-widest">{UI_TRANSLATIONS[language].nextStage}</div>
@@ -1306,7 +1320,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         <div className="space-y-4">
                           <div className="flex items-center justify-between p-4 rounded-xl bg-black/20 border border-white/5">
                             <div className="flex items-center gap-3">
-                              <MapPin className="w-4 h-4 text-brand-red" />
+                              <MapPin className="w-4 h-4 text-[var(--cat-accent)]" />
                               <span className="text-sm font-bold text-[var(--text-main)]">
                                 {nextUpcomingRace?.location || UI_TRANSLATIONS[language].notAvailableShort}
                               </span>
@@ -1315,7 +1329,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           </div>
                           <div className="flex items-center justify-between p-4 rounded-xl bg-black/20 border border-white/5">
                             <div className="flex items-center gap-3">
-                              <Calendar className="w-4 h-4 text-brand-red" />
+                              <Calendar className="w-4 h-4 text-[var(--cat-accent)]" />
                               <span className="text-sm font-bold text-[var(--text-main)]">
                                 {nextUpcomingRace?.circuit || UI_TRANSLATIONS[language].notAvailableShort}
                               </span>
@@ -1349,8 +1363,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         className={cn(
                           "flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold uppercase tracking-widest transition-all whitespace-nowrap",
                           activeTab === tab.id 
-                            ? "bg-brand-red text-white shadow-lg shadow-brand-red/20" 
-                            : "bg-[var(--card-bg)] text-gray-500 border border-[var(--card-border)] hover:text-brand-red"
+                            ? "bg-[var(--cat-accent)] text-[var(--cat-accent-ink)] shadow-lg shadow-[var(--cat-accent)]/20"
+                            : "bg-[var(--card-bg)] text-gray-500 border border-[var(--card-border)] hover:text-[var(--cat-accent)]"
                         )}
                       >
                         <tab.icon className="w-4 h-4" />
@@ -1371,37 +1385,37 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       >
                         <div className="glass-card p-8">
                           <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
-                            <Users className="text-brand-red" /> {UI_TRANSLATIONS[language].teams}
+                            <Users className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].teams}
                           </h3>
-                          <div className="text-4xl font-display font-black text-brand-red mb-2">
+                          <div className="text-4xl font-display font-black text-[var(--cat-accent)] mb-2">
                             {selectedCategory.teams.length}
                           </div>
                           <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">{UI_TRANSLATIONS[language].officialTeams}</p>
                         </div>
                         <div className="glass-card p-8">
                           <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
-                            <Flag className="text-brand-red" /> {UI_TRANSLATIONS[language].drivers}
+                            <Flag className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].drivers}
                           </h3>
-                          <div className="text-4xl font-display font-black text-brand-red mb-2">
+                          <div className="text-4xl font-display font-black text-[var(--cat-accent)] mb-2">
                             {selectedCategory.drivers.length}
                           </div>
                           <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">{UI_TRANSLATIONS[language].driversOnGrid}</p>
                         </div>
                         <div className="glass-card p-8">
                           <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
-                            <Calendar className="text-brand-red" /> {UI_TRANSLATIONS[language].rounds}
+                            <Calendar className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].rounds}
                           </h3>
-                          <div className="text-4xl font-display font-black text-brand-red mb-2">
+                          <div className="text-4xl font-display font-black text-[var(--cat-accent)] mb-2">
                             {selectedCategory.calendar.length}
                           </div>
                           <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">{UI_TRANSLATIONS[language].racesInSeason}</p>
                         </div>
                         
                         <div className="md:col-span-2 lg:col-span-3 glass-card p-8 relative overflow-hidden group">
-                          <div className="absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 bg-brand-red/5 rounded-full group-hover:bg-brand-red/10 transition-colors" />
+                          <div className="absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 bg-[var(--cat-accent)]/5 rounded-full group-hover:bg-[var(--cat-accent)]/10 transition-colors" />
                           <div className="relative z-10">
                             <h3 className="text-2xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
-                              <Info className="text-brand-red" /> {UI_TRANSLATIONS[language].overview}
+                              <Info className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].overview}
                             </h3>
                             <div className="prose prose-invert max-w-none">
                               <p className="text-lg leading-relaxed text-gray-400 font-medium">
@@ -1409,7 +1423,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               </p>
                             </div>
                             <div className="mt-8 flex flex-wrap gap-4">
-                              <div className="px-4 py-2 rounded-full bg-brand-red/10 border border-brand-red/20 text-brand-red text-xs font-black uppercase tracking-widest">
+                              <div className="px-4 py-2 rounded-full bg-[var(--cat-accent)]/10 border border-[var(--cat-accent)]/20 text-[var(--cat-accent)] text-xs font-black uppercase tracking-widest">
                                 {seasonBadgeLabel}
                               </div>
                               <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-black uppercase tracking-widest">
@@ -1428,9 +1442,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           <>
                             <div className="glass-card p-8">
                               <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
-                                <Timer className="text-brand-red" /> {UI_TRANSLATIONS[language].liveNextEvent}
+                                <Timer className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].liveNextEvent}
                               </h3>
-                              <div className="text-2xl font-display font-black text-brand-red mb-2">
+                              <div className="text-2xl font-display font-black text-[var(--cat-accent)] mb-2">
                                 {nextUpcomingRace?.name || '--'}
                               </div>
                               <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">
@@ -1440,9 +1454,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                             <div className="glass-card p-8">
                               <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
-                                <Trophy className="text-brand-red" /> {UI_TRANSLATIONS[language].liveLastResult}
+                                <Trophy className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].liveLastResult}
                               </h3>
-                              <div className="text-2xl font-display font-black text-brand-red mb-2">
+                              <div className="text-2xl font-display font-black text-[var(--cat-accent)] mb-2">
                                 {lastCompletedRace?.winner || '--'}
                               </div>
                               <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">
@@ -1452,9 +1466,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                             <div className="glass-card p-8">
                               <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
-                                <Flag className="text-brand-red" /> {UI_TRANSLATIONS[language].championshipLeader}
+                                <Flag className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].championshipLeader}
                               </h3>
-                              <div className="text-2xl font-display font-black text-brand-red mb-2">
+                              <div className="text-2xl font-display font-black text-[var(--cat-accent)] mb-2">
                                 {championshipLeader?.name || '--'}
                               </div>
                               <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">
@@ -1464,9 +1478,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                             <div className="glass-card p-8">
                               <h3 className="text-xl font-display font-black italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
-                                <Users className="text-brand-red" /> {UI_TRANSLATIONS[language].constructorsLeader}
+                                <Users className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].constructorsLeader}
                               </h3>
-                              <div className="text-2xl font-display font-black text-brand-red mb-2">
+                              <div className="text-2xl font-display font-black text-[var(--cat-accent)] mb-2">
                                 {constructorsLeader?.name || '--'}
                               </div>
                               <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">
@@ -1490,7 +1504,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       >
                         {teamClasses.map(className => (
                           <div key={className} className="space-y-6">
-                            <h3 className="text-2xl font-display font-black italic border-l-4 border-brand-red pl-4 text-[var(--text-main)]">
+                            <h3 className="text-2xl font-display font-black italic border-l-4 border-[var(--cat-accent)] pl-4 text-[var(--text-main)]">
                               {className}
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1504,7 +1518,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                         <div>
                                           <h4 className="text-xl font-display font-black italic text-[var(--text-main)]">{team.name}</h4>
                                           {team.car && (
-                                            <div className="text-xs font-mono text-brand-red font-bold uppercase tracking-widest mt-1">
+                                            <div className="text-xs font-mono text-[var(--cat-accent)] font-bold uppercase tracking-widest mt-1">
                                               {team.car}
                                             </div>
                                           )}
@@ -1514,8 +1528,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                           className={cn(
                                             "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors",
                                             followedTeamSet.has(`${selectedCategory.id}::${team.id}`)
-                                              ? "bg-brand-red/10 border-brand-red/30 text-brand-red"
-                                              : "bg-white/5 border-white/10 text-gray-400 hover:text-brand-red"
+                                              ? "bg-[var(--cat-accent)]/10 border-[var(--cat-accent)]/30 text-[var(--cat-accent)]"
+                                              : "bg-white/5 border-white/10 text-gray-400 hover:text-[var(--cat-accent)]"
                                           )}
                                         >
                                           {followedTeamSet.has(`${selectedCategory.id}::${team.id}`) ? UI_TRANSLATIONS[language].following : UI_TRANSLATIONS[language].follow}
@@ -1525,7 +1539,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                         {(driversByTeamId.get(team.id) ?? [])
                                           .map(driver => (
                                             <div key={driver.id} className="relative flex flex-col p-4 rounded-2xl bg-black/20 hover:bg-black/30 transition-all group/driver overflow-hidden border border-white/5">
-                                              <div className="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 bg-brand-red/5 rounded-full group-hover/driver:bg-brand-red/10 transition-colors" />
+                                              <div className="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 bg-[var(--cat-accent)]/5 rounded-full group-hover/driver:bg-[var(--cat-accent)]/10 transition-colors" />
                                               
                                               <div className="flex items-center gap-4 mb-4 relative z-10">
                                                 <div className="relative">
@@ -1533,24 +1547,24 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                                     <img 
                                                       src={driver.image} 
                                                       alt={driver.name} 
-                                                      className="w-16 h-16 rounded-xl object-cover border-2 border-brand-red/30 shadow-lg"
+                                                      className="w-16 h-16 rounded-xl object-cover border-2 border-[var(--cat-accent)]/30 shadow-lg"
                                                       referrerPolicy="no-referrer"
                                                       loading="lazy"
                                                       decoding="async"
                                                     />
                                                   ) : (
-                                                    <div className="w-16 h-16 rounded-xl bg-brand-red/10 flex items-center justify-center border-2 border-brand-red/30">
-                                                      <Users className="w-8 h-8 text-brand-red/40" />
+                                                    <div className="w-16 h-16 rounded-xl bg-[var(--cat-accent)]/10 flex items-center justify-center border-2 border-[var(--cat-accent)]/30">
+                                                      <Users className="w-8 h-8 text-[var(--cat-accent)]/40" />
                                                     </div>
                                                   )}
-                                                  <div className="absolute -bottom-2 -right-2 bg-brand-red text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-lg">
+                                                  <div className="absolute -bottom-2 -right-2 bg-[var(--cat-accent)] text-[var(--cat-accent-ink)] text-[10px] font-black px-2 py-0.5 rounded-md shadow-lg">
                                                     #{driver.number}
                                                   </div>
                                                 </div>
                                                 
                                                 <div className="min-w-0 flex-1">
-                                                  <div className="font-display font-black italic text-lg text-[var(--text-main)] group-hover/driver:text-brand-red transition-colors">
-                                                    {driver.name.split(' ')[0]} <span className="text-brand-red group-hover/driver:text-[var(--text-main)]">{driver.name.split(' ').slice(1).join(' ')}</span>
+                                                  <div className="font-display font-black italic text-lg text-[var(--text-main)] group-hover/driver:text-[var(--cat-accent)] transition-colors">
+                                                    {driver.name.split(' ')[0]} <span className="text-[var(--cat-accent)] group-hover/driver:text-[var(--text-main)]">{driver.name.split(' ').slice(1).join(' ')}</span>
                                                   </div>
                                                   <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest flex items-center gap-1">
                                                     <Flag className="w-2 h-2" />
@@ -1565,8 +1579,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                                   className={cn(
                                                     "px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border transition-colors shrink-0",
                                                     followedDriverSet.has(`${selectedCategory.id}::${driver.id}`)
-                                                      ? "bg-brand-red/10 border-brand-red/30 text-brand-red"
-                                                      : "bg-white/5 border-white/10 text-gray-400 hover:text-brand-red"
+                                                      ? "bg-[var(--cat-accent)]/10 border-[var(--cat-accent)]/30 text-[var(--cat-accent)]"
+                                                      : "bg-white/5 border-white/10 text-gray-400 hover:text-[var(--cat-accent)]"
                                                   )}
                                                 >
                                                   {followedDriverSet.has(`${selectedCategory.id}::${driver.id}`) ? UI_TRANSLATIONS[language].following : UI_TRANSLATIONS[language].follow}
@@ -1575,7 +1589,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                               
                                               <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
                                                 <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].grid2026}</div>
-                                                <ChevronRight className="w-4 h-4 text-brand-red opacity-0 group-hover/driver:opacity-100 group-hover/driver:translate-x-1 transition-all" />
+                                                <ChevronRight className="w-4 h-4 text-[var(--cat-accent)] opacity-0 group-hover/driver:opacity-100 group-hover/driver:translate-x-1 transition-all" />
                                               </div>
                                             </div>
                                           ))}
@@ -1614,7 +1628,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               key={race.id} 
                               className={cn(
                                 "flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 glass-card items-center transition-all hover:bg-white/10",
-                                race.status === 'upcoming' ? "border-l-4 border-l-brand-red" : 
+                                race.status === 'upcoming' ? "border-l-4 border-l-[var(--cat-accent)]" : 
                                 race.status === 'cancelled' ? "border-l-4 border-l-red-500 opacity-60" : ""
                               )}
                             >
@@ -1637,7 +1651,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1",
                                   race.status === 'completed' ? "bg-gray-800 text-gray-400" : 
                                   race.status === 'cancelled' ? "bg-red-900/50 text-red-400" :
-                                  "bg-brand-red text-white"
+                                  "bg-[var(--cat-accent)] text-[var(--cat-accent-ink)]"
                                 )}>
                                   {race.status === 'completed' && <CheckCircle2 className="w-3 h-3" />}
                                   {race.status === 'cancelled' && <XCircle className="w-3 h-3" />}
@@ -1687,7 +1701,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                             {selectedCategory.standings.drivers && (
                               <div className="space-y-6">
-                                <h3 className="text-2xl font-display font-black italic border-l-4 border-brand-red pl-4 text-[var(--text-main)]">
+                                <h3 className="text-2xl font-display font-black italic border-l-4 border-[var(--cat-accent)] pl-4 text-[var(--text-main)]">
                                   {UI_TRANSLATIONS[language].driversChampionship}
                                 </h3>
                                 <div className="glass-card overflow-x-auto no-scrollbar">
@@ -1703,7 +1717,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     <tbody className="divide-y divide-[var(--card-border)]">
                                       {selectedCategory.standings.drivers.map((item) => (
                                         <tr key={item.name} className="hover:bg-white/5 transition-colors">
-                                          <td className="px-6 py-4 font-display font-black italic text-brand-red">{item.position}</td>
+                                          <td className="px-6 py-4 font-display font-black italic text-[var(--cat-accent)]">{item.position}</td>
                                           <td className="px-6 py-4 font-bold text-[var(--text-main)]">{item.name}</td>
                                           <td className="px-6 py-4 text-sm text-gray-500">{item.team || '-'}</td>
                                           <td className="px-6 py-4 font-mono font-bold text-right text-[var(--text-main)]">{item.points}</td>
@@ -1717,7 +1731,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                             {selectedCategory.standings.constructors && (
                               <div className="space-y-6">
-                                <h3 className="text-2xl font-display font-black italic border-l-4 border-brand-red pl-4 text-[var(--text-main)]">
+                                <h3 className="text-2xl font-display font-black italic border-l-4 border-[var(--cat-accent)] pl-4 text-[var(--text-main)]">
                                   {UI_TRANSLATIONS[language].constructorsChampionship}
                                 </h3>
                                 <div className="glass-card overflow-x-auto no-scrollbar">
@@ -1732,7 +1746,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     <tbody className="divide-y divide-[var(--card-border)]">
                                       {selectedCategory.standings.constructors.map((item) => (
                                         <tr key={item.name} className="hover:bg-white/5 transition-colors">
-                                          <td className="px-6 py-4 font-display font-black italic text-brand-red">{item.position}</td>
+                                          <td className="px-6 py-4 font-display font-black italic text-[var(--cat-accent)]">{item.position}</td>
                                           <td className="px-6 py-4 font-bold text-[var(--text-main)]">{item.name}</td>
                                           <td className="px-6 py-4 font-mono font-bold text-right text-[var(--text-main)]">{item.points}</td>
                                         </tr>
@@ -1745,7 +1759,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                             {selectedCategory.standings.teams && (
                               <div className="space-y-6 lg:col-span-2">
-                                <h3 className="text-2xl font-display font-black italic border-l-4 border-brand-red pl-4 text-[var(--text-main)]">
+                                <h3 className="text-2xl font-display font-black italic border-l-4 border-[var(--cat-accent)] pl-4 text-[var(--text-main)]">
                                   {UI_TRANSLATIONS[language].teamsChampionship}
                                 </h3>
                                 <div className="glass-card overflow-x-auto no-scrollbar">
@@ -1761,7 +1775,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     <tbody className="divide-y divide-[var(--card-border)]">
                                       {selectedCategory.standings.teams.map((item) => (
                                         <tr key={item.name + item.extra} className="hover:bg-white/5 transition-colors">
-                                          <td className="px-6 py-4 font-display font-black italic text-brand-red">{item.position}</td>
+                                          <td className="px-6 py-4 font-display font-black italic text-[var(--cat-accent)]">{item.position}</td>
                                           <td className="px-6 py-4 font-mono font-bold text-gray-400">{item.extra || '-'}</td>
                                           <td className="px-6 py-4 font-bold text-[var(--text-main)]">{item.name}</td>
                                           <td className="px-6 py-4 font-mono font-bold text-right text-[var(--text-main)]">{item.points}</td>
@@ -1887,19 +1901,19 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               transition={SPRING}
               className="relative w-full max-w-2xl glass-card p-8 md:p-12 overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 bg-brand-red/10 rounded-full" />
+              <div className="absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 bg-[var(--cat-accent)]/10 rounded-full" />
               
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-brand-red flex items-center justify-center shadow-lg shadow-brand-red/20">
-                      <Info className="text-white w-6 h-6" />
+                    <div className="w-12 h-12 rounded-xl bg-[var(--cat-accent)] flex items-center justify-center shadow-lg shadow-[var(--cat-accent)]/20">
+                      <Info className="w-6 h-6" style={{ color: categoryAccentInk }} />
                     </div>
                     <div>
                       <h2 className="text-3xl font-display font-black italic tracking-tighter text-[var(--text-main)]">
                         {UI_TRANSLATIONS[language].rulesAndFormat}
                       </h2>
-                      <p className="text-brand-red text-xs font-black uppercase tracking-widest">
+                      <p className="text-[var(--cat-accent)] text-xs font-black uppercase tracking-widest">
                         {language === 'pt' ? selectedCategory.fullName : (selectedCategory.enFullName || selectedCategory.fullName)}
                       </p>
                     </div>
@@ -1921,7 +1935,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 <div className="mt-10 flex justify-end">
                   <button 
                     onClick={() => setShowRules(false)}
-                    className="px-8 py-3 bg-brand-red text-white font-display font-black italic uppercase tracking-widest rounded-xl hover:bg-brand-red/90 transition-all shadow-lg shadow-brand-red/20"
+                    className="px-8 py-3 bg-[var(--cat-accent)] text-[var(--cat-accent-ink)] font-display font-black italic uppercase tracking-widest rounded-xl hover:bg-[var(--cat-accent)]/90 transition-all shadow-lg shadow-[var(--cat-accent)]/20"
                   >
                     {UI_TRANSLATIONS[language].gotIt}
                   </button>
