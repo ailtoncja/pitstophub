@@ -41,30 +41,54 @@ const LEAGUE_IDS = {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 async function main() {
-  const allRows = [];
+  const allRaceRows = [];
+  const standingsByCategory = {};
   const summary = [];
 
   for (const [categoryId, leagueId] of Object.entries(LEAGUE_IDS)) {
     try {
-      const rows = await syncCategory(categoryId, leagueId);
-      allRows.push(...rows);
-      summary.push(`${categoryId}: ${rows.length} corridas`);
+      const { rows, standings, standingsRound } = await syncCategory(categoryId, leagueId);
+      allRaceRows.push(...rows);
+      if (standings) standingsByCategory[categoryId] = { standings, round: standingsRound };
+      summary.push(`${categoryId}: ${rows.length} corridas${standings ? `, classificacao apos rodada ${standingsRound}` : ''}`);
     } catch (error) {
       console.error(`[${categoryId}] falhou:`, error.message);
       summary.push(`${categoryId}: FALHOU (${error.message})`);
     }
   }
 
-  if (allRows.length > 0) {
+  if (allRaceRows.length > 0) {
     const { error } = await supabase
       .from('synced_races')
-      .upsert(allRows, { onConflict: 'category_id,race_id' });
-    if (error) throw new Error(`Falha ao gravar no Supabase: ${error.message}`);
+      .upsert(allRaceRows, { onConflict: 'category_id,race_id' });
+    if (error) throw new Error(`Falha ao gravar corridas no Supabase: ${error.message}`);
+  }
+
+  for (const [categoryId, { standings, round }] of Object.entries(standingsByCategory)) {
+    // A classificacao e uma "foto" atual, nao historico: apaga e regrava.
+    const { error: deleteError } = await supabase.from('synced_standings').delete().eq('category_id', categoryId);
+    if (deleteError) {
+      console.error(`[${categoryId}] falha ao limpar classificacao antiga:`, deleteError.message);
+      continue;
+    }
+    const standingsRows = standings.map((item) => ({
+      category_id: categoryId,
+      position: item.position,
+      name: item.name,
+      team: item.team || null,
+      points: item.points,
+      as_of_round: round,
+      source: 'thesportsdb',
+      updated_at: new Date().toISOString(),
+    }));
+    const { error: insertError } = await supabase.from('synced_standings').insert(standingsRows);
+    if (insertError) console.error(`[${categoryId}] falha ao gravar classificacao:`, insertError.message);
   }
 
   console.log('\n=== Resumo ===');
   summary.forEach((line) => console.log(line));
-  console.log(`Total de linhas gravadas: ${allRows.length}`);
+  console.log(`Total de corridas gravadas: ${allRaceRows.length}`);
+  console.log(`Categorias com classificacao: ${Object.keys(standingsByCategory).length}/${Object.keys(LEAGUE_IDS).length}`);
 }
 
 async function syncCategory(categoryId, leagueId) {
@@ -73,6 +97,8 @@ async function syncCategory(categoryId, leagueId) {
   if (!season) throw new Error('temporada atual nao encontrada');
 
   const rows = [];
+  let latestStandings = null;
+  let latestStandingsRound = null;
   let consecutiveMisses = 0;
 
   for (let round = 1; round <= MAX_ROUNDS && consecutiveMisses < MAX_CONSECUTIVE_MISSES; round++) {
@@ -90,9 +116,15 @@ async function syncCategory(categoryId, leagueId) {
     if (!main) continue;
 
     rows.push(buildRow(categoryId, round, main));
+
+    const standings = parseStandings(main.strResult);
+    if (standings) {
+      latestStandings = standings;
+      latestStandingsRound = round;
+    }
   }
 
-  return rows;
+  return { rows, standings: latestStandings, standingsRound: latestStandingsRound };
 }
 
 function pickMainEvent(events) {
@@ -156,6 +188,44 @@ function parseWinner(strResult) {
 
   const name = fields.slice(1).find((f) => /[a-zA-Z]{3,}/.test(f) && !/^[\d:.+\s]+$/.test(f));
   return name ?? null;
+}
+
+// Alguns eventos trazem um bloco extra tipo "Driver Standings after X" ou
+// "Current Championship Standings After X" no fim do texto de resultado, com
+// linhas "posicao /piloto /equipe /pontos". Nao aparece em toda corrida, entao
+// guardamos a classificacao mais recente encontrada (e cumulativa, so cresce).
+function parseStandings(strResult) {
+  if (!strResult) return null;
+  const headingMatch = strResult.match(/.*standings.*/i);
+  if (!headingMatch) return null;
+
+  const tail = strResult.slice(strResult.indexOf(headingMatch[0]) + headingMatch[0].length);
+  const rows = [];
+
+  for (const rawLine of tail.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const match = line.match(/^(\d{1,2})\s*\/\s*([^/]+?)\s*\/\s*([^/]+?)\s*\/\s*([\d.]+)\s*$/);
+    if (!match) continue;
+    rows.push({
+      position: parseInt(match[1], 10),
+      name: match[2].trim(),
+      team: match[3].trim(),
+      points: parseFloat(match[4]),
+    });
+  }
+
+  if (rows.length === 0) return null;
+
+  // Categorias multi-classe (ex: WEC com Hypercar/LMGT3) reiniciam a posicao em
+  // 1 para cada classe dentro do mesmo bloco de texto. Nesse caso nao existe uma
+  // classificacao geral unica, entao preferimos nao gravar nada a misturar
+  // posicoes de classes diferentes como se fosse um ranking so.
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i].position !== i + 1) return null;
+  }
+
+  return rows;
 }
 
 async function fetchJson(path, attempt = 0) {
