@@ -17,8 +17,6 @@ import {
   Moon,
   LayoutGrid,
   Zap,
-  Car,
-  Truck,
   Menu,
   X,
   Languages,
@@ -51,9 +49,7 @@ const IconMap: Record<string, React.ElementType> = {
   Timer,
   Flag,
   Mountain,
-  Zap,
-  Car,
-  Truck
+  Zap
 };
 
 const SPRING = { type: 'spring' as const, stiffness: 380, damping: 32 };
@@ -77,8 +73,6 @@ const CATEGORY_ACCENTS: Record<string, string> = {
   indy: '#003DA5',
   nascar: '#D62828',
   wrc: '#2E7D32',
-  'stock-car': '#F4A300',
-  'formula-truck': '#8B5E3C',
 };
 
 const getCategoryAccent = (id: string) => CATEGORY_ACCENTS[id] ?? '#e10600';
@@ -99,10 +93,6 @@ const NAV_GROUPS = [
   {
     name: { pt: 'Rally', en: 'Rally' },
     ids: ['wrc']
-  },
-  {
-    name: { pt: 'Nacionais', en: 'National' },
-    ids: ['stock-car', 'formula-truck']
   }
 ];
 
