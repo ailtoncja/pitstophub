@@ -37,6 +37,8 @@ import {
   mergeCategoryWithLiveData,
   type JolpicaCategoryData,
 } from './jolpica';
+import { fetchSyncedCalendar, getSyncedCategoryIds, mergeCategoryWithSyncedCalendar } from './synced-races';
+import type { Race } from './types';
 
 const IconMap: Record<string, React.ElementType> = {
   Trophy,
@@ -305,6 +307,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [liveCategorySummaries, setLiveCategorySummaries] = useState<Partial<Record<Category['id'], JolpicaCategoryData | null>>>({});
   const [liveCategoryData, setLiveCategoryData] = useState<JolpicaCategoryData | null>(null);
   const [liveCategoryState, setLiveCategoryState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const [syncedCalendars, setSyncedCalendars] = useState<Partial<Record<Category['id'], Race[] | null>>>({});
 
   React.useEffect(() => {
     if (!currentUser) {
@@ -436,6 +439,35 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   React.useEffect(() => {
     let isMounted = true;
 
+    const syncCalendars = async (force = false) => {
+      await Promise.allSettled(
+        getSyncedCategoryIds().map(async (categoryId) => {
+          try {
+            const calendar = await fetchSyncedCalendar(categoryId, force);
+            if (!isMounted) return;
+            setSyncedCalendars((prev) => ({ ...prev, [categoryId]: calendar }));
+          } catch (error) {
+            console.error(`Falha ao sincronizar calendario de ${categoryId}.`, error);
+          }
+        }),
+      );
+    };
+
+    void syncCalendars();
+
+    const intervalId = window.setInterval(() => {
+      void syncCalendars(true);
+    }, 30 * 60 * 1000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    let isMounted = true;
+
     if (!isCategoryLiveSupported(selectedCategoryBase.id)) {
       setLiveCategoryData(null);
       setLiveCategoryState('idle');
@@ -488,9 +520,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         : category;
       const summaryData = liveCategorySummaries[category.id] ?? null;
       const detailData = selectedCategoryBase.id === category.id ? liveCategoryData : null;
-      return mergeCategoryWithLiveData(mergeCategoryWithLiveData(normalizedCategory, summaryData), detailData);
+      const liveMerged = mergeCategoryWithLiveData(mergeCategoryWithLiveData(normalizedCategory, summaryData), detailData);
+      return mergeCategoryWithSyncedCalendar(liveMerged, syncedCalendars[category.id] ?? null);
     }),
-    [liveCategorySummaries, selectedCategoryBase.id, liveCategoryData]
+    [liveCategorySummaries, selectedCategoryBase.id, liveCategoryData, syncedCalendars]
   );
 
   const allCategoriesById = useMemo(
