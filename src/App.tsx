@@ -37,8 +37,14 @@ import {
   mergeCategoryWithLiveData,
   type JolpicaCategoryData,
 } from './jolpica';
-import { fetchSyncedCalendar, getSyncedCategoryIds, mergeCategoryWithSyncedCalendar } from './synced-races';
-import type { Race } from './types';
+import {
+  fetchSyncedCalendar,
+  fetchSyncedStandings,
+  getSyncedCategoryIds,
+  mergeCategoryWithSyncedCalendar,
+  mergeCategoryWithSyncedStandings,
+} from './synced-races';
+import type { Race, StandingItem } from './types';
 
 const IconMap: Record<string, React.ElementType> = {
   Trophy,
@@ -308,6 +314,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [liveCategoryData, setLiveCategoryData] = useState<JolpicaCategoryData | null>(null);
   const [liveCategoryState, setLiveCategoryState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [syncedCalendars, setSyncedCalendars] = useState<Partial<Record<Category['id'], Race[] | null>>>({});
+  const [syncedStandings, setSyncedStandings] = useState<Partial<Record<Category['id'], StandingItem[] | null>>>({});
 
   React.useEffect(() => {
     if (!currentUser) {
@@ -443,11 +450,15 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       await Promise.allSettled(
         getSyncedCategoryIds().map(async (categoryId) => {
           try {
-            const calendar = await fetchSyncedCalendar(categoryId, force);
+            const [calendar, standings] = await Promise.all([
+              fetchSyncedCalendar(categoryId, force),
+              fetchSyncedStandings(categoryId, force),
+            ]);
             if (!isMounted) return;
             setSyncedCalendars((prev) => ({ ...prev, [categoryId]: calendar }));
+            setSyncedStandings((prev) => ({ ...prev, [categoryId]: standings }));
           } catch (error) {
-            console.error(`Falha ao sincronizar calendario de ${categoryId}.`, error);
+            console.error(`Falha ao sincronizar dados de ${categoryId}.`, error);
           }
         }),
       );
@@ -521,9 +532,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       const summaryData = liveCategorySummaries[category.id] ?? null;
       const detailData = selectedCategoryBase.id === category.id ? liveCategoryData : null;
       const liveMerged = mergeCategoryWithLiveData(mergeCategoryWithLiveData(normalizedCategory, summaryData), detailData);
-      return mergeCategoryWithSyncedCalendar(liveMerged, syncedCalendars[category.id] ?? null);
+      const calendarMerged = mergeCategoryWithSyncedCalendar(liveMerged, syncedCalendars[category.id] ?? null);
+      return mergeCategoryWithSyncedStandings(calendarMerged, syncedStandings[category.id] ?? null);
     }),
-    [liveCategorySummaries, selectedCategoryBase.id, liveCategoryData, syncedCalendars]
+    [liveCategorySummaries, selectedCategoryBase.id, liveCategoryData, syncedCalendars, syncedStandings]
   );
 
   const allCategoriesById = useMemo(

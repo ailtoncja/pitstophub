@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import type { Category, Race } from './types';
+import type { Category, Race, StandingItem } from './types';
 
 // Categorias sem API propria: calendario mantido pelo job agendado em
 // scripts/sync-thesportsdb.mjs (GitHub Actions), gravado na tabela
@@ -23,8 +23,16 @@ type SyncedRaceRow = {
   winner: string | null;
 };
 
-type CacheEntry = { expiresAt: number; value: Promise<Race[] | null> };
-const cache = new Map<string, CacheEntry>();
+type SyncedStandingRow = {
+  position: number;
+  name: string;
+  team: string | null;
+  points: number;
+};
+
+type CacheEntry<T> = { expiresAt: number; value: Promise<T> };
+const calendarCache = new Map<string, CacheEntry<Race[] | null>>();
+const standingsCache = new Map<string, CacheEntry<StandingItem[] | null>>();
 
 export function isCategorySynced(id: string): boolean {
   return (SYNCED_CATEGORY_IDS as readonly string[]).includes(id);
@@ -38,23 +46,46 @@ export async function fetchSyncedCalendar(categoryId: string, force = false): Pr
   if (!supabase || !isCategorySynced(categoryId)) return null;
 
   const now = Date.now();
-  const hit = cache.get(categoryId);
+  const hit = calendarCache.get(categoryId);
   if (!force && hit && hit.expiresAt > now) return hit.value;
 
   const value = loadCalendar(categoryId).catch((error: unknown) => {
     console.error(`Falha ao carregar calendario sincronizado de ${categoryId}.`, error);
     if (hit) return hit.value;
-    cache.delete(categoryId);
+    calendarCache.delete(categoryId);
     return null;
   });
 
-  cache.set(categoryId, { expiresAt: now + CACHE_TTL_MS, value });
+  calendarCache.set(categoryId, { expiresAt: now + CACHE_TTL_MS, value });
   return value;
 }
 
 export function mergeCategoryWithSyncedCalendar(category: Category, calendar: Race[] | null): Category {
   if (!calendar || calendar.length === 0) return category;
   return { ...category, calendar };
+}
+
+export async function fetchSyncedStandings(categoryId: string, force = false): Promise<StandingItem[] | null> {
+  if (!supabase || !isCategorySynced(categoryId)) return null;
+
+  const now = Date.now();
+  const hit = standingsCache.get(categoryId);
+  if (!force && hit && hit.expiresAt > now) return hit.value;
+
+  const value = loadStandings(categoryId).catch((error: unknown) => {
+    console.error(`Falha ao carregar classificacao sincronizada de ${categoryId}.`, error);
+    if (hit) return hit.value;
+    standingsCache.delete(categoryId);
+    return null;
+  });
+
+  standingsCache.set(categoryId, { expiresAt: now + CACHE_TTL_MS, value });
+  return value;
+}
+
+export function mergeCategoryWithSyncedStandings(category: Category, standings: StandingItem[] | null): Category {
+  if (!standings || standings.length === 0) return category;
+  return { ...category, standings: { ...category.standings, drivers: standings } };
 }
 
 async function loadCalendar(categoryId: string): Promise<Race[] | null> {
@@ -79,5 +110,25 @@ async function loadCalendar(categoryId: string): Promise<Race[] | null> {
     date: row.date,
     status: row.status,
     winner: row.winner ?? undefined,
+  }));
+}
+
+async function loadStandings(categoryId: string): Promise<StandingItem[] | null> {
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from('synced_standings')
+    .select('position, name, team, points')
+    .eq('category_id', categoryId)
+    .order('position', { ascending: true });
+
+  if (error) throw error;
+  if (!data || data.length === 0) return null;
+
+  return (data as SyncedStandingRow[]).map((row) => ({
+    position: row.position,
+    name: row.name,
+    points: row.points,
+    team: row.team ?? undefined,
   }));
 }
