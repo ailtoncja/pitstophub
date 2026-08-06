@@ -916,26 +916,30 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     };
   }, [selectedRace, now]);
 
-  // Usuario logado seguindo algo: "ultimo vencedor" e "lider do campeonato" passam a
-  // refletir só as categorias seguidas (a mesma categoria em ambos, pra ficar coerente),
-  // em vez de sempre mostrar o resultado mais recente global e o lider da F1.
-  const followedLastResult = useMemo(() => {
-    if (!currentUser || followedCategoryObjects.length === 0) return null;
-    return followedCategoryObjects
+  // "Ultimo vencedor" e "lider do campeonato" sempre mostram a MESMA categoria entre si
+  // (logado/seguindo ou não): busca a corrida concluida mais recente cuja categoria tambem
+  // tenha classificacao (senao os dois cards nunca bateriam), preferindo categorias seguidas
+  // quando o usuario estiver logado e seguindo algo.
+  const hasStandingsData = (category: Category) =>
+    (category.standings?.drivers?.length ?? 0) > 0 ||
+    (category.standings?.constructors?.length ?? 0) > 0 ||
+    (category.standings?.teams?.length ?? 0) > 0;
+
+  const pickLastResultWithStandings = (categories: Category[]) =>
+    categories
       .flatMap((category) => category.calendar
         .filter((race) => race.status === 'completed' && race.winner)
         .map((race) => ({ category, race })))
+      .filter((item) => hasStandingsData(item.category))
       .sort((a, b) => b.race.date.localeCompare(a.race.date))[0] ?? null;
-  }, [currentUser, followedCategoryObjects]);
 
   const lastGlobalResult = useMemo(() => {
-    if (followedLastResult) return followedLastResult;
-    return allCategories
-      .flatMap((category) => category.calendar
-        .filter((race) => race.status === 'completed' && race.winner)
-        .map((race) => ({ category, race })))
-      .sort((a, b) => b.race.date.localeCompare(a.race.date))[0] ?? null;
-  }, [allCategories, followedLastResult]);
+    if (currentUser && followedCategoryObjects.length > 0) {
+      const followed = pickLastResultWithStandings(followedCategoryObjects);
+      if (followed) return followed;
+    }
+    return pickLastResultWithStandings(allCategories);
+  }, [allCategories, currentUser, followedCategoryObjects]);
 
   const overviewStats = useMemo(() => ({
     categories: allCategories.length,
@@ -944,15 +948,13 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   }), [allCategories]);
 
   const featuredLeader = useMemo(() => {
-    // Nem toda categoria tem classificacao por piloto (ex.: IMSA so tem por equipe) e a WEC
-    // nao tem classificacao nenhuma nos dados -- cai pra construtores/equipes primeiro, e se
-    // a categoria seguida simplesmente nao tiver nada disso, cai pro lider da F1 em vez de "N/A".
-    const pickEntry = (category: Category | undefined) => {
-      const entry = category?.standings?.drivers?.[0] ?? category?.standings?.constructors?.[0] ?? category?.standings?.teams?.[0] ?? null;
-      return entry && category ? { entry, category } : null;
-    };
-    return pickEntry(followedLastResult?.category) ?? pickEntry(allCategoriesById.get('f1'));
-  }, [followedLastResult, allCategoriesById]);
+    // Sempre a mesma categoria do card "ultimo vencedor" (lastGlobalResult), que ja garante
+    // que a categoria escolhida tem classificacao. Nem toda categoria tem por piloto (ex.:
+    // IMSA so tem por equipe), entao cai pra construtores/equipes antes de desistir.
+    const category = lastGlobalResult?.category;
+    const entry = category?.standings?.drivers?.[0] ?? category?.standings?.constructors?.[0] ?? category?.standings?.teams?.[0] ?? null;
+    return entry && category ? { entry, category } : null;
+  }, [lastGlobalResult]);
 
   const teamClasses = useMemo(
     () => Array.from(new Set(selectedCategory.teams.map(team => team.class || 'Geral'))),
