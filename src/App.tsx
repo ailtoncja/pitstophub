@@ -944,8 +944,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   }), [allCategories]);
 
   const featuredLeader = useMemo(() => {
-    if (followedLastResult) return followedLastResult.category.standings?.drivers?.[0] ?? null;
-    return allCategoriesById.get('f1')?.standings?.drivers?.[0] ?? null;
+    const category = followedLastResult ? followedLastResult.category : allCategoriesById.get('f1');
+    // Nem toda categoria tem classificacao por piloto (ex.: IMSA so tem por equipe) --
+    // cai pra construtores/equipes em vez de mostrar "N/A" quando isso acontece.
+    const entry = category?.standings?.drivers?.[0] ?? category?.standings?.constructors?.[0] ?? category?.standings?.teams?.[0] ?? null;
+    return entry && category ? { entry, category } : null;
   }, [followedLastResult, allCategoriesById]);
 
   const teamClasses = useMemo(
@@ -1359,10 +1362,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         </span>
                       </div>
                       <div className="font-apex text-2xl font-extrabold italic text-[var(--text-main)] mb-1 truncate">
-                        {featuredLeader?.name || '--'}
+                        {featuredLeader?.entry.name || '--'}
                       </div>
                       <div className="font-apex-mono text-xs text-gray-500 uppercase tracking-widest font-medium truncate">
-                        {featuredLeader ? `${featuredLeader.team} • ${featuredLeader.points} ${UI_TRANSLATIONS[language].points}` : UI_TRANSLATIONS[language].notAvailableShort}
+                        {featuredLeader ? `${featuredLeader.entry.team ?? (language === 'pt' ? featuredLeader.category.name : (featuredLeader.category.enFullName || featuredLeader.category.name))} • ${featuredLeader.entry.points} ${UI_TRANSLATIONS[language].points}` : UI_TRANSLATIONS[language].notAvailableShort}
                       </div>
                     </div>
 
