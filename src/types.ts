@@ -5,6 +5,7 @@ export interface Driver {
   nationality: string;
   teamId: string;
   image?: string;
+  cutout?: string;
 }
 
 export interface Team {
@@ -13,6 +14,7 @@ export interface Team {
   color: string;
   car?: string;
   logo?: string;
+  badge?: string;
   class?: string;
 }
 
@@ -70,41 +72,41 @@ export const MOTORSPORT_DATA: Category[] = [
     enLongDescription: 'Formula 1 is the peak of motorsport, regulated by the FIA. The championship consists of a series of races, known as Grands Prix, held on street circuits and permanent tracks. The cars are the fastest in the world on mixed circuits, thanks to extremely advanced aerodynamics and 1.6-liter V6 turbo hybrid engines. The scoring system rewards the top 10 finishers (25, 18, 15, 12, 10, 8, 6, 4, 2, 1), with an extra point for the fastest lap if the driver finishes in the top 10. In 2026, new engine and aerodynamic rules come into force, focusing on 100% sustainable fuels and greater electric power.',
     icon: 'OpenWheelCar',
     teams: [
-      { id: 'mercedes', name: 'Mercedes', color: '#00D2BE', car: 'W17' },
-      { id: 'ferrari', name: 'Ferrari', color: '#DC0000', car: 'SF-26' },
-      { id: 'mclaren', name: 'McLaren', color: '#FF8700', car: 'MCL40' },
-      { id: 'haas', name: 'Haas F1 Team', color: '#FFFFFF', car: 'VF-26' },
-      { id: 'alpine', name: 'Alpine', color: '#0093CC', car: 'A526' },
-      { id: 'redbull', name: 'Red Bull Racing', color: '#0600EF', car: 'RB22' },
-      { id: 'rb', name: 'Racing Bulls', color: '#6692FF', car: 'VCARB 03' },
-      { id: 'audi', name: 'Audi', color: '#F50537', car: 'Audi F1' },
-      { id: 'williams', name: 'Williams', color: '#005AFF', car: 'FW48' },
-      { id: 'cadillac', name: 'Cadillac', color: '#555555', car: 'Cadillac F1' },
-      { id: 'astonmartin', name: 'Aston Martin', color: '#006F62', car: 'AMR26' },
+      { id: 'mercedes', name: 'Mercedes', color: '#00D2BE', car: 'W17', badge: 'https://r2.thesportsdb.com/images/media/team/badge/6caw0r1744037679.png' },
+      { id: 'ferrari', name: 'Ferrari', color: '#DC0000', car: 'SF-26', badge: 'https://r2.thesportsdb.com/images/media/team/badge/rxwsqv1420417429.png' },
+      { id: 'mclaren', name: 'McLaren', color: '#FF8700', car: 'MCL40', badge: 'https://r2.thesportsdb.com/images/media/team/badge/kzqi7v1743602056.png' },
+      { id: 'haas', name: 'Haas F1 Team', color: '#FFFFFF', car: 'VF-26', badge: 'https://r2.thesportsdb.com/images/media/team/badge/9yp3s51740773680.png' },
+      { id: 'alpine', name: 'Alpine', color: '#0093CC', car: 'A526', badge: 'https://r2.thesportsdb.com/images/media/team/badge/ozhoj31740774899.png' },
+      { id: 'redbull', name: 'Red Bull Racing', color: '#0600EF', car: 'RB22', badge: 'https://r2.thesportsdb.com/images/media/team/badge/nhlev81679826274.png' },
+      { id: 'rb', name: 'Racing Bulls', color: '#6692FF', car: 'VCARB 03', badge: 'https://r2.thesportsdb.com/images/media/team/badge/ot7pjx1740775883.png' },
+      { id: 'audi', name: 'Audi', color: '#F50537', car: 'Audi F1', badge: 'https://r2.thesportsdb.com/images/media/team/badge/3uce6h1773158180.png' },
+      { id: 'williams', name: 'Williams', color: '#005AFF', car: 'FW48', badge: 'https://r2.thesportsdb.com/images/media/team/badge/fp1cil1740776050.png' },
+      { id: 'cadillac', name: 'Cadillac', color: '#555555', car: 'Cadillac F1', badge: 'https://r2.thesportsdb.com/images/media/team/badge/2wqnjo1769429652.png' },
+      { id: 'astonmartin', name: 'Aston Martin', color: '#006F62', car: 'AMR26', badge: 'https://r2.thesportsdb.com/images/media/team/badge/ez5rlk1740774066.png' },
     ],
     drivers: [
-      { id: 'norris', name: 'Lando Norris', number: '1', nationality: 'Reino Unido', teamId: 'mclaren', image: 'https://r2.thesportsdb.com/images/media/player/thumb/z6jg371717362077.jpg' },
-      { id: 'piastri', name: 'Oscar Piastri', number: '81', nationality: 'Austrália', teamId: 'mclaren', image: 'https://r2.thesportsdb.com/images/media/player/thumb/5t124z1717362132.jpg' },
-      { id: 'verstappen', name: 'Max Verstappen', number: '3', nationality: 'Países Baixos', teamId: 'redbull', image: 'https://r2.thesportsdb.com/images/media/player/thumb/xig6b51713259135.jpg' },
-      { id: 'hadjar', name: 'Isack Hadjar', number: '6', nationality: 'França', teamId: 'redbull', image: 'https://r2.thesportsdb.com/images/media/player/thumb/0zpsl31769372695.jpg' },
-      { id: 'leclerc', name: 'Charles Leclerc', number: '16', nationality: 'Mônaco', teamId: 'ferrari', image: 'https://r2.thesportsdb.com/images/media/player/thumb/9ryjv91717361703.jpg' },
-      { id: 'hamilton', name: 'Lewis Hamilton', number: '44', nationality: 'Reino Unido', teamId: 'ferrari', image: 'https://r2.thesportsdb.com/images/media/player/thumb/1h8xav1661947105.jpg' },
-      { id: 'russell', name: 'George Russell', number: '63', nationality: 'Reino Unido', teamId: 'mercedes', image: 'https://r2.thesportsdb.com/images/media/player/thumb/pvbdm01717362023.jpg' },
-      { id: 'antonelli', name: 'Kimi Antonelli', number: '12', nationality: 'Itália', teamId: 'mercedes', image: 'https://r2.thesportsdb.com/images/media/player/thumb/yz5lys1740214217.jpg' },
-      { id: 'alonso', name: 'Fernando Alonso', number: '14', nationality: 'Espanha', teamId: 'astonmartin', image: 'https://r2.thesportsdb.com/images/media/player/thumb/207l1w1769372838.jpg' },
-      { id: 'stroll', name: 'Lance Stroll', number: '18', nationality: 'Canadá', teamId: 'astonmartin', image: 'https://r2.thesportsdb.com/images/media/player/thumb/513ev41769372879.jpg' },
-      { id: 'gasly', name: 'Pierre Gasly', number: '10', nationality: 'França', teamId: 'alpine', image: 'https://r2.thesportsdb.com/images/media/player/thumb/xf5ma81743535257.jpg' },
-      { id: 'colapinto', name: 'Franco Colapinto', number: '43', nationality: 'Argentina', teamId: 'alpine', image: 'https://r2.thesportsdb.com/images/media/player/thumb/6ivy8s1677441826.jpg' },
-      { id: 'ocon', name: 'Esteban Ocon', number: '31', nationality: 'França', teamId: 'haas', image: 'https://r2.thesportsdb.com/images/media/player/thumb/j3navx1769372967.jpg' },
-      { id: 'bearman', name: 'Oliver Bearman', number: '87', nationality: 'Reino Unido', teamId: 'haas', image: 'https://r2.thesportsdb.com/images/media/player/thumb/55nvb51769372922.jpg' },
-      { id: 'lawson', name: 'Liam Lawson', number: '30', nationality: 'Nova Zelândia', teamId: 'rb', image: 'https://r2.thesportsdb.com/images/media/player/thumb/jsft061769372658.jpg' },
-      { id: 'lindblad', name: 'Arvid Lindblad', number: '41', nationality: 'Reino Unido', teamId: 'rb', image: 'https://r2.thesportsdb.com/images/media/player/thumb/88kmxp1742921594.jpg' },
-      { id: 'sainz', name: 'Carlos Sainz', number: '55', nationality: 'Espanha', teamId: 'williams', image: 'https://r2.thesportsdb.com/images/media/player/thumb/ox4fln1717361942.jpg' },
-      { id: 'albon', name: 'Alexander Albon', number: '23', nationality: 'Tailândia', teamId: 'williams', image: 'https://r2.thesportsdb.com/images/media/player/thumb/aenc7f1769372740.jpg' },
-      { id: 'hulkenberg', name: 'Nico Hülkenberg', number: '27', nationality: 'Alemanha', teamId: 'audi', image: 'https://r2.thesportsdb.com/images/media/player/thumb/54zzf81769372282.jpg' },
-      { id: 'bortoleto', name: 'Gabriel Bortoleto', number: '5', nationality: 'Brasil', teamId: 'audi', image: 'https://r2.thesportsdb.com/images/media/player/thumb/ulvxcc1769373052.jpg' },
-      { id: 'perez', name: 'Sergio Pérez', number: '11', nationality: 'México', teamId: 'cadillac', image: 'https://r2.thesportsdb.com/images/media/player/thumb/adtxmr1543425184.jpg' },
-      { id: 'bottas', name: 'Valtteri Bottas', number: '77', nationality: 'Finlândia', teamId: 'cadillac', image: 'https://r2.thesportsdb.com/images/media/player/thumb/17n2g21772535234.jpg' },
+      { id: 'norris', name: 'Lando Norris', number: '1', nationality: 'Reino Unido', teamId: 'mclaren', image: 'https://r2.thesportsdb.com/images/media/player/thumb/z6jg371717362077.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/og7n5r1769371379.png' },
+      { id: 'piastri', name: 'Oscar Piastri', number: '81', nationality: 'Austrália', teamId: 'mclaren', image: 'https://r2.thesportsdb.com/images/media/player/thumb/5t124z1717362132.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/ce3zpq1769371471.png' },
+      { id: 'verstappen', name: 'Max Verstappen', number: '3', nationality: 'Países Baixos', teamId: 'redbull', image: 'https://r2.thesportsdb.com/images/media/player/thumb/xig6b51713259135.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/fiyui61769371945.png' },
+      { id: 'hadjar', name: 'Isack Hadjar', number: '6', nationality: 'França', teamId: 'redbull', image: 'https://r2.thesportsdb.com/images/media/player/thumb/0zpsl31769372695.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/ifqmow1772534127.png' },
+      { id: 'leclerc', name: 'Charles Leclerc', number: '16', nationality: 'Mônaco', teamId: 'ferrari', image: 'https://r2.thesportsdb.com/images/media/player/thumb/9ryjv91717361703.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/t7asa51769372100.png' },
+      { id: 'hamilton', name: 'Lewis Hamilton', number: '44', nationality: 'Reino Unido', teamId: 'ferrari', image: 'https://r2.thesportsdb.com/images/media/player/thumb/1h8xav1661947105.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/exado51769372031.png' },
+      { id: 'russell', name: 'George Russell', number: '63', nationality: 'Reino Unido', teamId: 'mercedes', image: 'https://r2.thesportsdb.com/images/media/player/thumb/pvbdm01717362023.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/cmqswc1769371629.png' },
+      { id: 'antonelli', name: 'Kimi Antonelli', number: '12', nationality: 'Itália', teamId: 'mercedes', image: 'https://r2.thesportsdb.com/images/media/player/thumb/yz5lys1740214217.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/8s9ouj1769371565.png' },
+      { id: 'alonso', name: 'Fernando Alonso', number: '14', nationality: 'Espanha', teamId: 'astonmartin', image: 'https://r2.thesportsdb.com/images/media/player/thumb/207l1w1769372838.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/rmczq21677931848.png' },
+      { id: 'stroll', name: 'Lance Stroll', number: '18', nationality: 'Canadá', teamId: 'astonmartin', image: 'https://r2.thesportsdb.com/images/media/player/thumb/513ev41769372879.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/25otva1679827137.png' },
+      { id: 'gasly', name: 'Pierre Gasly', number: '10', nationality: 'França', teamId: 'alpine', image: 'https://r2.thesportsdb.com/images/media/player/thumb/xf5ma81743535257.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/6tef141769371181.png' },
+      { id: 'colapinto', name: 'Franco Colapinto', number: '43', nationality: 'Argentina', teamId: 'alpine', image: 'https://r2.thesportsdb.com/images/media/player/thumb/6ivy8s1677441826.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/uztkh41769371230.png' },
+      { id: 'ocon', name: 'Esteban Ocon', number: '31', nationality: 'França', teamId: 'haas', image: 'https://r2.thesportsdb.com/images/media/player/thumb/j3navx1769372967.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/m7uhbe1769371819.png' },
+      { id: 'bearman', name: 'Oliver Bearman', number: '87', nationality: 'Reino Unido', teamId: 'haas', image: 'https://r2.thesportsdb.com/images/media/player/thumb/55nvb51769372922.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/f4stqe1769371755.png' },
+      { id: 'lawson', name: 'Liam Lawson', number: '30', nationality: 'Nova Zelândia', teamId: 'rb', image: 'https://r2.thesportsdb.com/images/media/player/thumb/jsft061769372658.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/3wa7ut1769372613.png' },
+      { id: 'lindblad', name: 'Arvid Lindblad', number: '41', nationality: 'Reino Unido', teamId: 'rb', image: 'https://r2.thesportsdb.com/images/media/player/thumb/88kmxp1742921594.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/fspuvx1770026197.png' },
+      { id: 'sainz', name: 'Carlos Sainz', number: '55', nationality: 'Espanha', teamId: 'williams', image: 'https://r2.thesportsdb.com/images/media/player/thumb/ox4fln1717361942.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/4ojzdf1769372410.png' },
+      { id: 'albon', name: 'Alexander Albon', number: '23', nationality: 'Tailândia', teamId: 'williams', image: 'https://r2.thesportsdb.com/images/media/player/thumb/aenc7f1769372740.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/x6mxpp1769372345.png' },
+      { id: 'hulkenberg', name: 'Nico Hülkenberg', number: '27', nationality: 'Alemanha', teamId: 'audi', image: 'https://r2.thesportsdb.com/images/media/player/thumb/54zzf81769372282.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/90zkg81773160744.png' },
+      { id: 'bortoleto', name: 'Gabriel Bortoleto', number: '5', nationality: 'Brasil', teamId: 'audi', image: 'https://r2.thesportsdb.com/images/media/player/thumb/ulvxcc1769373052.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/dw6mi31773160637.png' },
+      { id: 'perez', name: 'Sergio Pérez', number: '11', nationality: 'México', teamId: 'cadillac', image: 'https://r2.thesportsdb.com/images/media/player/thumb/adtxmr1543425184.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/tk90eh1662920615.png' },
+      { id: 'bottas', name: 'Valtteri Bottas', number: '77', nationality: 'Finlândia', teamId: 'cadillac', image: 'https://r2.thesportsdb.com/images/media/player/thumb/17n2g21772535234.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/kf5lq01772535017.png' },
     ],
     calendar: [
       { id: 'australia', name: 'GP da Austrália', enName: 'Australian GP', location: 'Melbourne', date: '2026-03-08', circuit: 'Albert Park', status: 'completed', winner: 'George Russell' },
