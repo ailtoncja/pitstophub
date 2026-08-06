@@ -2323,9 +2323,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               <div className="px-4 py-2 rounded-full bg-[var(--cat-accent)]/10 border border-[var(--cat-accent)]/20 text-[var(--cat-accent)] text-xs font-black uppercase tracking-widest">
                                 {seasonBadgeLabel}
                               </div>
-                              <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-black uppercase tracking-widest">
-                                {UI_TRANSLATIONS[language].fiaSanctioned}
-                              </div>
+                              {selectedCategory.id !== 'imsa' && (
+                                <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-black uppercase tracking-widest">
+                                  {UI_TRANSLATIONS[language].fiaSanctioned}
+                                </div>
+                              )}
                               {selectedCategory.id === 'f1' && (
                                 <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs font-black uppercase tracking-widest">
                                   {UI_TRANSLATIONS[language].liveSource}
