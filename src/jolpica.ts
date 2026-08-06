@@ -114,12 +114,37 @@ export type JolpicaCategoryData = {
   matchedCalendarCount?: number;
 };
 
+export type DriverResultRow = {
+  round: string;
+  raceName: string;
+  date: string;
+  grid: number | null;
+  finishPosition: number | null;
+  points: number;
+  status: string;
+};
+
+type JolpicaDriverRaceResult = {
+  position: string;
+  points: string;
+  grid: string;
+  status: string;
+};
+
+type JolpicaDriverRace = {
+  round: string;
+  raceName: string;
+  date: string;
+  Results?: JolpicaDriverRaceResult[];
+};
+
 // ─── Cache ────────────────────────────────────────────────────────────────────
 
 type CacheEntry<T> = { expiresAt: number; value: Promise<T> };
 
 const summaryCache = new Map<string, CacheEntry<JolpicaCategoryData | null>>();
 const detailCache = new Map<string, CacheEntry<JolpicaCategoryData | null>>();
+const driverResultsCache = new Map<string, CacheEntry<DriverResultRow[] | null>>();
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
@@ -211,6 +236,33 @@ export async function fetchCategoryLiveData(
       matchedDriverCount: countMatched(category.drivers, mergedDrivers),
       matchedCalendarCount: normalizedCalendar.length,
     };
+  });
+}
+
+// Resultados reais, corrida a corrida, de um piloto na temporada -- usado na
+// pagina de piloto para vitorias/podios/ultimos resultados sem inventar numeros.
+export async function fetchDriverSeasonResults(
+  driverId: string,
+  year: string,
+  force = false,
+): Promise<DriverResultRow[] | null> {
+  return getCached(driverResultsCache, `${driverId}:${year}`, DETAIL_TTL_MS, force, async () => {
+    const data = await fetchJson<MRData<{ RaceTable: { Races: JolpicaDriverRace[] } }>>(
+      `/${year}/drivers/${driverId}/results.json?limit=100`,
+    );
+    const races = data.MRData.RaceTable.Races ?? [];
+    return races.map((race) => {
+      const result = race.Results?.[0];
+      return {
+        round: race.round,
+        raceName: race.raceName,
+        date: race.date,
+        grid: result ? Number(result.grid) : null,
+        finishPosition: result ? Number(result.position) : null,
+        points: result ? Number(result.points) : 0,
+        status: result?.status ?? '',
+      };
+    });
   });
 }
 
