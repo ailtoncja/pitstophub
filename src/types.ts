@@ -398,8 +398,7 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'billard', name: 'Lola Billard', number: '14', nationality: 'França', teamId: 'art-academy' },
       { id: 'countryman', name: 'Kaylee Countryman', number: '91', nationality: 'EUA', teamId: 'art-academy', image: 'https://r2.thesportsdb.com/images/media/player/thumb/o3tunz1767977656.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/b67rp51767977663.png'},
       { id: 'jacquet', name: 'Jade Jacquet', number: '95', nationality: 'França', teamId: 'art-academy', image: 'https://r2.thesportsdb.com/images/media/player/thumb/ybz6qz1767977035.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/234y5u1767977142.png'},
-      { id: 'shi', name: 'Wei Shi', number: '24', nationality: 'China', teamId: 'hitech-academy', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/3lgqaf1742673512.png'},
-      { id: 'dobson', name: 'Abbi Dobson', number: '55', nationality: 'EUA', teamId: 'hitech-academy' },
+      { id: 'dobson', name: 'Ava Dobson', number: '55', nationality: 'EUA', teamId: 'hitech-academy', image: 'https://r2.thesportsdb.com/images/media/player/thumb/7jshsh1770914267.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/n5ycfg1770914415.png' },
       { id: 'robertson', name: 'Rachel Robertson', number: '56', nationality: 'Reino Unido', teamId: 'hitech-academy', image: 'https://r2.thesportsdb.com/images/media/player/thumb/qn2be41764365926.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/o7qp011764366167.png'},
     ],
     calendar: [
