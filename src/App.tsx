@@ -21,7 +21,10 @@ import {
   Languages,
   Heart,
   Download,
-  Share2
+  Share2,
+  Route,
+  Zap,
+  AlertTriangle
 } from 'lucide-react';
 import { MOTORSPORT_DATA, Category } from './types';
 import { OpenWheelCarIcon, HypercarIcon, GtCarIcon, RallyCarIcon, StockCarIcon } from './category-icons';
@@ -188,7 +191,21 @@ const UI_TRANSLATIONS = {
     featuredTitle: 'Destaques',
     latestWinner: 'Último Vencedor',
     seasonPanorama: 'Panorama 2026',
-    categoriesLabel: 'Categorias'
+    categoriesLabel: 'Categorias',
+    trackLayout: 'Traçado do Circuito',
+    trackSpecs: 'Ficha Técnica',
+    circuitLength: 'Extensão',
+    raceDistance: 'Distância da Prova',
+    laps: 'Voltas',
+    corners: 'Curvas',
+    direction: 'Sentido',
+    counterclockwise: 'Anti-horário',
+    lapRecord: 'Recorde da Volta',
+    firstGrandPrix: 'Primeiro GP',
+    drsZones: 'Zonas de DRS',
+    tyreStrategy: 'Estratégia de Pneus',
+    criticalBrakingZones: 'Principais Zonas de Frenagem',
+    dataSourceNote: 'Dados verificados publicamente; a Pirelli ainda não anunciou os compostos para esta corrida.'
   },
   en: {
     home: 'Home',
@@ -271,8 +288,55 @@ const UI_TRANSLATIONS = {
     featuredTitle: 'Highlights',
     latestWinner: 'Latest Winner',
     seasonPanorama: '2026 Overview',
-    categoriesLabel: 'Categories'
+    categoriesLabel: 'Categories',
+    trackLayout: 'Track Layout',
+    trackSpecs: 'Track Specs',
+    circuitLength: 'Circuit Length',
+    raceDistance: 'Race Distance',
+    laps: 'Laps',
+    corners: 'Corners',
+    direction: 'Direction',
+    counterclockwise: 'Counterclockwise',
+    lapRecord: 'Lap Record',
+    firstGrandPrix: 'First Grand Prix',
+    drsZones: 'DRS Zones',
+    tyreStrategy: 'Tyre Strategy',
+    criticalBrakingZones: 'Critical Braking Zones',
+    dataSourceNote: 'Publicly verified data; Pirelli has not announced tyre compounds for this race yet.'
   }
+};
+
+// Dados reais do Autódromo José Carlos Pace (Interlagos), usados só na página de teste do GP de São Paulo.
+// Fontes: Wikipedia (Interlagos Circuit) e RaceFans (briefing do GP do Brasil).
+const INTERLAGOS_CIRCUIT_INFO = {
+  lengthKm: 4.309,
+  raceDistanceKm: 305.879,
+  laps: 71,
+  corners: 15,
+  lapRecord: { time: '1:10.540', driver: 'V. Bottas (Mercedes)', year: 2018 },
+  firstGrandPrix: 1973,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+    { pt: 'Reta oposta, da Curva 12 até a Curva 13', en: 'Back straight, from Turn 12 into Turn 13' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1-C2',
+      name: 'Senna S',
+      pt: 'Frenada pesada logo após a reta principal, com os carros chegando a mais de 300 km/h. Cerca de 80% das ultrapassagens em Interlagos acontecem aqui ou na Curva 4.',
+      en: 'Heavy braking right after the main straight, with cars arriving at over 300 km/h. Around 80% of overtakes at Interlagos happen here or at Turn 4.',
+    },
+    {
+      turn: 'C4',
+      name: 'Descida do Lago',
+      pt: 'Segunda maior zona de ultrapassagem da pista, na sequência imediata da Senna S.',
+      en: "The track's second-biggest overtaking zone, right after the Senna S.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Pista abrasiva e historicamente favorável a estratégias de um pit stop combinando o composto macio com o médio; o desgaste é o fator decisivo, não a diferença de ritmo entre compostos.',
+    en: 'An abrasive track that has historically favored one-stop strategies mixing the soft and medium compounds; tyre wear is the deciding factor, not the pace gap between compounds.',
+  },
 };
 
 function getIsIOSInstallable(): boolean {
@@ -1344,6 +1408,90 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         {selectedRace.winner}
                       </p>
                     </div>
+                  </div>
+                )}
+
+                {selectedRace.id === 'brazil' && selectedCategory.id === 'f1' && (
+                  <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 apex-card p-8">
+                      <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6 flex items-center gap-2">
+                        <Route className="w-5 h-5 text-[var(--cat-accent)]" />
+                        {UI_TRANSLATIONS[language].trackLayout}
+                      </h3>
+                      <svg viewBox="0 0 800 500" className="w-full h-52 mb-6" fill="none">
+                        <path
+                          d="M 620 90 C 700 130, 720 220, 660 270 C 600 320, 520 260, 460 300 C 400 340, 340 420, 250 400 C 160 380, 110 300, 150 230 C 190 160, 280 190, 340 150 C 400 110, 400 60, 480 60 C 540 60, 560 60, 620 90 Z"
+                          stroke="var(--cat-accent)"
+                          strokeWidth="5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <div className="flex flex-wrap gap-3">
+                        {INTERLAGOS_CIRCUIT_INFO.drsZones.map((zone, index) => (
+                          <div key={index} className="flex items-center gap-2 px-3 py-2 bg-black/20 border border-white/5 text-xs font-apex-mono text-gray-400">
+                            <Zap className="w-3.5 h-3.5 text-[var(--cat-accent)]" />
+                            {UI_TRANSLATIONS[language].drsZones} {index + 1} — {language === 'pt' ? zone.pt : zone.en}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="apex-card p-8">
+                      <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
+                        {UI_TRANSLATIONS[language].trackSpecs}
+                      </h3>
+                      <dl className="space-y-3">
+                        {[
+                          [UI_TRANSLATIONS[language].circuitLength, `${INTERLAGOS_CIRCUIT_INFO.lengthKm.toFixed(3)} km`],
+                          [UI_TRANSLATIONS[language].raceDistance, `${INTERLAGOS_CIRCUIT_INFO.raceDistanceKm.toFixed(3)} km`],
+                          [UI_TRANSLATIONS[language].laps, String(INTERLAGOS_CIRCUIT_INFO.laps)],
+                          [UI_TRANSLATIONS[language].corners, String(INTERLAGOS_CIRCUIT_INFO.corners)],
+                          [UI_TRANSLATIONS[language].direction, UI_TRANSLATIONS[language].counterclockwise],
+                          [UI_TRANSLATIONS[language].lapRecord, `${INTERLAGOS_CIRCUIT_INFO.lapRecord.time} — ${INTERLAGOS_CIRCUIT_INFO.lapRecord.driver} (${INTERLAGOS_CIRCUIT_INFO.lapRecord.year})`],
+                          [UI_TRANSLATIONS[language].firstGrandPrix, String(INTERLAGOS_CIRCUIT_INFO.firstGrandPrix)],
+                        ].map(([label, value]) => (
+                          <div key={label} className="flex items-center justify-between border-b border-white/5 pb-3 gap-4">
+                            <dt className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">{label}</dt>
+                            <dd className="text-sm font-bold text-[var(--text-main)] text-right">{value}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+
+                    <div className="lg:col-span-3 apex-card p-8">
+                      <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-4">
+                        {UI_TRANSLATIONS[language].tyreStrategy}
+                      </h3>
+                      <p className="text-gray-400 leading-relaxed max-w-3xl">
+                        {language === 'pt' ? INTERLAGOS_CIRCUIT_INFO.tyreStrategyNote.pt : INTERLAGOS_CIRCUIT_INFO.tyreStrategyNote.en}
+                      </p>
+                    </div>
+
+                    <div className="lg:col-span-3 apex-card p-8">
+                      <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
+                        {UI_TRANSLATIONS[language].criticalBrakingZones}
+                      </h3>
+                      <div className="grid sm:grid-cols-2 gap-8">
+                        {INTERLAGOS_CIRCUIT_INFO.brakingZones.map((zone) => (
+                          <div key={zone.turn} className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-apex font-extrabold italic text-lg text-[var(--text-main)]">
+                                {zone.turn} <span className="font-apex-mono text-xs text-gray-500 font-normal not-italic">"{zone.name}"</span>
+                              </h4>
+                              <AlertTriangle className="w-4 h-4 text-[var(--cat-accent)]" />
+                            </div>
+                            <p className="text-sm text-gray-400 leading-relaxed">
+                              {language === 'pt' ? zone.pt : zone.en}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <p className="lg:col-span-3 text-[11px] text-gray-600 font-apex-mono">
+                      {UI_TRANSLATIONS[language].dataSourceNote}
+                    </p>
                   </div>
                 )}
               </div>
