@@ -505,13 +505,6 @@ const DRIVER_BIOS: Record<string, { pt: string; en: string }> = {
   piastri: PIASTRI_BIO,
 };
 
-// Recortes reais (fundo transparente) da TheSportsDB, mesmo CDN ja usado pra foto dos
-// pilotos (r2.thesportsdb.com) -- so pros dois pilotos com pagina dedicada, por enquanto.
-const DRIVER_CUTOUTS: Record<string, string> = {
-  norris: 'https://r2.thesportsdb.com/images/media/player/cutout/og7n5r1769371379.png',
-  piastri: 'https://r2.thesportsdb.com/images/media/player/cutout/ce3zpq1769371471.png',
-};
-
 // Identifica GPs por texto (circuito/local/nome), nao pelo id estatico: o calendario de F1
 // e substituido pelos dados ao vivo da Jolpica, que pode gerar um id diferente do id local
 // quando o casamento por data/nome com a base local falha.
@@ -1890,9 +1883,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
                   <div className={cn(
                     "lg:col-span-5 apex-card relative overflow-hidden min-h-[420px] flex flex-col",
-                    DRIVER_CUTOUTS[selectedDriver.id] ? "justify-between" : "justify-end"
+                    selectedDriver.cutout ? "justify-between" : "justify-end"
                   )}>
-                    {DRIVER_CUTOUTS[selectedDriver.id] ? (
+                    {selectedDriver.cutout ? (
                       <>
                         <div className="absolute inset-0 bg-gradient-to-b from-[var(--cat-accent)]/20 via-transparent to-black/60" />
                         <div
@@ -1910,7 +1903,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         decoding="async"
                       />
                     )}
-                    {!DRIVER_CUTOUTS[selectedDriver.id] && (
+                    {!selectedDriver.cutout && (
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                     )}
                     <div className="relative z-10 p-8">
@@ -1931,9 +1924,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         {selectedDriver.nationality}
                       </p>
                     </div>
-                    {DRIVER_CUTOUTS[selectedDriver.id] && (
+                    {selectedDriver.cutout && (
                       <img
-                        src={DRIVER_CUTOUTS[selectedDriver.id]}
+                        src={selectedDriver.cutout}
                         alt={selectedDriver.name}
                         className="relative z-10 mx-auto max-h-[300px] w-auto object-contain drop-shadow-2xl"
                         referrerPolicy="no-referrer"
@@ -2419,13 +2412,25 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     <div className="h-2 w-full" style={{ backgroundColor: team.color }} />
                                     <div className="p-6">
                                       <div className="flex items-center justify-between mb-6">
-                                        <div>
-                                          <h4 className="text-xl font-apex font-extrabold italic text-[var(--text-main)]">{team.name}</h4>
-                                          {team.car && (
-                                            <div className="text-xs font-mono text-[var(--cat-accent)] font-bold uppercase tracking-widest mt-1">
-                                              {team.car}
-                                            </div>
+                                        <div className="flex items-center gap-3">
+                                          {team.badge && (
+                                            <img
+                                              src={team.badge}
+                                              alt={team.name}
+                                              className="w-10 h-10 object-contain shrink-0"
+                                              referrerPolicy="no-referrer"
+                                              loading="lazy"
+                                              decoding="async"
+                                            />
                                           )}
+                                          <div>
+                                            <h4 className="text-xl font-apex font-extrabold italic text-[var(--text-main)]">{team.name}</h4>
+                                            {team.car && (
+                                              <div className="text-xs font-mono text-[var(--cat-accent)] font-bold uppercase tracking-widest mt-1">
+                                                {team.car}
+                                              </div>
+                                            )}
+                                          </div>
                                         </div>
                                         <button
                                           onClick={() => toggleFollowTeam(selectedCategory.id, team.id)}
@@ -2457,10 +2462,19 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                               
                                               <div className="flex items-center gap-4 mb-4 relative z-10">
                                                 <div className="relative">
-                                                  {driver.image ? (
-                                                    <img 
-                                                      src={driver.image} 
-                                                      alt={driver.name} 
+                                                  {driver.cutout ? (
+                                                    <img
+                                                      src={driver.cutout}
+                                                      alt={driver.name}
+                                                      className="w-16 h-16 object-cover object-top bg-[var(--cat-accent)]/10 border-2 border-[var(--cat-accent)]/30 shadow-lg"
+                                                      referrerPolicy="no-referrer"
+                                                      loading="lazy"
+                                                      decoding="async"
+                                                    />
+                                                  ) : driver.image ? (
+                                                    <img
+                                                      src={driver.image}
+                                                      alt={driver.name}
                                                       className="w-16 h-16  object-cover border-2 border-[var(--cat-accent)]/30 shadow-lg"
                                                       referrerPolicy="no-referrer"
                                                       loading="lazy"
