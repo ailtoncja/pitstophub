@@ -486,11 +486,9 @@ const NORRIS_BIO = {
   en: 'Lando Norris made his Formula 1 debut with McLaren in 2019. After years of accumulating podiums, he claimed his first win at the 2024 Miami Grand Prix and, in 2025, closed the season as World Drivers\' Champion. As of the 2026 Hungarian Grand Prix, he has 12 career wins and 47 podiums, and remains McLaren\'s lead driver.',
 };
 
-// Foto real do MCL40 (GP da Áustria de 2026), nao um render/estoque -- por isso a
-// atribuição fica visível: Creative Commons exige credito ao fotografo.
-const CAR_PHOTO_CREDIT = {
-  pt: 'Foto: Lukas Raich / Wikimedia Commons (CC BY-SA 4.0)',
-  en: 'Photo: Lukas Raich / Wikimedia Commons (CC BY-SA 4.0)',
+// Clearart real do carro (equipamento atual da equipe na TheSportsDB), por id de equipe.
+const TEAM_CLEARARTS: Record<string, string> = {
+  mclaren: 'https://r2.thesportsdb.com/images/media/team/equipment/hq4x5r1773231742.png',
 };
 
 // Biografia real do Oscar Piastri, usada só na página de teste do piloto.
@@ -505,6 +503,13 @@ const PIASTRI_BIO = {
 const DRIVER_BIOS: Record<string, { pt: string; en: string }> = {
   norris: NORRIS_BIO,
   piastri: PIASTRI_BIO,
+};
+
+// Recortes reais (fundo transparente) da TheSportsDB, mesmo CDN ja usado pra foto dos
+// pilotos (r2.thesportsdb.com) -- so pros dois pilotos com pagina dedicada, por enquanto.
+const DRIVER_CUTOUTS: Record<string, string> = {
+  norris: 'https://r2.thesportsdb.com/images/media/player/cutout/og7n5r1769371379.png',
+  piastri: 'https://r2.thesportsdb.com/images/media/player/cutout/ce3zpq1769371471.png',
 };
 
 // Identifica GPs por texto (circuito/local/nome), nao pelo id estatico: o calendario de F1
@@ -1883,8 +1888,19 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 </button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-                  <div className="lg:col-span-5 apex-card relative overflow-hidden min-h-[420px] flex flex-col justify-end">
-                    {selectedDriver.image && (
+                  <div className={cn(
+                    "lg:col-span-5 apex-card relative overflow-hidden min-h-[420px] flex flex-col",
+                    DRIVER_CUTOUTS[selectedDriver.id] ? "justify-between" : "justify-end"
+                  )}>
+                    {DRIVER_CUTOUTS[selectedDriver.id] ? (
+                      <>
+                        <div className="absolute inset-0 bg-gradient-to-b from-[var(--cat-accent)]/20 via-transparent to-black/60" />
+                        <div
+                          className="absolute left-1/2 bottom-0 w-64 h-64 -translate-x-1/2 translate-y-1/4 rounded-full blur-3xl opacity-30"
+                          style={{ backgroundColor: selectedDriverTeam?.color ?? 'var(--cat-accent)' }}
+                        />
+                      </>
+                    ) : selectedDriver.image && (
                       <img
                         src={selectedDriver.image}
                         alt={selectedDriver.name}
@@ -1894,7 +1910,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         decoding="async"
                       />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                    {!DRIVER_CUTOUTS[selectedDriver.id] && (
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                    )}
                     <div className="relative z-10 p-8">
                       <div className="flex items-center gap-3 mb-3">
                         {selectedDriverTeam && (
@@ -1913,6 +1931,16 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         {selectedDriver.nationality}
                       </p>
                     </div>
+                    {DRIVER_CUTOUTS[selectedDriver.id] && (
+                      <img
+                        src={DRIVER_CUTOUTS[selectedDriver.id]}
+                        alt={selectedDriver.name}
+                        className="relative z-10 mx-auto max-h-[300px] w-auto object-contain drop-shadow-2xl"
+                        referrerPolicy="no-referrer"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
                   </div>
 
                   <div className="lg:col-span-7 flex flex-col gap-6">
@@ -2000,18 +2028,18 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               )}
                             </div>
                           </div>
-                          <div>
-                            <img
-                              src="/cars/mclaren-mcl40.jpg"
-                              alt="McLaren MCL40"
-                              className="w-full h-auto"
-                              loading="lazy"
-                              decoding="async"
-                            />
-                            <p className="text-[10px] text-gray-600 font-apex-mono mt-2">
-                              {language === 'pt' ? CAR_PHOTO_CREDIT.pt : CAR_PHOTO_CREDIT.en}
-                            </p>
-                          </div>
+                          {selectedDriverTeam && TEAM_CLEARARTS[selectedDriverTeam.id] && (
+                            <div className="bg-black/20 border border-white/5 p-4">
+                              <img
+                                src={TEAM_CLEARARTS[selectedDriverTeam.id]}
+                                alt={selectedDriverTeam.car ?? selectedDriverTeam.name}
+                                className="w-full h-auto"
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className="grid grid-cols-2 gap-x-6 gap-y-8">
