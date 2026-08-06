@@ -1418,7 +1418,7 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'preining', name: 'Thomas Preining', number: '80', nationality: 'Áustria', teamId: 'lionspeed', image: 'https://r2.thesportsdb.com/images/media/player/thumb/imyj1x1714312421.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/7gcy2w1714312464.png' },
       { id: 'haase', name: 'Christopher Haase', number: '84', nationality: 'Alemanha', teamId: 'eastalent' },
       { id: 'reicher', name: 'Simon Reicher', number: '84', nationality: 'Áustria', teamId: 'eastalent' },
-      { id: 'winkelhock', name: 'Markus Winkelhock', number: '84', nationality: 'Alemanha', teamId: 'eastalent', image: 'https://r2.thesportsdb.com/images/media/player/thumb/7c1nm71740214078.jpg', cutout: 'https://www.thesportsdb.com/images/media/player/cutout/53ktu71781881339.png' },
+      { id: 'winkelhock', name: 'Markus Winkelhock', number: '84', nationality: 'Alemanha', teamId: 'eastalent', image: 'https://r2.thesportsdb.com/images/media/player/thumb/7c1nm71740214078.jpg' },
       { id: 'engstler', name: 'Luca Engstler', number: '96', nationality: 'Alemanha', teamId: 'rutronik', image: 'https://r2.thesportsdb.com/images/media/player/thumb/2rqk3i1714306220.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/vbk2cq1714310887.png' },
       { id: 'mapelli', name: 'Marco Mapelli', number: '96', nationality: 'Itália', teamId: 'rutronik', image: 'https://r2.thesportsdb.com/images/media/player/thumb/fl8yue1560369080.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/02sxq51779801176.png' },
       { id: 'niederhauser', name: 'Patric Niederhauser', number: '96', nationality: 'Suíça', teamId: 'rutronik' },
