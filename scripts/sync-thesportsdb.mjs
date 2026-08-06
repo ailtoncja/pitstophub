@@ -32,7 +32,7 @@ const LEAGUE_IDS = {
   wec: '4413',
   imsa: '4488',
   dtm: '4438',
-  'gt-world-challenge': '4440',
+  'gt-world-challenge': '4439', // Endurance Cup (a liga 4440 e so a Sprint Cup, sem Paul Ricard/Monza/Spa/Portimao)
   indy: '4373',
   nascar: '4393',
   wrc: '4409',
