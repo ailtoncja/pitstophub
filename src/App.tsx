@@ -411,6 +411,40 @@ const SILVERSTONE_CIRCUIT_INFO: CircuitInfo = {
   },
 };
 
+// Dados reais do Circuit de Spa-Francorchamps, usados só na página de teste do GP da Bélgica. Fonte: Wikipedia.
+const SPA_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/spa.png',
+  lengthKm: 7.004,
+  raceDistanceKm: 308.052,
+  laps: 44,
+  corners: 19,
+  direction: 'clockwise',
+  lapRecord: { time: '1:44.701', driver: 'S. Pérez (Red Bull)', year: 2024 },
+  firstGrandPrix: 1950,
+  drsZones: [
+    { pt: 'Reta Kemmel, de Raidillon até Les Combes', en: 'Kemmel Straight, from Raidillon into Les Combes' },
+    { pt: 'Reta dos boxes, entrando na Curva 1 (La Source)', en: 'Pit straight, into Turn 1 (La Source)' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C5',
+      name: 'Les Combes',
+      pt: 'Frenada pesada ao fim da reta Kemmel, vindo de mais de 300 km/h logo depois da subida de Eau Rouge/Raidillon; principal ponto de ultrapassagem de Spa.',
+      en: "Heavy braking at the end of the Kemmel Straight, arriving at over 300 km/h right after the Eau Rouge/Raidillon climb; Spa's main overtaking point.",
+    },
+    {
+      turn: 'C1',
+      name: 'La Source',
+      pt: 'Hairpin lento logo após a linha de largada, sequência clássica de ultrapassagens na primeira volta.',
+      en: 'A slow hairpin right after the start/finish line, a classic first-lap overtaking spot.',
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'O trecho mais longo de pista sem curvas do calendário (reta Kemmel) soma-se a um clima notoriamente instável nas Ardenas, que pode obrigar a trocas de pneus de chuva no meio da corrida mesmo em estratégias planejadas para pista seca.',
+    en: "The calendar's longest flat-out stretch (Kemmel Straight) combines with notoriously unstable Ardennes weather, which can force mid-race wet-tyre changes even in strategies planned for a dry race.",
+  },
+};
+
 // Dados reais do Albert Park Circuit, usados só na página de teste do GP da Austrália. Fonte: Wikipedia.
 const ALBERT_PARK_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/albertpark.png',
@@ -502,11 +536,17 @@ function isAlbertParkRace(race: Race): boolean {
   return haystack.includes('albert park') || haystack.includes('melbourne');
 }
 
-// Paginas de teste habilitadas ate agora: Interlagos, Silverstone e Albert Park.
+function isSpaRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('francorchamps') || haystack.includes('belgian grand prix');
+}
+
+// Paginas de teste habilitadas ate agora: Interlagos, Silverstone, Albert Park e Spa-Francorchamps.
 const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[] = [
   { match: isInterlagosRace, info: INTERLAGOS_CIRCUIT_INFO },
   { match: isSilverstoneRace, info: SILVERSTONE_CIRCUIT_INFO },
   { match: isAlbertParkRace, info: ALBERT_PARK_CIRCUIT_INFO },
+  { match: isSpaRace, info: SPA_CIRCUIT_INFO },
 ];
 
 function getRaceCircuitInfo(race: Race): CircuitInfo | null {
