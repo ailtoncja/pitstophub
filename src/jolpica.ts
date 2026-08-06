@@ -222,7 +222,7 @@ export async function fetchCategoryLiveData(
       ? mergeDriversByName(category.drivers, liveDrivers)
       : category.drivers;
     const normalizedCalendar = normalizeWinners(calendar, mergedDrivers);
-    const standings = buildStandings(driverStandings, constructorStandings);
+    const standings = buildStandings(category, driverStandings, constructorStandings);
     const next = getNextRace(normalizedCalendar);
     const last = getLastRace(normalizedCalendar);
 
@@ -337,23 +337,39 @@ function buildDrivers(category: Category, standings: JolpicaDriverStanding[]): D
   });
 }
 
+// Resolve o nome do construtor pro nosso team.name canonico (via
+// CONSTRUCTOR_ID_TO_TEAM) - a Jolpica usa nomes tipo "Red Bull"/"RB F1 Team"
+// que nao batem com os nomes que usamos nos dados estaticos (e por tabela nas
+// fotos de badge/cutout, que sao casadas por nome exato).
+function resolveTeamName(constructorId: string, fallbackName: string, teams: Team[]): string {
+  const teamId = CONSTRUCTOR_ID_TO_TEAM[constructorId.toLowerCase()];
+  const team = teamId ? teams.find((t) => t.id === teamId) : undefined;
+  return team?.name ?? fallbackName;
+}
+
 function buildStandings(
+  category: Category,
   driverStandings: JolpicaDriverStanding[],
   constructorStandings: JolpicaConstructorStanding[],
 ): CategoryStandings | null {
   const drivers: StandingItem[] = driverStandings
-    .map((e) => ({
-      position: parseInt(e.position, 10),
-      name: `${e.Driver.givenName} ${e.Driver.familyName}`,
-      points: parseFloat(e.points),
-      team: e.Constructors[0]?.name,
-    }))
+    .map((e) => {
+      const fullName = `${e.Driver.givenName} ${e.Driver.familyName}`;
+      const base = findBaseDriver(category.drivers, fullName);
+      const constructor = e.Constructors[0];
+      return {
+        position: parseInt(e.position, 10),
+        name: base?.name ?? fullName,
+        points: parseFloat(e.points),
+        team: constructor ? resolveTeamName(constructor.constructorId, constructor.name, category.teams) : undefined,
+      };
+    })
     .filter((s) => !Number.isNaN(s.position) && !Number.isNaN(s.points));
 
   const constructors: StandingItem[] = constructorStandings
     .map((e) => ({
       position: parseInt(e.position, 10),
-      name: e.Constructor.name,
+      name: resolveTeamName(e.Constructor.constructorId, e.Constructor.name, category.teams),
       points: parseFloat(e.points),
     }))
     .filter((s) => !Number.isNaN(s.position) && !Number.isNaN(s.points));
