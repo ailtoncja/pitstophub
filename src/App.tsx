@@ -486,11 +486,6 @@ const NORRIS_BIO = {
   en: 'Lando Norris made his Formula 1 debut with McLaren in 2019. After years of accumulating podiums, he claimed his first win at the 2024 Miami Grand Prix and, in 2025, closed the season as World Drivers\' Champion. As of the 2026 Hungarian Grand Prix, he has 12 career wins and 47 podiums, and remains McLaren\'s lead driver.',
 };
 
-// Clearart real do carro (equipamento atual da equipe na TheSportsDB), por id de equipe.
-const TEAM_CLEARARTS: Record<string, string> = {
-  mclaren: 'https://r2.thesportsdb.com/images/media/team/equipment/hq4x5r1773231742.png',
-};
-
 // Biografia real do Oscar Piastri, usada só na página de teste do piloto.
 // Fonte: Wikipedia (verificado até o encerramento da temporada de 2025).
 const PIASTRI_BIO = {
@@ -2021,10 +2016,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               )}
                             </div>
                           </div>
-                          {selectedDriverTeam && TEAM_CLEARARTS[selectedDriverTeam.id] && (
+                          {selectedDriverTeam?.clearart && (
                             <div className="bg-black/20 border border-white/5 p-4">
                               <img
-                                src={TEAM_CLEARARTS[selectedDriverTeam.id]}
+                                src={selectedDriverTeam.clearart}
                                 alt={selectedDriverTeam.car ?? selectedDriverTeam.name}
                                 className="w-full h-auto"
                                 referrerPolicy="no-referrer"
@@ -2420,6 +2415,16 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                               src={team.badge}
                                               alt={team.name}
                                               className="w-10 h-10 object-contain shrink-0"
+                                              referrerPolicy="no-referrer"
+                                              loading="lazy"
+                                              decoding="async"
+                                            />
+                                          )}
+                                          {team.clearart && (
+                                            <img
+                                              src={team.clearart}
+                                              alt={team.car ?? team.name}
+                                              className="h-10 w-16 object-contain shrink-0"
                                               referrerPolicy="no-referrer"
                                               loading="lazy"
                                               decoding="async"
