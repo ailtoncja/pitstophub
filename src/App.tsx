@@ -129,8 +129,6 @@ const UI_TRANSLATIONS = {
     liveData: 'Dados ao Vivo',
     language: 'Idioma',
     appearance: 'Tema',
-    followedRacesTitle: 'Próximas corridas que você segue',
-    noFollowedRaces: 'Você ainda não segue categorias, equipes ou pilotos.',
     tagline: 'Explore os calendários, equipes e pilotos das principais competições do automobilismo mundial em 2026.',
     drivers: 'Pilotos',
     constructors: 'Construtores',
@@ -226,8 +224,6 @@ const UI_TRANSLATIONS = {
     liveData: 'Live Data',
     language: 'Language',
     appearance: 'Theme',
-    followedRacesTitle: 'Next races from what you follow',
-    noFollowedRaces: 'You are not following any categories, teams, or drivers yet.',
     tagline: 'Explore the calendars, teams and drivers of the world\'s main motorsport competitions in 2026.',
     drivers: 'Drivers',
     constructors: 'Constructors',
@@ -1263,33 +1259,6 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     </div>
                   </div>
                 </div>
-
-                {currentUser && (
-                  <div className="glass-card p-4 sm:p-6 mb-8 sm:mb-10">
-                    <div className="flex items-center justify-between gap-3 mb-4">
-                      <h3 className="text-lg sm:text-xl font-display font-black italic text-[var(--text-main)]">
-                        {UI_TRANSLATIONS[language].followedRacesTitle}
-                      </h3>
-                      <Heart className="w-5 h-5 text-brand-red" />
-                    </div>
-                    {upcomingFollowedRaces.length === 0 ? (
-                      <p className="text-sm text-gray-500">{UI_TRANSLATIONS[language].noFollowedRaces}</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {upcomingFollowedRaces.slice(0, 6).map(({ category, race }) => (
-                          <div key={`${category.id}-${race.id}`} className="p-3 rounded-lg border border-[var(--card-border)] bg-white/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
-                            <div>
-                              <p className="text-[10px] font-black uppercase tracking-widest text-brand-red">{category.name}</p>
-                              <p className="text-sm font-semibold text-[var(--text-main)]">{race.name}</p>
-                              <p className="text-xs text-gray-500">{race.location} • {race.circuit}</p>
-                            </div>
-                            <span className="font-mono text-xs text-[var(--text-main)]">{race.date.split('-').reverse().join('/')}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
 
                 <div className="mb-16">
                   <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 mb-8">
