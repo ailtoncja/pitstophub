@@ -935,12 +935,12 @@ export const MOTORSPORT_DATA: Category[] = [
         { position: 2, name: 'Cadillac Whelen', points: 675, extra: '#31' },
         { position: 3, name: 'Porsche Penske Motorsport', points: 654, extra: '#6' },
         { position: 4, name: 'BMW M Team WRT', points: 606, extra: '#24' },
-        { position: 5, name: 'Acura Meyer Shank Racing', points: 567, extra: '#93' },
-        { position: 6, name: 'Acura Meyer Shank Racing', points: 560, extra: '#60' },
+        { position: 5, name: 'Acura Meyer Shank Racing with Curb-Agajanian', points: 567, extra: '#93' },
+        { position: 6, name: 'Acura Meyer Shank Racing with Curb-Agajanian', points: 560, extra: '#60' },
         { position: 7, name: 'Cadillac Wayne Taylor Racing', points: 548, extra: '#40' },
-        { position: 8, name: 'JDC-Miller Motorsports', points: 519, extra: '#5' },
+        { position: 8, name: 'JDC–Miller MotorSports', points: 519, extra: '#5' },
         { position: 9, name: 'BMW M Team WRT', points: 482, extra: '#25' },
-        { position: 10, name: 'Aston Martin Thor Team', points: 472, extra: '#23' },
+        { position: 10, name: 'Aston Martin THOR Team', points: 472, extra: '#23' },
         { position: 11, name: 'Cadillac Wayne Taylor Racing', points: 455, extra: '#10' },
       ]
     }
