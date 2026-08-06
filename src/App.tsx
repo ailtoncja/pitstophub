@@ -33,9 +33,11 @@ import { getUserSettings, saveUserSettings, type AuthUser } from './auth';
 import {
   fetchCategoryLiveData,
   fetchCategoryLiveSummary,
+  fetchDriverSeasonResults,
   getSupportedLiveCategoryIds,
   isCategoryLiveSupported,
   mergeCategoryWithLiveData,
+  type DriverResultRow,
   type JolpicaCategoryData,
 } from './jolpica';
 import {
@@ -209,7 +211,12 @@ const UI_TRANSLATIONS = {
     chassis: 'Chassi',
     winsThisSeason: 'Vitórias na Temporada',
     noWinsYet: 'Nenhuma vitória nesta temporada ainda.',
-    driverProfile: 'Perfil do Piloto'
+    driverProfile: 'Perfil do Piloto',
+    careerOverview: 'Carreira',
+    grid: 'Grid',
+    finish: 'Chegada',
+    recentResults: 'Resultados Recentes',
+    podiums: 'Pódios'
   },
   en: {
     home: 'Home',
@@ -310,7 +317,12 @@ const UI_TRANSLATIONS = {
     chassis: 'Chassis',
     winsThisSeason: 'Wins This Season',
     noWinsYet: 'No wins this season yet.',
-    driverProfile: 'Driver Profile'
+    driverProfile: 'Driver Profile',
+    careerOverview: 'Career Overview',
+    grid: 'Grid',
+    finish: 'Finish',
+    recentResults: 'Recent Results',
+    podiums: 'Podiums'
   }
 };
 
@@ -345,6 +357,20 @@ const INTERLAGOS_CIRCUIT_INFO = {
     pt: 'Pista abrasiva e historicamente favorável a estratégias de um pit stop combinando o composto macio com o médio; o desgaste é o fator decisivo, não a diferença de ritmo entre compostos.',
     en: 'An abrasive track that has historically favored one-stop strategies mixing the soft and medium compounds; tyre wear is the deciding factor, not the pace gap between compounds.',
   },
+};
+
+// Biografia real do Lando Norris, usada só na página de teste do piloto.
+// Fonte: Wikipedia (verificado até a etapa da Hungria de 2026).
+const NORRIS_BIO = {
+  pt: 'Lando Norris estreou na Fórmula 1 pela McLaren em 2019. Depois de anos acumulando pódios, conquistou sua primeira vitória no GP de Miami de 2024 e, em 2025, fechou a temporada como Campeão Mundial de Pilotos. Até a etapa da Hungria de 2026, soma 12 vitórias e 47 pódios na carreira, seguindo como piloto principal da McLaren.',
+  en: 'Lando Norris made his Formula 1 debut with McLaren in 2019. After years of accumulating podiums, he claimed his first win at the 2024 Miami Grand Prix and, in 2025, closed the season as World Drivers\' Champion. As of the 2026 Hungarian Grand Prix, he has 12 career wins and 47 podiums, and remains McLaren\'s lead driver.',
+};
+
+// Foto real do MCL40 (GP da Áustria de 2026), nao um render/estoque -- por isso a
+// atribuição fica visível: Creative Commons exige credito ao fotografo.
+const CAR_PHOTO_CREDIT = {
+  pt: 'Foto: Lukas Raich / Wikimedia Commons (CC BY-SA 4.0)',
+  en: 'Photo: Lukas Raich / Wikimedia Commons (CC BY-SA 4.0)',
 };
 
 // Identifica o GP de Interlagos por texto (circuito/local/nome), nao pelo id estatico:
@@ -463,6 +489,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [liveCategoryData, setLiveCategoryData] = useState<JolpicaCategoryData | null>(null);
   const [liveCategoryState, setLiveCategoryState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [syncedCalendars, setSyncedCalendars] = useState<Partial<Record<Category['id'], Race[] | null>>>({});
+  const [driverSeasonResults, setDriverSeasonResults] = useState<DriverResultRow[] | null>(null);
+  const [driverResultsState, setDriverResultsState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
 
   React.useEffect(() => {
     try {
@@ -715,6 +743,32 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const categoryAccent = getCategoryAccent(selectedCategory.id);
   const categoryAccentInk = getAccentTextColor(categoryAccent);
 
+  React.useEffect(() => {
+    if (view !== 'driver' || !selectedDriver || selectedCategory.id !== 'f1') {
+      setDriverSeasonResults(null);
+      setDriverResultsState('idle');
+      return;
+    }
+    let isMounted = true;
+    setDriverResultsState('loading');
+    const year = selectedCategory.calendar[0]?.date.slice(0, 4) ?? String(new Date().getFullYear());
+    fetchDriverSeasonResults(selectedDriver.id, year)
+      .then((rows) => {
+        if (!isMounted) return;
+        setDriverSeasonResults(rows);
+        setDriverResultsState(rows ? 'ready' : 'error');
+      })
+      .catch((error: unknown) => {
+        console.error('Falha ao buscar resultados do piloto.', error);
+        if (!isMounted) return;
+        setDriverSeasonResults(null);
+        setDriverResultsState('error');
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [view, selectedDriver, selectedCategory.id, selectedCategory.calendar]);
+
   const handleCategorySelect = useCallback((cat: Category) => {
     setSelectedCategoryBase(cat);
     setView('category');
@@ -917,6 +971,23 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     if (!selectedDriver) return [];
     return (driversByTeamId.get(selectedDriver.teamId) ?? []).filter((d) => d.id !== selectedDriver.id);
   }, [driversByTeamId, selectedDriver]);
+
+  // Vitorias e podios: quando temos resultados ao vivo (Jolpica, so F1 por enquanto),
+  // usa eles (mais precisos); senao cai para a contagem derivada do calendario local.
+  const selectedDriverWinsCount = useMemo(() => {
+    if (driverSeasonResults) return driverSeasonResults.filter((r) => r.finishPosition === 1).length;
+    return selectedDriverWins.length;
+  }, [driverSeasonResults, selectedDriverWins]);
+
+  const selectedDriverPodiumsCount = useMemo(() => {
+    if (!driverSeasonResults) return null;
+    return driverSeasonResults.filter((r) => r.finishPosition !== null && r.finishPosition <= 3).length;
+  }, [driverSeasonResults]);
+
+  const selectedDriverRecentResults = useMemo(() => {
+    if (!driverSeasonResults) return [];
+    return [...driverSeasonResults].sort((a, b) => Number(b.round) - Number(a.round)).slice(0, 5);
+  }, [driverSeasonResults]);
 
   return (
     <div
@@ -1645,7 +1716,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   </div>
 
                   <div className="lg:col-span-7 flex flex-col gap-6">
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       <div className="apex-card p-4">
                         <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
                           {UI_TRANSLATIONS[language].position}
@@ -1674,55 +1745,143 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           {UI_TRANSLATIONS[language].wins}
                         </div>
                         <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
-                          {selectedDriverWins.length}
+                          {selectedDriverWinsCount}
+                        </div>
+                      </div>
+                      <div className="apex-card p-4">
+                        <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                          {UI_TRANSLATIONS[language].podiums}
+                        </div>
+                        <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                          {selectedDriverPodiumsCount ?? '-'}
                         </div>
                       </div>
                     </div>
 
                     <div className="apex-card p-8 flex-grow">
                       <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
-                        {selectedDriverTeam?.name ?? UI_TRANSLATIONS[language].team}
+                        {selectedDriver.id === 'norris' ? UI_TRANSLATIONS[language].careerOverview : (selectedDriverTeam?.name ?? UI_TRANSLATIONS[language].team)}
                       </h3>
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-8">
-                        {selectedDriverTeam?.color && (
+                      {selectedDriver.id === 'norris' ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                           <div>
-                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
-                              {UI_TRANSLATIONS[language].team}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="w-4 h-4 shrink-0" style={{ backgroundColor: selectedDriverTeam.color }} />
-                              <span className="font-bold text-[var(--text-main)]">{selectedDriverTeam.name}</span>
+                            <p className="text-gray-400 leading-relaxed mb-8">
+                              {language === 'pt' ? NORRIS_BIO.pt : NORRIS_BIO.en}
+                            </p>
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-6">
+                              {selectedDriverTeam?.color && (
+                                <div>
+                                  <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                                    {UI_TRANSLATIONS[language].team}
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="w-4 h-4 shrink-0" style={{ backgroundColor: selectedDriverTeam.color }} />
+                                    <span className="font-bold text-[var(--text-main)]">{selectedDriverTeam.name}</span>
+                                  </div>
+                                </div>
+                              )}
+                              {selectedDriverTeam?.car && (
+                                <div>
+                                  <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                                    {UI_TRANSLATIONS[language].chassis}
+                                  </div>
+                                  <div className="font-bold text-[var(--text-main)]">{selectedDriverTeam.car}</div>
+                                </div>
+                              )}
+                              {selectedDriverTeammates.length > 0 && (
+                                <div>
+                                  <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                                    {UI_TRANSLATIONS[language].teammate}
+                                  </div>
+                                  <div className="font-bold text-[var(--text-main)]">
+                                    {selectedDriverTeammates.map((t) => t.name).join(', ')}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
-                        )}
-                        {selectedDriverTeam?.car && (
                           <div>
-                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
-                              {UI_TRANSLATIONS[language].chassis}
-                            </div>
-                            <div className="font-bold text-[var(--text-main)]">{selectedDriverTeam.car}</div>
+                            <img
+                              src="/cars/mclaren-mcl40.jpg"
+                              alt="McLaren MCL40"
+                              className="w-full h-auto"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <p className="text-[10px] text-gray-600 font-apex-mono mt-2">
+                              {language === 'pt' ? CAR_PHOTO_CREDIT.pt : CAR_PHOTO_CREDIT.en}
+                            </p>
                           </div>
-                        )}
-                        {selectedDriverTeammates.length > 0 && (
-                          <div>
-                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
-                              {UI_TRANSLATIONS[language].teammate}
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-8">
+                          {selectedDriverTeam?.color && (
+                            <div>
+                              <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                                {UI_TRANSLATIONS[language].team}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="w-4 h-4 shrink-0" style={{ backgroundColor: selectedDriverTeam.color }} />
+                                <span className="font-bold text-[var(--text-main)]">{selectedDriverTeam.name}</span>
+                              </div>
                             </div>
-                            <div className="font-bold text-[var(--text-main)]">
-                              {selectedDriverTeammates.map((t) => t.name).join(', ')}
+                          )}
+                          {selectedDriverTeam?.car && (
+                            <div>
+                              <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                                {UI_TRANSLATIONS[language].chassis}
+                              </div>
+                              <div className="font-bold text-[var(--text-main)]">{selectedDriverTeam.car}</div>
                             </div>
-                          </div>
-                        )}
-                      </div>
+                          )}
+                          {selectedDriverTeammates.length > 0 && (
+                            <div>
+                              <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                                {UI_TRANSLATIONS[language].teammate}
+                              </div>
+                              <div className="font-bold text-[var(--text-main)]">
+                                {selectedDriverTeammates.map((t) => t.name).join(', ')}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 <div className="apex-card p-8">
                   <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
-                    {UI_TRANSLATIONS[language].winsThisSeason}
+                    {driverSeasonResults ? UI_TRANSLATIONS[language].recentResults : UI_TRANSLATIONS[language].winsThisSeason}
                   </h3>
-                  {selectedDriverWins.length === 0 ? (
+                  {driverSeasonResults ? (
+                    <div className="overflow-x-auto no-scrollbar">
+                      <table className="w-full text-left min-w-[500px]">
+                        <thead>
+                          <tr className="border-b border-[var(--card-border)]">
+                            <th className="py-3 pr-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].roundLabel}</th>
+                            <th className="py-3 pr-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].event}</th>
+                            <th className="py-3 pr-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].grid}</th>
+                            <th className="py-3 pr-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].finish}</th>
+                            <th className="py-3 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500 text-right">{UI_TRANSLATIONS[language].points}</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {selectedDriverRecentResults.map((row) => (
+                            <tr key={row.round} className="hover:bg-white/5 transition-colors">
+                              <td className="py-3 pr-4 text-sm text-gray-500">R{row.round}</td>
+                              <td className="py-3 pr-4 font-bold text-[var(--text-main)] uppercase">{row.raceName}</td>
+                              <td className="py-3 pr-4 text-sm text-[var(--text-main)]">{row.grid ?? '-'}</td>
+                              <td className={cn("py-3 pr-4 text-sm font-bold", row.finishPosition === 1 ? "text-[var(--cat-accent)]" : "text-[var(--text-main)]")}>
+                                {row.finishPosition ?? row.status}
+                              </td>
+                              <td className="py-3 font-apex-mono text-sm text-right text-[var(--text-main)]">{row.points}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : selectedDriverWins.length === 0 ? (
                     <p className="text-gray-500 text-sm">{UI_TRANSLATIONS[language].noWinsYet}</p>
                   ) : (
                     <div className="divide-y divide-white/5">
