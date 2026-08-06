@@ -2241,8 +2241,18 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                       </div>
                                       <div className="space-y-3">
                                         {(driversByTeamId.get(team.id) ?? [])
-                                          .map(driver => (
-                                            <div key={driver.id} className="relative flex flex-col p-4  bg-black/20 hover:bg-black/30 transition-all group/driver overflow-hidden border border-white/5">
+                                          .map(driver => {
+                                            // Teste: mesmo atalho pra pagina de piloto da aba Classificacao, por enquanto so pro Lando Norris.
+                                            const isDriverPageTest = selectedCategory.id === 'f1' && driver.id === 'norris';
+                                            return (
+                                            <div
+                                              key={driver.id}
+                                              onClick={isDriverPageTest ? () => { setSelectedDriver(driver); setView('driver'); } : undefined}
+                                              className={cn(
+                                                "relative flex flex-col p-4  bg-black/20 hover:bg-black/30 transition-all group/driver overflow-hidden border border-white/5",
+                                                isDriverPageTest && "cursor-pointer ring-1 ring-inset ring-[var(--cat-accent)]/40"
+                                              )}
+                                            >
                                               <div className="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 bg-[var(--cat-accent)]/5 rounded-full group-hover/driver:bg-[var(--cat-accent)]/10 transition-colors" />
                                               
                                               <div className="flex items-center gap-4 mb-4 relative z-10">
@@ -2296,7 +2306,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                                 <ChevronRight className="w-4 h-4 text-[var(--cat-accent)] opacity-0 group-hover/driver:opacity-100 group-hover/driver:translate-x-1 transition-all" />
                                               </div>
                                             </div>
-                                          ))}
+                                          );})}
                                       </div>
                                     </div>
                                   </div>
