@@ -41,14 +41,14 @@ const LEAGUE_IDS = {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 async function main() {
-  const allRaceRows = [];
+  const rowsByCategory = {};
   const standingsByCategory = {};
   const summary = [];
 
   for (const [categoryId, leagueId] of Object.entries(LEAGUE_IDS)) {
     try {
       const { rows, standings, standingsRound } = await syncCategory(categoryId, leagueId);
-      allRaceRows.push(...rows);
+      rowsByCategory[categoryId] = rows;
       if (standings) standingsByCategory[categoryId] = { standings, round: standingsRound };
       summary.push(`${categoryId}: ${rows.length} corridas${standings ? `, classificacao apos rodada ${standingsRound}` : ''}`);
     } catch (error) {
@@ -57,11 +57,24 @@ async function main() {
     }
   }
 
-  if (allRaceRows.length > 0) {
-    const { error } = await supabase
-      .from('synced_races')
-      .upsert(allRaceRows, { onConflict: 'category_id,race_id' });
-    if (error) throw new Error(`Falha ao gravar corridas no Supabase: ${error.message}`);
+  // O calendario tambem e uma "foto" atual: apaga e regrava por categoria.
+  // Sem isso, quando a resolucao de temporada troca de ano entre execucoes
+  // (ex.: volta a marcar "2025" por um dia), as linhas da temporada errada
+  // ficam para sempre (race_id diferente = upsert nunca as sobrescreve).
+  let totalRows = 0;
+  for (const [categoryId, rows] of Object.entries(rowsByCategory)) {
+    if (rows.length === 0) continue;
+    const { error: deleteError } = await supabase.from('synced_races').delete().eq('category_id', categoryId);
+    if (deleteError) {
+      console.error(`[${categoryId}] falha ao limpar corridas antigas:`, deleteError.message);
+      continue;
+    }
+    const { error: insertError } = await supabase.from('synced_races').insert(rows);
+    if (insertError) {
+      console.error(`[${categoryId}] falha ao gravar corridas:`, insertError.message);
+      continue;
+    }
+    totalRows += rows.length;
   }
 
   for (const [categoryId, { standings, round }] of Object.entries(standingsByCategory)) {
@@ -87,7 +100,7 @@ async function main() {
 
   console.log('\n=== Resumo ===');
   summary.forEach((line) => console.log(line));
-  console.log(`Total de corridas gravadas: ${allRaceRows.length}`);
+  console.log(`Total de corridas gravadas: ${totalRows}`);
   console.log(`Categorias com classificacao: ${Object.keys(standingsByCategory).length}/${Object.keys(LEAGUE_IDS).length}`);
 }
 
