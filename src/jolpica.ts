@@ -468,7 +468,7 @@ function toEvent(race: Race): JolpicaLiveEvent {
 function normalizeWinners(calendar: Race[], drivers: Driver[]): Race[] {
   return calendar.map((race) => {
     if (!race.winner) return race;
-    const match = drivers.find((d) => normalizeText(d.name) === normalizeText(race.winner!));
+    const match = findBaseDriver(drivers, race.winner);
     return { ...race, winner: match?.name ?? race.winner };
   });
 }
