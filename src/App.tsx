@@ -339,6 +339,21 @@ const INTERLAGOS_CIRCUIT_INFO = {
   },
 };
 
+// Identifica o GP de Interlagos por texto (circuito/local/nome), nao pelo id estatico:
+// o calendario de F1 e substituido pelos dados ao vivo da Jolpica, que pode gerar
+// um id diferente de 'brazil' quando o casamento por data/nome com a base local falha.
+function isInterlagosRace(race: Race): boolean {
+  const haystack = `${race.circuit} ${race.location} ${race.enLocation ?? ''} ${race.name} ${race.enName ?? ''}`
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase();
+  return (
+    haystack.includes('interlagos') ||
+    haystack.includes('jose carlos pace') ||
+    haystack.includes('sao paulo')
+  );
+}
+
 function getIsIOSInstallable(): boolean {
   if (typeof navigator === 'undefined') return false;
   const isIOS =
@@ -1411,7 +1426,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   </div>
                 )}
 
-                {selectedRace.id === 'brazil' && selectedCategory.id === 'f1' && (
+                {selectedCategory.id === 'f1' && isInterlagosRace(selectedRace) && (
                   <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 apex-card p-8">
                       <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6 flex items-center gap-2">
@@ -1893,7 +1908,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           {selectedCategory.calendar.map((race) => {
                             const winnerDriver = race.winner ? driverByName.get(race.winner) : undefined;
                             // Teste: pagina dedicada de corrida, habilitada so para o GP de Interlagos por enquanto.
-                            const isRacePageTest = selectedCategory.id === 'f1' && race.id === 'brazil';
+                            const isRacePageTest = selectedCategory.id === 'f1' && isInterlagosRace(race);
                             return (
                             <div
                               key={race.id}
