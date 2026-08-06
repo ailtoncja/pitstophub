@@ -137,6 +137,7 @@ const UI_TRANSLATIONS = {
     date: 'Data',
     circuit: 'Circuito',
     winner: 'Vencedor',
+    roundLabel: 'Etapa',
     upcoming: 'Próxima',
     completed: 'Concluída',
     cancelled: 'Cancelada',
@@ -219,6 +220,7 @@ const UI_TRANSLATIONS = {
     date: 'Date',
     circuit: 'Circuit',
     winner: 'Winner',
+    roundLabel: 'Round',
     upcoming: 'Upcoming',
     completed: 'Completed',
     cancelled: 'Cancelled',
@@ -305,6 +307,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [selectedCategoryBase, setSelectedCategoryBase] = useState<Category>(MOTORSPORT_DATA[0]);
   const [activeTab, setActiveTab] = useState<'overview' | 'teams' | 'calendar' | 'standings'>('overview');
   const [showRules, setShowRules] = useState(false);
+  const [selectedRace, setSelectedRace] = useState<Race | null>(null);
   const [activeHomeGroup, setActiveHomeGroup] = useState<string>(NAV_GROUPS[0].name.en);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [followedCategoryIds, setFollowedCategoryIds] = useState<string[]>([]);
@@ -681,6 +684,18 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       minutes: totalMinutes % 60,
     };
   }, [heroNextRace, now]);
+
+  const selectedRaceCountdown = useMemo(() => {
+    if (!selectedRace || selectedRace.status !== 'upcoming') return null;
+    const raceDate = new Date(`${selectedRace.date}T00:00:00`);
+    const diffMs = Math.max(0, raceDate.getTime() - now.getTime());
+    const totalMinutes = Math.floor(diffMs / (1000 * 60));
+    return {
+      days: Math.floor(totalMinutes / (60 * 24)),
+      hours: Math.floor((totalMinutes % (60 * 24)) / 60),
+      minutes: totalMinutes % 60,
+    };
+  }, [selectedRace, now]);
 
   const lastGlobalResult = useMemo(() => {
     return allCategories
@@ -1631,11 +1646,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           {selectedCategory.calendar.map((race) => {
                             const winnerDriver = race.winner ? driverByName.get(race.winner) : undefined;
                             return (
-                            <div 
-                              key={race.id} 
+                            <div
+                              key={race.id}
+                              onClick={() => setSelectedRace(race)}
                               className={cn(
-                                "flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 apex-card items-center transition-all hover:bg-white/10",
-                                race.status === 'upcoming' ? "border-l-4 border-l-[var(--cat-accent)]" : 
+                                "flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 apex-card items-center transition-all hover:bg-white/10 cursor-pointer",
+                                race.status === 'upcoming' ? "border-l-4 border-l-[var(--cat-accent)]" :
                                 race.status === 'cancelled' ? "border-l-4 border-l-red-500 opacity-60" : ""
                               )}
                             >
@@ -1955,6 +1971,109 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   </button>
                 </div>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {selectedRace && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedRace(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 16 }}
+              transition={SPRING}
+              className="relative w-full max-w-2xl apex-card p-8 md:p-12 max-h-[85vh] overflow-y-auto no-scrollbar"
+            >
+              <button
+                onClick={() => setSelectedRace(null)}
+                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"
+              >
+                <XCircle className="w-6 h-6 text-gray-500" />
+              </button>
+
+              <p className="font-apex-mono text-xs font-semibold uppercase tracking-widest text-[var(--cat-accent)] flex items-center gap-2 mb-3">
+                <span className="w-8 h-[2px] bg-[var(--cat-accent)] inline-block" />
+                {UI_TRANSLATIONS[language].roundLabel} {selectedCategory.calendar.findIndex((r) => r.id === selectedRace.id) + 1}
+              </p>
+              <h2 className="font-apex font-extrabold italic uppercase text-4xl md:text-5xl tracking-tighter text-[var(--text-main)] leading-none mb-2">
+                {selectedRace.circuit}
+              </h2>
+              <p className="text-lg md:text-xl text-gray-400 font-medium mb-6">
+                {language === 'pt' ? selectedRace.name : (selectedRace.enName || selectedRace.name)}
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4 mb-8">
+                <span className={cn(
+                  "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1",
+                  selectedRace.status === 'completed' ? "bg-gray-800 text-gray-400" :
+                  selectedRace.status === 'cancelled' ? "bg-red-900/50 text-red-400" :
+                  "bg-[var(--cat-accent)] text-[var(--cat-accent-ink)]"
+                )}>
+                  {selectedRace.status === 'completed' && <CheckCircle2 className="w-3 h-3" />}
+                  {selectedRace.status === 'cancelled' && <XCircle className="w-3 h-3" />}
+                  {selectedRace.status === 'upcoming' && <Timer className="w-3 h-3" />}
+                  {UI_TRANSLATIONS[language][selectedRace.status]}
+                </span>
+                <span className="flex items-center gap-1.5 text-sm text-gray-400 font-apex-mono">
+                  <Calendar className="w-4 h-4" />
+                  {new Date(`${selectedRace.date}T00:00:00`).toLocaleDateString(language === 'pt' ? 'pt-BR' : 'en-US', { day: '2-digit', month: 'long', year: 'numeric' })}
+                </span>
+                <span className="flex items-center gap-1.5 text-sm text-gray-400 font-apex-mono">
+                  <MapPin className="w-4 h-4" />
+                  {language === 'pt' ? selectedRace.location : (selectedRace.enLocation || selectedRace.location)}
+                </span>
+              </div>
+
+              {selectedRace.status === 'upcoming' && selectedRaceCountdown && (
+                <div className="grid grid-cols-3 gap-4 max-w-sm">
+                  {[
+                    { value: selectedRaceCountdown.days, label: UI_TRANSLATIONS[language].daysLabel },
+                    { value: selectedRaceCountdown.hours, label: UI_TRANSLATIONS[language].hoursLabel },
+                    { value: selectedRaceCountdown.minutes, label: UI_TRANSLATIONS[language].minsLabel },
+                  ].map((item) => (
+                    <div key={item.label} className="apex-card text-center py-4">
+                      <div className="font-apex font-extrabold italic text-3xl text-[var(--text-main)]">
+                        {String(item.value).padStart(2, '0')}
+                      </div>
+                      <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mt-1">
+                        {item.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {selectedRace.status === 'completed' && selectedRace.winner && (
+                <div className="apex-card p-6 flex items-center gap-4">
+                  {driverByName.get(selectedRace.winner)?.image && (
+                    <img
+                      src={driverByName.get(selectedRace.winner)!.image}
+                      alt={selectedRace.winner}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-yellow-500/50"
+                      referrerPolicy="no-referrer"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  )}
+                  <div>
+                    <p className="font-apex-mono text-[10px] uppercase tracking-widest text-yellow-500 mb-1 flex items-center gap-1.5">
+                      <Trophy className="w-3.5 h-3.5" /> {UI_TRANSLATIONS[language].winner}
+                    </p>
+                    <p className="font-apex font-extrabold italic text-2xl text-[var(--text-main)]">
+                      {selectedRace.winner}
+                    </p>
+                  </div>
+                </div>
+              )}
             </motion.div>
           </div>
         )}
