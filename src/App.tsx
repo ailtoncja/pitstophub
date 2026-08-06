@@ -200,12 +200,13 @@ const UI_TRANSLATIONS = {
     corners: 'Curvas',
     direction: 'Sentido',
     counterclockwise: 'Anti-horário',
+    clockwise: 'Horário',
     lapRecord: 'Recorde da Volta',
     firstGrandPrix: 'Primeiro GP',
     drsZones: 'Zonas de DRS',
     tyreStrategy: 'Estratégia de Pneus',
     criticalBrakingZones: 'Principais Zonas de Frenagem',
-    dataSourceNote: 'Dados verificados publicamente; a Pirelli ainda não anunciou os compostos para esta corrida.',
+    dataSourceNote: 'Dados verificados publicamente (Wikipedia, RaceFans).',
     wins: 'Vitórias',
     teammate: 'Companheiro de Equipe',
     chassis: 'Chassi',
@@ -306,12 +307,13 @@ const UI_TRANSLATIONS = {
     corners: 'Corners',
     direction: 'Direction',
     counterclockwise: 'Counterclockwise',
+    clockwise: 'Clockwise',
     lapRecord: 'Lap Record',
     firstGrandPrix: 'First Grand Prix',
     drsZones: 'DRS Zones',
     tyreStrategy: 'Tyre Strategy',
     criticalBrakingZones: 'Critical Braking Zones',
-    dataSourceNote: 'Publicly verified data; Pirelli has not announced tyre compounds for this race yet.',
+    dataSourceNote: 'Publicly verified data (Wikipedia, RaceFans).',
     wins: 'Wins',
     teammate: 'Teammate',
     chassis: 'Chassis',
@@ -326,13 +328,29 @@ const UI_TRANSLATIONS = {
   }
 };
 
+type CircuitInfo = {
+  trackImage?: string;
+  lengthKm: number;
+  raceDistanceKm: number;
+  laps: number;
+  corners: number;
+  direction: 'clockwise' | 'counterclockwise';
+  lapRecord: { time: string; driver: string; year: number };
+  firstGrandPrix: number;
+  drsZones: { pt: string; en: string }[];
+  brakingZones: { turn: string; name: string; pt: string; en: string }[];
+  tyreStrategyNote: { pt: string; en: string };
+};
+
 // Dados reais do Autódromo José Carlos Pace (Interlagos), usados só na página de teste do GP de São Paulo.
 // Fontes: Wikipedia (Interlagos Circuit) e RaceFans (briefing do GP do Brasil).
-const INTERLAGOS_CIRCUIT_INFO = {
+const INTERLAGOS_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/interlagos.png',
   lengthKm: 4.309,
   raceDistanceKm: 305.879,
   laps: 71,
   corners: 15,
+  direction: 'counterclockwise',
   lapRecord: { time: '1:10.540', driver: 'V. Bottas (Mercedes)', year: 2018 },
   firstGrandPrix: 1973,
   drsZones: [
@@ -359,6 +377,72 @@ const INTERLAGOS_CIRCUIT_INFO = {
   },
 };
 
+// Dados reais do Silverstone Circuit, usados só na página de teste do GP da Grã-Bretanha. Fonte: Wikipedia.
+const SILVERSTONE_CIRCUIT_INFO: CircuitInfo = {
+  lengthKm: 5.891,
+  raceDistanceKm: 306.198,
+  laps: 52,
+  corners: 18,
+  direction: 'clockwise',
+  lapRecord: { time: '1:27.097', driver: 'M. Verstappen (Red Bull)', year: 2020 },
+  firstGrandPrix: 1950,
+  drsZones: [
+    { pt: 'Reta Wellington, de Aintree até Brooklands', en: 'Wellington Straight, from Aintree into Brooklands' },
+    { pt: 'Reta Hangar, de Chapel até Stowe', en: 'Hangar Straight, from Chapel into Stowe' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C6',
+      name: 'Brooklands',
+      pt: 'Frenada média ao fim da reta Wellington, numa curva à esquerda que fecha até o ápice; um dos dois pontos de ultrapassagem mais realistas do traçado.',
+      en: "Medium-speed braking at the end of the Wellington Straight, a left-hander that tightens to the apex; one of the track's two most realistic overtaking spots.",
+    },
+    {
+      turn: 'C15',
+      name: 'Stowe',
+      pt: 'Frenada pesada ao fim da reta Hangar, vindo de mais de 300 km/h; principal ponto de ultrapassagem de Silverstone.',
+      en: "Heavy braking at the end of the Hangar Straight, arriving at over 300 km/h; Silverstone's main overtaking point.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'A sequência de curvas rápidas e de alta carga lateral (como Maggotts-Becketts-Chapel) impõe desgaste severo aos pneus; em 2020 esse estresse chegou a causar múltiplos furos nas voltas finais da corrida. As estratégias alternam entre um e dois pit stops, dependendo da temperatura da pista.',
+    en: 'The sequence of fast, high-lateral-load corners (like Maggotts-Becketts-Chapel) puts severe stress on the tyres; in 2020 that stress caused multiple tyre failures in the closing laps of the race. Strategies swing between one and two pit stops depending on track temperature.',
+  },
+};
+
+// Dados reais do Albert Park Circuit, usados só na página de teste do GP da Austrália. Fonte: Wikipedia.
+const ALBERT_PARK_CIRCUIT_INFO: CircuitInfo = {
+  lengthKm: 5.278,
+  raceDistanceKm: 306.124,
+  laps: 58,
+  corners: 14,
+  direction: 'clockwise',
+  lapRecord: { time: '1:19.813', driver: 'C. Leclerc (Ferrari)', year: 2024 },
+  firstGrandPrix: 1996,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+    { pt: 'Da Curva 6 até a Curva 9', en: 'From Turn 6 into Turn 9' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Turn 1',
+      pt: 'Frenada pesada logo após a reta principal; principal ponto de ultrapassagem do traçado desde a reconfiguração de 2022.',
+      en: "Heavy braking right after the main straight; the layout's primary overtaking point since the 2022 reconfiguration.",
+    },
+    {
+      turn: 'C9',
+      name: 'Turn 9',
+      pt: 'Fim de uma sequência rápida vinda da Curva 6, com frenada tardia à beira do lago.',
+      en: 'The end of a fast sequence from Turn 6, with a late brake alongside the lake.',
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Pista remodelada em 2022, com asfalto mais liso e curvas mais rápidas que reduziram o desgaste em relação ao traçado antigo; a maioria das corridas recentes tem sido decidida com apenas um pit stop.',
+    en: 'Reconfigured in 2022 with smoother asphalt and faster corners that reduced tyre wear compared to the old layout; most recent races have been decided with just a single pit stop.',
+  },
+};
+
 // Biografia real do Lando Norris, usada só na página de teste do piloto.
 // Fonte: Wikipedia (verificado até a etapa da Hungria de 2026).
 const NORRIS_BIO = {
@@ -373,19 +457,58 @@ const CAR_PHOTO_CREDIT = {
   en: 'Photo: Lukas Raich / Wikimedia Commons (CC BY-SA 4.0)',
 };
 
-// Identifica o GP de Interlagos por texto (circuito/local/nome), nao pelo id estatico:
-// o calendario de F1 e substituido pelos dados ao vivo da Jolpica, que pode gerar
-// um id diferente de 'brazil' quando o casamento por data/nome com a base local falha.
-function isInterlagosRace(race: Race): boolean {
-  const haystack = `${race.circuit} ${race.location} ${race.enLocation ?? ''} ${race.name} ${race.enName ?? ''}`
+// Biografia real do Oscar Piastri, usada só na página de teste do piloto.
+// Fonte: Wikipedia (verificado até o encerramento da temporada de 2025).
+const PIASTRI_BIO = {
+  pt: 'Oscar Piastri estreou na Fórmula 1 pela McLaren em 2023, depois de vencer a Fórmula 3 em 2020 e a Fórmula 2 em 2021. Subiu ao pódio já na temporada de estreia, no GP do Japão de 2023, e conquistou sua primeira vitória no GP da Hungria de 2024. Em 2025, com um grand chelem (pole, volta mais rápida e vitória) no GP da Holanda, encerrou o campeonato em 3º lugar com 9 vitórias e 28 pódios na carreira — recordes para um piloto australiano na Fórmula 1.',
+  en: 'Oscar Piastri made his Formula 1 debut with McLaren in 2023, after winning the Formula 3 title in 2020 and the Formula 2 title in 2021. He reached the podium in his rookie season at the 2023 Japanese Grand Prix and took his first win at the 2024 Hungarian Grand Prix. In 2025, with a grand chelem (pole, fastest lap and victory) at the Dutch Grand Prix, he closed the championship 3rd with 9 career wins and 28 podiums — records for an Australian driver in Formula 1.',
+};
+
+// Pilotos com página de biografia dedicada (testes ate agora). Reaproveita a mesma foto do
+// MCL40 pro Piastri: e o mesmo chassi real que ele tambem dirige na McLaren.
+const DRIVER_BIOS: Record<string, { pt: string; en: string }> = {
+  norris: NORRIS_BIO,
+  piastri: PIASTRI_BIO,
+};
+
+// Identifica GPs por texto (circuito/local/nome), nao pelo id estatico: o calendario de F1
+// e substituido pelos dados ao vivo da Jolpica, que pode gerar um id diferente do id local
+// quando o casamento por data/nome com a base local falha.
+function raceHaystack(race: Race): string {
+  return `${race.circuit} ${race.location} ${race.enLocation ?? ''} ${race.name} ${race.enName ?? ''}`
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .toLowerCase();
+}
+
+function isInterlagosRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
   return (
     haystack.includes('interlagos') ||
     haystack.includes('jose carlos pace') ||
     haystack.includes('sao paulo')
   );
+}
+
+function isSilverstoneRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('silverstone') || haystack.includes('british grand prix') || haystack.includes('gra-bretanha');
+}
+
+function isAlbertParkRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('albert park') || haystack.includes('melbourne');
+}
+
+// Paginas de teste habilitadas ate agora: Interlagos, Silverstone e Albert Park.
+const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[] = [
+  { match: isInterlagosRace, info: INTERLAGOS_CIRCUIT_INFO },
+  { match: isSilverstoneRace, info: SILVERSTONE_CIRCUIT_INFO },
+  { match: isAlbertParkRace, info: ALBERT_PARK_CIRCUIT_INFO },
+];
+
+function getRaceCircuitInfo(race: Race): CircuitInfo | null {
+  return RACE_TEST_CIRCUITS.find(({ match }) => match(race))?.info ?? null;
 }
 
 function formatOrdinal(position: number, language: 'pt' | 'en'): { number: string; suffix: string } {
@@ -915,6 +1038,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       minutes: totalMinutes % 60,
     };
   }, [selectedRace, now]);
+
+  const selectedRaceCircuitInfo = useMemo(() => {
+    if (!selectedRace || selectedCategory.id !== 'f1') return null;
+    return getRaceCircuitInfo(selectedRace);
+  }, [selectedRace, selectedCategory.id]);
 
   // "Ultimo vencedor" e "lider do campeonato" sempre mostram a MESMA categoria entre si
   // (logado/seguindo ou não): busca a corrida concluida mais recente cuja categoria tambem
@@ -1603,24 +1731,26 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   </div>
                 )}
 
-                {selectedCategory.id === 'f1' && isInterlagosRace(selectedRace) && (
+                {selectedRaceCircuitInfo && (
                   <div className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 apex-card p-8">
                       <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6 flex items-center gap-2">
                         <Route className="w-5 h-5 text-[var(--cat-accent)]" />
                         {UI_TRANSLATIONS[language].trackLayout}
                       </h3>
-                      <div className="mb-6 bg-black/20 border border-white/5 p-4">
-                        <img
-                          src="/circuits/interlagos.png"
-                          alt="Traçado do Autódromo José Carlos Pace (Interlagos)"
-                          className="w-full h-auto"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </div>
+                      {selectedRaceCircuitInfo.trackImage && (
+                        <div className="mb-6 bg-black/20 border border-white/5 p-4">
+                          <img
+                            src={selectedRaceCircuitInfo.trackImage}
+                            alt={selectedRace.circuit}
+                            className="w-full h-auto"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </div>
+                      )}
                       <div className="flex flex-wrap gap-3">
-                        {INTERLAGOS_CIRCUIT_INFO.drsZones.map((zone, index) => (
+                        {selectedRaceCircuitInfo.drsZones.map((zone, index) => (
                           <div key={index} className="flex items-center gap-2 px-3 py-2 bg-black/20 border border-white/5 text-xs font-apex-mono text-gray-400">
                             <Zap className="w-3.5 h-3.5 text-[var(--cat-accent)]" />
                             {UI_TRANSLATIONS[language].drsZones} {index + 1} — {language === 'pt' ? zone.pt : zone.en}
@@ -1635,13 +1765,13 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       </h3>
                       <dl className="space-y-3">
                         {[
-                          [UI_TRANSLATIONS[language].circuitLength, `${INTERLAGOS_CIRCUIT_INFO.lengthKm.toFixed(3)} km`],
-                          [UI_TRANSLATIONS[language].raceDistance, `${INTERLAGOS_CIRCUIT_INFO.raceDistanceKm.toFixed(3)} km`],
-                          [UI_TRANSLATIONS[language].laps, String(INTERLAGOS_CIRCUIT_INFO.laps)],
-                          [UI_TRANSLATIONS[language].corners, String(INTERLAGOS_CIRCUIT_INFO.corners)],
-                          [UI_TRANSLATIONS[language].direction, UI_TRANSLATIONS[language].counterclockwise],
-                          [UI_TRANSLATIONS[language].lapRecord, `${INTERLAGOS_CIRCUIT_INFO.lapRecord.time} — ${INTERLAGOS_CIRCUIT_INFO.lapRecord.driver} (${INTERLAGOS_CIRCUIT_INFO.lapRecord.year})`],
-                          [UI_TRANSLATIONS[language].firstGrandPrix, String(INTERLAGOS_CIRCUIT_INFO.firstGrandPrix)],
+                          [UI_TRANSLATIONS[language].circuitLength, `${selectedRaceCircuitInfo.lengthKm.toFixed(3)} km`],
+                          [UI_TRANSLATIONS[language].raceDistance, `${selectedRaceCircuitInfo.raceDistanceKm.toFixed(3)} km`],
+                          [UI_TRANSLATIONS[language].laps, String(selectedRaceCircuitInfo.laps)],
+                          [UI_TRANSLATIONS[language].corners, String(selectedRaceCircuitInfo.corners)],
+                          [UI_TRANSLATIONS[language].direction, selectedRaceCircuitInfo.direction === 'clockwise' ? UI_TRANSLATIONS[language].clockwise : UI_TRANSLATIONS[language].counterclockwise],
+                          [UI_TRANSLATIONS[language].lapRecord, `${selectedRaceCircuitInfo.lapRecord.time} — ${selectedRaceCircuitInfo.lapRecord.driver} (${selectedRaceCircuitInfo.lapRecord.year})`],
+                          [UI_TRANSLATIONS[language].firstGrandPrix, String(selectedRaceCircuitInfo.firstGrandPrix)],
                         ].map(([label, value]) => (
                           <div key={label} className="flex items-center justify-between border-b border-white/5 pb-3 gap-4">
                             <dt className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">{label}</dt>
@@ -1656,7 +1786,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         {UI_TRANSLATIONS[language].tyreStrategy}
                       </h3>
                       <p className="text-gray-400 leading-relaxed max-w-3xl">
-                        {language === 'pt' ? INTERLAGOS_CIRCUIT_INFO.tyreStrategyNote.pt : INTERLAGOS_CIRCUIT_INFO.tyreStrategyNote.en}
+                        {language === 'pt' ? selectedRaceCircuitInfo.tyreStrategyNote.pt : selectedRaceCircuitInfo.tyreStrategyNote.en}
                       </p>
                     </div>
 
@@ -1665,7 +1795,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         {UI_TRANSLATIONS[language].criticalBrakingZones}
                       </h3>
                       <div className="grid sm:grid-cols-2 gap-8">
-                        {INTERLAGOS_CIRCUIT_INFO.brakingZones.map((zone) => (
+                        {selectedRaceCircuitInfo.brakingZones.map((zone) => (
                           <div key={zone.turn} className="flex flex-col gap-2">
                             <div className="flex items-center justify-between">
                               <h4 className="font-apex font-extrabold italic text-lg text-[var(--text-main)]">
@@ -1788,13 +1918,13 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                     <div className="apex-card p-8 flex-grow">
                       <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
-                        {selectedDriver.id === 'norris' ? UI_TRANSLATIONS[language].careerOverview : (selectedDriverTeam?.name ?? UI_TRANSLATIONS[language].team)}
+                        {DRIVER_BIOS[selectedDriver.id] ? UI_TRANSLATIONS[language].careerOverview : (selectedDriverTeam?.name ?? UI_TRANSLATIONS[language].team)}
                       </h3>
-                      {selectedDriver.id === 'norris' ? (
+                      {DRIVER_BIOS[selectedDriver.id] ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                           <div>
                             <p className="text-gray-400 leading-relaxed mb-8">
-                              {language === 'pt' ? NORRIS_BIO.pt : NORRIS_BIO.en}
+                              {language === 'pt' ? DRIVER_BIOS[selectedDriver.id].pt : DRIVER_BIOS[selectedDriver.id].en}
                             </p>
                             <div className="grid grid-cols-2 gap-x-6 gap-y-6">
                               {selectedDriverTeam?.color && (
@@ -2243,7 +2373,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                         {(driversByTeamId.get(team.id) ?? [])
                                           .map(driver => {
                                             // Teste: mesmo atalho pra pagina de piloto da aba Classificacao, por enquanto so pro Lando Norris.
-                                            const isDriverPageTest = selectedCategory.id === 'f1' && driver.id === 'norris';
+                                            const isDriverPageTest = selectedCategory.id === 'f1' && Boolean(DRIVER_BIOS[driver.id]);
                                             return (
                                             <div
                                               key={driver.id}
@@ -2338,7 +2468,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           {selectedCategory.calendar.map((race) => {
                             const winnerDriver = race.winner ? driverByName.get(race.winner) : undefined;
                             // Teste: pagina dedicada de corrida, habilitada so para o GP de Interlagos por enquanto.
-                            const isRacePageTest = selectedCategory.id === 'f1' && isInterlagosRace(race);
+                            const isRacePageTest = selectedCategory.id === 'f1' && getRaceCircuitInfo(race) != null;
                             return (
                             <div
                               key={race.id}
@@ -2437,7 +2567,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                         const teamColor = selectedCategory.teams.find((t) => t.name === item.team)?.color;
                                         const driver = driverByName.get(item.name);
                                         // Teste: pagina de piloto dedicada, habilitada so para o Lando Norris por enquanto.
-                                        const isDriverPageTest = selectedCategory.id === 'f1' && driver?.id === 'norris';
+                                        const isDriverPageTest = selectedCategory.id === 'f1' && Boolean(driver && DRIVER_BIOS[driver.id]);
                                         return (
                                           <tr
                                             key={item.name}
