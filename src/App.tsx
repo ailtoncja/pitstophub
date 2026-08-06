@@ -1,14 +1,13 @@
 ﻿import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  Trophy, 
-  Timer, 
-  Flag, 
-  Mountain, 
-  ChevronRight, 
+import {
+  Trophy,
+  Timer,
+  Flag,
+  ChevronRight,
   ChevronDown,
-  Calendar, 
-  MapPin, 
+  Calendar,
+  MapPin,
   Users,
   Info,
   XCircle,
@@ -16,7 +15,6 @@ import {
   Sun,
   Moon,
   LayoutGrid,
-  Zap,
   Menu,
   X,
   Languages,
@@ -25,6 +23,7 @@ import {
   Share2
 } from 'lucide-react';
 import { MOTORSPORT_DATA, Category } from './types';
+import { OpenWheelCarIcon, HypercarIcon, GtCarIcon, RallyCarIcon, StockCarIcon } from './category-icons';
 import { cn } from './lib/utils';
 import { getUserSettings, saveUserSettings, type AuthUser } from './auth';
 import {
@@ -45,11 +44,11 @@ import {
 import type { Race, StandingItem } from './types';
 
 const IconMap: Record<string, React.ElementType> = {
-  Trophy,
-  Timer,
-  Flag,
-  Mountain,
-  Zap
+  OpenWheelCar: OpenWheelCarIcon,
+  Hypercar: HypercarIcon,
+  GtCar: GtCarIcon,
+  RallyCar: RallyCarIcon,
+  StockCar: StockCarIcon,
 };
 
 const SPRING = { type: 'spring' as const, stiffness: 380, damping: 32 };
