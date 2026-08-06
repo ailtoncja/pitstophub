@@ -1745,11 +1745,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                 {selectedRace.status === 'completed' && selectedRace.winner && (
                   <div className="apex-card p-8 flex items-center gap-6 max-w-md">
-                    {driverByName.get(selectedRace.winner)?.image && (
+                    {(driverByName.get(selectedRace.winner)?.cutout || driverByName.get(selectedRace.winner)?.image) && (
                       <img
-                        src={driverByName.get(selectedRace.winner)!.image}
+                        src={driverByName.get(selectedRace.winner)!.cutout || driverByName.get(selectedRace.winner)!.image}
                         alt={selectedRace.winner}
-                        className="w-20 h-20 rounded-full object-cover border-2 border-yellow-500/50"
+                        className="w-20 h-20 rounded-full object-cover object-top border-2 border-yellow-500/50"
                         referrerPolicy="no-referrer"
                         loading="lazy"
                         decoding="async"
@@ -2602,11 +2602,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 <span className="md:hidden text-xs font-bold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].result}</span>
                                 {race.winner ? (
                                   <div className="flex items-center justify-end gap-3">
-                                    {winnerDriver?.image && (
-                                      <img 
-                                        src={winnerDriver.image} 
-                                        alt={race.winner} 
-                                        className="w-8 h-8 rounded-full object-cover border border-yellow-500/50"
+                                    {(winnerDriver?.cutout || winnerDriver?.image) && (
+                                      <img
+                                        src={winnerDriver.cutout || winnerDriver.image}
+                                        alt={race.winner}
+                                        className="w-8 h-8 rounded-full object-cover object-top border border-yellow-500/50"
                                         referrerPolicy="no-referrer"
                                         loading="lazy"
                                         decoding="async"
