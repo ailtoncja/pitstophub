@@ -782,7 +782,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const followedTeamSet = useMemo(() => new Set(followedTeamIds), [followedTeamIds]);
   const followedDriverSet = useMemo(() => new Set(followedDriverIds), [followedDriverIds]);
 
-  const upcomingFollowedRaces = useMemo(() => {
+  const followedCategoryObjects = useMemo(() => {
     const categoriesToShow = new Set<string>([
       ...followedCategoryIds,
       ...followedTeamIds.map(v => v.split('::')[0]).filter(Boolean),
@@ -791,14 +791,18 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
     return Array.from(categoriesToShow)
       .map(id => allCategoriesById.get(id))
-      .filter((cat): cat is NonNullable<typeof cat> => cat != null)
+      .filter((cat): cat is NonNullable<typeof cat> => cat != null);
+  }, [allCategoriesById, followedCategoryIds, followedTeamIds, followedDriverIds]);
+
+  const upcomingFollowedRaces = useMemo(() => {
+    return followedCategoryObjects
       .flatMap(category =>
         category.calendar
           .filter(race => race.status === 'upcoming')
           .map(race => ({ category, race }))
       )
       .sort((a, b) => a.race.date.localeCompare(b.race.date));
-  }, [allCategoriesById, followedCategoryIds, followedTeamIds, followedDriverIds]);
+  }, [followedCategoryObjects]);
 
   const toggleFollowCategory = useCallback((categoryId: string) => {
     if (!currentUser) return onLoginRequest();
@@ -912,13 +916,26 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     };
   }, [selectedRace, now]);
 
+  // Usuario logado seguindo algo: "ultimo vencedor" e "lider do campeonato" passam a
+  // refletir só as categorias seguidas (a mesma categoria em ambos, pra ficar coerente),
+  // em vez de sempre mostrar o resultado mais recente global e o lider da F1.
+  const followedLastResult = useMemo(() => {
+    if (!currentUser || followedCategoryObjects.length === 0) return null;
+    return followedCategoryObjects
+      .flatMap((category) => category.calendar
+        .filter((race) => race.status === 'completed' && race.winner)
+        .map((race) => ({ category, race })))
+      .sort((a, b) => b.race.date.localeCompare(a.race.date))[0] ?? null;
+  }, [currentUser, followedCategoryObjects]);
+
   const lastGlobalResult = useMemo(() => {
+    if (followedLastResult) return followedLastResult;
     return allCategories
       .flatMap((category) => category.calendar
         .filter((race) => race.status === 'completed' && race.winner)
         .map((race) => ({ category, race })))
       .sort((a, b) => b.race.date.localeCompare(a.race.date))[0] ?? null;
-  }, [allCategories]);
+  }, [allCategories, followedLastResult]);
 
   const overviewStats = useMemo(() => ({
     categories: allCategories.length,
@@ -926,7 +943,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     teams: allCategories.reduce((sum, category) => sum + category.teams.length, 0),
   }), [allCategories]);
 
-  const f1Leader = allCategoriesById.get('f1')?.standings?.drivers?.[0] ?? null;
+  const featuredLeader = useMemo(() => {
+    if (followedLastResult) return followedLastResult.category.standings?.drivers?.[0] ?? null;
+    return allCategoriesById.get('f1')?.standings?.drivers?.[0] ?? null;
+  }, [followedLastResult, allCategoriesById]);
 
   const teamClasses = useMemo(
     () => Array.from(new Set(selectedCategory.teams.map(team => team.class || 'Geral'))),
@@ -1339,10 +1359,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         </span>
                       </div>
                       <div className="font-apex text-2xl font-extrabold italic text-[var(--text-main)] mb-1 truncate">
-                        {f1Leader?.name || '--'}
+                        {featuredLeader?.name || '--'}
                       </div>
                       <div className="font-apex-mono text-xs text-gray-500 uppercase tracking-widest font-medium truncate">
-                        {f1Leader ? `${f1Leader.team} • ${f1Leader.points} ${UI_TRANSLATIONS[language].points}` : UI_TRANSLATIONS[language].notAvailableShort}
+                        {featuredLeader ? `${featuredLeader.team} • ${featuredLeader.points} ${UI_TRANSLATIONS[language].points}` : UI_TRANSLATIONS[language].notAvailableShort}
                       </div>
                     </div>
 
