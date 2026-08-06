@@ -1433,15 +1433,15 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         <Route className="w-5 h-5 text-[var(--cat-accent)]" />
                         {UI_TRANSLATIONS[language].trackLayout}
                       </h3>
-                      <svg viewBox="0 0 800 500" className="w-full h-52 mb-6" fill="none">
-                        <path
-                          d="M 620 90 C 700 130, 720 220, 660 270 C 600 320, 520 260, 460 300 C 400 340, 340 420, 250 400 C 160 380, 110 300, 150 230 C 190 160, 280 190, 340 150 C 400 110, 400 60, 480 60 C 540 60, 560 60, 620 90 Z"
-                          stroke="var(--cat-accent)"
-                          strokeWidth="5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                      <div className="mb-6 bg-black/20 border border-white/5 p-4">
+                        <img
+                          src="/circuits/interlagos.png"
+                          alt="Traçado do Autódromo José Carlos Pace (Interlagos)"
+                          className="w-full h-auto"
+                          loading="lazy"
+                          decoding="async"
                         />
-                      </svg>
+                      </div>
                       <div className="flex flex-wrap gap-3">
                         {INTERLAGOS_CIRCUIT_INFO.drsZones.map((zone, index) => (
                           <div key={index} className="flex items-center gap-2 px-3 py-2 bg-black/20 border border-white/5 text-xs font-apex-mono text-gray-400">
