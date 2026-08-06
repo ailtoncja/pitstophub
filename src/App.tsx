@@ -944,11 +944,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   }), [allCategories]);
 
   const featuredLeader = useMemo(() => {
-    const category = followedLastResult ? followedLastResult.category : allCategoriesById.get('f1');
-    // Nem toda categoria tem classificacao por piloto (ex.: IMSA so tem por equipe) --
-    // cai pra construtores/equipes em vez de mostrar "N/A" quando isso acontece.
-    const entry = category?.standings?.drivers?.[0] ?? category?.standings?.constructors?.[0] ?? category?.standings?.teams?.[0] ?? null;
-    return entry && category ? { entry, category } : null;
+    // Nem toda categoria tem classificacao por piloto (ex.: IMSA so tem por equipe) e a WEC
+    // nao tem classificacao nenhuma nos dados -- cai pra construtores/equipes primeiro, e se
+    // a categoria seguida simplesmente nao tiver nada disso, cai pro lider da F1 em vez de "N/A".
+    const pickEntry = (category: Category | undefined) => {
+      const entry = category?.standings?.drivers?.[0] ?? category?.standings?.constructors?.[0] ?? category?.standings?.teams?.[0] ?? null;
+      return entry && category ? { entry, category } : null;
+    };
+    return pickEntry(followedLastResult?.category) ?? pickEntry(allCategoriesById.get('f1'));
   }, [followedLastResult, allCategoriesById]);
 
   const teamClasses = useMemo(
