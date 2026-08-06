@@ -6,6 +6,7 @@ import {
   Flag,
   ChevronRight,
   ChevronDown,
+  ChevronLeft,
   Calendar,
   MapPin,
   Users,
@@ -303,7 +304,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [view, setView] = useState<'home' | 'category'>('home');
+  const [view, setView] = useState<'home' | 'category' | 'race'>('home');
   const [selectedCategoryBase, setSelectedCategoryBase] = useState<Category>(MOTORSPORT_DATA[0]);
   const [activeTab, setActiveTab] = useState<'overview' | 'teams' | 'calendar' | 'standings'>('overview');
   const [showRules, setShowRules] = useState(false);
@@ -1250,6 +1251,104 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 </div>
             </motion.section>
           </motion.div>
+        ) : view === 'race' && selectedRace ? (
+          <motion.div
+            key="race-page"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={SPRING}
+          >
+            <section className="relative py-12 md:py-20 overflow-hidden min-h-[70vh]">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
+                <div className="absolute inset-0 bg-gradient-to-b from-[var(--cat-accent)]/20 to-transparent" />
+              </div>
+
+              <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <button
+                  onClick={() => { setView('category'); setActiveTab('calendar'); setSelectedRace(null); }}
+                  className="inline-flex items-center gap-2 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500 hover:text-[var(--cat-accent)] transition-colors mb-10"
+                >
+                  <ChevronLeft className="w-4 h-4" /> {UI_TRANSLATIONS[language].calendar}
+                </button>
+
+                <p className="font-apex-mono text-xs font-semibold uppercase tracking-widest text-[var(--cat-accent)] flex items-center gap-2 mb-4">
+                  <span className="w-8 h-[2px] bg-[var(--cat-accent)] inline-block" />
+                  {UI_TRANSLATIONS[language].roundLabel} {selectedCategory.calendar.findIndex((r) => r.id === selectedRace.id) + 1}
+                </p>
+                <h1 className="font-apex font-extrabold italic uppercase text-5xl sm:text-7xl md:text-8xl tracking-tighter text-[var(--text-main)] leading-[0.92] mb-4">
+                  {selectedRace.circuit}
+                </h1>
+                <p className="text-xl sm:text-2xl text-gray-400 font-medium mb-10">
+                  {language === 'pt' ? selectedRace.name : (selectedRace.enName || selectedRace.name)}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-4 mb-12">
+                  <span className={cn(
+                    "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1",
+                    selectedRace.status === 'completed' ? "bg-gray-800 text-gray-400" :
+                    selectedRace.status === 'cancelled' ? "bg-red-900/50 text-red-400" :
+                    "bg-[var(--cat-accent)] text-[var(--cat-accent-ink)]"
+                  )}>
+                    {selectedRace.status === 'completed' && <CheckCircle2 className="w-3 h-3" />}
+                    {selectedRace.status === 'cancelled' && <XCircle className="w-3 h-3" />}
+                    {selectedRace.status === 'upcoming' && <Timer className="w-3 h-3" />}
+                    {UI_TRANSLATIONS[language][selectedRace.status]}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-sm text-gray-400 font-apex-mono">
+                    <Calendar className="w-4 h-4" />
+                    {new Date(`${selectedRace.date}T00:00:00`).toLocaleDateString(language === 'pt' ? 'pt-BR' : 'en-US', { day: '2-digit', month: 'long', year: 'numeric' })}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-sm text-gray-400 font-apex-mono">
+                    <MapPin className="w-4 h-4" />
+                    {language === 'pt' ? selectedRace.location : (selectedRace.enLocation || selectedRace.location)}
+                  </span>
+                </div>
+
+                {selectedRace.status === 'upcoming' && selectedRaceCountdown && (
+                  <div className="flex gap-4 max-w-md">
+                    {[
+                      { value: selectedRaceCountdown.days, label: UI_TRANSLATIONS[language].daysLabel },
+                      { value: selectedRaceCountdown.hours, label: UI_TRANSLATIONS[language].hoursLabel },
+                      { value: selectedRaceCountdown.minutes, label: UI_TRANSLATIONS[language].minsLabel },
+                    ].map((item) => (
+                      <div key={item.label} className="apex-card flex-1 text-center py-6">
+                        <div className="font-apex text-4xl font-extrabold text-[var(--text-main)] mb-1">
+                          {String(item.value).padStart(2, '0')}
+                        </div>
+                        <div className="font-apex-mono text-[10px] text-gray-500 uppercase tracking-widest">
+                          {item.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {selectedRace.status === 'completed' && selectedRace.winner && (
+                  <div className="apex-card p-8 flex items-center gap-6 max-w-md">
+                    {driverByName.get(selectedRace.winner)?.image && (
+                      <img
+                        src={driverByName.get(selectedRace.winner)!.image}
+                        alt={selectedRace.winner}
+                        className="w-20 h-20 rounded-full object-cover border-2 border-yellow-500/50"
+                        referrerPolicy="no-referrer"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
+                    <div>
+                      <p className="font-apex-mono text-[10px] uppercase tracking-widest text-yellow-500 mb-1 flex items-center gap-1.5">
+                        <Trophy className="w-3.5 h-3.5" /> {UI_TRANSLATIONS[language].winner}
+                      </p>
+                      <p className="font-apex font-extrabold italic text-3xl text-[var(--text-main)]">
+                        {selectedRace.winner}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+          </motion.div>
         ) : (
             <motion.div
               key="category"
@@ -1645,12 +1744,15 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         <div className="space-y-4">
                           {selectedCategory.calendar.map((race) => {
                             const winnerDriver = race.winner ? driverByName.get(race.winner) : undefined;
+                            // Teste: pagina dedicada de corrida, habilitada so para o GP de Interlagos por enquanto.
+                            const isRacePageTest = selectedCategory.id === 'f1' && race.id === 'brazil';
                             return (
                             <div
                               key={race.id}
-                              onClick={() => setSelectedRace(race)}
+                              onClick={isRacePageTest ? () => { setSelectedRace(race); setView('race'); } : undefined}
                               className={cn(
-                                "flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 apex-card items-center transition-all hover:bg-white/10 cursor-pointer",
+                                "flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 apex-card items-center transition-all hover:bg-white/10",
+                                isRacePageTest && "cursor-pointer ring-1 ring-[var(--cat-accent)]/40",
                                 race.status === 'upcoming' ? "border-l-4 border-l-[var(--cat-accent)]" :
                                 race.status === 'cancelled' ? "border-l-4 border-l-red-500 opacity-60" : ""
                               )}
@@ -1971,109 +2073,6 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   </button>
                 </div>
               </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {selectedRace && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedRace(null)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.94, y: 16 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.94, y: 16 }}
-              transition={SPRING}
-              className="relative w-full max-w-2xl apex-card p-8 md:p-12 max-h-[85vh] overflow-y-auto no-scrollbar"
-            >
-              <button
-                onClick={() => setSelectedRace(null)}
-                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"
-              >
-                <XCircle className="w-6 h-6 text-gray-500" />
-              </button>
-
-              <p className="font-apex-mono text-xs font-semibold uppercase tracking-widest text-[var(--cat-accent)] flex items-center gap-2 mb-3">
-                <span className="w-8 h-[2px] bg-[var(--cat-accent)] inline-block" />
-                {UI_TRANSLATIONS[language].roundLabel} {selectedCategory.calendar.findIndex((r) => r.id === selectedRace.id) + 1}
-              </p>
-              <h2 className="font-apex font-extrabold italic uppercase text-4xl md:text-5xl tracking-tighter text-[var(--text-main)] leading-none mb-2">
-                {selectedRace.circuit}
-              </h2>
-              <p className="text-lg md:text-xl text-gray-400 font-medium mb-6">
-                {language === 'pt' ? selectedRace.name : (selectedRace.enName || selectedRace.name)}
-              </p>
-
-              <div className="flex flex-wrap items-center gap-4 mb-8">
-                <span className={cn(
-                  "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1",
-                  selectedRace.status === 'completed' ? "bg-gray-800 text-gray-400" :
-                  selectedRace.status === 'cancelled' ? "bg-red-900/50 text-red-400" :
-                  "bg-[var(--cat-accent)] text-[var(--cat-accent-ink)]"
-                )}>
-                  {selectedRace.status === 'completed' && <CheckCircle2 className="w-3 h-3" />}
-                  {selectedRace.status === 'cancelled' && <XCircle className="w-3 h-3" />}
-                  {selectedRace.status === 'upcoming' && <Timer className="w-3 h-3" />}
-                  {UI_TRANSLATIONS[language][selectedRace.status]}
-                </span>
-                <span className="flex items-center gap-1.5 text-sm text-gray-400 font-apex-mono">
-                  <Calendar className="w-4 h-4" />
-                  {new Date(`${selectedRace.date}T00:00:00`).toLocaleDateString(language === 'pt' ? 'pt-BR' : 'en-US', { day: '2-digit', month: 'long', year: 'numeric' })}
-                </span>
-                <span className="flex items-center gap-1.5 text-sm text-gray-400 font-apex-mono">
-                  <MapPin className="w-4 h-4" />
-                  {language === 'pt' ? selectedRace.location : (selectedRace.enLocation || selectedRace.location)}
-                </span>
-              </div>
-
-              {selectedRace.status === 'upcoming' && selectedRaceCountdown && (
-                <div className="grid grid-cols-3 gap-4 max-w-sm">
-                  {[
-                    { value: selectedRaceCountdown.days, label: UI_TRANSLATIONS[language].daysLabel },
-                    { value: selectedRaceCountdown.hours, label: UI_TRANSLATIONS[language].hoursLabel },
-                    { value: selectedRaceCountdown.minutes, label: UI_TRANSLATIONS[language].minsLabel },
-                  ].map((item) => (
-                    <div key={item.label} className="apex-card text-center py-4">
-                      <div className="font-apex font-extrabold italic text-3xl text-[var(--text-main)]">
-                        {String(item.value).padStart(2, '0')}
-                      </div>
-                      <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mt-1">
-                        {item.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {selectedRace.status === 'completed' && selectedRace.winner && (
-                <div className="apex-card p-6 flex items-center gap-4">
-                  {driverByName.get(selectedRace.winner)?.image && (
-                    <img
-                      src={driverByName.get(selectedRace.winner)!.image}
-                      alt={selectedRace.winner}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-yellow-500/50"
-                      referrerPolicy="no-referrer"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  )}
-                  <div>
-                    <p className="font-apex-mono text-[10px] uppercase tracking-widest text-yellow-500 mb-1 flex items-center gap-1.5">
-                      <Trophy className="w-3.5 h-3.5" /> {UI_TRANSLATIONS[language].winner}
-                    </p>
-                    <p className="font-apex font-extrabold italic text-2xl text-[var(--text-main)]">
-                      {selectedRace.winner}
-                    </p>
-                  </div>
-                </div>
-              )}
             </motion.div>
           </div>
         )}
