@@ -786,12 +786,17 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   }, []);
 
   const heroNextRace = useMemo(() => {
+    // Usuario logado com categorias/equipes/pilotos seguidos: mostra a proxima
+    // corrida entre o que ele segue, em vez da proxima corrida de qualquer categoria.
+    if (currentUser && upcomingFollowedRaces.length > 0) {
+      return upcomingFollowedRaces[0];
+    }
     return allCategories
       .flatMap((category) => category.calendar
         .filter((race) => race.status === 'upcoming')
         .map((race) => ({ category, race })))
       .sort((a, b) => a.race.date.localeCompare(b.race.date))[0] ?? null;
-  }, [allCategories]);
+  }, [allCategories, currentUser, upcomingFollowedRaces]);
 
   const heroCountdownDays = useMemo(() => {
     if (!heroNextRace) return null;
