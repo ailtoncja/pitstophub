@@ -1366,6 +1366,12 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'eastalent', name: 'Eastalent Racing', color: '#999999', car: 'Audi R8 LMS Evo II' },
       { id: 'rutronik', name: 'Rutronik Racing', color: '#00FF00', car: 'Lamborghini Temerario GT3' },
       { id: 'rowe-racing', name: 'Rowe Racing', color: '#00274D', car: 'BMW M4 GT3 Evo', badge: 'https://r2.thesportsdb.com/images/media/team/badge/cicuup1560269033.png' },
+      { id: '2seas', name: '2Seas Motorsport', color: '#0033A0', car: 'Mercedes-AMG GT3 Evo', badge: 'https://r2.thesportsdb.com/images/media/team/badge/438lyu1593782196.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/8grbr61747140602.png' },
+      { id: 'tresor-attempto', name: 'Tresor Attempto Racing', color: '#000000', car: 'Audi R8 LMS Evo II', badge: 'https://r2.thesportsdb.com/images/media/team/badge/gmsnqj1560366890.png' },
+      { id: 'emil-frey-gtwc', name: 'Emil Frey Racing', color: '#CC0000', car: 'Ferrari 296 GT3 Evo', badge: 'https://r2.thesportsdb.com/images/media/team/badge/a6usmg1711453030.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/7pe86l1779553314.png' },
+      { id: 'team-rjn', name: 'Team RJN', color: '#000000', car: 'Nissan GT-R NISMO GT3', badge: 'https://r2.thesportsdb.com/images/media/team/badge/xnfjbg1560269096.png' },
+      { id: 'optimum-motorsport', name: 'Optimum Motorsport', color: '#FF8700', car: 'McLaren 720S GT3 Evo', badge: 'https://r2.thesportsdb.com/images/media/team/badge/u80rpq1593029957.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/5if2x71778443564.png' },
+      { id: 'ecurie-ecosse', name: 'Ecurie Ecosse Blackthorn', color: '#003399', car: 'Aston Martin Vantage AMR GT3 Evo', badge: 'https://r2.thesportsdb.com/images/media/team/badge/vruxxx1432598325.png' },
     ],
     drivers: [
       { id: 'boccolacci', name: 'Dorian Boccolacci', number: '2', nationality: 'França', teamId: 'boutsen-vds', image: 'https://r2.thesportsdb.com/images/media/player/thumb/pn8lck1537383652.jpg' },
@@ -1439,17 +1445,6 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'portimao-gt', name: 'Portimão', enName: 'Portimão', location: 'Portugal', enLocation: 'Portugal', date: '2026-10-18', circuit: 'Autódromo Internacional do Algarve', status: 'upcoming' },
     ],
     standings: {
-      drivers: [
-        { position: 1, name: 'Mercedes-AMG', points: 111, team: 'Fabricante' },
-        { position: 2, name: 'Ferrari', points: 82, team: 'Fabricante' },
-        { position: 3, name: 'Audi Sport', points: 67, team: 'Fabricante' },
-        { position: 4, name: 'Porsche', points: 60, team: 'Fabricante' },
-        { position: 5, name: 'BMW M', points: 28, team: 'Fabricante' },
-        { position: 6, name: 'Ford', points: 20, team: 'Fabricante' },
-        { position: 7, name: 'Lamborghini', points: 16, team: 'Fabricante' },
-        { position: 8, name: 'McLaren', points: 11, team: 'Fabricante' },
-        { position: 9, name: 'Aston Martin', points: 8, team: 'Fabricante' },
-      ],
       // Fonte: gt-world-challenge-europe.com/standings (Teams, geral Sprint+Endurance)
       teams: [
         { position: 1, name: 'Winward Racing', points: 116 },
