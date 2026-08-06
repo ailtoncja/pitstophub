@@ -45,7 +45,7 @@ import {
   mergeCategoryWithSyncedCalendar,
   mergeCategoryWithSyncedStandings,
 } from './synced-races';
-import type { Race, StandingItem } from './types';
+import type { Driver, Race, StandingItem } from './types';
 
 const IconMap: Record<string, React.ElementType> = {
   OpenWheelCar: OpenWheelCarIcon,
@@ -203,7 +203,13 @@ const UI_TRANSLATIONS = {
     drsZones: 'Zonas de DRS',
     tyreStrategy: 'Estratégia de Pneus',
     criticalBrakingZones: 'Principais Zonas de Frenagem',
-    dataSourceNote: 'Dados verificados publicamente; a Pirelli ainda não anunciou os compostos para esta corrida.'
+    dataSourceNote: 'Dados verificados publicamente; a Pirelli ainda não anunciou os compostos para esta corrida.',
+    wins: 'Vitórias',
+    teammate: 'Companheiro de Equipe',
+    chassis: 'Chassi',
+    winsThisSeason: 'Vitórias na Temporada',
+    noWinsYet: 'Nenhuma vitória nesta temporada ainda.',
+    driverProfile: 'Perfil do Piloto'
   },
   en: {
     home: 'Home',
@@ -298,7 +304,13 @@ const UI_TRANSLATIONS = {
     drsZones: 'DRS Zones',
     tyreStrategy: 'Tyre Strategy',
     criticalBrakingZones: 'Critical Braking Zones',
-    dataSourceNote: 'Publicly verified data; Pirelli has not announced tyre compounds for this race yet.'
+    dataSourceNote: 'Publicly verified data; Pirelli has not announced tyre compounds for this race yet.',
+    wins: 'Wins',
+    teammate: 'Teammate',
+    chassis: 'Chassis',
+    winsThisSeason: 'Wins This Season',
+    noWinsYet: 'No wins this season yet.',
+    driverProfile: 'Driver Profile'
   }
 };
 
@@ -350,6 +362,19 @@ function isInterlagosRace(race: Race): boolean {
   );
 }
 
+function formatOrdinal(position: number, language: 'pt' | 'en'): { number: string; suffix: string } {
+  if (language === 'pt') return { number: String(position), suffix: 'º' };
+  const mod100 = position % 100;
+  const mod10 = position % 10;
+  let suffix = 'TH';
+  if (mod100 < 11 || mod100 > 13) {
+    if (mod10 === 1) suffix = 'ST';
+    else if (mod10 === 2) suffix = 'ND';
+    else if (mod10 === 3) suffix = 'RD';
+  }
+  return { number: String(position), suffix };
+}
+
 function getIsIOSInstallable(): boolean {
   if (typeof navigator === 'undefined') return false;
   const isIOS =
@@ -368,10 +393,11 @@ function getIsIOSInstallable(): boolean {
 const NAV_STORAGE_KEY = 'pitstophub_nav_state';
 
 type StoredNav = {
-  view: 'home' | 'category' | 'race';
+  view: 'home' | 'category' | 'race' | 'driver';
   categoryId: string;
   activeTab: 'overview' | 'teams' | 'calendar' | 'standings';
   raceId: string | null;
+  driverId: string | null;
 };
 
 function readStoredNav(): StoredNav | null {
@@ -402,7 +428,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [view, setView] = useState<'home' | 'category' | 'race'>(() => readStoredNav()?.view ?? 'home');
+  const [view, setView] = useState<'home' | 'category' | 'race' | 'driver'>(() => readStoredNav()?.view ?? 'home');
   const [selectedCategoryBase, setSelectedCategoryBase] = useState<Category>(() => {
     const stored = readStoredNav();
     return (stored && CATEGORY_BY_ID.get(stored.categoryId)) || MOTORSPORT_DATA[0];
@@ -416,6 +442,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     if (!stored?.raceId) return null;
     const category = CATEGORY_BY_ID.get(stored.categoryId);
     return category?.calendar.find((r) => r.id === stored.raceId) ?? null;
+  });
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(() => {
+    const stored = readStoredNav();
+    if (!stored?.driverId) return null;
+    const category = CATEGORY_BY_ID.get(stored.categoryId);
+    return category?.drivers.find((d) => d.id === stored.driverId) ?? null;
   });
   const [activeHomeGroup, setActiveHomeGroup] = useState<string>(NAV_GROUPS[0].name.en);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
@@ -439,12 +471,13 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         categoryId: selectedCategoryBase.id,
         activeTab,
         raceId: selectedRace?.id ?? null,
+        driverId: selectedDriver?.id ?? null,
       };
       window.sessionStorage.setItem(NAV_STORAGE_KEY, JSON.stringify(payload));
     } catch {
       // sessionStorage indisponivel (modo privado, etc.) -- ignora, so afeta a persistencia.
     }
-  }, [view, selectedCategoryBase.id, activeTab, selectedRace?.id]);
+  }, [view, selectedCategoryBase.id, activeTab, selectedRace?.id, selectedDriver?.id]);
   const [syncedStandings, setSyncedStandings] = useState<Partial<Record<Category['id'], StandingItem[] | null>>>({});
 
   React.useEffect(() => {
@@ -860,6 +893,30 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     () => new Map(selectedCategory.drivers.map(d => [d.name, d])),
     [selectedCategory.drivers]
   );
+
+  const selectedDriverTeam = useMemo(
+    () => (selectedDriver ? selectedCategory.teams.find((t) => t.id === selectedDriver.teamId) ?? null : null),
+    [selectedCategory.teams, selectedDriver]
+  );
+
+  const selectedDriverStanding = useMemo(
+    () => (selectedDriver ? selectedCategory.standings?.drivers?.find((d) => d.name === selectedDriver.name) ?? null : null),
+    [selectedCategory.standings, selectedDriver]
+  );
+
+  // Vitorias reais, contadas a partir de quem venceu cada corrida do calendario --
+  // nao ha campo de "vitorias"/"podios" nos dados, entao so o que da pra derivar entra aqui.
+  const selectedDriverWins = useMemo(() => {
+    if (!selectedDriver) return [];
+    return selectedCategory.calendar
+      .filter((race) => race.winner === selectedDriver.name)
+      .sort((a, b) => b.date.localeCompare(a.date));
+  }, [selectedCategory.calendar, selectedDriver]);
+
+  const selectedDriverTeammates = useMemo(() => {
+    if (!selectedDriver) return [];
+    return (driversByTeamId.get(selectedDriver.teamId) ?? []).filter((d) => d.id !== selectedDriver.id);
+  }, [driversByTeamId, selectedDriver]);
 
   return (
     <div
@@ -1533,6 +1590,161 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               </div>
             </section>
           </motion.div>
+        ) : view === 'driver' && selectedDriver ? (
+          <motion.div
+            key="driver-page"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={SPRING}
+          >
+            <section className="relative py-12 md:py-20 overflow-hidden min-h-[70vh]">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
+                <div className="absolute inset-0 bg-gradient-to-b from-[var(--cat-accent)]/20 to-transparent" />
+              </div>
+
+              <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <button
+                  onClick={() => { setView('category'); setActiveTab('standings'); setSelectedDriver(null); }}
+                  className="inline-flex items-center gap-2 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500 hover:text-[var(--cat-accent)] transition-colors mb-10"
+                >
+                  <ChevronLeft className="w-4 h-4" /> {UI_TRANSLATIONS[language].standings}
+                </button>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+                  <div className="lg:col-span-5 apex-card relative overflow-hidden min-h-[420px] flex flex-col justify-end">
+                    {selectedDriver.image && (
+                      <img
+                        src={selectedDriver.image}
+                        alt={selectedDriver.name}
+                        className="absolute inset-0 w-full h-full object-cover object-top opacity-80"
+                        referrerPolicy="no-referrer"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                    <div className="relative z-10 p-8">
+                      <div className="flex items-center gap-3 mb-3">
+                        {selectedDriverTeam && (
+                          <span className="text-[var(--cat-accent)] font-apex-mono text-xs font-semibold border border-[var(--cat-accent)] px-2 py-1 uppercase">
+                            {selectedDriverTeam.name}
+                          </span>
+                        )}
+                        <span className="font-apex-mono text-xs text-gray-300">#{selectedDriver.number}</span>
+                      </div>
+                      <h1 className="font-apex font-extrabold italic uppercase text-4xl sm:text-5xl leading-[0.95] text-white">
+                        {selectedDriver.name.split(' ').slice(0, -1).join(' ')}
+                        <br />
+                        <span className="text-[var(--cat-accent)]">{selectedDriver.name.split(' ').slice(-1)}</span>
+                      </h1>
+                      <p className="font-apex-mono text-xs uppercase tracking-widest text-gray-300 mt-4">
+                        {selectedDriver.nationality}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-7 flex flex-col gap-6">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="apex-card p-4">
+                        <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                          {UI_TRANSLATIONS[language].position}
+                        </div>
+                        <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                          {selectedDriverStanding ? (
+                            <>
+                              {formatOrdinal(selectedDriverStanding.position, language).number}
+                              <span className="text-[var(--cat-accent)] text-base align-top">
+                                {formatOrdinal(selectedDriverStanding.position, language).suffix}
+                              </span>
+                            </>
+                          ) : '-'}
+                        </div>
+                      </div>
+                      <div className="apex-card p-4">
+                        <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                          {UI_TRANSLATIONS[language].points}
+                        </div>
+                        <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                          {selectedDriverStanding?.points ?? '-'}
+                        </div>
+                      </div>
+                      <div className="apex-card p-4">
+                        <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                          {UI_TRANSLATIONS[language].wins}
+                        </div>
+                        <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                          {selectedDriverWins.length}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="apex-card p-8 flex-grow">
+                      <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
+                        {selectedDriverTeam?.name ?? UI_TRANSLATIONS[language].team}
+                      </h3>
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-8">
+                        {selectedDriverTeam?.color && (
+                          <div>
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                              {UI_TRANSLATIONS[language].team}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="w-4 h-4 shrink-0" style={{ backgroundColor: selectedDriverTeam.color }} />
+                              <span className="font-bold text-[var(--text-main)]">{selectedDriverTeam.name}</span>
+                            </div>
+                          </div>
+                        )}
+                        {selectedDriverTeam?.car && (
+                          <div>
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                              {UI_TRANSLATIONS[language].chassis}
+                            </div>
+                            <div className="font-bold text-[var(--text-main)]">{selectedDriverTeam.car}</div>
+                          </div>
+                        )}
+                        {selectedDriverTeammates.length > 0 && (
+                          <div>
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                              {UI_TRANSLATIONS[language].teammate}
+                            </div>
+                            <div className="font-bold text-[var(--text-main)]">
+                              {selectedDriverTeammates.map((t) => t.name).join(', ')}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="apex-card p-8">
+                  <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
+                    {UI_TRANSLATIONS[language].winsThisSeason}
+                  </h3>
+                  {selectedDriverWins.length === 0 ? (
+                    <p className="text-gray-500 text-sm">{UI_TRANSLATIONS[language].noWinsYet}</p>
+                  ) : (
+                    <div className="divide-y divide-white/5">
+                      {selectedDriverWins.map((race) => (
+                        <div key={race.id} className="flex items-center justify-between py-3">
+                          <div>
+                            <div className="font-bold text-[var(--text-main)]">
+                              {language === 'pt' ? race.name : (race.enName || race.name)}
+                            </div>
+                            <div className="text-xs text-gray-500">{race.location}</div>
+                          </div>
+                          <div className="font-apex-mono text-xs text-gray-400">
+                            {race.date.split('-').reverse().join('/')}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+          </motion.div>
         ) : (
             <motion.div
               key="category"
@@ -2026,10 +2238,17 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     <tbody className="divide-y divide-[var(--card-border)]">
                                       {selectedCategory.standings.drivers.map((item) => {
                                         const teamColor = selectedCategory.teams.find((t) => t.name === item.team)?.color;
+                                        const driver = driverByName.get(item.name);
+                                        // Teste: pagina de piloto dedicada, habilitada so para o Lando Norris por enquanto.
+                                        const isDriverPageTest = selectedCategory.id === 'f1' && driver?.id === 'norris';
                                         return (
                                           <tr
                                             key={item.name}
-                                            className="hover:bg-white/5 transition-colors border-l-2"
+                                            onClick={isDriverPageTest ? () => { setSelectedDriver(driver!); setView('driver'); } : undefined}
+                                            className={cn(
+                                              "hover:bg-white/5 transition-colors border-l-2",
+                                              isDriverPageTest && "cursor-pointer ring-1 ring-inset ring-[var(--cat-accent)]/40"
+                                            )}
                                             style={{ borderLeftColor: item.position === 1 ? 'var(--cat-accent)' : (teamColor ?? 'transparent') }}
                                           >
                                             <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--cat-accent)]">{item.position}</td>
