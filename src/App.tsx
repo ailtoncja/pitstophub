@@ -379,6 +379,7 @@ const INTERLAGOS_CIRCUIT_INFO: CircuitInfo = {
 
 // Dados reais do Silverstone Circuit, usados só na página de teste do GP da Grã-Bretanha. Fonte: Wikipedia.
 const SILVERSTONE_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/silverstone.png',
   lengthKm: 5.891,
   raceDistanceKm: 306.198,
   laps: 52,
@@ -412,6 +413,7 @@ const SILVERSTONE_CIRCUIT_INFO: CircuitInfo = {
 
 // Dados reais do Albert Park Circuit, usados só na página de teste do GP da Austrália. Fonte: Wikipedia.
 const ALBERT_PARK_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/albertpark.png',
   lengthKm: 5.278,
   raceDistanceKm: 306.124,
   laps: 58,
