@@ -68,7 +68,7 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The pinnacle of global motorsport, featuring the fastest single-seater cars on the planet.',
     longDescription: 'A Fórmula 1 é o auge do automobilismo, regulada pela FIA. O campeonato consiste em uma série de corridas, conhecidas como Grandes Prêmios, realizadas em circuitos de rua e autódromos permanentes. Os carros são os mais rápidos do mundo em circuitos mistos, graças a uma aerodinâmica extremamente avançada e motores híbridos V6 turbo de 1.6 litros. O sistema de pontuação premia os 10 primeiros colocados (25, 18, 15, 12, 10, 8, 6, 4, 2, 1), com um ponto extra para a volta mais rápida se o piloto terminar no top 10. Em 2026, novas regras de motores e aerodinâmica entram em vigor, focando em combustíveis 100% sustentáveis e maior potência elétrica.',
     enLongDescription: 'Formula 1 is the peak of motorsport, regulated by the FIA. The championship consists of a series of races, known as Grands Prix, held on street circuits and permanent tracks. The cars are the fastest in the world on mixed circuits, thanks to extremely advanced aerodynamics and 1.6-liter V6 turbo hybrid engines. The scoring system rewards the top 10 finishers (25, 18, 15, 12, 10, 8, 6, 4, 2, 1), with an extra point for the fastest lap if the driver finishes in the top 10. In 2026, new engine and aerodynamic rules come into force, focusing on 100% sustainable fuels and greater electric power.',
-    icon: 'Trophy',
+    icon: 'OpenWheelCar',
     teams: [
       { id: 'mercedes', name: 'Mercedes', color: '#00D2BE', car: 'W17' },
       { id: 'ferrari', name: 'Ferrari', color: '#DC0000', car: 'SF-26' },
@@ -175,7 +175,7 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The main feeder series to Formula 1, where young talents prove their worth in identical cars.',
     longDescription: 'A FIA Fórmula 2 é o último degrau antes da Fórmula 1. Todos os competidores utilizam o mesmo chassi Dallara F2 2024 e motores Mecachrome V6 Turbo de 3.4 litros, garantindo que o talento do piloto seja o fator determinante. As rodadas triplas ou duplas acompanham os finais de semana da F1, proporcionando visibilidade máxima. O sistema de pontuação é similar ao da F1, mas com pontos adicionais para a pole position e voltas mais rápidas em ambas as corridas (Sprint e Feature).',
     enLongDescription: 'FIA Formula 2 is the final step before Formula 1. All competitors use the same Dallara F2 2024 chassis and 3.4-liter Mecachrome V6 Turbo engines, ensuring that driver talent is the determining factor. Triple or double headers accompany F1 weekends, providing maximum visibility. The scoring system is similar to F1, but with additional points for pole position and fastest laps in both races (Sprint and Feature).',
-    icon: 'Trophy',
+    icon: 'OpenWheelCar',
     teams: [
       { id: 'invicta', name: 'Invicta Racing', color: '#FFD700', car: 'Dallara F2 2024' },
       { id: 'campos', name: 'Campos Racing', color: '#FFFFFF', car: 'Dallara F2 2024' },
@@ -277,7 +277,7 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The ultimate training ground for future stars, with frantic and competitive racing.',
     longDescription: 'A FIA Fórmula 3 é a categoria de base que serve como porta de entrada para o caminho da F1. Com grid de 30 carros idênticos, as corridas são conhecidas por serem extremamente disputadas e imprevisíveis. É onde os pilotos vindos do kart e das Fórmulas 4 regionais começam a competir nos grandes palcos mundiais, dividindo o final de semana com a F1 e F2. O foco é o desenvolvimento técnico e a preparação para os desafios físicos e mentais das categorias superiores.',
     enLongDescription: 'FIA Formula 3 is the entry-level category that serves as the gateway to the F1 path. With a grid of 30 identical cars, the races are known for being extremely competitive and unpredictable. It is where drivers coming from karting and regional Formula 4 begin to compete on the world\'s big stages, sharing the weekend with F1 and F2. The focus is on technical development and preparation for the physical and mental challenges of higher categories.',
-    icon: 'Trophy',
+    icon: 'OpenWheelCar',
     teams: [
       { id: 'prema-f3', name: 'Prema Racing', color: '#DC0000', car: 'Dallara F3 2025' },
       { id: 'trident-f3', name: 'Trident', color: '#0000FF', car: 'Dallara F3 2025' },
@@ -367,7 +367,7 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'Exclusive all-female feeder series for Formula 1.',
     longDescription: 'A F1 Academy é uma categoria de automobilismo exclusivamente feminina fundada pela Fórmula 1. O objetivo é preparar jovens pilotos para níveis mais altos de competição, como a Fórmula 3, Fórmula 2 e, eventualmente, a Fórmula 1. A categoria utiliza carros Tatuus F4-T421 e motores Autotecnica de 174 cv.',
     enLongDescription: 'F1 Academy is an all-female racing category founded by Formula 1. The goal is to prepare young drivers for higher levels of competition, such as Formula 3, Formula 2, and eventually Formula 1. The category uses Tatuus F4-T421 cars and 174 hp Autotecnica engines.',
-    icon: 'Zap',
+    icon: 'OpenWheelCar',
     teams: [
       { id: 'prema-academy', name: 'Prema Racing', color: '#E31E24', car: 'Tatuus F4-T421' },
       { id: 'campos-academy', name: 'Campos Racing', color: '#FF7F00', car: 'Tatuus F4-T421' },
@@ -436,7 +436,7 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'Long-distance races that test the endurance of machines and drivers, including the legendary 24 Hours of Le Mans.',
     longDescription: 'O FIA WEC é o campeonato mundial de corridas de resistência. A categoria principal é a Hypercar (LMH e LMDh), onde grandes fabricantes como Ferrari, Toyota, Porsche e BMW competem com protótipos híbridos sofisticados. Além dos Hypercars, a categoria conta com a classe LMGT3 para carros baseados em modelos de produção. As corridas variam de 6 a 24 horas de duração, exigindo trocas de pilotos (geralmente 3 por carro), gerenciamento estratégico de pneus e combustível, e confiabilidade mecânica absoluta. O ponto alto da temporada são as 24 Horas de Le Mans, a corrida mais famosa do mundo.',
     enLongDescription: 'The FIA WEC is the world endurance racing championship. The main category is Hypercar (LMH and LMDh), where major manufacturers such as Ferrari, Toyota, Porsche and BMW compete with sophisticated hybrid prototypes. In addition to Hypercars, the category has the LMGT3 class for cars based on production models. Races range from 6 to 24 hours in length, requiring driver changes (usually 3 per car), strategic tire and fuel management, and absolute mechanical reliability. The highlight of the season is the 24 Hours of Le Mans, the most famous race in the world.',
-    icon: 'Timer',
+    icon: 'Hypercar',
     teams: [
       { id: 'toyota-racing', name: 'Toyota Racing', color: '#E4002B', class: 'Hypercar', car: 'Toyota GR010 Hybrid' },
       { id: 'cadillac-jota', name: 'Cadillac Hertz Team Jota', color: '#FFD700', class: 'Hypercar', car: 'Cadillac V-Series.R' },
@@ -538,7 +538,7 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The premier endurance category in North America, featuring prototypes and GT cars.',
     longDescription: 'O IMSA WeatherTech SportsCar Championship é a principal série de corridas de carros esportivos na América do Norte. A categoria de topo é a GTP (Grand Touring Prototype), que compartilha regulamentos técnicos com os Hypercars do WEC, permitindo que os carros compitam em ambos os campeonatos. Outras classes incluem LMP2 (protótipos), GTD Pro e GTD (carros GT3). O calendário inclui clássicos como as 24 Horas de Daytona e as 12 Horas de Sebring. Diferente do WEC, o IMSA é conhecido por corridas extremamente disputadas, com frequentes períodos de bandeira amarela que reagrupam o pelotão, garantindo finais emocionantes.',
     enLongDescription: 'The IMSA WeatherTech SportsCar Championship is the premier sports car racing series in North America. The top category is GTP (Grand Touring Prototype), which shares technical regulations with the WEC Hypercars, allowing cars to compete in both championships. Other classes include LMP2 (prototypes), GTD Pro and GTD (GT3 cars). The calendar includes classics such as the 24 Hours of Daytona and the 12 Hours of Sebring. Unlike the WEC, IMSA is known for extremely competitive racing, with frequent yellow flag periods that regroup the field, ensuring exciting finishes.',
-    icon: 'Flag',
+    icon: 'GtCar',
     teams: [
       { id: 'porsche-penske', name: 'Porsche Penske Motorsport', color: '#000000', class: 'GTP', car: 'Porsche 963' },
       { id: 'cadillac-wtr', name: 'Cadillac Wayne Taylor Racing', color: '#000000', class: 'GTP', car: 'Cadillac V-Series.R' },
@@ -664,7 +664,7 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'Drivers facing extreme terrains, from snow to gravel, at incredible speeds.',
     longDescription: 'O WRC é a competição de rali de mais alto nível da FIA. Pilotos e navegadores competem em carros "Rally1" híbridos em superfícies que variam de asfalto liso a cascalho bruto, neve e gelo. Cada rali é dividido em "estágios" cronometrados em estradas fechadas ao público. O objetivo é completar os estágios no menor tempo possível. Entre os estágios, os carros circulam em estradas públicas, devendo obedecer às leis de trânsito. O WRC exige uma habilidade de condução incomparável e uma confiança cega entre o piloto e o navegador, que lê as "notas de ritmo" para descrever o que vem pela frente em alta velocidade.',
     enLongDescription: 'The WRC is the highest level of rally competition from the FIA. Drivers and co-drivers compete in hybrid "Rally1" cars on surfaces ranging from smooth asphalt to rough gravel, snow and ice. Each rally is divided into timed "stages" on roads closed to the public. The goal is to complete the stages in the shortest time possible. Between stages, cars circulate on public roads, having to obey traffic laws. The WRC requires unparalleled driving skill and blind trust between the driver and the co-driver, who reads the "pace notes" to describe what lies ahead at high speed.',
-    icon: 'Mountain',
+    icon: 'RallyCar',
     teams: [
       { id: 'hyundai-wrc', name: 'Hyundai Shell Mobis WRT', color: '#003478', car: 'Hyundai i20 N Rally1' },
       { id: 'toyota-wrc', name: 'Toyota Gazoo Racing WRT', color: '#E4002B', car: 'Toyota GR Yaris Rally1' },
@@ -731,7 +731,7 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The fastest single-seater category in the USA, famous for the Indianapolis 500.',
     longDescription: 'A NTT IndyCar Series é a principal categoria de monopostos da América do Norte. Conhecida por sua incrível diversidade de circuitos, a categoria compete em ovais de alta velocidade, circuitos mistos permanentes e desafiadores circuitos de rua. O chassi Dallara IR-18 é padrão para todas as equipes, com motores V6 Twin-Turbo fornecidos pela Chevrolet e Honda. O ponto alto do automobilismo mundial são as 500 Milhas de Indianápolis (Indy 500), uma das provas da Tríplice Coroa do Automobilismo. A categoria é famosa pelo equilíbrio, onde a habilidade do piloto e a estratégia da equipe fazem a diferença real.',
     enLongDescription: 'The NTT IndyCar Series is the premier single-seater category in North America. Known for its incredible diversity of circuits, the category competes on high-speed ovals, permanent road courses and challenging street circuits. The Dallara IR-18 chassis is standard for all teams, with Twin-Turbo V6 engines supplied by Chevrolet and Honda. The highlight of world motorsport is the Indianapolis 500 (Indy 500), one of the races of the Triple Crown of Motorsport. The category is famous for its balance, where driver skill and team strategy make the real difference.',
-    icon: 'Zap',
+    icon: 'OpenWheelCar',
     teams: [
       { id: 'foyt', name: 'A. J. Foyt Enterprises', color: '#DC0000', car: 'Dallara IR-18 (Chevrolet)' },
       { id: 'andretti', name: 'Andretti Global', color: '#000000', car: 'Dallara IR-18 (Honda)' },
@@ -824,7 +824,7 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The world\'s premier stock car category, with intense racing on ovals and road courses.',
     longDescription: 'A NASCAR Cup Series é o auge das corridas de stock car. Com carros baseados em modelos de produção (Chevrolet Camaro, Ford Mustang e Toyota Camry), a categoria é famosa por suas corridas em ovais de alta velocidade, onde o vácuo e o contato físico são partes essenciais da estratégia. O campeonato utiliza um sistema de pontos complexo e o formato de "Playoffs" para decidir o campeão. As 500 Milhas de Daytona são a joia da coroa do calendário, abrindo a temporada com o maior espetáculo do automobilismo americano.',
     enLongDescription: 'The NASCAR Cup Series is the pinnacle of stock car racing. With cars based on production models (Chevrolet Camaro, Ford Mustang and Toyota Camry), the category is famous for its high-speed oval racing, where drafting and physical contact are essential parts of the strategy. The championship uses a complex points system and the "Playoffs" format to decide the champion. The Daytona 500 is the crown jewel of the calendar, opening the season with the greatest spectacle in American motorsport.',
-    icon: 'Flag',
+    icon: 'StockCar',
     teams: [
       { id: '23xi', name: '23XI Racing', color: '#FF0000', car: 'Toyota Camry XSE' },
       { id: 'penske-nascar', name: 'Team Penske', color: '#DC0000', car: 'Ford Mustang Dark Horse' },
@@ -973,7 +973,7 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'Europe\'s most prestigious touring car category, featuring high-performance GT3 cars.',
     longDescription: 'O DTM é o auge das corridas de carros de turismo alemães. Utilizando regulamentos GT3, a categoria atrai os melhores fabricantes do mundo, incluindo Porsche, BMW, Mercedes-AMG, Lamborghini, Audi, McLaren e Ferrari. As corridas são conhecidas por serem curtas, intensas e com paradas nos boxes obrigatórias, exigindo perfeição tanto dos pilotos quanto das equipes técnicas.',
     enLongDescription: 'The DTM is the pinnacle of German touring car racing. Using GT3 regulations, the category attracts the world\'s best manufacturers, including Porsche, BMW, Mercedes-AMG, Lamborghini, Audi, McLaren and Ferrari. Races are known for being short, intense and with mandatory pit stops, requiring perfection from both drivers and technical teams.',
-    icon: 'Timer',
+    icon: 'GtCar',
     teams: [
       { id: 'manthey-ema', name: 'Manthey EMA', color: '#FFFF00', car: 'Porsche 911 GT3 R' },
       { id: 'schubert', name: 'Schubert Motorsport', color: '#0000FF', car: 'BMW M4 GT3' },
@@ -1055,7 +1055,7 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The biggest GT3 championship in the world, with Sprint and Endurance races.',
     longDescription: 'O GT World Challenge Europe é a principal categoria de carros GT3, reunindo os fabricantes mais prestigiados do mundo como Ferrari, Lamborghini, Porsche, BMW e Mercedes-AMG. O campeonato é dividido em duas copas: a Sprint Cup (corridas curtas de 1 hora) e a Endurance Cup (corridas de longa duração, incluindo as lendárias 24 Horas de Spa).',
     enLongDescription: 'GT World Challenge Europe is the premier GT3 car category, bringing together the world\'s most prestigious manufacturers such as Ferrari, Lamborghini, Porsche, BMW and Mercedes-AMG. The championship is divided into two cups: the Sprint Cup (short 1-hour races) and the Endurance Cup (long-distance races, including the legendary 24 Hours of Spa).',
-    icon: 'Timer',
+    icon: 'GtCar',
     teams: [
       { id: 'wrt-bmw', name: 'Team WRT', color: '#003399', car: 'BMW M4 GT3' },
       { id: 'winward-merc', name: 'Winward Racing', color: '#00A19C', car: 'Mercedes-AMG GT3' },
