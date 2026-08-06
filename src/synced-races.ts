@@ -62,7 +62,30 @@ export async function fetchSyncedCalendar(categoryId: string, force = false): Pr
 
 export function mergeCategoryWithSyncedCalendar(category: Category, calendar: Race[] | null): Category {
   if (!calendar || calendar.length === 0) return category;
-  return { ...category, calendar };
+  return { ...category, calendar: calendar.map((race) => normalizeRaceWinner(race, category)) };
+}
+
+// A TheSportsDB traz o vencedor em formatos abreviados tipo "U. Ugochukwu"
+// (inicial + sobrenome), que nunca bate com o nome completo que guardamos
+// ("Ugo Ugochukwu"). Sem isso, driverByName.get(race.winner) nunca acha o
+// piloto e a foto/link da corrida fica quebrado mesmo com o dado certo.
+function normalizeRaceWinner(race: Race, category: Category): Race {
+  if (!race.winner) return race;
+  const norm = normalizeText(race.winner);
+  const exact = category.drivers.find((d) => normalizeText(d.name) === norm);
+  if (exact) return { ...race, winner: exact.name };
+  const lastName = norm.split(' ').at(-1) ?? '';
+  const bySurname = category.drivers.find((d) => normalizeText(d.name).split(' ').at(-1) === lastName);
+  return bySurname ? { ...race, winner: bySurname.name } : race;
+}
+
+function normalizeText(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, ' ')
+    .trim()
+    .toLowerCase();
 }
 
 export async function fetchSyncedStandings(categoryId: string, force = false): Promise<StandingItem[] | null> {
