@@ -366,6 +366,29 @@ function getIsIOSInstallable(): boolean {
   return !isStandalone;
 }
 
+// Guarda em qual pagina o usuario estava (view/categoria/aba/corrida) para
+// sobreviver a um refresh -- inclusive o reload automatico do service worker
+// quando uma nova versao do site e publicada (ver src/pwa.ts).
+const NAV_STORAGE_KEY = 'pitstophub_nav_state';
+
+type StoredNav = {
+  view: 'home' | 'category' | 'race';
+  categoryId: string;
+  activeTab: 'overview' | 'teams' | 'calendar' | 'standings';
+  raceId: string | null;
+};
+
+function readStoredNav(): StoredNav | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.sessionStorage.getItem(NAV_STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as StoredNav;
+  } catch {
+    return null;
+  }
+}
+
 type AppProps = {
   currentUser: AuthUser | null;
   onLogout: () => void;
@@ -383,11 +406,21 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [view, setView] = useState<'home' | 'category' | 'race'>('home');
-  const [selectedCategoryBase, setSelectedCategoryBase] = useState<Category>(MOTORSPORT_DATA[0]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'teams' | 'calendar' | 'standings'>('overview');
+  const [view, setView] = useState<'home' | 'category' | 'race'>(() => readStoredNav()?.view ?? 'home');
+  const [selectedCategoryBase, setSelectedCategoryBase] = useState<Category>(() => {
+    const stored = readStoredNav();
+    return (stored && CATEGORY_BY_ID.get(stored.categoryId)) || MOTORSPORT_DATA[0];
+  });
+  const [activeTab, setActiveTab] = useState<'overview' | 'teams' | 'calendar' | 'standings'>(
+    () => readStoredNav()?.activeTab ?? 'overview'
+  );
   const [showRules, setShowRules] = useState(false);
-  const [selectedRace, setSelectedRace] = useState<Race | null>(null);
+  const [selectedRace, setSelectedRace] = useState<Race | null>(() => {
+    const stored = readStoredNav();
+    if (!stored?.raceId) return null;
+    const category = CATEGORY_BY_ID.get(stored.categoryId);
+    return category?.calendar.find((r) => r.id === stored.raceId) ?? null;
+  });
   const [activeHomeGroup, setActiveHomeGroup] = useState<string>(NAV_GROUPS[0].name.en);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [followedCategoryIds, setFollowedCategoryIds] = useState<string[]>([]);
@@ -402,6 +435,20 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [liveCategoryData, setLiveCategoryData] = useState<JolpicaCategoryData | null>(null);
   const [liveCategoryState, setLiveCategoryState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [syncedCalendars, setSyncedCalendars] = useState<Partial<Record<Category['id'], Race[] | null>>>({});
+
+  React.useEffect(() => {
+    try {
+      const payload: StoredNav = {
+        view,
+        categoryId: selectedCategoryBase.id,
+        activeTab,
+        raceId: selectedRace?.id ?? null,
+      };
+      window.sessionStorage.setItem(NAV_STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      // sessionStorage indisponivel (modo privado, etc.) -- ignora, so afeta a persistencia.
+    }
+  }, [view, selectedCategoryBase.id, activeTab, selectedRace?.id]);
   const [syncedStandings, setSyncedStandings] = useState<Partial<Record<Category['id'], StandingItem[] | null>>>({});
 
   React.useEffect(() => {
