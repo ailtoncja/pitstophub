@@ -20,7 +20,7 @@ if (!THESPORTSDB_API_KEY || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 }
 
 const API_BASE = `https://www.thesportsdb.com/api/v1/json/${THESPORTSDB_API_KEY}`;
-const REQUEST_DELAY_MS = 2200; // ~27 req/min, folga sob o limite free de 30/min
+const REQUEST_DELAY_MS = 700; // ~85 req/min, folga sob o limite Premium de 100/min
 const MAX_ROUNDS = 30;
 const MAX_CONSECUTIVE_MISSES = 3;
 
