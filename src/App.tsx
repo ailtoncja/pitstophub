@@ -2655,8 +2655,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     </thead>
                                     <tbody className="divide-y divide-[var(--card-border)]">
                                       {selectedCategory.standings.drivers.map((item) => {
-                                        const teamColor = selectedCategory.teams.find((t) => t.name === item.team)?.color;
+                                        const team = selectedCategory.teams.find((t) => t.name === item.team);
                                         const driver = driverByName.get(item.name);
+                                        const driverPhoto = driver?.cutout || driver?.image;
                                         // Teste: pagina de piloto dedicada, habilitada so para o Lando Norris por enquanto.
                                         const isDriverPageTest = selectedCategory.id === 'f1' && Boolean(driver && DRIVER_BIOS[driver.id]);
                                         return (
@@ -2667,11 +2668,43 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                               "hover:bg-white/5 transition-colors border-l-2",
                                               isDriverPageTest && "cursor-pointer ring-1 ring-inset ring-[var(--cat-accent)]/40"
                                             )}
-                                            style={{ borderLeftColor: item.position === 1 ? 'var(--cat-accent)' : (teamColor ?? 'transparent') }}
+                                            style={{ borderLeftColor: item.position === 1 ? 'var(--cat-accent)' : (team?.color ?? 'transparent') }}
                                           >
                                             <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--cat-accent)]">{item.position}</td>
-                                            <td className="px-6 py-4 font-bold text-[var(--text-main)]">{item.name}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-500">{item.team || '-'}</td>
+                                            <td className="px-6 py-4 font-bold text-[var(--text-main)]">
+                                              <div className="flex items-center gap-3">
+                                                {driverPhoto ? (
+                                                  <img
+                                                    src={driverPhoto}
+                                                    alt={item.name}
+                                                    className="w-9 h-9 object-cover object-top bg-[var(--cat-accent)]/10 border border-[var(--cat-accent)]/30 shrink-0"
+                                                    referrerPolicy="no-referrer"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                  />
+                                                ) : (
+                                                  <div className="w-9 h-9 bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                                                    <Users className="w-4 h-4 text-gray-600" />
+                                                  </div>
+                                                )}
+                                                <span>{item.name}</span>
+                                              </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-500">
+                                              <div className="flex items-center gap-2">
+                                                {team?.badge && (
+                                                  <img
+                                                    src={team.badge}
+                                                    alt={item.team}
+                                                    className="w-5 h-5 object-contain shrink-0"
+                                                    referrerPolicy="no-referrer"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                  />
+                                                )}
+                                                <span>{item.team || '-'}</span>
+                                              </div>
+                                            </td>
                                             <td className="px-6 py-4 font-apex-mono font-bold text-right text-[var(--text-main)]">{item.points}</td>
                                           </tr>
                                         );
@@ -2697,13 +2730,30 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                       </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[var(--card-border)]">
-                                      {selectedCategory.standings.constructors.map((item) => (
-                                        <tr key={item.name} className="hover:bg-white/5 transition-colors">
-                                          <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--cat-accent)]">{item.position}</td>
-                                          <td className="px-6 py-4 font-bold text-[var(--text-main)]">{item.name}</td>
-                                          <td className="px-6 py-4 font-apex-mono font-bold text-right text-[var(--text-main)]">{item.points}</td>
-                                        </tr>
-                                      ))}
+                                      {selectedCategory.standings.constructors.map((item) => {
+                                        const team = selectedCategory.teams.find((t) => t.name === item.name);
+                                        return (
+                                          <tr key={item.name} className="hover:bg-white/5 transition-colors">
+                                            <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--cat-accent)]">{item.position}</td>
+                                            <td className="px-6 py-4 font-bold text-[var(--text-main)]">
+                                              <div className="flex items-center gap-3">
+                                                {team?.badge && (
+                                                  <img
+                                                    src={team.badge}
+                                                    alt={item.name}
+                                                    className="w-7 h-7 object-contain shrink-0"
+                                                    referrerPolicy="no-referrer"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                  />
+                                                )}
+                                                <span>{item.name}</span>
+                                              </div>
+                                            </td>
+                                            <td className="px-6 py-4 font-apex-mono font-bold text-right text-[var(--text-main)]">{item.points}</td>
+                                          </tr>
+                                        );
+                                      })}
                                     </tbody>
                                   </table>
                                 </div>
@@ -2726,14 +2776,31 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                       </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[var(--card-border)]">
-                                      {selectedCategory.standings.teams.map((item) => (
-                                        <tr key={item.name + item.extra} className="hover:bg-white/5 transition-colors">
-                                          <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--cat-accent)]">{item.position}</td>
-                                          <td className="px-6 py-4 font-mono font-bold text-gray-400">{item.extra || '-'}</td>
-                                          <td className="px-6 py-4 font-bold text-[var(--text-main)]">{item.name}</td>
-                                          <td className="px-6 py-4 font-mono font-bold text-right text-[var(--text-main)]">{item.points}</td>
-                                        </tr>
-                                      ))}
+                                      {selectedCategory.standings.teams.map((item) => {
+                                        const team = selectedCategory.teams.find((t) => t.name === item.name);
+                                        return (
+                                          <tr key={item.name + item.extra} className="hover:bg-white/5 transition-colors">
+                                            <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--cat-accent)]">{item.position}</td>
+                                            <td className="px-6 py-4 font-mono font-bold text-gray-400">{item.extra || '-'}</td>
+                                            <td className="px-6 py-4 font-bold text-[var(--text-main)]">
+                                              <div className="flex items-center gap-3">
+                                                {team?.badge && (
+                                                  <img
+                                                    src={team.badge}
+                                                    alt={item.name}
+                                                    className="w-7 h-7 object-contain shrink-0"
+                                                    referrerPolicy="no-referrer"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                  />
+                                                )}
+                                                <span>{item.name}</span>
+                                              </div>
+                                            </td>
+                                            <td className="px-6 py-4 font-mono font-bold text-right text-[var(--text-main)]">{item.points}</td>
+                                          </tr>
+                                        );
+                                      })}
                                     </tbody>
                                   </table>
                                 </div>
