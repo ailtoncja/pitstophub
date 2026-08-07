@@ -87,6 +87,10 @@ button, [role="button"] {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
 @media (max-width: 768px) {
   .glass-card {
     border-radius: 1rem;

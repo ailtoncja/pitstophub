@@ -1185,7 +1185,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       className="min-h-screen flex flex-col transition-colors duration-300 overflow-x-hidden"
       style={{ '--cat-accent': categoryAccent, '--cat-accent-ink': categoryAccentInk } as React.CSSProperties}
     >
-      <header className="sticky top-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-[var(--card-border)]">
+      <header className="pt-safe sticky top-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-[var(--card-border)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center">
 
           <button
