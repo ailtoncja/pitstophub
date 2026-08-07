@@ -26,6 +26,12 @@ if (!THESPORTSDB_API_KEY || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 }
 
 const API_BASE = `https://www.thesportsdb.com/api/v1/json/${THESPORTSDB_API_KEY}`;
+// "123" e a chave publica de teste da propria TheSportsDB (sem cadastro, sem
+// custo). Se a nossa chave parar de responder por qualquer motivo (endpoint
+// descontinuado como o eventsround.php, assinatura vencida, chave revogada),
+// fetchJson tenta de novo com essa chave antes de desistir - degrada pro
+// nivel gratuito em vez de parar de sincronizar.
+const FALLBACK_API_BASE = 'https://www.thesportsdb.com/api/v1/json/123';
 const REQUEST_DELAY_MS = 700; // ~85 req/min, folga sob o limite Premium de 100/min
 const MAX_ROUNDS = 60; // sanidade: descarta rodadas fora desse intervalo (ex.: eventos de pre-temporada com intRound estranho). NASCAR ja chega a 36 rodadas reais, entao a margem e generosa de proposito.
 
@@ -353,11 +359,24 @@ function parseStandings(strResult) {
   return rows;
 }
 
-async function fetchJson(path, attempt = 0) {
-  const res = await fetch(`${API_BASE}${path}`);
+async function fetchJson(path) {
+  try {
+    return await fetchFrom(API_BASE, path);
+  } catch (primaryError) {
+    console.warn(`[fallback] chave paga falhou em ${path} (${primaryError.message}) - tentando chave publica de teste`);
+    try {
+      return await fetchFrom(FALLBACK_API_BASE, path);
+    } catch {
+      throw primaryError; // erro da chave paga e mais util pro resumo final
+    }
+  }
+}
+
+async function fetchFrom(base, path, attempt = 0) {
+  const res = await fetch(`${base}${path}`);
   if ((res.status === 429 || res.status >= 500) && attempt < 2) {
     await sleep(3000 * (attempt + 1));
-    return fetchJson(path, attempt + 1);
+    return fetchFrom(base, path, attempt + 1);
   }
   if (!res.ok) throw new Error(`TheSportsDB HTTP ${res.status} em ${path}`);
   return res.json();
