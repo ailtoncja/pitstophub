@@ -1394,7 +1394,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       </div>
                       <div className="min-w-0">
                         <div className="text-sm font-bold text-[var(--text-main)] truncate">{currentUser.name}</div>
-                        <div className="text-[10px] text-gray-500 uppercase tracking-widest">{currentUser.email}</div>
+                        <div className="text-[10px] text-gray-500 uppercase tracking-widest truncate">{currentUser.email}</div>
                       </div>
                     </div>
                     <button
