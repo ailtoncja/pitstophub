@@ -9,11 +9,21 @@ export function registerServiceWorker() {
 
   // Com skipWaiting + clientsClaim, o novo service worker assume o controle
   // de abas ja abertas sem elas saberem: sem este reload, a aba continua
-  // rodando o bundle antigo ate ser fechada e reaberta manualmente.
+  // rodando o bundle antigo ate ser fechada e reaberta manualmente. Mas
+  // recarregar na hora, no meio do uso (ex: enquanto a pessoa esta logada
+  // navegando), interrompe a sessao em andamento e da a impressao de que o
+  // app "deslogou sozinho". Em vez disso, so recarrega quando a aba estiver
+  // em segundo plano (troca de app, tela bloqueada, etc) -- nunca durante
+  // uso ativo.
   let reloaded = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
+  const reloadWhenSafe = () => {
     if (reloaded) return;
-    reloaded = true;
-    window.location.reload();
-  });
+    if (document.visibilityState === 'hidden') {
+      reloaded = true;
+      window.location.reload();
+      return;
+    }
+    document.addEventListener('visibilitychange', reloadWhenSafe, { once: true });
+  };
+  navigator.serviceWorker.addEventListener('controllerchange', reloadWhenSafe);
 }
