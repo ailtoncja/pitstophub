@@ -59,6 +59,10 @@ export default defineConfig(() => ({
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
+        // Handlers de push/notificationclick -- generateSW nao sabe gerar
+        // isso sozinho, entao ficam num arquivo a parte e sao importados
+        // dentro do service worker gerado.
+        importScripts: ['sw-push.js'],
       },
     }),
   ],
