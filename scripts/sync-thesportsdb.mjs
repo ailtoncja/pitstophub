@@ -184,6 +184,7 @@ function buildRow(categoryId, round, event) {
     date: event.dateEvent,
     status,
     winner: status === 'completed' ? parseWinner(event.strResult) : null,
+    external_id: event.idEvent ?? null,
     source: 'thesportsdb',
     updated_at: new Date().toISOString(),
   };
