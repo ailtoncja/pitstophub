@@ -15,6 +15,8 @@ export type UserSettings = {
   followedCategoryIds: string[];
   followedTeamIds: string[];
   followedDriverIds: string[];
+  favoritesOnboarded: boolean;
+  priorityFollowIds: string[];
 };
 
 type AuthSuccess =
@@ -206,7 +208,17 @@ export async function getUserSettings(userId: string): Promise<UserSettings | nu
   const cached = localStorage.getItem(cacheKey);
   if (cached) {
     try {
-      return JSON.parse(cached) as UserSettings;
+      const parsed = JSON.parse(cached) as Partial<UserSettings>;
+      return {
+        theme: parsed.theme === 'light' ? 'light' : 'dark',
+        language: parsed.language === 'en' ? 'en' : 'pt',
+        favoriteCategoryId: parsed.favoriteCategoryId ?? 'f1',
+        followedCategoryIds: parsed.followedCategoryIds ?? [],
+        followedTeamIds: parsed.followedTeamIds ?? [],
+        followedDriverIds: parsed.followedDriverIds ?? [],
+        favoritesOnboarded: parsed.favoritesOnboarded ?? false,
+        priorityFollowIds: parsed.priorityFollowIds ?? [],
+      };
     } catch {
       localStorage.removeItem(cacheKey);
     }
@@ -214,15 +226,31 @@ export async function getUserSettings(userId: string): Promise<UserSettings | nu
 
   if (!supabase) return null;
 
+  // As colunas favorites_onboarded/priority_follow_ids exigem a migracao em
+  // supabase/favorites_schema.sql. Se ela ainda nao rodou no banco, o select
+  // completo falha (coluna inexistente) -- cai para o select legado abaixo
+  // em vez de quebrar o carregamento de tema/idioma/follows de todo mundo.
   try {
     const response = await withTimeout(Promise.resolve(
       supabase
         .from('user_settings')
-        .select('theme, language, favorite_category_id, followed_category_ids, followed_team_ids, followed_driver_ids')
+        .select('theme, language, favorite_category_id, followed_category_ids, followed_team_ids, followed_driver_ids, favorites_onboarded, priority_follow_ids')
         .eq('user_id', userId)
         .maybeSingle()
     ));
-    const { data, error } = response;
+    let { data, error } = response;
+
+    if (error) {
+      const legacy = await withTimeout(Promise.resolve(
+        supabase
+          .from('user_settings')
+          .select('theme, language, favorite_category_id, followed_category_ids, followed_team_ids, followed_driver_ids')
+          .eq('user_id', userId)
+          .maybeSingle()
+      ));
+      data = legacy.data as typeof data;
+      error = legacy.error;
+    }
 
     if (error || !data) return null;
 
@@ -233,6 +261,10 @@ export async function getUserSettings(userId: string): Promise<UserSettings | nu
       followedCategoryIds: Array.isArray(data.followed_category_ids) ? data.followed_category_ids : [],
       followedTeamIds: Array.isArray(data.followed_team_ids) ? data.followed_team_ids : [],
       followedDriverIds: Array.isArray(data.followed_driver_ids) ? data.followed_driver_ids : [],
+      favoritesOnboarded: (data as { favorites_onboarded?: boolean }).favorites_onboarded ?? false,
+      priorityFollowIds: Array.isArray((data as { priority_follow_ids?: string[] }).priority_follow_ids)
+        ? (data as { priority_follow_ids: string[] }).priority_follow_ids
+        : [],
     };
     localStorage.setItem(cacheKey, JSON.stringify(settings));
     return settings;
@@ -245,23 +277,33 @@ export async function getUserSettings(userId: string): Promise<UserSettings | nu
 export async function saveUserSettings(userId: string, settings: UserSettings) {
   localStorage.setItem(`${SETTINGS_CACHE_PREFIX}${userId}`, JSON.stringify(settings));
   if (!supabase) return;
+
+  const basePayload = {
+    user_id: userId,
+    theme: settings.theme,
+    language: settings.language,
+    favorite_category_id: settings.favoriteCategoryId,
+    followed_category_ids: settings.followedCategoryIds,
+    followed_team_ids: settings.followedTeamIds,
+    followed_driver_ids: settings.followedDriverIds,
+    updated_at: new Date().toISOString(),
+  };
+
   const { error } = await withTimeout(Promise.resolve(
     supabase.from('user_settings').upsert(
-      {
-        user_id: userId,
-        theme: settings.theme,
-        language: settings.language,
-        favorite_category_id: settings.favoriteCategoryId,
-        followed_category_ids: settings.followedCategoryIds,
-        followed_team_ids: settings.followedTeamIds,
-        followed_driver_ids: settings.followedDriverIds,
-        updated_at: new Date().toISOString(),
-      },
+      { ...basePayload, favorites_onboarded: settings.favoritesOnboarded, priority_follow_ids: settings.priorityFollowIds },
       { onConflict: 'user_id' }
     )
   ));
 
-  if (error) throw error;
+  if (error) {
+    // Ver comentario em getUserSettings: migracao ainda nao aplicada no banco.
+    const { error: legacyError } = await withTimeout(Promise.resolve(
+      supabase.from('user_settings').upsert(basePayload, { onConflict: 'user_id' })
+    ));
+    if (legacyError) throw legacyError;
+    return;
+  }
 }
 
 export function getAuthTheme(): 'dark' | 'light' {
