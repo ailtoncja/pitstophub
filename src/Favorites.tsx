@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronDown, ChevronUp, X, Heart, Users } from 'lucide-react';
+import { ChevronDown, ChevronUp, X, Heart, Users, Bell, BellOff, BellRing } from 'lucide-react';
 import type { Category } from './types';
 import { cn } from './lib/utils';
+import { getExistingPushSubscription, isPushSupported, subscribeToPush, unsubscribeFromPush } from './push';
 
 type PriorityKind = 'team' | 'driver';
 
@@ -20,7 +21,7 @@ export type PriorityEntry = {
 const TEXT = {
   pt: {
     priorityOrder: 'Ordem de Prioridade',
-    priorityOrderDesc: 'As notificações vão priorizar quem estiver no topo desta lista.',
+    priorityOrderDesc: 'Isso vai definir a prioridade quando as notificações forem personalizadas por piloto/time. Por enquanto, as notificações são por categoria.',
     noFavoritesYet: 'Você ainda não segue nenhum time ou piloto. Escolha abaixo.',
     browseTitle: 'Escolha times e pilotos',
     teams: 'Times',
@@ -31,7 +32,7 @@ const TEXT = {
   },
   en: {
     priorityOrder: 'Priority Order',
-    priorityOrderDesc: 'Notifications will prioritize whoever is at the top of this list.',
+    priorityOrderDesc: "This will set the priority once notifications are personalized by driver/team. For now, notifications are by category.",
     noFavoritesYet: "You don't follow any team or driver yet. Choose below.",
     browseTitle: 'Choose teams and drivers',
     teams: 'Teams',
@@ -41,6 +42,107 @@ const TEXT = {
     moveDown: 'Move down',
   },
 } as const;
+
+const NOTIF_TEXT = {
+  pt: {
+    title: 'Notificações',
+    desc: 'Receba um aviso no dia de corridas das categorias que você segue.',
+    enable: 'Ativar notificações',
+    enabled: 'Notificações ativadas',
+    disable: 'Desativar',
+    checking: 'Verificando...',
+    unsupported: 'Notificações não são suportadas neste navegador.',
+    denied: 'Permissão de notificação bloqueada. Ative nas configurações do navegador.',
+    error: 'Não foi possível ativar as notificações agora. Tente novamente.',
+  },
+  en: {
+    title: 'Notifications',
+    desc: "Get notified on race day for the categories you follow.",
+    enable: 'Enable notifications',
+    enabled: 'Notifications enabled',
+    disable: 'Disable',
+    checking: 'Checking...',
+    unsupported: 'Notifications are not supported in this browser.',
+    denied: 'Notification permission blocked. Enable it in your browser settings.',
+    error: 'Could not enable notifications right now. Try again.',
+  },
+} as const;
+
+interface NotificationsToggleProps {
+  userId: string;
+  language: 'pt' | 'en';
+}
+
+export function NotificationsToggle({ userId, language }: NotificationsToggleProps) {
+  const t = NOTIF_TEXT[language];
+  const [status, setStatus] = useState<'checking' | 'unsupported' | 'subscribed' | 'not-subscribed' | 'busy'>('checking');
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!isPushSupported()) {
+      setStatus('unsupported');
+      return;
+    }
+    getExistingPushSubscription().then((sub) => {
+      if (!isMounted) return;
+      setStatus(sub ? 'subscribed' : 'not-subscribed');
+    });
+    return () => { isMounted = false; };
+  }, []);
+
+  const handleEnable = async () => {
+    setStatus('busy');
+    setErrorMsg(null);
+    const result = await subscribeToPush(userId);
+    if (result.ok) {
+      setStatus('subscribed');
+    } else {
+      setStatus('not-subscribed');
+      setErrorMsg(result.reason === 'denied' ? t.denied : result.reason === 'unsupported' ? t.unsupported : t.error);
+    }
+  };
+
+  const handleDisable = async () => {
+    setStatus('busy');
+    await unsubscribeFromPush();
+    setStatus('not-subscribed');
+  };
+
+  return (
+    <div className="p-4 bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center gap-4 mb-8">
+      <div className={cn(
+        "w-10 h-10 shrink-0 flex items-center justify-center",
+        status === 'subscribed' ? "bg-brand-red/10 text-brand-red" : "bg-white/5 text-gray-500"
+      )}>
+        {status === 'subscribed' ? <BellRing className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="text-sm font-bold text-[var(--text-main)]">{t.title}</div>
+        <div className="text-xs text-gray-500">{errorMsg ?? (status === 'unsupported' ? t.unsupported : t.desc)}</div>
+      </div>
+      {status === 'unsupported' ? null : status === 'subscribed' ? (
+        <button
+          type="button"
+          onClick={() => void handleDisable()}
+          className="shrink-0 flex items-center gap-2 px-3 py-2 text-[10px] font-black uppercase tracking-widest border border-[var(--card-border)] text-gray-500 hover:text-brand-red transition-colors"
+        >
+          <BellOff className="w-3.5 h-3.5" />
+          {t.disable}
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => void handleEnable()}
+          disabled={status === 'checking' || status === 'busy'}
+          className="shrink-0 px-4 py-2 bg-brand-red text-white text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
+        >
+          {status === 'checking' ? t.checking : t.enable}
+        </button>
+      )}
+    </div>
+  );
+}
 
 export function buildPriorityEntries(
   categories: Category[],

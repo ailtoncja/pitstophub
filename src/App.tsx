@@ -48,7 +48,7 @@ import {
   mergeCategoryWithSyncedStandings,
 } from './synced-races';
 import type { Driver, Race, StandingItem } from './types';
-import { FavoritesPicker, FavoritesOnboardingModal } from './Favorites';
+import { FavoritesPicker, FavoritesOnboardingModal, NotificationsToggle } from './Favorites';
 
 const IconMap: Record<string, React.ElementType> = {
   OpenWheelCar: OpenWheelCarIcon,
@@ -2231,6 +2231,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   </h1>
                 </div>
                 <p className="text-sm text-gray-500 mb-10">{UI_TRANSLATIONS[language].favoritesPageDesc}</p>
+
+                <NotificationsToggle userId={currentUser.id} language={language} />
 
                 <FavoritesPicker
                   categories={allCategories}
