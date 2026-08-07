@@ -1,9 +1,15 @@
 // Sincroniza o calendario das categorias sem API propria usando a TheSportsDB.
 // Roda 1x/dia via GitHub Actions (.github/workflows/sync-categories.yml).
 //
-// Por que rodada-a-rodada em vez de eventsseason.php: o endpoint de temporada
-// inteira e limitado a 15 eventos no plano free (corta a temporada na metade,
-// sem avisar). eventsround.php nao tem esse limite.
+// Por que nao eventsround.php: parou de funcionar pra chaves de producao (404
+// em toda liga/rodada), e sumiu da documentacao atual da TheSportsDB - parece
+// descontinuado, nao uma instabilidade passageira. Em vez disso montamos o
+// "esqueleto" da temporada juntando eventsseason.php (temporada inteira, sem
+// limite no plano Premium) + eventspastleague.php + eventsnextleague.php, e
+// depois detalhamos cada rodada com lookupevent.php (traz strResult/strCity,
+// que eventsseason.php nao devolve). Juntar past+next serve de rede de
+// seguranca: se a chave cair pro plano gratuito (eventsseason.php limitado a
+// 15 eventos), past+next ainda cobrem o que estiver mais perto de hoje.
 //
 // Env vars necessarias: THESPORTSDB_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
 
@@ -21,8 +27,7 @@ if (!THESPORTSDB_API_KEY || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 
 const API_BASE = `https://www.thesportsdb.com/api/v1/json/${THESPORTSDB_API_KEY}`;
 const REQUEST_DELAY_MS = 700; // ~85 req/min, folga sob o limite Premium de 100/min
-const MAX_ROUNDS = 30;
-const MAX_CONSECUTIVE_MISSES = 3;
+const MAX_ROUNDS = 60; // sanidade: descarta rodadas fora desse intervalo (ex.: eventos de pre-temporada com intRound estranho). NASCAR ja chega a 36 rodadas reais, entao a margem e generosa de proposito.
 
 // id da categoria no app -> id da liga na TheSportsDB
 const LEAGUE_IDS = {
@@ -105,30 +110,40 @@ async function main() {
 }
 
 async function syncCategory(categoryId, leagueId) {
-  const season = await resolveCurrentSeason(leagueId);
+  await sleep(REQUEST_DELAY_MS);
+  const past = await fetchJson(`/eventspastleague.php?id=${leagueId}`);
+  const season = await resolveCurrentSeason(leagueId, past);
+
+  await sleep(REQUEST_DELAY_MS);
+  const seasonData = await fetchJson(`/eventsseason.php?id=${leagueId}&s=${season}`);
+
+  await sleep(REQUEST_DELAY_MS);
+  const nextData = await fetchJson(`/eventsnextleague.php?id=${leagueId}`);
+
+  const byRound = groupByRound([
+    ...(seasonData?.events ?? []),
+    ...(past?.events ?? []),
+    ...(nextData?.events ?? []),
+  ]);
 
   const rows = [];
   let latestStandings = null;
   let latestStandingsRound = null;
-  let consecutiveMisses = 0;
 
-  for (let round = 1; round <= MAX_ROUNDS && consecutiveMisses < MAX_CONSECUTIVE_MISSES; round++) {
-    await sleep(REQUEST_DELAY_MS);
-    const data = await fetchJson(`/eventsround.php?id=${leagueId}&r=${round}&s=${season}`);
-    const events = data?.events ?? [];
-
-    if (events.length === 0) {
-      consecutiveMisses++;
-      continue;
-    }
-    consecutiveMisses = 0;
-
-    const main = pickMainEvent(events);
+  for (const round of [...byRound.keys()].sort((a, b) => a - b)) {
+    const main = pickMainEvent(byRound.get(round));
     if (!main) continue;
 
-    rows.push(buildRow(categoryId, round, main));
+    // eventsseason.php/eventsnextleague.php nao trazem strResult/strCity;
+    // eventspastleague.php so cobre os ultimos 15. Detalha sempre pra ter os
+    // dados completos e consistentes, seja qual for a fonte que achou a rodada.
+    await sleep(REQUEST_DELAY_MS);
+    const detail = await fetchJson(`/lookupevent.php?id=${main.idEvent}`);
+    const fullEvent = detail?.events?.[0] ?? main;
 
-    const standings = parseStandings(main.strResult);
+    rows.push(buildRow(categoryId, round, fullEvent));
+
+    const standings = parseStandings(fullEvent.strResult);
     if (standings) {
       latestStandings = standings;
       latestStandingsRound = round;
@@ -138,12 +153,30 @@ async function syncCategory(categoryId, leagueId) {
   return { rows, standings: latestStandings, standingsRound: latestStandingsRound };
 }
 
+// Junta eventos de varias fontes (dedupe por idEvent) e agrupa por rodada,
+// descartando rodadas fora do intervalo valido (ex.: intRound "0" de eventos
+// fora do campeonato, tipo o NASCAR All-Star Race, ou valores estranhos tipo
+// "500" de eventos de pre-temporada como o Roar Before the Rolex 24 do IMSA).
+function groupByRound(events) {
+  const merged = new Map();
+  for (const event of events) {
+    if (event?.idEvent) merged.set(event.idEvent, event);
+  }
+
+  const byRound = new Map();
+  for (const event of merged.values()) {
+    const round = Number(event.intRound);
+    if (!Number.isInteger(round) || round < 1 || round > MAX_ROUNDS) continue;
+    if (!byRound.has(round)) byRound.set(round, []);
+    byRound.get(round).push(event);
+  }
+  return byRound;
+}
+
 // lookupleague.php->strCurrentSeason fica desatualizado para varias ligas (viu
 // "2025" com a temporada 2026 ja em andamento). O evento passado mais recente
 // e um sinal mais confiavel de qual temporada esta rodando agora.
-async function resolveCurrentSeason(leagueId) {
-  await sleep(REQUEST_DELAY_MS);
-  const past = await fetchJson(`/eventspastleague.php?id=${leagueId}`);
+async function resolveCurrentSeason(leagueId, past) {
   const seasonFromPast = past?.events?.[0]?.strSeason;
   if (seasonFromPast) return seasonFromPast;
 
