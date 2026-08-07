@@ -1283,6 +1283,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     () => (selectedDriver ? selectedCategory.teams.find((t) => t.id === selectedDriver.teamId) ?? null : null),
     [selectedCategory.teams, selectedDriver]
   );
+  // Pagina de piloto usa a cor da equipe do piloto como destaque, nao a cor fixa da categoria.
+  const driverAccent = selectedDriverTeam?.color ?? categoryAccent;
 
   const selectedDriverStanding = useMemo(
     () => (selectedDriver ? selectedCategory.standings?.drivers?.find((d) => d.name === selectedDriver.name) ?? null : null),
@@ -2029,15 +2031,18 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             exit={{ opacity: 0, y: -6 }}
             transition={SPRING}
           >
-            <section className="relative py-12 md:py-20 overflow-hidden min-h-[70vh]">
+            <section
+              className="relative py-12 md:py-20 overflow-hidden min-h-[70vh]"
+              style={{ '--driver-accent': driverAccent } as React.CSSProperties}
+            >
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
-                <div className="absolute inset-0 bg-gradient-to-b from-[var(--cat-accent)]/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[var(--driver-accent)]/20 to-transparent" />
               </div>
 
               <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <button
                   onClick={() => { setView('category'); setActiveTab('standings'); setSelectedDriver(null); }}
-                  className="inline-flex items-center gap-2 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500 hover:text-[var(--cat-accent)] transition-colors mb-10"
+                  className="inline-flex items-center gap-2 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500 hover:text-[var(--driver-accent)] transition-colors mb-10"
                 >
                   <ChevronLeft className="w-4 h-4" /> {UI_TRANSLATIONS[language].standings}
                 </button>
@@ -2049,10 +2054,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   )}>
                     {selectedDriver.cutout ? (
                       <>
-                        <div className="absolute inset-0 bg-gradient-to-b from-[var(--cat-accent)]/20 via-transparent to-black/60" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-[var(--driver-accent)]/20 via-transparent to-black/60" />
                         <div
                           className="absolute left-1/2 bottom-0 w-64 h-64 -translate-x-1/2 translate-y-1/4 rounded-full blur-3xl opacity-30"
-                          style={{ backgroundColor: selectedDriverTeam?.color ?? 'var(--cat-accent)' }}
+                          style={{ backgroundColor: driverAccent }}
                         />
                       </>
                     ) : selectedDriver.image && (
@@ -2071,7 +2076,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     <div className="relative z-10 p-8">
                       <div className="flex items-center gap-3 mb-3">
                         {selectedDriverTeam && (
-                          <span className="text-[var(--cat-accent)] font-apex-mono text-xs font-semibold border border-[var(--cat-accent)] px-2 py-1 uppercase">
+                          <span className="text-[var(--driver-accent)] font-apex-mono text-xs font-semibold border border-[var(--driver-accent)] px-2 py-1 uppercase">
                             {selectedDriverTeam.name}
                           </span>
                         )}
@@ -2080,7 +2085,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       <h1 className="font-apex font-extrabold italic uppercase text-4xl sm:text-5xl leading-[0.95] text-white">
                         {selectedDriver.name.split(' ').slice(0, -1).join(' ')}
                         <br />
-                        <span className="text-[var(--cat-accent)]">{selectedDriver.name.split(' ').slice(-1)}</span>
+                        <span className="text-[var(--driver-accent)]">{selectedDriver.name.split(' ').slice(-1)}</span>
                       </h1>
                       <p className="font-apex-mono text-xs uppercase tracking-widest text-gray-300 mt-4">
                         {selectedDriver.nationality}
@@ -2108,7 +2113,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           {selectedDriverStanding ? (
                             <>
                               {formatOrdinal(selectedDriverStanding.position, language).number}
-                              <span className="text-[var(--cat-accent)] text-base align-top">
+                              <span className="text-[var(--driver-accent)] text-base align-top">
                                 {formatOrdinal(selectedDriverStanding.position, language).suffix}
                               </span>
                             </>
@@ -2255,7 +2260,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               <td className="py-3 pr-4 text-sm text-gray-500">R{row.round}</td>
                               <td className="py-3 pr-4 font-bold text-[var(--text-main)] uppercase">{row.raceName}</td>
                               <td className="py-3 pr-4 text-sm text-[var(--text-main)]">{row.grid ?? '-'}</td>
-                              <td className={cn("py-3 pr-4 text-sm font-bold", row.finishPosition === 1 ? "text-[var(--cat-accent)]" : "text-[var(--text-main)]")}>
+                              <td className={cn("py-3 pr-4 text-sm font-bold", row.finishPosition === 1 ? "text-[var(--driver-accent)]" : "text-[var(--text-main)]")}>
                                 {row.finishPosition ?? row.status}
                               </td>
                               <td className="py-3 font-apex-mono text-sm text-right text-[var(--text-main)]">{row.points}</td>

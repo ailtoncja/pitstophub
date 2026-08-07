@@ -239,6 +239,14 @@ export async function fetchCategoryLiveData(
   });
 }
 
+// Nosso id estatico de piloto quase sempre bate com o driverId da Jolpica
+// (sobrenome em minusculo), exceto quando ha ambiguidade entre pilotos e a
+// Jolpica precisa de nome completo pra desempatar.
+const DRIVER_ID_OVERRIDES: Record<string, string> = {
+  verstappen: 'max_verstappen',
+  lindblad: 'arvid_lindblad',
+};
+
 // Resultados reais, corrida a corrida, de um piloto na temporada -- usado na
 // pagina de piloto para vitorias/podios/ultimos resultados sem inventar numeros.
 export async function fetchDriverSeasonResults(
@@ -246,9 +254,10 @@ export async function fetchDriverSeasonResults(
   year: string,
   force = false,
 ): Promise<DriverResultRow[] | null> {
+  const jolpicaDriverId = DRIVER_ID_OVERRIDES[driverId] ?? driverId;
   return getCached(driverResultsCache, `${driverId}:${year}`, DETAIL_TTL_MS, force, async () => {
     const data = await fetchJson<MRData<{ RaceTable: { Races: JolpicaDriverRace[] } }>>(
-      `/${year}/drivers/${driverId}/results.json?limit=100`,
+      `/${year}/drivers/${jolpicaDriverId}/results.json?limit=100`,
     );
     const races = data.MRData.RaceTable.Races ?? [];
     return races.map((race) => {
