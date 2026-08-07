@@ -66,9 +66,28 @@ async function main() {
   // Sem isso, quando a resolucao de temporada troca de ano entre execucoes
   // (ex.: volta a marcar "2025" por um dia), as linhas da temporada errada
   // ficam para sempre (race_id diferente = upsert nunca as sobrescreve).
+  //
+  // Trava de seguranca: se um dia a chave da TheSportsDB cair pro plano
+  // gratuito, eventsseason.php volta a limitar a temporada (a rede de
+  // seguranca do past+next so cobre o que estiver perto de hoje, nao a
+  // temporada toda). Sem essa trava, um dia de API degradada apagaria
+  // corridas antigas boas so porque a resposta daquele dia veio menor.
+  const skipped = [];
   let totalRows = 0;
   for (const [categoryId, rows] of Object.entries(rowsByCategory)) {
     if (rows.length === 0) continue;
+
+    const { count: existingCount } = await supabase
+      .from('synced_races')
+      .select('*', { count: 'exact', head: true })
+      .eq('category_id', categoryId);
+
+    if (existingCount != null && existingCount >= 10 && rows.length < existingCount * 0.6) {
+      console.warn(`[${categoryId}] API devolveu so ${rows.length} corridas contra ${existingCount} ja salvas - parece degradada. Mantendo dados antigos.`);
+      skipped.push(`${categoryId}: MANTIDO dado antigo (API devolveu so ${rows.length}/${existingCount})`);
+      continue;
+    }
+
     const { error: deleteError } = await supabase.from('synced_races').delete().eq('category_id', categoryId);
     if (deleteError) {
       console.error(`[${categoryId}] falha ao limpar corridas antigas:`, deleteError.message);
@@ -83,6 +102,21 @@ async function main() {
   }
 
   for (const [categoryId, { standings, round }] of Object.entries(standingsByCategory)) {
+    // Mesma trava do calendario: se a API degradada so achou o bloco de
+    // classificacao numa rodada mais cedo que a ja salva, isso seria regredir
+    // a classificacao (voltar no tempo). Mantem a mais recente que ja temos.
+    const { data: existingStandings } = await supabase
+      .from('synced_standings')
+      .select('as_of_round')
+      .eq('category_id', categoryId)
+      .limit(1);
+    const existingRound = existingStandings?.[0]?.as_of_round;
+    if (existingRound != null && round < existingRound) {
+      console.warn(`[${categoryId}] classificacao nova e da rodada ${round}, mais antiga que a salva (rodada ${existingRound}) - mantendo a atual.`);
+      skipped.push(`${categoryId}: classificacao MANTIDA (nova seria da rodada ${round}, atual e da ${existingRound})`);
+      continue;
+    }
+
     // A classificacao e uma "foto" atual, nao historico: apaga e regrava.
     const { error: deleteError } = await supabase.from('synced_standings').delete().eq('category_id', categoryId);
     if (deleteError) {
@@ -105,6 +139,10 @@ async function main() {
 
   console.log('\n=== Resumo ===');
   summary.forEach((line) => console.log(line));
+  if (skipped.length > 0) {
+    console.log('\n=== Mantidos (API degradada) ===');
+    skipped.forEach((line) => console.log(line));
+  }
   console.log(`Total de corridas gravadas: ${totalRows}`);
   console.log(`Categorias com classificacao: ${Object.keys(standingsByCategory).length}/${Object.keys(LEAGUE_IDS).length}`);
 }
