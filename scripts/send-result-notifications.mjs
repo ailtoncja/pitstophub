@@ -61,6 +61,16 @@ function normalize(str) {
     .trim();
 }
 
+// Alguns eventos da TheSportsDB colam a classificacao do campeonato logo
+// depois do resultado da corrida, separadas so por uma linha de tracos (ex.:
+// DTM e F2/F3) -- sem cortar isso fora, uma busca por nome podia pegar a
+// posicao no campeonato em vez da posicao na corrida (confirmado testando
+// com dados reais antes de subir isso pra producao).
+function stripStandingsTail(strResult) {
+  const idx = strResult.search(/-{3,}|standings/i);
+  return idx === -1 ? strResult : strResult.slice(0, idx);
+}
+
 // Procura o nome (piloto ou time) linha a linha no texto de resultado da
 // TheSportsDB e devolve a posicao de cada linha em que ele aparece. So
 // confia em linhas que comecam com um numero (a posicao) -- se o nome nao
@@ -70,7 +80,7 @@ function findPositions(strResult, name) {
   const target = normalize(name);
   if (!target) return [];
   const positions = [];
-  for (const line of strResult.split('\n')) {
+  for (const line of stripStandingsTail(strResult).split('\n')) {
     if (!normalize(line).includes(target)) continue;
     const match = line.match(/^\s*0*(\d{1,2})[.\t/ ]/);
     if (match) positions.push(Number(match[1]));
@@ -80,6 +90,13 @@ function findPositions(strResult, name) {
 
 function formatOrdinal(n) {
   return `${n}º`;
+}
+
+// "2º, 4º e 5º" em vez de "2º e 4º e 5º" pra times com 3+ carros classificados.
+function formatOrdinalList(positions) {
+  const labels = positions.map(formatOrdinal);
+  if (labels.length <= 1) return labels[0] ?? '';
+  return `${labels.slice(0, -1).join(', ')} e ${labels.at(-1)}`;
 }
 
 async function fetchRacesToCheck() {
@@ -232,10 +249,7 @@ async function processRace(race, allSettings, allCategories) {
         : findPositions(resultText, team.name);
       if (positions.length === 0) continue;
       const sorted = [...new Set(positions.map(Number))].sort((a, b) => a - b);
-      const label = sorted.length > 1
-        ? `${sorted.map(formatOrdinal).join(' e ')}`
-        : formatOrdinal(sorted[0]);
-      messages.push(`${team.name} terminou com ${sorted.length > 1 ? 'os carros em' : 'o carro em'} ${label} no ${race.raceName}!`);
+      messages.push(`${team.name} terminou com ${sorted.length > 1 ? 'os carros em' : 'o carro em'} ${formatOrdinalList(sorted)} no ${race.raceName}!`);
     }
 
     if (messages.length === 0) continue;
