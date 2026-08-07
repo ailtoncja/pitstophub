@@ -48,6 +48,7 @@ import {
   mergeCategoryWithSyncedStandings,
 } from './synced-races';
 import type { Driver, Race, StandingItem } from './types';
+import { FavoritesPicker, FavoritesOnboardingModal } from './Favorites';
 
 const IconMap: Record<string, React.ElementType> = {
   OpenWheelCar: OpenWheelCarIcon,
@@ -217,7 +218,9 @@ const UI_TRANSLATIONS = {
     grid: 'Grid',
     finish: 'Chegada',
     recentResults: 'Resultados Recentes',
-    podiums: 'Pódios'
+    podiums: 'Pódios',
+    favorites: 'Favoritos',
+    favoritesPageDesc: 'Escolha os times e pilotos que você quer acompanhar e defina a ordem de prioridade entre eles.'
   },
   en: {
     home: 'Home',
@@ -324,7 +327,9 @@ const UI_TRANSLATIONS = {
     grid: 'Grid',
     finish: 'Finish',
     recentResults: 'Recent Results',
-    podiums: 'Podiums'
+    podiums: 'Podiums',
+    favorites: 'Favorites',
+    favoritesPageDesc: 'Choose the teams and drivers you want to follow and set the priority order between them.'
   }
 };
 
@@ -577,7 +582,7 @@ function getIsIOSInstallable(): boolean {
 const NAV_STORAGE_KEY = 'pitstophub_nav_state';
 
 type StoredNav = {
-  view: 'home' | 'category' | 'race' | 'driver';
+  view: 'home' | 'category' | 'race' | 'driver' | 'favorites';
   categoryId: string;
   activeTab: 'overview' | 'teams' | 'calendar' | 'standings';
   raceId: string | null;
@@ -612,7 +617,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [view, setView] = useState<'home' | 'category' | 'race' | 'driver'>(() => readStoredNav()?.view ?? 'home');
+  const [view, setView] = useState<'home' | 'category' | 'race' | 'driver' | 'favorites'>(() => readStoredNav()?.view ?? 'home');
   const [selectedCategoryBase, setSelectedCategoryBase] = useState<Category>(() => {
     const stored = readStoredNav();
     return (stored && CATEGORY_BY_ID.get(stored.categoryId)) || MOTORSPORT_DATA[0];
@@ -638,6 +643,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [followedCategoryIds, setFollowedCategoryIds] = useState<string[]>([]);
   const [followedTeamIds, setFollowedTeamIds] = useState<string[]>([]);
   const [followedDriverIds, setFollowedDriverIds] = useState<string[]>([]);
+  const [favoritesOnboarded, setFavoritesOnboarded] = useState(false);
+  const [priorityFollowIds, setPriorityFollowIds] = useState<string[]>([]);
+  const [showFavoritesOnboarding, setShowFavoritesOnboarding] = useState(false);
   const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installingApp, setInstallingApp] = useState(false);
   const [showIOSBanner, setShowIOSBanner] = useState(
@@ -673,6 +681,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       setFollowedCategoryIds([]);
       setFollowedTeamIds([]);
       setFollowedDriverIds([]);
+      setFavoritesOnboarded(true);
+      setPriorityFollowIds([]);
       setSelectedCategoryBase(MOTORSPORT_DATA[0]);
       setSettingsLoaded(true);
       return;
@@ -690,8 +700,13 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
           setFollowedCategoryIds(settings.followedCategoryIds);
           setFollowedTeamIds(settings.followedTeamIds);
           setFollowedDriverIds(settings.followedDriverIds);
+          setFavoritesOnboarded(settings.favoritesOnboarded);
+          setPriorityFollowIds(settings.priorityFollowIds);
           const category = CATEGORY_BY_ID.get(settings.favoriteCategoryId);
           if (category) setSelectedCategoryBase(category);
+        } else {
+          setFavoritesOnboarded(false);
+          setPriorityFollowIds([]);
         }
       } catch (error) {
         console.error('Falha ao aplicar configuracoes do usuario.', error);
@@ -726,12 +741,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         followedCategoryIds,
         followedTeamIds,
         followedDriverIds,
+        favoritesOnboarded,
+        priorityFollowIds,
       }).catch((error) => {
         console.error('Falha ao salvar configuracoes do usuario.', error);
       });
     }, 250);
     return () => window.clearTimeout(t);
-  }, [currentUser, settingsLoaded, isDarkMode, language, selectedCategoryBase.id, followedCategoryIds, followedTeamIds, followedDriverIds]);
+  }, [currentUser, settingsLoaded, isDarkMode, language, selectedCategoryBase.id, followedCategoryIds, followedTeamIds, followedDriverIds, favoritesOnboarded, priorityFollowIds]);
 
   React.useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
@@ -978,6 +995,49 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     const key = `${categoryId}::${driverId}`;
     setFollowedDriverIds(prev => prev.includes(key) ? prev.filter(id => id !== key) : [...prev, key]);
   }, [currentUser, onLoginRequest]);
+
+  // Mantem a ordem de prioridade sincronizada com quem a pessoa segue: preserva
+  // a ordem existente, remove quem deixou de ser seguido e adiciona no fim quem
+  // passou a ser seguido (por qualquer caminho -- onboarding, botao de seguir, etc).
+  React.useEffect(() => {
+    if (!settingsLoaded) return;
+    const validKeys = new Set([
+      ...followedTeamIds.map(k => `team::${k}`),
+      ...followedDriverIds.map(k => `driver::${k}`),
+    ]);
+    setPriorityFollowIds(prev => {
+      const next = prev.filter(k => validKeys.has(k));
+      const present = new Set(next);
+      for (const k of validKeys) {
+        if (!present.has(k)) next.push(k);
+      }
+      if (next.length === prev.length && next.every((v, i) => v === prev[i])) return prev;
+      return next;
+    });
+  }, [followedTeamIds, followedDriverIds, settingsLoaded]);
+
+  React.useEffect(() => {
+    if (currentUser && settingsLoaded && !favoritesOnboarded) {
+      setShowFavoritesOnboarding(true);
+    }
+  }, [currentUser, settingsLoaded, favoritesOnboarded]);
+
+  const movePriorityFollow = useCallback((key: string, direction: -1 | 1) => {
+    setPriorityFollowIds(prev => {
+      const idx = prev.indexOf(key);
+      if (idx === -1) return prev;
+      const targetIdx = idx + direction;
+      if (targetIdx < 0 || targetIdx >= prev.length) return prev;
+      const next = [...prev];
+      [next[idx], next[targetIdx]] = [next[targetIdx], next[idx]];
+      return next;
+    });
+  }, []);
+
+  const dismissFavoritesOnboarding = useCallback(() => {
+    setFavoritesOnboarded(true);
+    setShowFavoritesOnboarding(false);
+  }, []);
 
   const handleDismissIOSBanner = useCallback(() => {
     localStorage.setItem('pitstophub_ios_install_dismissed', '1');
@@ -1272,6 +1332,18 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             )}
             {currentUser ? (
               <div className="hidden xl:flex items-center gap-2">
+                <button
+                  onClick={() => { setView('favorites'); requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' })); }}
+                  aria-label={UI_TRANSLATIONS[language].favorites}
+                  className={cn(
+                    "p-2.5 border transition-colors",
+                    view === 'favorites'
+                      ? "bg-brand-red/10 border-brand-red/30 text-brand-red"
+                      : "bg-[var(--card-bg)] border-[var(--card-border)] text-gray-500 hover:text-brand-red"
+                  )}
+                >
+                  <Heart className="w-4 h-4" />
+                </button>
                 <div className="flex items-center gap-2 px-3 py-1.5  bg-[var(--card-bg)] border border-[var(--card-border)]">
                   <div className="w-6 h-6 rounded-full bg-brand-red flex items-center justify-center text-white text-[10px] font-black shrink-0 select-none">
                     {currentUser.name.charAt(0).toUpperCase()}
@@ -1338,6 +1410,21 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     className="w-full flex items-center justify-center gap-2 p-4  bg-brand-red text-white text-sm font-black uppercase tracking-widest shadow-lg shadow-brand-red/20 active:scale-95 transition-transform"
                   >
                     {UI_TRANSLATIONS[language].login}
+                  </button>
+                )}
+
+                {currentUser && (
+                  <button
+                    onClick={() => { setView('favorites'); setIsMobileMenuOpen(false); requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' })); }}
+                    className={cn(
+                      "w-full flex items-center justify-center gap-2 p-4  text-xs font-black uppercase tracking-widest transition-all border",
+                      view === 'favorites'
+                        ? "bg-brand-red text-white border-brand-red shadow-lg shadow-brand-red/20"
+                        : "bg-[var(--card-bg)] border-[var(--card-border)] text-[var(--text-main)]"
+                    )}
+                  >
+                    <Heart className="w-4 h-4" />
+                    {UI_TRANSLATIONS[language].favorites}
                   </button>
                 )}
 
@@ -2117,6 +2204,44 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     </div>
                   )}
                 </div>
+              </div>
+            </section>
+          </motion.div>
+        ) : view === 'favorites' && currentUser ? (
+          <motion.div
+            key="favorites-page"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={SPRING}
+          >
+            <section className="relative py-12 md:py-20 min-h-[70vh]">
+              <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <button
+                  onClick={() => setView('home')}
+                  className="inline-flex items-center gap-2 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500 hover:text-brand-red transition-colors mb-8"
+                >
+                  <ChevronLeft className="w-4 h-4" /> {UI_TRANSLATIONS[language].home}
+                </button>
+
+                <div className="flex items-center gap-3 mb-2">
+                  <Heart className="w-6 h-6 text-brand-red fill-current" />
+                  <h1 className="text-2xl sm:text-3xl font-apex font-extrabold italic text-[var(--text-main)]">
+                    {UI_TRANSLATIONS[language].favorites}
+                  </h1>
+                </div>
+                <p className="text-sm text-gray-500 mb-10">{UI_TRANSLATIONS[language].favoritesPageDesc}</p>
+
+                <FavoritesPicker
+                  categories={allCategories}
+                  language={language}
+                  followedTeamIds={followedTeamIds}
+                  followedDriverIds={followedDriverIds}
+                  priorityFollowIds={priorityFollowIds}
+                  onToggleTeam={toggleFollowTeam}
+                  onToggleDriver={toggleFollowDriver}
+                  onMovePriority={movePriorityFollow}
+                />
               </div>
             </section>
           </motion.div>
@@ -2998,6 +3123,23 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               </button>
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showFavoritesOnboarding && currentUser && (
+          <FavoritesOnboardingModal
+            categories={allCategories}
+            language={language}
+            followedTeamIds={followedTeamIds}
+            followedDriverIds={followedDriverIds}
+            priorityFollowIds={priorityFollowIds}
+            onToggleTeam={toggleFollowTeam}
+            onToggleDriver={toggleFollowDriver}
+            onMovePriority={movePriorityFollow}
+            onSkip={dismissFavoritesOnboarding}
+            onFinish={dismissFavoritesOnboarding}
+          />
         )}
       </AnimatePresence>
     </div>
