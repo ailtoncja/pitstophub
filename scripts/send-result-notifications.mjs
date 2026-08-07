@@ -230,6 +230,10 @@ async function processRace(race, allSettings, allCategories) {
     if (await alreadyNotified(race.categoryId, race.raceId, settings.user_id)) continue;
 
     const messages = [];
+    // Posicoes ja citadas por um piloto seguido individualmente -- se a
+    // pessoa segue o Leclerc e a Ferrari, a linha da Ferrari nao repete a
+    // posicao dele, so entra com o(s) outro(s) carro(s) (se houver).
+    const coveredPositions = new Set();
 
     for (const driverId of followedDriverIds) {
       const driver = category.drivers.find((d) => d.id === driverId);
@@ -238,6 +242,7 @@ async function processRace(race, allSettings, allCategories) {
         ? f1Results.find((r) => r.Driver.driverId === driverId)?.position
         : findPositions(resultText, driver.name)[0];
       if (!position) continue;
+      coveredPositions.add(Number(position));
       messages.push(`${driver.name} terminou em ${formatOrdinal(position)} no ${race.raceName}!`);
     }
 
@@ -248,7 +253,8 @@ async function processRace(race, allSettings, allCategories) {
         ? f1Results.filter((r) => r.Constructor && category.drivers.some((d) => d.id === r.Driver.driverId && d.teamId === teamId)).map((r) => r.position)
         : findPositions(resultText, team.name);
       if (positions.length === 0) continue;
-      const sorted = [...new Set(positions.map(Number))].sort((a, b) => a - b);
+      const sorted = [...new Set(positions.map(Number))].filter((p) => !coveredPositions.has(p)).sort((a, b) => a - b);
+      if (sorted.length === 0) continue;
       messages.push(`${team.name} terminou com ${sorted.length > 1 ? 'os carros em' : 'o carro em'} ${formatOrdinalList(sorted)} no ${race.raceName}!`);
     }
 
