@@ -93,14 +93,25 @@ async function markNotified(categoryId, raceId) {
   if (error) console.error(`Falha ao marcar ${categoryId}/${raceId} como notificada.`, error);
 }
 
+function followsCategory(row, categoryId) {
+  const prefix = `${categoryId}::`;
+  if ((row.followed_category_ids ?? []).includes(categoryId)) return true;
+  if ((row.followed_team_ids ?? []).some((k) => k.startsWith(prefix))) return true;
+  if ((row.followed_driver_ids ?? []).some((k) => k.startsWith(prefix))) return true;
+  return false;
+}
+
 async function subscribersForCategory(categoryId) {
+  // Mesma regra da home do app (followedCategoryObjects em App.tsx): seguir
+  // um time ou piloto de uma categoria conta como seguir a categoria, mesmo
+  // sem ter clicado no botao "Seguir categoria" separadamente. A base de
+  // usuarios ainda e pequena, entao filtrar em JS em vez de SQL e suficiente.
   const { data: settingsRows, error: settingsError } = await supabase
     .from('user_settings')
-    .select('user_id')
-    .contains('followed_category_ids', [categoryId]);
+    .select('user_id, followed_category_ids, followed_team_ids, followed_driver_ids');
   if (settingsError) throw settingsError;
 
-  const userIds = (settingsRows ?? []).map((r) => r.user_id);
+  const userIds = (settingsRows ?? []).filter((row) => followsCategory(row, categoryId)).map((r) => r.user_id);
   if (userIds.length === 0) return [];
 
   const { data: subs, error: subsError } = await supabase
