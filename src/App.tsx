@@ -2255,10 +2255,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   <div className="flex flex-wrap gap-2">
                                     {selectedDriverTeammates.map((t) => {
                                       const canOpenTeammate = selectedCategory.id === 'f1' && Boolean(DRIVER_BIOS[t.id]);
-                                      const teammatePhoto = t.image || t.cutout;
+                                      const teammatePhoto = t.cutout || t.image;
                                       const inner = (
                                         <>
-                                          <span className="w-8 h-8 overflow-hidden bg-[var(--driver-accent)]/10 border-2 border-[var(--driver-accent)]/30 shrink-0">
+                                          <span className="w-8 h-8 rounded-full overflow-hidden shrink-0">
                                             {teammatePhoto && (
                                               <img
                                                 src={teammatePhoto}
@@ -2335,10 +2335,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               <div className="flex flex-wrap gap-2">
                                 {selectedDriverTeammates.map((t) => {
                                   const canOpenTeammate = selectedCategory.id === 'f1' && Boolean(DRIVER_BIOS[t.id]);
-                                  const teammatePhoto = t.image || t.cutout;
+                                  const teammatePhoto = t.cutout || t.image;
                                   const inner = (
                                     <>
-                                      <span className="w-8 h-8 overflow-hidden bg-[var(--driver-accent)]/10 border-2 border-[var(--driver-accent)]/30 shrink-0">
+                                      <span className="w-8 h-8 rounded-full overflow-hidden shrink-0">
                                         {teammatePhoto && (
                                           <img
                                             src={teammatePhoto}
