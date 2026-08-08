@@ -1,10 +1,29 @@
 export function registerServiceWorker() {
   if (!('serviceWorker' in navigator) || !import.meta.env.PROD) return;
 
+  let registration: ServiceWorkerRegistration | null = null;
+
   window.addEventListener('load', () => {
-    void navigator.serviceWorker.register('/sw.js').catch((error) => {
-      console.error('Falha ao registrar o service worker.', error);
-    });
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((reg) => {
+        registration = reg;
+      })
+      .catch((error) => {
+        console.error('Falha ao registrar o service worker.', error);
+      });
+  });
+
+  // O navegador so checa sozinho se ha uma versao nova do service worker em
+  // alguns gatilhos, e o PWA instalado (modo standalone, principalmente no
+  // iOS) e' conhecido por nao fazer essa checagem de forma confiavel. Forca
+  // uma checagem manual toda vez que o app volta a ficar visivel (reabrir
+  // pelo icone, voltar de outro app) -- so compara o sw.js publicado com o
+  // instalado, nunca recarrega a pagina sozinho (ver comentario abaixo).
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      void registration?.update().catch(() => {});
+    }
   });
 
   // Antes, um `controllerchange` (novo service worker assumindo) disparava
