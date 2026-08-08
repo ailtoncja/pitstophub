@@ -23,7 +23,9 @@ const TEXT = {
     priorityOrder: 'Ordem de Prioridade',
     priorityOrderDesc: 'Isso vai definir a prioridade quando as notificações forem personalizadas por piloto/time. Por enquanto, as notificações são por categoria.',
     noFavoritesYet: 'Você ainda não segue nenhum time ou piloto. Escolha abaixo.',
-    browseTitle: 'Escolha times e pilotos',
+    browseTitle: 'Escolha categorias, times e pilotos',
+    followCategory: 'Seguir categoria inteira',
+    followingCategory: 'Seguindo categoria inteira',
     teams: 'Times',
     drivers: 'Pilotos',
     remove: 'Remover',
@@ -34,7 +36,9 @@ const TEXT = {
     priorityOrder: 'Priority Order',
     priorityOrderDesc: "This will set the priority once notifications are personalized by driver/team. For now, notifications are by category.",
     noFavoritesYet: "You don't follow any team or driver yet. Choose below.",
-    browseTitle: 'Choose teams and drivers',
+    browseTitle: 'Choose categories, teams and drivers',
+    followCategory: 'Follow whole category',
+    followingCategory: 'Following whole category',
     teams: 'Teams',
     drivers: 'Drivers',
     remove: 'Remove',
@@ -253,19 +257,22 @@ export function FavoritesOnboardingModal({ onSkip, onFinish, language, ...picker
 interface FavoritesPickerProps {
   categories: Category[];
   language: 'pt' | 'en';
+  followedCategoryIds: string[];
   followedTeamIds: string[];
   followedDriverIds: string[];
   priorityFollowIds: string[];
+  onToggleCategory: (categoryId: string) => void;
   onToggleTeam: (categoryId: string, teamId: string) => void;
   onToggleDriver: (categoryId: string, driverId: string) => void;
   onMovePriority: (key: string, direction: -1 | 1) => void;
 }
 
 export function FavoritesPicker({
-  categories, language, followedTeamIds, followedDriverIds, priorityFollowIds,
-  onToggleTeam, onToggleDriver, onMovePriority,
+  categories, language, followedCategoryIds, followedTeamIds, followedDriverIds, priorityFollowIds,
+  onToggleCategory, onToggleTeam, onToggleDriver, onMovePriority,
 }: FavoritesPickerProps) {
   const t = TEXT[language];
+  const followedCategorySet = useMemo(() => new Set(followedCategoryIds), [followedCategoryIds]);
   const followedTeamSet = useMemo(() => new Set(followedTeamIds), [followedTeamIds]);
   const followedDriverSet = useMemo(() => new Set(followedDriverIds), [followedDriverIds]);
   const priorityEntries = useMemo(
@@ -356,25 +363,47 @@ export function FavoritesPicker({
         <div className="space-y-2">
           {categories.map((category) => {
             const isExpanded = expandedCategoryId === category.id;
+            const isCategoryFollowed = followedCategorySet.has(category.id);
             const followedCount = category.teams.filter((tm) => followedTeamSet.has(`${category.id}::${tm.id}`)).length
               + category.drivers.filter((d) => followedDriverSet.has(`${category.id}::${d.id}`)).length;
             return (
               <div key={category.id} className="border border-[var(--card-border)] bg-[var(--card-bg)]">
-                <button
-                  type="button"
+                <div
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setExpandedCategoryId(isExpanded ? null : category.id)}
-                  className="w-full flex items-center justify-between px-4 py-3 text-left"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setExpandedCategoryId(isExpanded ? null : category.id);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left cursor-pointer"
                 >
-                  <span className="text-sm font-bold text-[var(--text-main)]">{category.name}</span>
-                  <div className="flex items-center gap-3">
+                  <span className="text-sm font-bold text-[var(--text-main)] truncate">{category.name}</span>
+                  <div className="flex items-center gap-3 shrink-0">
                     {followedCount > 0 && (
                       <span className="flex items-center gap-1 text-[10px] font-black text-brand-red">
                         <Heart className="w-3 h-3 fill-current" />{followedCount}
                       </span>
                     )}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleCategory(category.id);
+                      }}
+                      title={isCategoryFollowed ? t.followingCategory : t.followCategory}
+                      className={cn(
+                        "p-1 rounded-full transition-colors",
+                        isCategoryFollowed ? "text-brand-red" : "text-gray-500 hover:text-brand-red"
+                      )}
+                    >
+                      <Heart className={cn("w-4 h-4", isCategoryFollowed && "fill-brand-red")} />
+                    </button>
                     <ChevronDown className={cn("w-4 h-4 text-gray-500 transition-transform", isExpanded && "rotate-180")} />
                   </div>
-                </button>
+                </div>
                 {isExpanded && (
                   <div className="px-4 pb-4 space-y-4 border-t border-[var(--card-border)] pt-4">
                     {category.teams.length > 0 && (
