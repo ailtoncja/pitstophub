@@ -1299,6 +1299,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   );
   // Pagina de piloto usa a cor da equipe do piloto como destaque, nao a cor fixa da categoria.
   const driverAccent = selectedDriverTeam?.color ?? categoryAccent;
+  // O menu FORMULAS/ENDURANCE do cabecalho normalmente usa o vermelho fixo da
+  // marca, mas numa pagina de piloto o destaque/hover do menu acompanha a cor
+  // da equipe daquele piloto (resto do cabecalho -- logo, botao de login --
+  // continua vermelho de proposito, e' identidade fixa do site).
+  const navAccent = view === 'driver' && selectedDriver ? driverAccent : '#e10600';
 
   const selectedDriverStanding = useMemo(
     () => (selectedDriver ? selectedCategory.standings?.drivers?.find((d) => d.name === selectedDriver.name) ?? null : null),
@@ -1339,7 +1344,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   return (
     <div
       className="min-h-screen flex flex-col transition-colors duration-300 overflow-x-hidden"
-      style={{ '--cat-accent': categoryAccent, '--cat-accent-ink': categoryAccentInk } as React.CSSProperties}
+      style={{ '--cat-accent': categoryAccent, '--cat-accent-ink': categoryAccentInk, '--nav-accent': navAccent } as React.CSSProperties}
     >
       <header className="pt-safe sticky top-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-[var(--card-border)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center">
@@ -1376,8 +1381,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               >
                 <button
                   className={cn(
-                    "flex items-center gap-1 px-3 py-2 font-apex-mono text-xs font-semibold uppercase tracking-wide transition-colors hover:text-brand-red whitespace-nowrap",
-                    group.ids.includes(selectedCategory.id) && view === 'category' ? "text-brand-red" : "text-gray-500"
+                    "flex items-center gap-1 px-3 py-2 font-apex-mono text-xs font-semibold uppercase tracking-wide transition-colors hover:text-[var(--nav-accent)] whitespace-nowrap",
+                    group.ids.includes(selectedCategory.id) && (view === 'category' || view === 'driver') ? "text-[var(--nav-accent)]" : "text-gray-500"
                   )}
                 >
                   {language === 'pt' ? group.name.pt : group.name.en}
@@ -1401,8 +1406,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             key={cat.id}
                             onClick={() => handleCategorySelect(cat)}
                             className={cn(
-                              "w-full text-left px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-brand-red hover:text-white",
-                              view === 'category' && selectedCategory.id === cat.id ? "text-brand-red bg-brand-red/5" : "text-gray-500"
+                              "w-full text-left px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-[var(--nav-accent)] hover:text-white",
+                              (view === 'category' || view === 'driver') && selectedCategory.id === cat.id ? "text-[var(--nav-accent)] bg-[var(--nav-accent)]/5" : "text-gray-500"
                             )}
                           >
                             {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
@@ -1553,7 +1558,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     <div key={group.name.en} className="space-y-3">
                       <div className="flex items-center gap-3 px-2">
                         <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--card-border)]" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-red shrink-0">
+                        <span
+                          className={cn(
+                            "text-[10px] font-black uppercase tracking-[0.2em] shrink-0",
+                            group.ids.includes(selectedCategory.id) && (view === 'category' || view === 'driver') ? "text-[var(--nav-accent)]" : "text-brand-red"
+                          )}
+                        >
                           {language === 'pt' ? group.name.pt : group.name.en}
                         </span>
                         <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[var(--card-border)]" />
@@ -1569,15 +1579,15 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               onClick={() => { handleCategorySelect(cat); setIsMobileMenuOpen(false); }}
                               className={cn(
                                 "w-full flex items-center justify-between px-5 py-4  text-sm font-bold uppercase tracking-widest transition-all border",
-                                view === 'category' && selectedCategory.id === cat.id
-                                  ? "bg-brand-red/10 text-brand-red border-brand-red/20"
+                                (view === 'category' || view === 'driver') && selectedCategory.id === cat.id
+                                  ? "bg-[var(--nav-accent)]/10 text-[var(--nav-accent)] border-[var(--nav-accent)]/20"
                                   : "bg-white/5 text-gray-400 border-white/5 hover:bg-white/10"
                               )}
                             >
                               <div className="flex items-center gap-3">
                                 <div className={cn(
                                   "w-8 h-8  flex items-center justify-center shrink-0",
-                                  view === 'category' && selectedCategory.id === cat.id ? "bg-brand-red text-white" : "bg-white/10 text-gray-500"
+                                  (view === 'category' || view === 'driver') && selectedCategory.id === cat.id ? "bg-[var(--nav-accent)] text-white" : "bg-white/10 text-gray-500"
                                 )}>
                                   <Icon className="w-4 h-4" />
                                 </div>
