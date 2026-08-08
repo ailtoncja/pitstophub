@@ -2078,6 +2078,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     direita costuma ser mais alto que o card da foto, a foto era esticada e
                     empurrada pro fundo pelo justify-between, abrindo um vao vazio enorme. */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6 items-start">
+                <div className="lg:col-span-5 flex flex-col gap-6">
                   {/* Versao compacta, so no mobile: card grande de baixo (pensado pro recorte
                       de corpo inteiro) deixava um vao vazio enorme quando empilhado em tela
                       estreita. Aqui a foto fica pequena ao lado do nome, sem sobra. */}
@@ -2120,7 +2121,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   </div>
 
                   <div className={cn(
-                    "hidden lg:flex lg:col-span-5 apex-card relative overflow-hidden min-h-[420px] flex-col",
+                    "hidden lg:flex apex-card relative overflow-hidden min-h-[420px] flex-col",
                     selectedDriver.cutout ? "justify-between" : "justify-end"
                   )}>
                     {selectedDriver.cutout ? (
@@ -2173,6 +2174,56 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       />
                     )}
                   </div>
+
+                  {selectedDriverTeammates.length > 0 && (
+                    <div className="apex-card p-5">
+                      <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-4">
+                        {UI_TRANSLATIONS[language].teammate}
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        {selectedDriverTeammates.map((t) => {
+                          const canOpenTeammate = selectedCategory.id === 'f1' && Boolean(DRIVER_BIOS[t.id]);
+                          const teammatePhoto = t.cutout || t.image;
+                          const content = (
+                            <>
+                              <div className="w-14 h-14 rounded-full overflow-hidden bg-black/30 shrink-0">
+                                {teammatePhoto && (
+                                  <img
+                                    src={teammatePhoto}
+                                    alt={t.name}
+                                    className="w-full h-full object-cover object-top"
+                                    referrerPolicy="no-referrer"
+                                    loading="lazy"
+                                    decoding="async"
+                                  />
+                                )}
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-apex font-extrabold italic text-[var(--text-main)] leading-tight">{t.name}</div>
+                                <div className="font-apex-mono text-[10px] text-gray-500 uppercase tracking-widest mt-0.5">#{t.number}</div>
+                              </div>
+                            </>
+                          );
+                          return canOpenTeammate ? (
+                            <button
+                              key={t.id}
+                              type="button"
+                              onClick={() => { setSelectedDriver(t); setView('driver'); }}
+                              className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--driver-accent)]/40 transition-colors text-left group/teammate"
+                            >
+                              {content}
+                              <ChevronRight className="w-4 h-4 text-[var(--driver-accent)] ml-auto shrink-0 opacity-0 group-hover/teammate:opacity-100 group-hover/teammate:translate-x-1 transition-all" />
+                            </button>
+                          ) : (
+                            <div key={t.id} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                              {content}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                   <div className="lg:col-span-7 flex flex-col gap-6">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -2247,50 +2298,6 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   <div className="font-bold text-[var(--text-main)]">{selectedDriverTeam.car}</div>
                                 </div>
                               )}
-                              {selectedDriverTeammates.length > 0 && (
-                                <div>
-                                  <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
-                                    {UI_TRANSLATIONS[language].teammate}
-                                  </div>
-                                  <div className="flex flex-wrap gap-2">
-                                    {selectedDriverTeammates.map((t) => {
-                                      const canOpenTeammate = selectedCategory.id === 'f1' && Boolean(DRIVER_BIOS[t.id]);
-                                      const teammatePhoto = t.cutout || t.image;
-                                      const inner = (
-                                        <>
-                                          <span className="w-8 h-8 rounded-full overflow-hidden shrink-0">
-                                            {teammatePhoto && (
-                                              <img
-                                                src={teammatePhoto}
-                                                alt={t.name}
-                                                className="w-full h-full object-cover object-top"
-                                                referrerPolicy="no-referrer"
-                                                loading="lazy"
-                                                decoding="async"
-                                              />
-                                            )}
-                                          </span>
-                                          <span className="font-bold text-[var(--text-main)] text-sm">{t.name}</span>
-                                        </>
-                                      );
-                                      return canOpenTeammate ? (
-                                        <button
-                                          key={t.id}
-                                          type="button"
-                                          onClick={() => { setSelectedDriver(t); setView('driver'); }}
-                                          className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--driver-accent)]/50 transition-colors"
-                                        >
-                                          {inner}
-                                        </button>
-                                      ) : (
-                                        <div key={t.id} className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-white/5 border border-white/10">
-                                          {inner}
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              )}
                             </div>
                           </div>
                           {selectedDriverTeam?.clearart && (
@@ -2325,50 +2332,6 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 {UI_TRANSLATIONS[language].chassis}
                               </div>
                               <div className="font-bold text-[var(--text-main)]">{selectedDriverTeam.car}</div>
-                            </div>
-                          )}
-                          {selectedDriverTeammates.length > 0 && (
-                            <div>
-                              <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
-                                {UI_TRANSLATIONS[language].teammate}
-                              </div>
-                              <div className="flex flex-wrap gap-2">
-                                {selectedDriverTeammates.map((t) => {
-                                  const canOpenTeammate = selectedCategory.id === 'f1' && Boolean(DRIVER_BIOS[t.id]);
-                                  const teammatePhoto = t.cutout || t.image;
-                                  const inner = (
-                                    <>
-                                      <span className="w-8 h-8 rounded-full overflow-hidden shrink-0">
-                                        {teammatePhoto && (
-                                          <img
-                                            src={teammatePhoto}
-                                            alt={t.name}
-                                            className="w-full h-full object-cover object-top"
-                                            referrerPolicy="no-referrer"
-                                            loading="lazy"
-                                            decoding="async"
-                                          />
-                                        )}
-                                      </span>
-                                      <span className="font-bold text-[var(--text-main)] text-sm">{t.name}</span>
-                                    </>
-                                  );
-                                  return canOpenTeammate ? (
-                                    <button
-                                      key={t.id}
-                                      type="button"
-                                      onClick={() => { setSelectedDriver(t); setView('driver'); }}
-                                      className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--driver-accent)]/50 transition-colors"
-                                    >
-                                      {inner}
-                                    </button>
-                                  ) : (
-                                    <div key={t.id} className="flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-white/5 border border-white/10">
-                                      {inner}
-                                    </div>
-                                  );
-                                })}
-                              </div>
                             </div>
                           )}
                         </div>
