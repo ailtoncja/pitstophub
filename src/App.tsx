@@ -2073,7 +2073,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   <ChevronLeft className="w-4 h-4" /> {UI_TRANSLATIONS[language].standings}
                 </button>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+                {/* items-start: sem isso, o grid estica os dois cards da linha pra terem a
+                    mesma altura (padrao do CSS Grid), e como o painel de carreira/bio a
+                    direita costuma ser mais alto que o card da foto, a foto era esticada e
+                    empurrada pro fundo pelo justify-between, abrindo um vao vazio enorme. */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6 items-start">
                   {/* Versao compacta, so no mobile: card grande de baixo (pensado pro recorte
                       de corpo inteiro) deixava um vao vazio enorme quando empilhado em tela
                       estreita. Aqui a foto fica pequena ao lado do nome, sem sobra. */}
