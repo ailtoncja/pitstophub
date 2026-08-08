@@ -2079,49 +2079,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     empurrada pro fundo pelo justify-between, abrindo um vao vazio enorme. */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6 items-start">
                 <div className="lg:col-span-5 flex flex-col gap-6">
-                  {/* Versao compacta, so no mobile: card grande de baixo (pensado pro recorte
-                      de corpo inteiro) deixava um vao vazio enorme quando empilhado em tela
-                      estreita. Aqui a foto fica pequena ao lado do nome, sem sobra. */}
-                  <div className="lg:hidden apex-card relative overflow-hidden p-5">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[var(--driver-accent)]/15 to-transparent" />
-                    <div className="relative z-10 flex items-center gap-4">
-                      <div
-                        className="w-20 h-20 rounded-full overflow-hidden bg-black/30 border-2 shrink-0"
-                        style={{ borderColor: driverAccent }}
-                      >
-                        {(selectedDriver.image || selectedDriver.cutout) && (
-                          <img
-                            src={selectedDriver.image || selectedDriver.cutout}
-                            alt={selectedDriver.name}
-                            className="w-full h-full object-cover object-top"
-                            referrerPolicy="no-referrer"
-                            loading="eager"
-                            decoding="async"
-                          />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          {selectedDriverTeam && (
-                            <span className="text-[var(--driver-accent)] font-apex-mono text-[10px] font-semibold border border-[var(--driver-accent)] px-1.5 py-0.5 uppercase">
-                              {selectedDriverTeam.name}
-                            </span>
-                          )}
-                          <span className="font-apex-mono text-[10px] text-gray-400">#{selectedDriver.number}</span>
-                        </div>
-                        <h1 className="font-apex font-extrabold italic uppercase text-2xl leading-[0.95] text-white">
-                          {selectedDriver.name.split(' ').slice(0, -1).join(' ')}{' '}
-                          <span className="text-[var(--driver-accent)]">{selectedDriver.name.split(' ').slice(-1)}</span>
-                        </h1>
-                        <p className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-400 mt-1">
-                          {selectedDriver.nationality}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
                   <div className={cn(
-                    "hidden lg:flex apex-card relative overflow-hidden min-h-[420px] flex-col",
+                    "apex-card relative overflow-hidden min-h-[420px] flex flex-col",
                     selectedDriver.cutout ? "justify-between" : "justify-end"
                   )}>
                     {selectedDriver.cutout ? (
