@@ -1279,6 +1279,20 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     [selectedCategory.drivers]
   );
 
+  // Destaques da aba Visao Geral (lider do campeonato, lider de construtores,
+  // ultimo resultado) usam a cor da equipe de quem esta sendo mostrado, em vez
+  // da cor fixa da categoria.
+  const championshipLeaderTeam = championshipLeader
+    ? selectedCategory.teams.find((t) => t.name === championshipLeader.team) ?? null
+    : null;
+  const constructorsLeaderTeam = constructorsLeader
+    ? selectedCategory.teams.find((t) => t.name === constructorsLeader.name) ?? null
+    : null;
+  const lastRaceWinnerDriver = lastCompletedRace?.winner ? driverByName.get(lastCompletedRace.winner) ?? null : null;
+  const lastRaceWinnerTeam = lastRaceWinnerDriver
+    ? selectedCategory.teams.find((t) => t.id === lastRaceWinnerDriver.teamId) ?? null
+    : null;
+
   const selectedDriverTeam = useMemo(
     () => (selectedDriver ? selectedCategory.teams.find((t) => t.id === selectedDriver.teamId) ?? null : null),
     [selectedCategory.teams, selectedDriver]
@@ -2562,7 +2576,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               <h3 className="text-xl font-apex font-extrabold italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
                                 <Trophy className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].liveLastResult}
                               </h3>
-                              <div className="text-2xl font-display font-black text-[var(--cat-accent)] mb-2">
+                              <div
+                                className="text-2xl font-display font-black mb-2"
+                                style={{ color: lastRaceWinnerTeam?.color ?? 'var(--cat-accent)' }}
+                              >
                                 {lastCompletedRace?.winner || '--'}
                               </div>
                               <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">
@@ -2574,7 +2591,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               <h3 className="text-xl font-apex font-extrabold italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
                                 <Flag className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].championshipLeader}
                               </h3>
-                              <div className="text-2xl font-display font-black text-[var(--cat-accent)] mb-2">
+                              <div
+                                className="text-2xl font-display font-black mb-2"
+                                style={{ color: championshipLeaderTeam?.color ?? 'var(--cat-accent)' }}
+                              >
                                 {championshipLeader?.name || '--'}
                               </div>
                               <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">
@@ -2586,7 +2606,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               <h3 className="text-xl font-apex font-extrabold italic mb-6 flex items-center gap-2 text-[var(--text-main)]">
                                 <Users className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].constructorsLeader}
                               </h3>
-                              <div className="text-2xl font-display font-black text-[var(--cat-accent)] mb-2">
+                              <div
+                                className="text-2xl font-display font-black mb-2"
+                                style={{ color: constructorsLeaderTeam?.color ?? 'var(--cat-accent)' }}
+                              >
                                 {constructorsLeader?.name || '--'}
                               </div>
                               <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">
@@ -2617,7 +2640,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               {selectedCategory.teams
                                 .filter(t => (t.class || 'Geral') === className)
                                 .map((team) => (
-                                  <div key={team.id} className="apex-card overflow-hidden group">
+                                  <div
+                                    key={team.id}
+                                    className="apex-card overflow-hidden group"
+                                    style={{
+                                      '--team-accent': team.color ?? 'var(--cat-accent)',
+                                      '--team-accent-ink': team.color ? getAccentTextColor(team.color) : 'var(--cat-accent-ink)',
+                                    } as React.CSSProperties}
+                                  >
                                     <div className="h-2 w-full" style={{ backgroundColor: team.color }} />
                                     <div className="p-6">
                                       <div className="flex items-center justify-between mb-6">
@@ -2645,7 +2675,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                           <div>
                                             <h4 className="text-xl font-apex font-extrabold italic text-[var(--text-main)]">{team.name}</h4>
                                             {team.car && (
-                                              <div className="text-xs font-mono text-[var(--cat-accent)] font-bold uppercase tracking-widest mt-1">
+                                              <div className="text-xs font-mono text-[var(--team-accent)] font-bold uppercase tracking-widest mt-1">
                                                 {team.car}
                                               </div>
                                             )}
@@ -2656,8 +2686,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                           className={cn(
                                             "px-3 py-1.5  text-[10px] font-black uppercase tracking-widest border transition-colors",
                                             followedTeamSet.has(`${selectedCategory.id}::${team.id}`)
-                                              ? "bg-[var(--cat-accent)]/10 border-[var(--cat-accent)]/30 text-[var(--cat-accent)]"
-                                              : "bg-white/5 border-white/10 text-gray-400 hover:text-[var(--cat-accent)]"
+                                              ? "bg-[var(--team-accent)]/10 border-[var(--team-accent)]/30 text-[var(--team-accent)]"
+                                              : "bg-white/5 border-white/10 text-gray-400 hover:text-[var(--team-accent)]"
                                           )}
                                         >
                                           {followedTeamSet.has(`${selectedCategory.id}::${team.id}`) ? UI_TRANSLATIONS[language].following : UI_TRANSLATIONS[language].follow}
@@ -2674,18 +2704,18 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                               onClick={isDriverPageTest ? () => { setSelectedDriver(driver); setView('driver'); } : undefined}
                                               className={cn(
                                                 "relative flex flex-col p-4  bg-black/20 hover:bg-black/30 transition-all group/driver overflow-hidden border border-white/5",
-                                                isDriverPageTest && "cursor-pointer ring-1 ring-inset ring-[var(--cat-accent)]/40"
+                                                isDriverPageTest && "cursor-pointer ring-1 ring-inset ring-[var(--team-accent)]/40"
                                               )}
                                             >
-                                              <div className="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 bg-[var(--cat-accent)]/5 rounded-full group-hover/driver:bg-[var(--cat-accent)]/10 transition-colors" />
-                                              
+                                              <div className="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 bg-[var(--team-accent)]/5 rounded-full group-hover/driver:bg-[var(--team-accent)]/10 transition-colors" />
+
                                               <div className="flex items-center gap-4 mb-4 relative z-10">
                                                 <div className="relative">
                                                   {driver.cutout ? (
                                                     <img
                                                       src={driver.cutout}
                                                       alt={driver.name}
-                                                      className="w-16 h-16 object-cover object-top bg-[var(--cat-accent)]/10 border-2 border-[var(--cat-accent)]/30 shadow-lg"
+                                                      className="w-16 h-16 object-cover object-top bg-[var(--team-accent)]/10 border-2 border-[var(--team-accent)]/30 shadow-lg"
                                                       referrerPolicy="no-referrer"
                                                       loading="lazy"
                                                       decoding="async"
@@ -2694,24 +2724,24 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                                     <img
                                                       src={driver.image}
                                                       alt={driver.name}
-                                                      className="w-16 h-16  object-cover border-2 border-[var(--cat-accent)]/30 shadow-lg"
+                                                      className="w-16 h-16  object-cover border-2 border-[var(--team-accent)]/30 shadow-lg"
                                                       referrerPolicy="no-referrer"
                                                       loading="lazy"
                                                       decoding="async"
                                                     />
                                                   ) : (
-                                                    <div className="w-16 h-16  bg-[var(--cat-accent)]/10 flex items-center justify-center border-2 border-[var(--cat-accent)]/30">
-                                                      <Users className="w-8 h-8 text-[var(--cat-accent)]/40" />
+                                                    <div className="w-16 h-16  bg-[var(--team-accent)]/10 flex items-center justify-center border-2 border-[var(--team-accent)]/30">
+                                                      <Users className="w-8 h-8 text-[var(--team-accent)]/40" />
                                                     </div>
                                                   )}
-                                                  <div className="absolute -bottom-2 -right-2 bg-[var(--cat-accent)] text-[var(--cat-accent-ink)] text-[10px] font-black px-2 py-0.5 rounded-md shadow-lg">
+                                                  <div className="absolute -bottom-2 -right-2 bg-[var(--team-accent)] text-[var(--team-accent-ink)] text-[10px] font-black px-2 py-0.5 rounded-md shadow-lg">
                                                     #{driver.number}
                                                   </div>
                                                 </div>
-                                                
+
                                                 <div className="min-w-0 flex-1">
-                                                  <div className="font-apex font-extrabold italic text-lg text-[var(--text-main)] group-hover/driver:text-[var(--cat-accent)] transition-colors">
-                                                    {driver.name.split(' ')[0]} <span className="text-[var(--cat-accent)] group-hover/driver:text-[var(--text-main)]">{driver.name.split(' ').slice(1).join(' ')}</span>
+                                                  <div className="font-apex font-extrabold italic text-lg text-[var(--text-main)] group-hover/driver:text-[var(--team-accent)] transition-colors">
+                                                    {driver.name.split(' ')[0]} <span className="text-[var(--team-accent)] group-hover/driver:text-[var(--text-main)]">{driver.name.split(' ').slice(1).join(' ')}</span>
                                                   </div>
                                                   <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest flex items-center gap-1">
                                                     <Flag className="w-2 h-2" />
@@ -2726,17 +2756,17 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                                   className={cn(
                                                     "px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border transition-colors shrink-0",
                                                     followedDriverSet.has(`${selectedCategory.id}::${driver.id}`)
-                                                      ? "bg-[var(--cat-accent)]/10 border-[var(--cat-accent)]/30 text-[var(--cat-accent)]"
-                                                      : "bg-white/5 border-white/10 text-gray-400 hover:text-[var(--cat-accent)]"
+                                                      ? "bg-[var(--team-accent)]/10 border-[var(--team-accent)]/30 text-[var(--team-accent)]"
+                                                      : "bg-white/5 border-white/10 text-gray-400 hover:text-[var(--team-accent)]"
                                                   )}
                                                 >
                                                   {followedDriverSet.has(`${selectedCategory.id}::${driver.id}`) ? UI_TRANSLATIONS[language].following : UI_TRANSLATIONS[language].follow}
                                                 </button>
                                               </div>
-                                              
+
                                               <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
                                                 <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].grid2026}</div>
-                                                <ChevronRight className="w-4 h-4 text-[var(--cat-accent)] opacity-0 group-hover/driver:opacity-100 group-hover/driver:translate-x-1 transition-all" />
+                                                <ChevronRight className="w-4 h-4 text-[var(--team-accent)] opacity-0 group-hover/driver:opacity-100 group-hover/driver:translate-x-1 transition-all" />
                                               </div>
                                             </div>
                                           );})}
@@ -2878,18 +2908,21 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                             onClick={isDriverPageTest ? () => { setSelectedDriver(driver!); setView('driver'); } : undefined}
                                             className={cn(
                                               "hover:bg-white/5 transition-colors border-l-2",
-                                              isDriverPageTest && "cursor-pointer ring-1 ring-inset ring-[var(--cat-accent)]/40"
+                                              isDriverPageTest && "cursor-pointer ring-1 ring-inset ring-[var(--row-accent)]/40"
                                             )}
-                                            style={{ borderLeftColor: item.position === 1 ? 'var(--cat-accent)' : (team?.color ?? 'transparent') }}
+                                            style={{
+                                              '--row-accent': team?.color ?? 'var(--cat-accent)',
+                                              borderLeftColor: team?.color ?? 'var(--cat-accent)',
+                                            } as React.CSSProperties}
                                           >
-                                            <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--cat-accent)]">{item.position}</td>
+                                            <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--row-accent)]">{item.position}</td>
                                             <td className="px-6 py-4 font-bold text-[var(--text-main)]">
                                               <div className="flex items-center gap-3">
                                                 {driverPhoto ? (
                                                   <img
                                                     src={driverPhoto}
                                                     alt={item.name}
-                                                    className="w-9 h-9 object-cover object-top bg-[var(--cat-accent)]/10 border border-[var(--cat-accent)]/30 shrink-0"
+                                                    className="w-9 h-9 object-cover object-top bg-[var(--row-accent)]/10 border border-[var(--row-accent)]/30 shrink-0"
                                                     referrerPolicy="no-referrer"
                                                     loading="lazy"
                                                     decoding="async"
@@ -2945,8 +2978,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                       {selectedCategory.standings.constructors.map((item) => {
                                         const team = selectedCategory.teams.find((t) => t.name === item.name);
                                         return (
-                                          <tr key={item.name} className="hover:bg-white/5 transition-colors">
-                                            <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--cat-accent)]">{item.position}</td>
+                                          <tr key={item.name} className="hover:bg-white/5 transition-colors border-l-2" style={{ borderLeftColor: team?.color ?? 'transparent' }}>
+                                            <td className="px-6 py-4 font-apex font-extrabold italic" style={{ color: team?.color ?? 'var(--cat-accent)' }}>{item.position}</td>
                                             <td className="px-6 py-4 font-bold text-[var(--text-main)]">
                                               <div className="flex items-center gap-3">
                                                 {team?.badge && (
@@ -2991,8 +3024,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                       {selectedCategory.standings.teams.map((item) => {
                                         const team = selectedCategory.teams.find((t) => t.name === item.name);
                                         return (
-                                          <tr key={item.name + item.extra} className="hover:bg-white/5 transition-colors">
-                                            <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--cat-accent)]">{item.position}</td>
+                                          <tr key={item.name + item.extra} className="hover:bg-white/5 transition-colors border-l-2" style={{ borderLeftColor: team?.color ?? 'transparent' }}>
+                                            <td className="px-6 py-4 font-apex font-extrabold italic" style={{ color: team?.color ?? 'var(--cat-accent)' }}>{item.position}</td>
                                             <td className="px-6 py-4 font-mono font-bold text-gray-400">{item.extra || '-'}</td>
                                             <td className="px-6 py-4 font-bold text-[var(--text-main)]">
                                               <div className="flex items-center gap-3">
