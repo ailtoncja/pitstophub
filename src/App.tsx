@@ -2077,7 +2077,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   {/* Versao compacta, so no mobile: card grande de baixo (pensado pro recorte
                       de corpo inteiro) deixava um vao vazio enorme quando empilhado em tela
                       estreita. Aqui a foto fica pequena ao lado do nome, sem sobra. */}
-                  <div className="sm:hidden lg:col-span-5 apex-card relative overflow-hidden p-5">
+                  <div className="lg:hidden apex-card relative overflow-hidden p-5">
                     <div className="absolute inset-0 bg-gradient-to-br from-[var(--driver-accent)]/15 to-transparent" />
                     <div className="relative z-10 flex items-center gap-4">
                       <div
@@ -2116,7 +2116,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   </div>
 
                   <div className={cn(
-                    "hidden sm:flex lg:col-span-5 apex-card relative overflow-hidden min-h-[420px] flex-col",
+                    "hidden lg:flex lg:col-span-5 apex-card relative overflow-hidden min-h-[420px] flex-col",
                     selectedDriver.cutout ? "justify-between" : "justify-end"
                   )}>
                     {selectedDriver.cutout ? (
@@ -2254,7 +2254,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                       const teammatePhoto = t.image || t.cutout;
                                       const inner = (
                                         <>
-                                          <span className="w-7 h-7 rounded-full overflow-hidden bg-black/30 shrink-0">
+                                          <span className="w-8 h-8 overflow-hidden bg-[var(--driver-accent)]/10 border-2 border-[var(--driver-accent)]/30 shrink-0">
                                             {teammatePhoto && (
                                               <img
                                                 src={teammatePhoto}
@@ -2334,7 +2334,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   const teammatePhoto = t.image || t.cutout;
                                   const inner = (
                                     <>
-                                      <span className="w-7 h-7 rounded-full overflow-hidden bg-black/30 shrink-0">
+                                      <span className="w-8 h-8 overflow-hidden bg-[var(--driver-accent)]/10 border-2 border-[var(--driver-accent)]/30 shrink-0">
                                         {teammatePhoto && (
                                           <img
                                             src={teammatePhoto}
