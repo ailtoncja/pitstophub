@@ -7,23 +7,19 @@ export function registerServiceWorker() {
     });
   });
 
-  // Com skipWaiting + clientsClaim, o novo service worker assume o controle
-  // de abas ja abertas sem elas saberem: sem este reload, a aba continua
-  // rodando o bundle antigo ate ser fechada e reaberta manualmente. Mas
-  // recarregar na hora, no meio do uso (ex: enquanto a pessoa esta logada
-  // navegando), interrompe a sessao em andamento e da a impressao de que o
-  // app "deslogou sozinho". Em vez disso, so recarrega quando a aba estiver
-  // em segundo plano (troca de app, tela bloqueada, etc) -- nunca durante
-  // uso ativo.
-  let reloaded = false;
-  const reloadWhenSafe = () => {
-    if (reloaded) return;
-    if (document.visibilityState === 'hidden') {
-      reloaded = true;
-      window.location.reload();
-      return;
-    }
-    document.addEventListener('visibilitychange', reloadWhenSafe, { once: true });
-  };
-  navigator.serviceWorker.addEventListener('controllerchange', reloadWhenSafe);
+  // Antes, um `controllerchange` (novo service worker assumindo) disparava
+  // window.location.reload() assim que a aba ficasse oculta (troca de app,
+  // tela bloqueada). O problema: o Supabase SO renova o token de sessao com
+  // a aba em primeiro plano, e para/retoma esse timer exatamente nos mesmos
+  // eventos de visibilitychange. Reload e renovacao de token disputando o
+  // mesmo gatilho abriam uma corrida real: a pagina antiga (prestes a sumir)
+  // e a pagina nova (recem recarregada) podiam tentar renovar o token quase
+  // juntas: como o refresh token do Supabase so vale uma vez, a segunda
+  // tentativa falhava e a pessoa aparecia deslogada sem motivo aparente.
+  //
+  // Por isso NAO forcamos mais reload aqui. Com clientsClaim, o novo service
+  // worker so passa a responder as proximas requisicoes de rede da aba ja
+  // aberta -- o bundle JS que ja esta rodando continua rodando normalmente
+  // ate a pessoa fechar e reabrir o app, quando ai sim pega a versao nova,
+  // sem overlap entre dois clientes Supabase disputando o mesmo refresh token.
 }
