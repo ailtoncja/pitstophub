@@ -2075,7 +2075,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
                   <div className={cn(
-                    "lg:col-span-5 apex-card relative overflow-hidden min-h-[420px] flex flex-col",
+                    "lg:col-span-5 apex-card relative overflow-hidden min-h-[340px] lg:min-h-[420px] flex flex-col",
                     selectedDriver.cutout ? "justify-between" : "justify-end"
                   )}>
                     {selectedDriver.cutout ? (
@@ -2121,9 +2121,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       <img
                         src={selectedDriver.cutout}
                         alt={selectedDriver.name}
-                        className="relative z-10 mx-auto max-h-[300px] w-auto object-contain drop-shadow-2xl"
+                        className="relative z-10 mx-auto max-h-[220px] sm:max-h-[300px] w-auto object-contain drop-shadow-2xl"
                         referrerPolicy="no-referrer"
-                        loading="lazy"
+                        loading="eager"
                         decoding="async"
                       />
                     )}
@@ -2207,8 +2207,26 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
                                     {UI_TRANSLATIONS[language].teammate}
                                   </div>
-                                  <div className="font-bold text-[var(--text-main)]">
-                                    {selectedDriverTeammates.map((t) => t.name).join(', ')}
+                                  <div className="font-bold text-[var(--text-main)] flex flex-wrap gap-x-1">
+                                    {selectedDriverTeammates.map((t, i) => {
+                                      const canOpenTeammate = selectedCategory.id === 'f1' && Boolean(DRIVER_BIOS[t.id]);
+                                      return (
+                                        <React.Fragment key={t.id}>
+                                          {canOpenTeammate ? (
+                                            <button
+                                              type="button"
+                                              onClick={() => { setSelectedDriver(t); setView('driver'); }}
+                                              className="hover:text-[var(--driver-accent)] underline underline-offset-4 decoration-white/20 hover:decoration-current transition-colors"
+                                            >
+                                              {t.name}
+                                            </button>
+                                          ) : (
+                                            <span>{t.name}</span>
+                                          )}
+                                          {i < selectedDriverTeammates.length - 1 && <span>,</span>}
+                                        </React.Fragment>
+                                      );
+                                    })}
                                   </div>
                                 </div>
                               )}
@@ -2253,8 +2271,26 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
                                 {UI_TRANSLATIONS[language].teammate}
                               </div>
-                              <div className="font-bold text-[var(--text-main)]">
-                                {selectedDriverTeammates.map((t) => t.name).join(', ')}
+                              <div className="font-bold text-[var(--text-main)] flex flex-wrap gap-x-1">
+                                {selectedDriverTeammates.map((t, i) => {
+                                  const canOpenTeammate = selectedCategory.id === 'f1' && Boolean(DRIVER_BIOS[t.id]);
+                                  return (
+                                    <React.Fragment key={t.id}>
+                                      {canOpenTeammate ? (
+                                        <button
+                                          type="button"
+                                          onClick={() => { setSelectedDriver(t); setView('driver'); }}
+                                          className="hover:text-[var(--driver-accent)] underline underline-offset-4 decoration-white/20 hover:decoration-current transition-colors"
+                                        >
+                                          {t.name}
+                                        </button>
+                                      ) : (
+                                        <span>{t.name}</span>
+                                      )}
+                                      {i < selectedDriverTeammates.length - 1 && <span>,</span>}
+                                    </React.Fragment>
+                                  );
+                                })}
                               </div>
                             </div>
                           )}
