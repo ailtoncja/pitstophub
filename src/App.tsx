@@ -1302,10 +1302,17 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   // Pagina de piloto usa a cor da equipe do piloto como destaque, nao a cor fixa da categoria.
   const driverAccent = selectedDriverTeam?.color ?? categoryAccent;
   // O menu FORMULAS/ENDURANCE do cabecalho normalmente usa o vermelho fixo da
-  // marca, mas numa pagina de piloto o destaque/hover do menu acompanha a cor
-  // da equipe daquele piloto (resto do cabecalho -- logo, botao de login --
-  // continua vermelho de proposito, e' identidade fixa do site).
-  const navAccent = view === 'driver' && selectedDriver ? driverAccent : '#e10600';
+  // marca, mas acompanha a cor de quem esta sendo visto: a cor da equipe numa
+  // pagina de piloto, ou a cor da propria categoria em qualquer pagina dela
+  // (visao geral, corrida). Fora disso (home, favoritos) fica no vermelho
+  // padrao. Resto do cabecalho -- logo, botao de login -- continua vermelho
+  // de proposito, e' identidade fixa do site.
+  const navAccent =
+    view === 'driver' && selectedDriver
+      ? driverAccent
+      : view === 'category' || view === 'race'
+        ? categoryAccent
+        : '#e10600';
 
   const selectedDriverStanding = useMemo(
     () => (selectedDriver ? selectedCategory.standings?.drivers?.find((d) => d.name === selectedDriver.name) ?? null : null),
