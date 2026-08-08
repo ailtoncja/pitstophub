@@ -2383,9 +2383,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 <FavoritesPicker
                   categories={allCategories}
                   language={language}
+                  followedCategoryIds={followedCategoryIds}
                   followedTeamIds={followedTeamIds}
                   followedDriverIds={followedDriverIds}
                   priorityFollowIds={priorityFollowIds}
+                  onToggleCategory={toggleFollowCategory}
                   onToggleTeam={toggleFollowTeam}
                   onToggleDriver={toggleFollowDriver}
                   onMovePriority={movePriorityFollow}
@@ -3298,9 +3300,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
           <FavoritesOnboardingModal
             categories={allCategories}
             language={language}
+            followedCategoryIds={followedCategoryIds}
             followedTeamIds={followedTeamIds}
             followedDriverIds={followedDriverIds}
             priorityFollowIds={priorityFollowIds}
+            onToggleCategory={toggleFollowCategory}
             onToggleTeam={toggleFollowTeam}
             onToggleDriver={toggleFollowDriver}
             onMovePriority={movePriorityFollow}
