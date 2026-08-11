@@ -22,8 +22,8 @@ export default defineConfig(() => ({
         scope: '/',
         display: 'standalone',
         orientation: 'portrait-primary',
-        background_color: '#0f1720',
-        theme_color: '#c1121f',
+        background_color: '#0a0a0b',
+        theme_color: '#0a0a0b',
         categories: ['sports', 'news', 'productivity'],
         icons: [
           {
