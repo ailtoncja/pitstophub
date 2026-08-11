@@ -6,8 +6,8 @@
   --font-apex: "Anybody", sans-serif;
   --font-apex-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  --color-brand-red: #e10600;
-  --color-brand-dark: #15151e;
+  --color-brand-red: #e8232a;
+  --color-brand-dark: #0a0a0b;
   --color-brand-light: #f8f9fa;
   --color-apex-accent: #ffb4a8;
 }
@@ -25,14 +25,16 @@
     --card-bg: rgba(255, 255, 255, 0.7);
     --card-border: rgba(0, 0, 0, 0.1);
     --header-bg: rgba(248, 249, 250, 0.8);
+    --sidebar-bg: #101012;
   }
 
   .dark {
     --bg-main: var(--color-brand-dark);
-    --text-main: #ffffff;
-    --card-bg: rgba(255, 255, 255, 0.05);
-    --card-border: rgba(255, 255, 255, 0.1);
-    --header-bg: rgba(21, 21, 30, 0.8);
+    --text-main: #f2f2f3;
+    --card-bg: #151517;
+    --card-border: #232326;
+    --header-bg: rgba(16, 16, 18, 0.86);
+    --sidebar-bg: #101012;
   }
 
   body {
@@ -54,16 +56,31 @@
 
 .glass-card {
   background-color: var(--card-bg);
-  backdrop-filter: blur(8px);
   border: 1px solid var(--card-border);
   @apply rounded-2xl shadow-sm;
 }
 
-/* Cartao de cantos retos usado na home redesenhada (estilo "Apex Pro") */
+/* Cartao usado em praticamente toda a UI (estilo dashboard TranGo: cantos arredondados). */
 .apex-card {
   background-color: var(--card-bg);
-  backdrop-filter: blur(8px);
   border: 1px solid var(--card-border);
+  border-radius: 0.875rem;
+}
+
+/* Manchas radiais decorativas atras do conteudo, estilo dashboard TranGo. */
+.tg-glow {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  filter: blur(2px);
+}
+
+.tg-glow-red {
+  background: radial-gradient(circle, rgba(214, 72, 20, 0.38) 0%, rgba(214, 72, 20, 0.08) 45%, rgba(0, 0, 0, 0) 70%);
+}
+
+.tg-glow-crimson {
+  background: radial-gradient(circle, rgba(232, 35, 42, 0.18) 0%, rgba(180, 50, 20, 0.08) 45%, rgba(0, 0, 0, 0) 72%);
 }
 
 button, [role="button"] {
