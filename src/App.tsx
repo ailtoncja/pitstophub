@@ -4264,40 +4264,62 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 16 }}
               transition={SPRING}
-              className="relative w-full max-w-2xl apex-card p-8 md:p-12 overflow-hidden"
+              className="relative w-full max-w-3xl apex-card p-6 md:p-10 overflow-hidden max-h-[88vh] flex flex-col"
             >
-              <div className="absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 bg-[var(--cat-accent)]/10 rounded-full" />
-              
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-8">
-                  <div className="flex items-center gap-4">
- <div className="w-12 h-12 rounded-lg bg-[var(--cat-accent)] flex items-center justify-center shadow-lg shadow-[var(--cat-accent)]/20">
+              <div className="absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 bg-[var(--cat-accent)]/10 rounded-full pointer-events-none" />
+
+              <div className="relative z-10 flex flex-col min-h-0">
+                <div className="flex items-center justify-between mb-6 shrink-0">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-12 h-12 rounded-lg bg-[var(--cat-accent)] flex items-center justify-center shadow-lg shadow-[var(--cat-accent)]/20 shrink-0">
                       <Info className="w-6 h-6" style={{ color: categoryAccentInk }} />
                     </div>
-                    <div>
-                      <h2 className="text-3xl font-apex font-extrabold italic tracking-tighter text-[var(--text-main)]">
+                    <div className="min-w-0">
+                      <h2 className="text-2xl md:text-3xl font-apex font-extrabold italic tracking-tighter text-[var(--text-main)] truncate">
                         {UI_TRANSLATIONS[language].rulesAndFormat}
                       </h2>
-                      <p className="text-[var(--cat-accent)] text-xs font-black uppercase tracking-widest">
+                      <p className="text-[var(--cat-accent)] text-xs font-black uppercase tracking-widest truncate">
                         {language === 'pt' ? selectedCategory.fullName : (selectedCategory.enFullName || selectedCategory.fullName)}
                       </p>
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setShowRules(false)}
-                    className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"
+                    className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors shrink-0"
                   >
                     <XCircle className="w-6 h-6 text-gray-500" />
                   </button>
                 </div>
-                
-                <div className="prose prose-invert max-w-none max-h-[60vh] overflow-y-auto pr-4 no-scrollbar">
-                  <p className="text-lg leading-relaxed text-gray-400 font-medium whitespace-pre-line">
-                    {language === 'pt' ? selectedCategory.longDescription : (selectedCategory.enLongDescription || selectedCategory.longDescription)}
-                  </p>
+
+                <div className="overflow-y-auto pr-1 md:pr-4 no-scrollbar">
+                  {selectedCategory.rulesFormat && selectedCategory.rulesFormat.length > 0 ? (
+                    <div className="space-y-5">
+                      {selectedCategory.rulesFormat.map((section, index) => (
+                        <div key={index} className="apex-card p-5 md:p-6 bg-white/[0.02]">
+                          <div className="flex items-start gap-3 mb-3">
+                            <span className="font-apex-mono text-xs font-black shrink-0 mt-0.5 text-[var(--cat-accent)]">
+                              {String(index + 1).padStart(2, '0')}
+                            </span>
+                            <h3 className="font-apex text-lg font-extrabold italic tracking-tight text-[var(--text-main)]">
+                              {language === 'pt' ? section.title : (section.enTitle || section.title)}
+                            </h3>
+                          </div>
+                          <p className="text-[15px] leading-relaxed text-gray-400 font-medium whitespace-pre-line pl-0 md:pl-8">
+                            {language === 'pt' ? section.body : (section.enBody || section.body)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="prose prose-invert max-w-none">
+                      <p className="text-lg leading-relaxed text-gray-400 font-medium whitespace-pre-line">
+                        {language === 'pt' ? selectedCategory.longDescription : (selectedCategory.enLongDescription || selectedCategory.longDescription)}
+                      </p>
+                    </div>
+                  )}
                 </div>
-                
-                <div className="mt-10 flex justify-end">
+
+                <div className="mt-8 flex justify-end shrink-0">
                   <button 
                     onClick={() => setShowRules(false)}
  className="px-8 py-3 bg-[var(--cat-accent)] text-[var(--cat-accent-ink)] font-apex font-extrabold italic uppercase tracking-widest rounded-lg hover:bg-[var(--cat-accent)]/90 transition-all shadow-lg shadow-[var(--cat-accent)]/20"
