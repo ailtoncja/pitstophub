@@ -1438,10 +1438,10 @@ function getIsIOSInstallable(): boolean {
 }
 
 // Guarda em qual pagina o usuario estava (view/categoria/aba/corrida) para
-// sobreviver a um refresh. Usa localStorage (nao sessionStorage): no PWA
-// instalado no celular, "atualizar" quase sempre significa fechar e reabrir
-// o app, o que encerra a sessao do navegador e apagaria um sessionStorage
-// -- localStorage sobrevive a isso e so some se o usuario limpar os dados.
+// sobreviver a um refresh (F5/recarregar). Usa sessionStorage (nao
+// localStorage) de proposito: sessionStorage sobrevive a um reload da pagina,
+// mas some quando a aba/app e fechado -- assim, fechar e reabrir o app volta
+// para a home, e so um refresh de verdade mantem a pagina atual.
 const NAV_STORAGE_KEY = 'pitstophub_nav_state';
 
 type StoredNav = {
@@ -1455,7 +1455,7 @@ type StoredNav = {
 function readStoredNav(): StoredNav | null {
   if (typeof window === 'undefined') return null;
   try {
-    const raw = window.localStorage.getItem(NAV_STORAGE_KEY);
+    const raw = window.sessionStorage.getItem(NAV_STORAGE_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as StoredNav;
   } catch {
@@ -1530,9 +1530,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         raceId: selectedRace?.id ?? null,
         driverId: selectedDriver?.id ?? null,
       };
-      window.localStorage.setItem(NAV_STORAGE_KEY, JSON.stringify(payload));
+      window.sessionStorage.setItem(NAV_STORAGE_KEY, JSON.stringify(payload));
     } catch {
-      // localStorage indisponivel (modo privado, etc.) -- ignora, so afeta a persistencia.
+      // sessionStorage indisponivel (modo privado, etc.) -- ignora, so afeta a persistencia.
     }
   }, [view, selectedCategoryBase.id, activeTab, selectedRace?.id, selectedDriver?.id]);
   const [syncedStandings, setSyncedStandings] = useState<Partial<Record<Category['id'], StandingItem[] | null>>>({});
