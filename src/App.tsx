@@ -2621,8 +2621,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             exit={{ opacity: 0, y: -6 }}
             transition={SPRING}
           >
-            <section className="relative py-12 md:py-20 min-h-[70vh]">
-              <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <section className="relative py-12 md:py-16 min-h-[70vh]">
+              <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 <button
                   onClick={() => setView('home')}
                   className="inline-flex items-center gap-2 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500 hover:text-brand-red transition-colors mb-8"
@@ -2630,11 +2630,22 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   <ChevronLeft className="w-4 h-4" /> {UI_TRANSLATIONS[language].home}
                 </button>
 
-                <div className="flex items-center gap-3 mb-2">
-                  <Heart className="w-6 h-6 text-brand-red fill-current" />
-                  <h1 className="text-2xl sm:text-3xl font-apex font-extrabold italic text-[var(--text-main)]">
-                    {UI_TRANSLATIONS[language].favorites}
-                  </h1>
+                <div className="flex items-center gap-4 mb-2">
+                  <div className="w-12 h-12 rounded-xl bg-brand-red/10 flex items-center justify-center shrink-0">
+                    <Heart className="w-6 h-6 text-brand-red fill-current" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h1 className="text-2xl sm:text-3xl font-apex font-extrabold italic text-[var(--text-main)]">
+                        {UI_TRANSLATIONS[language].favorites}
+                      </h1>
+                      {priorityFollowIds.length > 0 && (
+                        <span className="px-2 py-0.5 rounded-full bg-brand-red text-white text-[10px] font-black">
+                          {priorityFollowIds.length}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <p className="text-sm text-gray-500 mb-10">{UI_TRANSLATIONS[language].favoritesPageDesc}</p>
 
