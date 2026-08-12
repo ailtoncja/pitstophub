@@ -1350,7 +1350,9 @@ function isMexicoRace(race: Race): boolean {
 
 function isVegasRace(race: Race): boolean {
   const haystack = raceHaystack(race);
-  return haystack.includes('las vegas');
+  // "Las Vegas" tambem e o nome da NASCAR em Las Vegas Motor Speedway, um oval
+  // permanente bem diferente do circuito de rua que a F1/F1 Academy usam na Strip.
+  return haystack.includes('las vegas') && !haystack.includes('motor speedway');
 }
 
 function isQatarRace(race: Race): boolean {
@@ -1393,6 +1395,21 @@ const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[
 
 function getRaceCircuitInfo(race: Race): CircuitInfo | null {
   return RACE_TEST_CIRCUITS.find(({ match }) => match(race))?.info ?? null;
+}
+
+// Categorias que, em pesquisa, realmente correm em algum dos 23 circuitos acima
+// (mesmo tracado fisico, nao so a mesma cidade). F2/F3/F1 Academy dividem varios
+// finais de semana com a F1; WEC, DTM, GT World Challenge e NASCAR passam por
+// algumas dessas pistas em seus proprios calendarios. IMSA e IndyCar, nos
+// calendarios atuais do site, nao tocam nenhuma delas. WRC fica de fora de
+// proposito: mesmo quando o nome da etapa cita a mesma cidade (ex.: Rallye
+// Monte-Carlo), a prova roda em estradas de montanha, nao no circuito de verdade.
+const CIRCUIT_PAGE_CATEGORY_IDS = new Set([
+  'f1', 'f2', 'f3', 'f1-academy', 'wec', 'dtm', 'gt-world-challenge', 'nascar',
+]);
+
+function hasCircuitPage(category: Category, race: Race): boolean {
+  return CIRCUIT_PAGE_CATEGORY_IDS.has(category.id) && getRaceCircuitInfo(race) != null;
 }
 
 function formatOrdinal(position: number, language: 'pt' | 'en'): { number: string; suffix: string } {
@@ -2715,7 +2732,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             .sort((a, b) => a.race.date.localeCompare(b.race.date))
                             .slice(0, 6)
                             .map(({ category, race }, index) => {
-                              const isRacePageTest = category.id === 'f1' && getRaceCircuitInfo(race) != null;
+                              const isRacePageTest = hasCircuitPage(category, race);
                               const statusLabel = race.status === 'upcoming'
                                 ? UI_TRANSLATIONS[language].upcoming
                                 : race.status === 'cancelled'
@@ -3883,8 +3900,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         <div className="space-y-4">
                           {selectedCategory.calendar.map((race) => {
                             const winnerDriver = race.winner ? driverByName.get(race.winner) : undefined;
-                            // Teste: pagina dedicada de corrida, habilitada so para o GP de Interlagos por enquanto.
-                            const isRacePageTest = selectedCategory.id === 'f1' && getRaceCircuitInfo(race) != null;
+                            const isRacePageTest = hasCircuitPage(selectedCategory, race);
                             return (
                             <div
                               key={race.id}
