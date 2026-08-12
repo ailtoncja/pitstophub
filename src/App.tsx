@@ -221,7 +221,7 @@ const UI_TRANSLATIONS = {
     podiums: 'Pódios',
     favorites: 'Favoritos',
     favoritesPageDesc: 'Escolha os times e pilotos que você quer acompanhar e defina a ordem de prioridade entre eles.',
-    featuredRaces: 'Corridas em Destaque',
+    featuredRaces: 'Corridas Futuras',
     championshipLeaders: 'Líderes do Campeonato',
     raceLabel: 'Corrida',
     lapRecordPending: 'Ainda não disputado'
@@ -334,7 +334,7 @@ const UI_TRANSLATIONS = {
     podiums: 'Podiums',
     favorites: 'Favorites',
     favoritesPageDesc: 'Choose the teams and drivers you want to follow and set the priority order between them.',
-    featuredRaces: 'Featured Races',
+    featuredRaces: 'Upcoming Races',
     championshipLeaders: 'Championship Leaders',
     raceLabel: 'Race',
     lapRecordPending: 'Not raced yet'
@@ -2727,7 +2727,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             .flatMap((id) => {
                               const cat = allCategoriesById.get(id);
                               if (!cat) return [];
-                              return cat.calendar.map((race) => ({ category: cat, race }));
+                              return cat.calendar
+                                .filter((race) => race.status === 'upcoming')
+                                .map((race) => ({ category: cat, race }));
                             })
                             .sort((a, b) => a.race.date.localeCompare(b.race.date))
                             .slice(0, 6)
