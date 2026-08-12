@@ -1438,10 +1438,19 @@ function getIsIOSInstallable(): boolean {
 }
 
 // Guarda em qual pagina o usuario estava (view/categoria/aba/corrida) para
-// sobreviver a um refresh (F5/recarregar). Usa sessionStorage (nao
-// localStorage) de proposito: sessionStorage sobrevive a um reload da pagina,
-// mas some quando a aba/app e fechado -- assim, fechar e reabrir o app volta
-// para a home, e so um refresh de verdade mantem a pagina atual.
+// sobreviver a um refresh (F5/recarregar), mas voltar para a home quando o
+// app for fechado e reaberto. sessionStorage sozinho nao da conta disso de
+// forma confiavel: em PWA instalado (principalmente iOS), o que a pessoa
+// sente como "atualizar a pagina" as vezes reinicia o processo do WebView e
+// perde o sessionStorage do mesmo jeito que um fechar/reabrir de verdade --
+// nesse caso, a pagina voltaria pra home mesmo sendo so um refresh.
+//
+// Por isso guardamos o estado em localStorage (sobrevive a qualquer coisa) e
+// so restauramos ele quando a Navigation Timing API confirma que ESTA carga
+// de pagina foi mesmo um reload (type === 'reload') -- e o unico sinal que o
+// navegador da que independe de sessionStorage ter sobrevivido ou nao. Uma
+// abertura nova do app (icone, apos fechado) chega como "navigate", nunca
+// como "reload", entao cai na home normalmente.
 const NAV_STORAGE_KEY = 'pitstophub_nav_state';
 
 type StoredNav = {
@@ -1452,10 +1461,22 @@ type StoredNav = {
   driverId: string | null;
 };
 
-function readStoredNav(): StoredNav | null {
-  if (typeof window === 'undefined') return null;
+function isReloadNavigation(): boolean {
+  if (typeof window === 'undefined' || !window.performance) return false;
   try {
-    const raw = window.sessionStorage.getItem(NAV_STORAGE_KEY);
+    const [entry] = window.performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    if (entry) return entry.type === 'reload';
+  } catch {
+    // Navigation Timing L2 indisponivel -- cai no fallback legado abaixo.
+  }
+  const legacyNavigation = (window.performance as unknown as { navigation?: { type: number } }).navigation;
+  return legacyNavigation?.type === 1; // PerformanceNavigation.TYPE_RELOAD
+}
+
+function readStoredNav(): StoredNav | null {
+  if (typeof window === 'undefined' || !isReloadNavigation()) return null;
+  try {
+    const raw = window.localStorage.getItem(NAV_STORAGE_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as StoredNav;
   } catch {
@@ -1530,9 +1551,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         raceId: selectedRace?.id ?? null,
         driverId: selectedDriver?.id ?? null,
       };
-      window.sessionStorage.setItem(NAV_STORAGE_KEY, JSON.stringify(payload));
+      window.localStorage.setItem(NAV_STORAGE_KEY, JSON.stringify(payload));
     } catch {
-      // sessionStorage indisponivel (modo privado, etc.) -- ignora, so afeta a persistencia.
+      // localStorage indisponivel (modo privado, etc.) -- ignora, so afeta a persistencia.
     }
   }, [view, selectedCategoryBase.id, activeTab, selectedRace?.id, selectedDriver?.id]);
   const [syncedStandings, setSyncedStandings] = useState<Partial<Record<Category['id'], StandingItem[] | null>>>({});
