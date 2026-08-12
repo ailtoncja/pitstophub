@@ -45,6 +45,13 @@ export interface CategoryStandings {
   teams?: StandingItem[];
 }
 
+export interface RuleSection {
+  title: string;
+  enTitle?: string;
+  body: string;
+  enBody?: string;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -54,6 +61,10 @@ export interface Category {
   enDescription?: string;
   longDescription: string;
   enLongDescription?: string;
+  // Explicação séria e detalhada de formato de fim de semana, pontuação e
+  // regulamento técnico - o que aparece no modal "Regras e Formato". Distinto
+  // do longDescription (resumo curto usado na aba Visão Geral).
+  rulesFormat?: RuleSection[];
   icon: string;
   teams: Team[];
   drivers: Driver[];
@@ -71,6 +82,32 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The pinnacle of global motorsport, featuring the fastest single-seater cars on the planet.',
     longDescription: 'A Fórmula 1 é o auge do automobilismo, regulada pela FIA. O campeonato consiste em uma série de corridas, conhecidas como Grandes Prêmios, realizadas em circuitos de rua e autódromos permanentes. Os carros são os mais rápidos do mundo em circuitos mistos, graças a uma aerodinâmica extremamente avançada e motores híbridos V6 turbo de 1.6 litros. O sistema de pontuação premia os 10 primeiros colocados (25, 18, 15, 12, 10, 8, 6, 4, 2, 1), com um ponto extra para a volta mais rápida se o piloto terminar no top 10. Em 2026, novas regras de motores e aerodinâmica entram em vigor, focando em combustíveis 100% sustentáveis e maior potência elétrica.',
     enLongDescription: 'Formula 1 is the peak of motorsport, regulated by the FIA. The championship consists of a series of races, known as Grands Prix, held on street circuits and permanent tracks. The cars are the fastest in the world on mixed circuits, thanks to extremely advanced aerodynamics and 1.6-liter V6 turbo hybrid engines. The scoring system rewards the top 10 finishers (25, 18, 15, 12, 10, 8, 6, 4, 2, 1), with an extra point for the fastest lap if the driver finishes in the top 10. In 2026, new engine and aerodynamic rules come into force, focusing on 100% sustainable fuels and greater electric power.',
+    rulesFormat: [
+      {
+        title: 'Formato do fim de semana',
+        enTitle: 'Weekend format',
+        body: 'Um fim de semana padrão tem três treinos livres (FP1, FP2, FP3) e uma classificação eliminatória em três partes: Q1 elimina os cinco mais lentos, Q2 elimina outros cinco, e os 10 restantes decidem a pole em Q3. Com a chegada da Cadillac, o grid de 2026 chega a 11 equipes e 22 carros — por isso seis carros, e não mais cinco, caem em cada corte. Em seis etapas do calendário (Xangai, Miami, Montreal, Silverstone, Zandvoort e Singapura), o fim de semana ganha o formato Sprint: uma Sprint Qualifying própria (SQ1 de 12 min, SQ2 de 10 min, SQ3 de 8 min, com apenas um jogo de pneus por segmento) define o grid de uma corrida curta no sábado, que não interfere na pole do domingo. Depois da classificação, os carros entram em parc fermé e a configuração mecânica não pode mais ser alterada até a corrida.',
+        enBody: 'A standard weekend has three free practice sessions (FP1, FP2, FP3) and a three-part knockout qualifying: Q1 drops the five slowest, Q2 drops five more, and the remaining 10 fight for pole in Q3. With Cadillac joining, the 2026 grid grows to 11 teams and 22 cars — so six cars, not five, are cut at each stage. On six calendar rounds (Shanghai, Miami, Montreal, Silverstone, Zandvoort and Singapore) the weekend switches to the Sprint format: a separate Sprint Qualifying (SQ1 12 min, SQ2 10 min, SQ3 8 min, one tyre set per segment) sets the grid for a short Saturday race that has no bearing on Sunday\'s pole. Once qualifying ends, cars enter parc fermé and their mechanical setup is frozen until the race.',
+      },
+      {
+        title: 'Pontuação',
+        enTitle: 'Points system',
+        body: 'No Grande Prêmio de domingo, os 10 primeiros pontuam 25-18-15-12-10-8-6-4-2-1, com um ponto extra para quem fizer a volta mais rápida da corrida estando entre os 10 primeiros. Nas seis corridas Sprint do calendário, pontuam apenas os oito primeiros: 8-7-6-5-4-3-2-1, sem ponto de volta rápida. O campeonato de pilotos soma os pontos de Sprint e GP; o de construtores soma os pontos dos dois carros de cada equipe.',
+        enBody: 'In Sunday\'s Grand Prix, the top 10 score 25-18-15-12-10-8-6-4-2-1, with a bonus point for the fastest race lap if set by a top-10 finisher. On the six Sprint weekends, only the top eight score: 8-7-6-5-4-3-2-1, with no fastest-lap bonus. The Drivers\' Championship adds up Sprint and GP points; the Constructors\' Championship adds both cars from each team.',
+      },
+      {
+        title: 'Carros e regulamento técnico 2026',
+        enTitle: '2026 cars and technical regulations',
+        body: 'A geração 2026 troca a base técnica da categoria. O motor continua um V6 turbo híbrido de 1.6L, mas o MGU-K passa a entregar até 350 kW de potência elétrica — quase três vezes mais que os 120 kW anteriores — enquanto o MGU-H, ligado ao turbo, é eliminado. O combustível passa a ser 100% sustentável. Do lado aerodinâmico, os carros ganham asas ativas com dois modos: X-mode, de baixo arrasto para as retas, e Z-mode, de alta carga para as curvas, alternados automaticamente conforme o piloto acelera ou solta o pé. Existe ainda um "modo ultrapassagem" (MGU-K override): o carro que está perseguindo outro a menos de um segundo pode acionar uma descarga elétrica extra (0,5 MJ) até 337 km/h, complementando o X-mode para facilitar as ultrapassagens.',
+        enBody: 'The 2026 generation overhauls the category\'s technical base. The engine remains a 1.6L V6 turbo hybrid, but the MGU-K now delivers up to 350 kW of electrical power — nearly three times the previous 120 kW — while the turbo-linked MGU-H is removed entirely. Fuel becomes 100% sustainable. Aerodynamically, cars gain active wings with two modes: X-mode, low-drag for straights, and Z-mode, high-downforce for corners, switching automatically as the driver lifts or gets back on the throttle. There\'s also an "overtake mode" (MGU-K override): a car chasing another within one second can trigger an extra electrical discharge (0.5 MJ) up to 337 km/h, working alongside X-mode to make passing easier.',
+      },
+      {
+        title: 'Curiosidades e regras especiais',
+        enTitle: 'Quirks and special rules',
+        body: 'O DRS tradicional convive com o novo sistema de aero ativa e o modo ultrapassagem, dando à F1 2026 até três ferramentas simultâneas de ultrapassagem em algumas retas. O orçamento das equipes segue limitado pelo teto de custos (cost cap), que nivela o poder de desenvolvimento entre times grandes e pequenos. E como o parc fermé trava a configuração do carro após a classificação, qualquer equipe que precise mexer no setup depois disso é obrigada a largar do pit lane.',
+        enBody: 'Traditional DRS now coexists with the new active-aero system and overtake mode, giving 2026-spec F1 up to three simultaneous overtaking tools on some straights. Team budgets remain capped by the cost cap, which levels development power between big and small teams. And because parc fermé locks the car\'s setup after qualifying, any team that needs to change it afterward is forced to start from the pit lane.',
+      },
+    ],
     icon: 'OpenWheelCar',
     teams: [
       { id: 'mercedes', name: 'Mercedes', color: '#00D2BE', car: 'W17', badge: 'https://r2.thesportsdb.com/images/media/team/badge/6caw0r1744037679.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/1x45781773231834.png'},
@@ -178,6 +215,32 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The main feeder series to Formula 1, where young talents prove their worth in identical cars.',
     longDescription: 'A FIA Fórmula 2 é o último degrau antes da Fórmula 1. Todos os competidores utilizam o mesmo chassi Dallara F2 2024 e motores Mecachrome V6 Turbo de 3.4 litros, garantindo que o talento do piloto seja o fator determinante. As rodadas triplas ou duplas acompanham os finais de semana da F1, proporcionando visibilidade máxima. O sistema de pontuação é similar ao da F1, mas com pontos adicionais para a pole position e voltas mais rápidas em ambas as corridas (Sprint e Feature).',
     enLongDescription: 'FIA Formula 2 is the final step before Formula 1. All competitors use the same Dallara F2 2024 chassis and 3.4-liter Mecachrome V6 Turbo engines, ensuring that driver talent is the determining factor. Triple or double headers accompany F1 weekends, providing maximum visibility. The scoring system is similar to F1, but with additional points for pole position and fastest laps in both races (Sprint and Feature).',
+    rulesFormat: [
+      {
+        title: 'Formato do fim de semana',
+        enTitle: 'Weekend format',
+        body: 'A classificação de sexta define duas coisas: o grid da Feature Race de domingo (ordem direta) e, invertendo os 10 primeiros colocados, o grid da Sprint Race de sábado. A Sprint Race dura 120 km ou 45 minutos (o que vier primeiro) e não tem parada obrigatória nos boxes. Já a Feature Race, disputada domingo de manhã antes do GP de F1, dura 170 km ou 60 minutos e exige um pit stop obrigatório com troca dos quatro pneus.',
+        enBody: 'Friday qualifying sets two grids: Sunday\'s Feature Race (straight order) and, by reversing the top 10 finishers, Saturday\'s Sprint Race. The Sprint Race runs 120 km or 45 minutes, whichever comes first, with no mandatory pit stop. The Feature Race, held Sunday morning ahead of the F1 Grand Prix, runs 170 km or 60 minutes and requires one mandatory pit stop with all four tyres changed.',
+      },
+      {
+        title: 'Pontuação',
+        enTitle: 'Points system',
+        body: 'Na Sprint Race pontuam os oito primeiros: 10-8-6-5-4-3-2-1. Na Feature Race, pontuam os 10 primeiros: 25-18-15-12-10-8-6-4-2-1. Além disso, a pole position da Feature Race vale 2 pontos extras, e 1 ponto adicional vai para quem cravar a volta mais rápida entre os 10 primeiros colocados em cada uma das duas corridas.',
+        enBody: 'The top eight score in the Sprint Race: 10-8-6-5-4-3-2-1. The top 10 score in the Feature Race: 25-18-15-12-10-8-6-4-2-1. On top of that, Feature Race pole position is worth 2 bonus points, and 1 extra point goes to whoever sets the fastest lap among the top 10 finishers in each of the two races.',
+      },
+      {
+        title: 'Carros e regulamento técnico',
+        enTitle: 'Cars and technical regulations',
+        body: 'Todas as equipes usam o mesmo chassi Dallara F2 2024 e o mesmo motor Mecachrome V6 turbo de 3,4 litros — carro e potência são rigorosamente idênticos para todo o grid. Sem diferença técnica entre os carros, a diferença de resultado vem quase inteiramente do piloto, do trabalho de setup fino permitido dentro do regulamento e da estratégia de pneus e combustível na Feature Race.',
+        enBody: 'Every team runs the same Dallara F2 2024 chassis and the same 3.4-liter Mecachrome V6 turbo engine — car and power output are strictly identical across the grid. With no technical gap between cars, the result gap comes almost entirely from the driver, the fine setup work still allowed within the rules, and tyre/fuel strategy in the Feature Race.',
+      },
+      {
+        title: 'Curiosidades',
+        enTitle: 'Quirks',
+        body: 'A F2 corre quase sempre no mesmo fim de semana da F1, nos mesmos circuitos, dando visibilidade máxima aos futuros pilotos da categoria máxima. A troca obrigatória dos quatro pneus na Feature Race é o principal elemento estratégico da corrida, já que o grid de largada é definido só pela classificação de sexta, sem qualquer inversão.',
+        enBody: 'F2 races on almost every F1 weekend, at the same circuits, giving maximum visibility to future stars of the top category. The mandatory four-tyre change in the Feature Race is the race\'s main strategic element, since the starting grid there is set purely by Friday qualifying, with no reversal at all.',
+      },
+    ],
     icon: 'OpenWheelCar',
     teams: [
       { id: 'invicta', name: 'Invicta Racing', color: '#FFD700', car: 'Dallara F2 2024', badge: 'https://r2.thesportsdb.com/images/media/team/badge/plmg6e1742931354.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/nw97a41742931413.png'},
@@ -280,6 +343,32 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The ultimate training ground for future stars, with frantic and competitive racing.',
     longDescription: 'A FIA Fórmula 3 é a categoria de base que serve como porta de entrada para o caminho da F1. Com grid de 30 carros idênticos, as corridas são conhecidas por serem extremamente disputadas e imprevisíveis. É onde os pilotos vindos do kart e das Fórmulas 4 regionais começam a competir nos grandes palcos mundiais, dividindo o final de semana com a F1 e F2. O foco é o desenvolvimento técnico e a preparação para os desafios físicos e mentais das categorias superiores.',
     enLongDescription: 'FIA Formula 3 is the entry-level category that serves as the gateway to the F1 path. With a grid of 30 identical cars, the races are known for being extremely competitive and unpredictable. It is where drivers coming from karting and regional Formula 4 begin to compete on the world\'s big stages, sharing the weekend with F1 and F2. The focus is on technical development and preparation for the physical and mental challenges of higher categories.',
+    rulesFormat: [
+      {
+        title: 'Formato do fim de semana',
+        enTitle: 'Weekend format',
+        body: 'Sexta-feira tem um treino livre de 45 minutos e uma classificação de 30 minutos. A Sprint Race de sábado, com duração de 40 minutos mais uma volta, usa grid invertido: apenas os 12 primeiros colocados da classificação têm a ordem de largada invertida entre si. A Feature Race de domingo, disputada pela manhã antes do GP de F1 e com duração de 45 minutos mais uma volta, larga na ordem direta da classificação de sexta.',
+        enBody: 'Friday has a 45-minute free practice and a 30-minute qualifying session. Saturday\'s Sprint Race, run over 40 minutes plus one lap, uses a reverse grid: only the top 12 qualifiers have their starting order flipped among themselves. Sunday\'s Feature Race, held in the morning ahead of the F1 Grand Prix and run over 45 minutes plus one lap, starts in the straight order set by Friday\'s qualifying.',
+      },
+      {
+        title: 'Pontuação',
+        enTitle: 'Points system',
+        body: 'Na Sprint Race pontuam os 10 primeiros: 10-9-8-7-6-5-4-3-2-1. Na Feature Race, a pontuação segue o padrão da F1 para os 10 primeiros: 25-18-15-12-10-8-6-4-2-1. Em ambas as corridas, 1 ponto extra vai para a volta mais rápida entre os 10 primeiros colocados, e a pole position da Feature Race soma 2 pontos adicionais.',
+        enBody: 'The top 10 score in the Sprint Race: 10-9-8-7-6-5-4-3-2-1. The Feature Race follows F1\'s standard scale for the top 10: 25-18-15-12-10-8-6-4-2-1. In both races, 1 bonus point goes to the fastest lap among the top 10 finishers, and Feature Race pole position adds 2 extra points.',
+      },
+      {
+        title: 'Carros e regulamento técnico',
+        enTitle: 'Cars and technical regulations',
+        body: 'O grid de 30 carros idênticos é o maior das categorias de acesso à F1, o que por si só já torna as corridas mais imprevisíveis e disputadas. É o primeiro degrau internacional para pilotos que saem do kart ou das Fórmulas 4 regionais, com o objetivo declarado de preparar fisicamente e tecnicamente os futuros competidores de F2 e F1.',
+        enBody: 'The 30-identical-car grid is the largest of any F1 feeder series, which alone makes racing more unpredictable and tightly packed. It is the first international step for drivers coming from karting or regional Formula 4, explicitly designed to prepare future F2 and F1 competitors both physically and technically.',
+      },
+      {
+        title: 'Curiosidades',
+        enTitle: 'Quirks',
+        body: 'O grid invertido do top 12 na Sprint Race é o principal gerador de caos da categoria: pilotos que largam do fundo do top 12 muitas vezes vencem a corrida de sábado. Já a Feature Race de domingo, sem inversão, recompensa quem foi mais rápido na classificação — por isso costuma ser mais estratégica e menos caótica que a Sprint.',
+        enBody: 'The top-12 reverse grid in the Sprint Race is the category\'s main source of chaos: drivers starting near the back of that top 12 often win Saturday\'s race. Sunday\'s Feature Race, with no reversal, rewards whoever was fastest in qualifying — which usually makes it more strategic and less chaotic than the Sprint.',
+      },
+    ],
     icon: 'OpenWheelCar',
     teams: [
       { id: 'prema-f3', name: 'Prema Racing', color: '#DC0000', car: 'Dallara F3 2025', badge: 'https://r2.thesportsdb.com/images/media/team/badge/8gnhue1742932322.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/sfk7001742932603.png'},
@@ -373,6 +462,32 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'Exclusive all-female feeder series for Formula 1.',
     longDescription: 'A F1 Academy é uma categoria de automobilismo exclusivamente feminina fundada pela Fórmula 1. O objetivo é preparar jovens pilotos para níveis mais altos de competição, como a Fórmula 3, Fórmula 2 e, eventualmente, a Fórmula 1. A categoria utiliza carros Tatuus F4-T421 e motores Autotecnica de 174 cv.',
     enLongDescription: 'F1 Academy is an all-female racing category founded by Formula 1. The goal is to prepare young drivers for higher levels of competition, such as Formula 3, Formula 2, and eventually Formula 1. The category uses Tatuus F4-T421 cars and 174 hp Autotecnica engines.',
+    rulesFormat: [
+      {
+        title: 'Formato do fim de semana',
+        enTitle: 'Weekend format',
+        body: 'O fim de semana tem até dois treinos livres de 40 minutos e uma classificação de 30 minutos. Na maioria das etapas há duas corridas, mas em 2026 duas rodadas (Montreal e Austin) ganharam uma terceira corrida, a "Opening Race", cujo grid é definido pelo segundo melhor tempo de cada piloto na classificação. Depois dela vêm a Reverse Grid Race, com o top 8 da classificação invertido entre si, e a Feature Race, que larga na ordem direta da classificação.',
+        enBody: 'The weekend has up to two 40-minute free practice sessions and a 30-minute qualifying session. Most rounds run two races, but in 2026 two rounds (Montreal and Austin) gained a third race, the "Opening Race", whose grid is set by each driver\'s second-fastest qualifying lap. It\'s followed by the Reverse Grid Race, which flips the top 8 qualifiers among themselves, and the Feature Race, which starts in qualifying\'s straight order.',
+      },
+      {
+        title: 'Pontuação',
+        enTitle: 'Points system',
+        body: 'A Opening Race e a Feature Race usam a pontuação padrão de F1 para os 10 primeiros (25-18-15-12-10-8-6-4-2-1), com 1 ponto extra para a volta mais rápida no top 10; só a Feature Race soma mais 2 pontos de pole. Já a Reverse Grid Race pontua apenas os oito primeiros (10-8-6-5-4-3-2-1), com bônus de volta rápida apenas para quem terminar no top 8. Uma piloto pode somar até 39 pontos em um único fim de semana de três corridas.',
+        enBody: 'The Opening Race and Feature Race use F1\'s standard top-10 scale (25-18-15-12-10-8-6-4-2-1), with 1 bonus point for fastest lap inside the top 10; only the Feature Race adds a further 2 points for pole. The Reverse Grid Race scores just the top eight (10-8-6-5-4-3-2-1), with the fastest-lap bonus limited to top-8 finishers. A driver can score up to 39 points across a single three-race weekend.',
+      },
+      {
+        title: 'Carros e regulamento técnico',
+        enTitle: 'Cars and technical regulations',
+        body: 'Todas as equipes correm com o mesmo chassi Tatuus F4-T421 e motor Autotecnica de 174 cv — carros idênticos, sem qualquer diferença técnica entre equipes. É uma categoria fundada pela própria Fórmula 1, criada exclusivamente para pilotos mulheres, com o objetivo declarado de prepará-las para competir na Fórmula 3, Fórmula 2 e, no limite, na própria F1.',
+        enBody: 'Every team races the same Tatuus F4-T421 chassis and 174 hp Autotecnica engine — identical cars, with no technical difference between teams. It is a category founded by Formula 1 itself, created exclusively for female drivers, with the stated goal of preparing them to compete in Formula 3, Formula 2 and, ultimately, F1 itself.',
+      },
+      {
+        title: 'Curiosidades',
+        enTitle: 'Quirks',
+        body: 'A Reverse Grid Race é o grande fator de imprevisibilidade da categoria: como o top 8 é invertido, quem foi mais rápido na classificação larga atrás e precisa ultrapassar para pontuar bem. A "Opening Race", nova em 2026, usa o segundo melhor tempo de cada piloto como critério de grid — uma forma diferente de embaralhar a ordem de largada sem depender de inversão.',
+        enBody: 'The Reverse Grid Race is the category\'s biggest source of unpredictability: since the top 8 is flipped, whoever qualified fastest starts further back and has to fight through to score well. The "Opening Race", new for 2026, uses each driver\'s second-fastest qualifying lap as the grid criterion — a different way of shuffling the starting order without relying on reversal.',
+      },
+    ],
     icon: 'OpenWheelCar',
     teams: [
       { id: 'prema-academy', name: 'Prema Racing', color: '#E31E24', car: 'Tatuus F4-T421', badge: 'https://r2.thesportsdb.com/images/media/team/badge/q89gae1742653933.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/h9skpi1773491799.png'},
@@ -441,6 +556,32 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'Long-distance races that test the endurance of machines and drivers, including the legendary 24 Hours of Le Mans.',
     longDescription: 'O FIA WEC é o campeonato mundial de corridas de resistência. A categoria principal é a Hypercar (LMH e LMDh), onde grandes fabricantes como Ferrari, Toyota, Porsche e BMW competem com protótipos híbridos sofisticados. Além dos Hypercars, a categoria conta com a classe LMGT3 para carros baseados em modelos de produção. As corridas variam de 6 a 24 horas de duração, exigindo trocas de pilotos (geralmente 3 por carro), gerenciamento estratégico de pneus e combustível, e confiabilidade mecânica absoluta. O ponto alto da temporada são as 24 Horas de Le Mans, a corrida mais famosa do mundo.',
     enLongDescription: 'The FIA WEC is the world endurance racing championship. The main category is Hypercar (LMH and LMDh), where major manufacturers such as Ferrari, Toyota, Porsche and BMW compete with sophisticated hybrid prototypes. In addition to Hypercars, the category has the LMGT3 class for cars based on production models. Races range from 6 to 24 hours in length, requiring driver changes (usually 3 per car), strategic tire and fuel management, and absolute mechanical reliability. The highlight of the season is the 24 Hours of Le Mans, the most famous race in the world.',
+    rulesFormat: [
+      {
+        title: 'Classes',
+        enTitle: 'Classes',
+        body: 'Duas classes correm juntas na pista: Hypercar, a categoria de ponta que reúne protótipos híbridos sob dois regulamentos técnicos diferentes (LMH e LMDh) e é a única com chance real de vencer a prova no geral; e LMGT3, para carros baseados em modelos de rua construídos sob as regras FIA GT3. Só carros de Hypercar brigam pela vitória absoluta — LMGT3 disputa a vitória dentro da própria classe.',
+        enBody: 'Two classes share the track: Hypercar, the top tier bringing together hybrid prototypes built under two different technical rulesets (LMH and LMDh) and the only class with a realistic shot at the overall win; and LMGT3, for road-car-based machines built to FIA GT3 rules. Only Hypercars fight for the outright win — LMGT3 races for class honours.',
+      },
+      {
+        title: 'Formato das corridas',
+        enTitle: 'Race format',
+        body: 'As provas variam de 6 a 24 horas de duração, com destaque para as 24 Horas de Le Mans, a corrida mais famosa do automobilismo mundial. Cada carro é dividido entre três pilotos, que se revezam ao volante durante toda a prova. Gerenciar pneus, combustível e a confiabilidade mecânica do carro por horas seguidas é tão decisivo quanto a velocidade pura.',
+        enBody: 'Races range from 6 to 24 hours, headlined by the 24 Hours of Le Mans, the most famous race in world motorsport. Each car is shared by three drivers who rotate behind the wheel throughout the event. Managing tyres, fuel and the car\'s mechanical reliability over hours on end matters as much as outright pace.',
+      },
+      {
+        title: 'Pontuação',
+        enTitle: 'Points system',
+        body: 'Nas corridas de 6 horas, os 10 primeiros de cada classe pontuam 25-18-15-12-10-8-6-4-2-1, com 1 ponto extra de bônus para a pole position. Le Mans, por ser a prova mais longa e mais valorizada do calendário, tem peso reforçado na pontuação final da temporada.',
+        enBody: 'In the 6-hour races, the top 10 in each class score 25-18-15-12-10-8-6-4-2-1, with 1 bonus point for pole position. Le Mans, as the longest and most prestigious race on the calendar, carries extra weight in the season\'s final standings.',
+      },
+      {
+        title: 'Balance of Performance e Handicap de Sucesso',
+        enTitle: 'Balance of Performance and Success Handicap',
+        body: 'Como fabricantes como Ferrari, Toyota, Porsche, BMW, Cadillac, Alpine, Aston Martin e Peugeot competem com conceitos de motor e híbrido completamente diferentes entre si, o WEC usa o "Balance of Performance" (BoP) para equalizar o desempenho teórico dos carros, recalculado a partir das duas corridas mais recentes de cada um. Desde 2025, além do BoP, existe também o "handicap de sucesso": carros que vêm pontuando bem carregam um lastro extra de peso nas corridas seguintes, enquanto os rivais com pontuação menor seguem no peso normal — regra que fica suspensa em Le Mans, para que a joia da coroa do calendário não seja decidida por uma penalidade de meio de temporada.',
+        enBody: 'Because manufacturers like Ferrari, Toyota, Porsche, BMW, Cadillac, Alpine, Aston Martin and Peugeot compete with completely different engine and hybrid concepts, WEC uses "Balance of Performance" (BoP) to equalise theoretical performance, recalculated from each car\'s two most recent races. Since 2025, on top of BoP there\'s also a "success handicap": cars that have been scoring well carry extra mass ballast into following races, while lower-scoring rivals stay at base weight — a rule that\'s suspended at Le Mans, so the calendar\'s crown jewel isn\'t decided by a mid-season penalty.',
+      },
+    ],
     icon: 'Hypercar',
     teams: [
       { id: 'toyota-racing', name: 'Toyota Racing', color: '#E4002B', class: 'Hypercar', car: 'Toyota GR010 Hybrid', badge: 'https://r2.thesportsdb.com/images/media/team/badge/vjyicq1705843097.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/ltbhcc1746997706.png'},
@@ -624,6 +765,32 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The premier endurance category in North America, featuring prototypes and GT cars.',
     longDescription: 'O IMSA WeatherTech SportsCar Championship é a principal série de corridas de carros esportivos na América do Norte. A categoria de topo é a GTP (Grand Touring Prototype), que compartilha regulamentos técnicos com os Hypercars do WEC, permitindo que os carros compitam em ambos os campeonatos. Outras classes incluem LMP2 (protótipos), GTD Pro e GTD (carros GT3). O calendário inclui clássicos como as 24 Horas de Daytona e as 12 Horas de Sebring. Diferente do WEC, o IMSA é conhecido por corridas extremamente disputadas, com frequentes períodos de bandeira amarela que reagrupam o pelotão, garantindo finais emocionantes.',
     enLongDescription: 'The IMSA WeatherTech SportsCar Championship is the premier sports car racing series in North America. The top category is GTP (Grand Touring Prototype), which shares technical regulations with the WEC Hypercars, allowing cars to compete in both championships. Other classes include LMP2 (prototypes), GTD Pro and GTD (GT3 cars). The calendar includes classics such as the 24 Hours of Daytona and the 12 Hours of Sebring. Unlike the WEC, IMSA is known for extremely competitive racing, with frequent yellow flag periods that regroup the field, ensuring exciting finishes.',
+    rulesFormat: [
+      {
+        title: 'Classes',
+        enTitle: 'Classes',
+        body: 'Quatro classes correm juntas na mesma pista: GTP (Grand Touring Prototype), a mais rápida, com protótipos híbridos construídos sob os regulamentos LMDh ou LMH — tecnicamente equivalentes aos Hypercars do WEC, o que permite que os mesmos carros disputem os dois campeonatos; LMP2, protótipos de especificação fechada construídos por fabricantes homologados; GTD Pro, com carros GT3 e duplas 100% profissionais, incluindo pilotos de fábrica; e GTD, também GT3, mas com pelo menos um piloto amador na dupla.',
+        enBody: 'Four classes share the same track: GTP (Grand Touring Prototype), the fastest, with hybrid prototypes built under LMDh or LMH rules — technically equivalent to WEC\'s Hypercars, letting the same cars compete in both championships; LMP2, closed-spec prototypes built by approved manufacturers; GTD Pro, with GT3 cars and all-professional line-ups, including factory drivers; and GTD, also GT3, but with at least one amateur driver per crew.',
+      },
+      {
+        title: 'Formato do fim de semana',
+        enTitle: 'Weekend format',
+        body: 'O formato tradicional reúne treino livre na sexta-feira, classificação no sábado e a corrida no domingo, com as quatro classes competindo ao mesmo tempo na pista — o que obriga carros mais rápidos a ultrapassar constantemente os mais lentos de outras classes, um dos traços mais característicos do IMSA. Provas históricas como as 24 Horas de Daytona e as 12 Horas de Sebring seguem cronogramas estendidos, com sessões espalhadas por vários dias.',
+        enBody: 'The traditional format runs free practice on Friday, qualifying on Saturday and the race on Sunday, with all four classes competing on track at the same time — forcing faster cars to constantly lap slower cars from other classes, one of IMSA\'s most distinctive traits. Historic races like the 24 Hours of Daytona and 12 Hours of Sebring follow extended schedules with sessions spread across several days.',
+      },
+      {
+        title: 'Pontuação',
+        enTitle: 'Points system',
+        body: 'A pontuação é bem mais generosa que a da F1: todo carro que termina a corrida pontua. A vitória em cada classe vale 350 pontos, o segundo lugar 320, o terceiro 300, numa escala decrescente até 10 pontos para o 30º colocado. A pole position também pontua, valendo um décimo da pontuação de corrida (35 pontos para a pole, 32 para o segundo, e assim por diante).',
+        enBody: 'Scoring is far more generous than F1\'s: every car that finishes the race scores points. A class win is worth 350 points, second 320, third 300, sliding down to 10 points for 30th place. Pole position also scores, worth a tenth of the race points (35 for pole, 32 for second, and so on).',
+      },
+      {
+        title: 'Curiosidades',
+        enTitle: 'Quirks',
+        body: 'O GTP compartilha base técnica com o Hypercar do WEC, o que já levou fabricantes a inscrever o mesmo carro nos dois campeonatos em provas específicas. Bandeiras amarelas de pista totalmente interditada ("full-course caution") são frequentes e reagrupam o pelotão, um fator que costuma tornar as corridas do IMSA mais imprevisíveis e disputadas até a bandeirada final do que as do WEC.',
+        enBody: 'GTP shares technical DNA with WEC\'s Hypercar class, which has already led manufacturers to enter the same car in both championships for specific races. Full-course caution periods are frequent and bunch the field back up, a factor that tends to make IMSA races more unpredictable and closely fought right up to the finish than WEC\'s.',
+      },
+    ],
     icon: 'GtCar',
     teams: [
       { id: 'porsche-penske', name: 'Porsche Penske Motorsport', color: '#000000', class: 'GTP', car: 'Porsche 963', badge: 'https://r2.thesportsdb.com/images/media/team/badge/gm9m531705843079.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/hgj94c1770062813.png'},
@@ -954,6 +1121,32 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'Drivers facing extreme terrains, from snow to gravel, at incredible speeds.',
     longDescription: 'O WRC é a competição de rali de mais alto nível da FIA. Pilotos e navegadores competem em carros "Rally1" híbridos em superfícies que variam de asfalto liso a cascalho bruto, neve e gelo. Cada rali é dividido em "estágios" cronometrados em estradas fechadas ao público. O objetivo é completar os estágios no menor tempo possível. Entre os estágios, os carros circulam em estradas públicas, devendo obedecer às leis de trânsito. O WRC exige uma habilidade de condução incomparável e uma confiança cega entre o piloto e o navegador, que lê as "notas de ritmo" para descrever o que vem pela frente em alta velocidade.',
     enLongDescription: 'The WRC is the highest level of rally competition from the FIA. Drivers and co-drivers compete in hybrid "Rally1" cars on surfaces ranging from smooth asphalt to rough gravel, snow and ice. Each rally is divided into timed "stages" on roads closed to the public. The goal is to complete the stages in the shortest time possible. Between stages, cars circulate on public roads, having to obey traffic laws. The WRC requires unparalleled driving skill and blind trust between the driver and the co-driver, who reads the "pace notes" to describe what lies ahead at high speed.',
+    rulesFormat: [
+      {
+        title: 'Formato de uma etapa',
+        enTitle: 'Rally format',
+        body: 'Cada rali é dividido em "estágios especiais": trechos de estrada fechados ao público, cronometrados, disputados um piloto de cada vez. Vence quem somar o menor tempo total em todos os estágios do fim de semana. Entre um estágio e outro, os carros trafegam em estradas públicas normais ("ligações"), tendo que obedecer às leis de trânsito do país. A ordem de largada nos estágios de cada dia segue a posição na classificação geral, o que faz os primeiros colocados largarem "limpando" a pista de terra, lama ou neve para quem vem atrás — um fator que pode custar caro dependendo do piso.',
+        enBody: 'Each rally is split into timed "special stages": closed public roads run one driver at a time. Whoever posts the lowest combined time across the weekend\'s stages wins. Between stages, cars use normal public roads ("road sections/transits") and must obey the country\'s traffic laws. Each day\'s stage running order follows the overall standings, meaning the leaders start first and "clean" gravel, mud or snow off the road for those behind — a factor that can be very costly depending on the surface.',
+      },
+      {
+        title: 'Piloto e navegador',
+        enTitle: 'Driver and co-driver',
+        body: 'Diferente de quase todas as outras categorias do automobilismo, o WRC corre em dupla dentro do carro. O navegador lê em voz alta as "notas de ritmo" — uma descrição detalhada de cada curva, salto e risco da estrada à frente — permitindo que o piloto ataque em alta velocidade um trecho que nunca viu antes daquele jeito. A confiança cega entre os dois é tão decisiva quanto a velocidade pura.',
+        enBody: 'Unlike almost every other motorsport category, WRC races as a two-person crew inside the car. The co-driver reads out "pace notes" — a detailed description of every corner, jump and hazard ahead — letting the driver attack at high speed a road they\'ve never driven in quite that way before. Blind trust between the two matters as much as raw speed.',
+      },
+      {
+        title: 'Pontuação',
+        enTitle: 'Points system',
+        body: 'Os nove primeiros colocados na classificação geral do rali pontuam 25-17-15-12-10-8-6-4-2 — o 10º lugar não pontua. No domingo, dois bônus separados entram em jogo: os cinco pilotos mais rápidos somando apenas os tempos de domingo levam 5-4-3-2-1 pontos extras, e os cinco mais rápidos no "Power Stage" (o último estágio do rali, o único transmitido ao vivo em sua totalidade) levam outros 5-4-3-2-1 pontos, independentemente da posição geral.',
+        enBody: 'The top nine in the rally\'s overall classification score 25-17-15-12-10-8-6-4-2 — 10th place scores nothing. On Sunday, two separate bonus pots kick in: the five fastest drivers on Sunday-only stage times collect an extra 5-4-3-2-1 points, and the five fastest on the "Power Stage" (the rally\'s final stage, the only one broadcast live in full) collect another 5-4-3-2-1 points, regardless of overall position.',
+      },
+      {
+        title: 'Carros Rally1',
+        enTitle: 'Rally1 cars',
+        body: 'A partir de 2026, os Rally1 deixam de usar a unidade híbrida obrigatória que tiveram entre 2022 e 2025, com potência agora limitada a cerca de 330 cv por uma curva de torque de referência igual para todos os carros. Motor, câmbio e a célula de segurança são padronizados e com tecnologia equivalente à categoria Rally2, com teto de custo de € 430 mil por carro — mudanças pensadas para baratear a categoria sem descaracterizar o espetáculo. A carroceria de cada carro ainda é baseada em um modelo de rua (hatch, sedã compacto, SUV ou um conceito específico), respeitando limites técnicos apertados de centro de gravidade e aerodinâmica para manter os fabricantes equilibrados entre si.',
+        enBody: 'From 2026, Rally1 cars drop the mandatory hybrid unit they carried between 2022 and 2025, with power now capped at around 330 hp via a reference torque curve shared by every car. Engine, transmission and the safety cell are standardised at Rally2-equivalent technology, with a cost cap of €430,000 per car — changes meant to cut costs without gutting the spectacle. Each car\'s bodywork is still based on a road-going model (hatchback, compact sedan, SUV or a specific concept), within tight technical limits on centre of gravity and aerodynamics to keep manufacturers evenly matched.',
+      },
+    ],
     icon: 'RallyCar',
     teams: [
       { id: 'hyundai-wrc', name: 'Hyundai Shell Mobis WRT', color: '#003478', car: 'Hyundai i20 N Rally1', badge: 'https://r2.thesportsdb.com/images/media/team/badge/vwwyyp1432596195.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/l4gy5w1769433038.png' },
@@ -1025,6 +1218,32 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The fastest single-seater category in the USA, famous for the Indianapolis 500.',
     longDescription: 'A NTT IndyCar Series é a principal categoria de monopostos da América do Norte. Conhecida por sua incrível diversidade de circuitos, a categoria compete em ovais de alta velocidade, circuitos mistos permanentes e desafiadores circuitos de rua. O chassi Dallara IR-18 é padrão para todas as equipes, com motores V6 Twin-Turbo fornecidos pela Chevrolet e Honda. O ponto alto do automobilismo mundial são as 500 Milhas de Indianápolis (Indy 500), uma das provas da Tríplice Coroa do Automobilismo. A categoria é famosa pelo equilíbrio, onde a habilidade do piloto e a estratégia da equipe fazem a diferença real.',
     enLongDescription: 'The NTT IndyCar Series is the premier single-seater category in North America. Known for its incredible diversity of circuits, the category competes on high-speed ovals, permanent road courses and challenging street circuits. The Dallara IR-18 chassis is standard for all teams, with Twin-Turbo V6 engines supplied by Chevrolet and Honda. The highlight of world motorsport is the Indianapolis 500 (Indy 500), one of the races of the Triple Crown of Motorsport. The category is famous for its balance, where driver skill and team strategy make the real difference.',
+    rulesFormat: [
+      {
+        title: 'Três tipos de pista, três formatos de classificação',
+        enTitle: 'Three track types, three qualifying formats',
+        body: 'O calendário mistura ovais de alta velocidade, circuitos mistos permanentes e circuitos de rua — nenhuma outra categoria de monopostos do mundo varia tanto de pista para pista. Nos ovais, a classificação é decidida por uma tentativa de duas voltas cronometradas seguidas, cuja média define o tempo oficial. Já em circuitos de rua e mistos, a classificação usa um formato eliminatório de várias rodadas, no estilo Q1/Q2/Q3 da F1.',
+        enBody: 'The calendar mixes high-speed ovals, permanent road courses and street circuits — no other single-seater category in the world varies this much from track to track. On ovals, qualifying is decided by one attempt of two consecutive timed laps, whose average sets the official time. On street and road courses, qualifying uses a multi-round knockout format, similar in spirit to F1\'s Q1/Q2/Q3.',
+      },
+      {
+        title: 'Pontuação',
+        enTitle: 'Points system',
+        body: 'A pontuação também é generosa e premia todo mundo que larga: o vencedor leva 50 pontos, o segundo 40, o terceiro 35, numa escala decrescente até 5 pontos para o 25º colocado. Ainda há bônus: 1 ponto para a pole position, 1 ponto para quem liderar ao menos uma volta e 2 pontos extras para quem liderar o maior número de voltas na corrida.',
+        enBody: 'Scoring is also generous and rewards everyone who takes the green flag: the winner earns 50 points, second 40, third 35, sliding down to 5 points for 25th place. There are bonuses too: 1 point for pole position, 1 point for leading at least one lap, and 2 extra points for leading the most laps in the race.',
+      },
+      {
+        title: 'Híbrido e Push-to-Pass',
+        enTitle: 'Hybrid system and Push-to-Pass',
+        body: 'Desde a introdução do sistema híbrido, o carro recupera energia cinética na frenagem e a devolve como um pulso extra de cerca de 60 cv ao acionar um botão no volante. É diferente do tradicional "Push-to-Pass": um recurso à parte que aumenta a potência do motor em cerca de 60 a 70 cv, com um total de 200 segundos de uso disponíveis por corrida, usado estrategicamente para ultrapassar ou se defender. Em 2026, a INDYCAR aumentou o mínimo de energia elétrica que precisa ser usada, acabando com a estratégia de "liberar aos poucos" (trickle deploy) que as equipes vinham explorando.',
+        enBody: 'Since the hybrid system was introduced, the car recovers kinetic energy under braking and returns it as an extra ~60 hp burst via a steering wheel button. That\'s separate from the traditional "Push-to-Pass": a distinct boost that raises engine output by roughly 60-70 hp, with a total of 200 seconds of use available per race, deployed strategically to attack or defend. For 2026, INDYCAR raised the minimum electrical deployment required, killing off the "trickle deploy" strategy teams had been exploiting.',
+      },
+      {
+        title: 'Carros e curiosidades',
+        enTitle: 'Cars and quirks',
+        body: 'Todas as equipes correm com o mesmo chassi Dallara IR-18, com motores V6 biturbo fornecidos por Chevrolet ou Honda — a paridade técnica é o que torna o campeonato tão equilibrado. A Indy 500 é o evento mais importante do calendário e faz parte da chamada Tríplice Coroa do Automobilismo, ao lado do GP de Mônaco de F1 e das 24 Horas de Le Mans.',
+        enBody: 'Every team runs the same Dallara IR-18 chassis, with V6 twin-turbo engines supplied by Chevrolet or Honda — that technical parity is what keeps the championship so tightly matched. The Indy 500 is the calendar\'s biggest event and part of the unofficial Triple Crown of Motorsport, alongside F1\'s Monaco Grand Prix and the 24 Hours of Le Mans.',
+      },
+    ],
     icon: 'OpenWheelCar',
     teams: [
       { id: 'foyt', name: 'A. J. Foyt Enterprises', color: '#DC0000', car: 'Dallara IR-18 (Chevrolet)', badge: 'https://r2.thesportsdb.com/images/media/team/badge/qqcohx1551868828.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/hijcxv1773157321.png' },
@@ -1146,6 +1365,32 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The world\'s premier stock car category, with intense racing on ovals and road courses.',
     longDescription: 'A NASCAR Cup Series é o auge das corridas de stock car. Com carros baseados em modelos de produção (Chevrolet Camaro, Ford Mustang e Toyota Camry), a categoria é famosa por suas corridas em ovais de alta velocidade, onde o vácuo e o contato físico são partes essenciais da estratégia. O campeonato utiliza um sistema de pontos complexo e o formato de "Playoffs" para decidir o campeão. As 500 Milhas de Daytona são a joia da coroa do calendário, abrindo a temporada com o maior espetáculo do automobilismo americano.',
     enLongDescription: 'The NASCAR Cup Series is the pinnacle of stock car racing. With cars based on production models (Chevrolet Camaro, Ford Mustang and Toyota Camry), the category is famous for its high-speed oval racing, where drafting and physical contact are essential parts of the strategy. The championship uses a complex points system and the "Playoffs" format to decide the champion. The Daytona 500 is the crown jewel of the calendar, opening the season with the greatest spectacle in American motorsport.',
+    rulesFormat: [
+      {
+        title: 'Estágios dentro da corrida',
+        enTitle: 'In-race stages',
+        body: 'Cada corrida é dividida em três estágios (stages). Ao final do primeiro e do segundo estágio, a corrida para simbolicamente sua contagem e os 10 primeiros colocados naquele ponto ganham pontos extras (10 pontos para o 1º, decrescendo até 1 ponto para o 10º) — antes de a corrida ser retomada normalmente até a bandeirada final, que vale a pontuação cheia. Isso cria, na prática, três "corridas dentro da corrida" em cada prova.',
+        enBody: 'Every race is split into three stages. At the end of stage one and stage two, the race takes a scored snapshot: the top 10 at that point earn bonus points (10 for 1st, sliding down to 1 for 10th) — before racing resumes normally until the chequered flag, which pays full points. In practice, that creates three "races within the race" in every event.',
+      },
+      {
+        title: 'Pontuação',
+        enTitle: 'Points system',
+        body: 'Vencer a corrida vale 55 pontos, o segundo lugar 35, o terceiro 34, e assim por diante em escala decrescente. A esses pontos de resultado se somam os pontos ganhos nos dois estágios intermediários — um piloto que vencer a corrida e os dois estágios, além de fazer a volta mais rápida, pode somar 76 pontos em uma única etapa.',
+        enBody: 'Winning the race is worth 55 points, second 35, third 34, and so on down a sliding scale. Those finishing points stack with points earned in the two mid-race stages — a driver who wins the race and both stages, plus sets the fastest lap, can bank 76 points from a single event.',
+      },
+      {
+        title: 'Temporada regular e Chase (Playoffs)',
+        enTitle: 'Regular season and the Chase (Playoffs)',
+        body: 'A NASCAR volta em 2026 ao formato "Chase": os 16 primeiros colocados na pontuação após as 26 corridas da temporada regular avançam aos playoffs — vencer corridas continua importante, mas já não garante vaga sozinho, e a consistência ao longo do ano pesa mais. Na entrada dos playoffs, a pontuação é zerada e redistribuída por posição de "seed": o líder da temporada regular larga com 2.100 pontos e um bônus de 25 pontos, o segundo com 2.075, o terceiro com 2.065, e assim por diante, com quedas de 5 pontos entre colocações. Seguem-se 10 corridas eliminatórias até a decisão do título em Homestead-Miami.',
+        enBody: 'NASCAR returns to the "Chase" format in 2026: the top 16 in points after the 26-race regular season advance to the playoffs — winning races still matters, but no longer guarantees a spot on its own, and season-long consistency counts for more. Entering the playoffs, points are reset and redistributed by seed: the regular-season points leader starts with 2,100 points plus a 25-point bonus, the runner-up with 2,075, third with 2,065, and so on, dropping 5 points per position. Ten elimination races follow before the title is decided at Homestead-Miami.',
+      },
+      {
+        title: 'Carros e curiosidades',
+        enTitle: 'Cars and quirks',
+        body: 'O chassi "Next Gen", padronizado entre as carrocerias de Chevrolet Camaro, Ford Mustang e Toyota Camry, busca reduzir a diferença técnica entre fabricantes. A Daytona 500, disputada em fevereiro no oval de Daytona, abre a temporada como o evento mais importante e mais assistido do calendário. Nos ovais de alta velocidade, correr em "vácuo" (draft) logo atrás de outro carro é essencial para ganhar velocidade — e o contato físico entre carros faz parte da estratégia normal de corrida, algo raro em outras categorias.',
+        enBody: 'The "Next Gen" chassis, standardised across Chevrolet Camaro, Ford Mustang and Toyota Camry bodywork, aims to close the technical gap between manufacturers. The Daytona 500, run in February on the Daytona oval, opens the season as the calendar\'s biggest and most-watched event. On high-speed ovals, drafting closely behind another car is essential for extra speed — and physical contact between cars is a normal part of race strategy, something rare in other categories.',
+      },
+    ],
     icon: 'StockCar',
     teams: [
       { id: '23xi', name: '23XI Racing', color: '#FF0000', car: 'Toyota Camry XSE', badge: 'https://r2.thesportsdb.com/images/media/team/badge/xz9oaz1611247487.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/0hi93m1611248487.png' },
@@ -1290,6 +1535,26 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'Europe\'s most prestigious touring car category, featuring high-performance GT3 cars.',
     longDescription: 'O DTM é o auge das corridas de carros de turismo alemães. Utilizando regulamentos GT3, a categoria atrai os melhores fabricantes do mundo, incluindo Porsche, BMW, Mercedes-AMG, Lamborghini, Audi, McLaren e Ferrari. As corridas são conhecidas por serem curtas, intensas e com paradas nos boxes obrigatórias, exigindo perfeição tanto dos pilotos quanto das equipes técnicas.',
     enLongDescription: 'The DTM is the pinnacle of German touring car racing. Using GT3 regulations, the category attracts the world\'s best manufacturers, including Porsche, BMW, Mercedes-AMG, Lamborghini, Audi, McLaren and Ferrari. Races are known for being short, intense and with mandatory pit stops, requiring perfection from both drivers and technical teams.',
+    rulesFormat: [
+      {
+        title: 'Formato das corridas',
+        enTitle: 'Race format',
+        body: 'As corridas do DTM são sprints intensos de cerca de 55 minutos mais uma volta. A corrida de sábado exige apenas uma parada obrigatória nos boxes; a de domingo exige duas, cada uma dentro de uma janela de tempo pré-definida — o que transforma a estratégia de pit stop em um dos fatores decisivos do fim de semana.',
+        enBody: 'DTM races are intense sprints of roughly 55 minutes plus one lap. Saturday\'s race requires just one mandatory pit stop; Sunday\'s requires two, each within a pre-defined time window — turning pit stop strategy into one of the weekend\'s decisive factors.',
+      },
+      {
+        title: 'Pontuação',
+        enTitle: 'Points system',
+        body: 'A pontuação vai muito além do pódio: os 15 primeiros colocados de cada corrida pontuam em uma escala nos moldes da MotoGP (25-20-16-13-11-10-9-8-7-6-5-4-3-2-1), o que mantém posições de meio de pelotão valiosas e reduz o incentivo a "ordens de equipe" em um grid lotado de GT3. Além disso, os três primeiros de cada classificação somam pontos extra (3-2-1). Um fim de semana perfeito, com as duas poles e as duas vitórias, vale 56 pontos.',
+        enBody: 'Scoring goes well beyond the podium: the top 15 finishers in each race score on a MotoGP-style scale (25-20-16-13-11-10-9-8-7-6-5-4-3-2-1), which keeps midfield positions valuable and reduces the incentive for team orders on a packed GT3 grid. The top three in each qualifying session also add bonus points (3-2-1). A perfect weekend — both poles, both wins — is worth 56 points.',
+      },
+      {
+        title: 'Balance of Performance e lastro de sucesso',
+        enTitle: 'Balance of Performance and success ballast',
+        body: 'Com até oito fabricantes diferentes na pista (Porsche, BMW, Mercedes-AMG, Lamborghini, Audi, McLaren, Ferrari e Ford, entre outros), o DTM depende do "Balance of Performance" (BoP): peso, potência do motor e ângulo das asas são ajustados carro a carro para equalizar o desempenho teórico entre marcas tão diferentes. Por cima do BoP, ainda existe o lastro de sucesso — quem termina no pódio carrega peso extra na corrida seguinte, e quem fica fora do pódio volta ao peso normal — o que ajuda a manter o campeonato competitivo do início ao fim.',
+        enBody: 'With up to eight different manufacturers on track (Porsche, BMW, Mercedes-AMG, Lamborghini, Audi, McLaren, Ferrari and Ford, among others), DTM relies on "Balance of Performance" (BoP): weight, engine power and wing angle are adjusted car by car to equalise theoretical performance across such different marques. On top of BoP there\'s also success ballast — podium finishers carry extra weight into the next race, while non-podium finishers return to normal weight — which helps keep the championship competitive from start to finish.',
+      },
+    ],
     icon: 'GtCar',
     teams: [
       { id: 'comtoyou', name: 'Comtoyou Racing', color: '#00352F', car: 'Aston Martin Vantage AMR GT3 Evo', badge: 'https://r2.thesportsdb.com/images/media/team/badge/n44t3f1757929207.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/y2xoo41779805600.png' },
@@ -1372,6 +1637,26 @@ export const MOTORSPORT_DATA: Category[] = [
     enDescription: 'The biggest GT3 championship in the world, with Sprint and Endurance races.',
     longDescription: 'O GT World Challenge Europe é a principal categoria de carros GT3, reunindo os fabricantes mais prestigiados do mundo como Ferrari, Lamborghini, Porsche, BMW e Mercedes-AMG. O campeonato é dividido em duas copas: a Sprint Cup (corridas curtas de 1 hora) e a Endurance Cup (corridas de longa duração, incluindo as lendárias 24 Horas de Spa).',
     enLongDescription: 'GT World Challenge Europe is the premier GT3 car category, bringing together the world\'s most prestigious manufacturers such as Ferrari, Lamborghini, Porsche, BMW and Mercedes-AMG. The championship is divided into two cups: the Sprint Cup (short 1-hour races) and the Endurance Cup (long-distance races, including the legendary 24 Hours of Spa).',
+    rulesFormat: [
+      {
+        title: 'Sprint Cup e Endurance Cup',
+        enTitle: 'Sprint Cup and Endurance Cup',
+        body: 'A temporada é dividida em duas copas com formatos opostos. A Sprint Cup tem corridas curtas de cerca de 1 hora, disputadas em duplas (double-headers), com dois pilotos por carro. A Endurance Cup reúne provas de 3 a 6 horas, com três pilotos por carro, e tem nas 24 Horas de Spa-Francorchamps o evento mais tradicional e concorrido do calendário GT3 mundial.',
+        enBody: 'The season is split into two cups with opposite formats. The Sprint Cup features short ~1-hour races run as double-headers, with two drivers per car. The Endurance Cup brings together 3-to-6-hour races with three drivers per car, headlined by the 24 Hours of Spa-Francorchamps, the most traditional and heavily-contested event on the global GT3 calendar.',
+      },
+      {
+        title: 'Classes de pilotos',
+        enTitle: 'Driver classes',
+        body: 'Os pilotos são classificados pela SRO em categorias de habilidade — Platina, Ouro, Prata e Bronze — e cada carro precisa respeitar uma combinação específica dessas categorias na dupla ou trio. A classe Pro reúne duplas 100% Platina/Ouro e disputa a vitória geral; nas 24 Horas de Spa, ainda existe uma classe Pro-Am específica, que junta um piloto profissional com um amador no mesmo carro.',
+        enBody: 'Drivers are classified by SRO into skill categories — Platinum, Gold, Silver and Bronze — and each car must respect a specific combination of those categories across its line-up. The Pro class brings together all-Platinum/Gold crews and fights for the overall win; at the 24 Hours of Spa there\'s also a dedicated Pro-Am class, pairing one professional with one amateur in the same car.',
+      },
+      {
+        title: 'Pontuação e Balance of Performance',
+        enTitle: 'Points and Balance of Performance',
+        body: 'O campeão da temporada é definido pela soma dos pontos das duas copas, Sprint e Endurance. Como o grid reúne carros GT3 de fabricantes muito diferentes (Ferrari, Lamborghini, Porsche, BMW, Mercedes-AMG, McLaren e outros), a SRO administra um sistema sofisticado de Balance of Performance, ajustando peso, potência do motor (via restritor de turbo) e parâmetros aerodinâmicos com base em dados coletados em toda sessão: dinamômetro, túnel de vento, GPS e telemetria do ECU de cada carro.',
+        enBody: 'The season champion is decided by combining points from both the Sprint and Endurance cups. Since the grid brings together GT3 cars from very different manufacturers (Ferrari, Lamborghini, Porsche, BMW, Mercedes-AMG, McLaren and others), SRO runs a sophisticated Balance of Performance system, adjusting weight, engine power (via turbo restrictor) and aerodynamic parameters based on data collected every session: dyno testing, wind tunnel analysis, GPS and each car\'s ECU telemetry.',
+      },
+    ],
     icon: 'GtCar',
     teams: [
       { id: 'boutsen-vds', name: 'Boutsen VDS', color: '#FFCC00', car: 'Porsche 911 GT3 R (992.2)' },
