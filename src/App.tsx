@@ -223,7 +223,8 @@ const UI_TRANSLATIONS = {
     favoritesPageDesc: 'Escolha os times e pilotos que você quer acompanhar e defina a ordem de prioridade entre eles.',
     featuredRaces: 'Corridas em Destaque',
     championshipLeaders: 'Líderes do Campeonato',
-    raceLabel: 'Corrida'
+    raceLabel: 'Corrida',
+    lapRecordPending: 'Ainda não disputado'
   },
   en: {
     home: 'Home',
@@ -335,7 +336,8 @@ const UI_TRANSLATIONS = {
     favoritesPageDesc: 'Choose the teams and drivers you want to follow and set the priority order between them.',
     featuredRaces: 'Featured Races',
     championshipLeaders: 'Championship Leaders',
-    raceLabel: 'Race'
+    raceLabel: 'Race',
+    lapRecordPending: 'Not raced yet'
   }
 };
 
@@ -346,7 +348,8 @@ type CircuitInfo = {
   laps: number;
   corners: number;
   direction: 'clockwise' | 'counterclockwise';
-  lapRecord: { time: string; driver: string; year: number };
+  // Ausente para pistas novas que ainda nao sediaram corrida (ex.: Madrid em 2026).
+  lapRecord?: { time: string; driver: string; year: number };
   firstGrandPrix: number;
   drsZones: { pt: string; en: string }[];
   brakingZones: { turn: string; name: string; pt: string; en: string }[];
@@ -490,6 +493,646 @@ const ALBERT_PARK_CIRCUIT_INFO: CircuitInfo = {
   },
 };
 
+// Dados reais do Shanghai International Circuit, usados só na página de teste do GP da China. Fonte: Wikipedia.
+const SHANGHAI_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/china.png',
+  lengthKm: 5.451,
+  raceDistanceKm: 305.256,
+  laps: 56,
+  corners: 16,
+  direction: 'clockwise',
+  lapRecord: { time: '1:32.238', driver: 'M. Schumacher (Ferrari)', year: 2004 },
+  firstGrandPrix: 2004,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+    { pt: 'Reta oposta, entrando na Curva 14', en: 'Back straight, into Turn 14' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1-C2',
+      name: 'Curva do Caracol',
+      pt: 'Longa curva à direita de raio decrescente, inspirada no caractere chinês "上" (shàng); a frenada inicial é leve, mas a curva aperta progressivamente até a Curva 2.',
+      en: 'A long, decreasing-radius right-hander inspired by the Chinese character "上" (shàng); the initial brake is light, but the corner tightens progressively into Turn 2.',
+    },
+    {
+      turn: 'C14',
+      name: 'Hairpin',
+      pt: 'Frenada pesada ao fim da reta oposta, principal ponto de ultrapassagem do traçado.',
+      en: "Heavy braking at the end of the back straight, the layout's main overtaking point.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Superfície abrasiva e curvas de longa duração (como a Curva 1 e a Curva 8) geram desgaste lateral elevado; a estratégia mais comum é de um pit stop, mas o clima instável de Xangai no início da temporada pode forçar mudanças.',
+    en: "An abrasive surface and long-duration corners (like Turn 1 and Turn 8) create high lateral tyre wear; a one-stop strategy is most common, but Shanghai's unstable early-season weather can force changes.",
+  },
+};
+
+// Dados reais do Suzuka International Racing Course, usados só na página de teste do GP do Japão. Fonte: Wikipedia.
+const SUZUKA_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/japan.png',
+  lengthKm: 5.807,
+  raceDistanceKm: 307.771,
+  laps: 53,
+  corners: 18,
+  direction: 'clockwise',
+  lapRecord: { time: '1:30.965', driver: 'K. Antonelli (Mercedes)', year: 2025 },
+  firstGrandPrix: 1987,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: '130R / Reta Principal',
+      pt: 'Único traçado do calendário com um cruzamento em desnível (a pista passa por cima de si mesma perto da Curva 1), seguido de frenada pesada logo depois da lendária 130R.',
+      en: "The calendar's only layout with a grade-separated crossover (the track passes over itself near Turn 1), right after the legendary 130R corner.",
+    },
+    {
+      turn: 'C8',
+      name: 'Degner',
+      pt: 'Sequência de duas curvas rápidas à direita que testa a confiança do carro sob carga lateral, logo após a S de Esses.',
+      en: 'A fast two-part right-hand sequence that tests the car under lateral load, right after the Esses.',
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Considerada uma das pistas mais exigentes do calendário para os pneus, com curvas rápidas e de alta carga lateral em sequência (Esses, Degner, 130R); historicamente decidida com uma parada, mas o clima instável do outono japonês pode obrigar à troca para pneus de chuva.',
+    en: "Regarded as one of the most tyre-demanding tracks on the calendar, with a sequence of fast, high-load corners (Esses, Degner, 130R); historically decided with one stop, though unstable autumn weather in Japan can force a switch to wet tyres.",
+  },
+};
+
+// Dados reais do Bahrain International Circuit, usados só na página de teste do GP do Bahrein. Fonte: Wikipedia.
+const BAHRAIN_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/bahrain.png',
+  lengthKm: 5.412,
+  raceDistanceKm: 308.484,
+  laps: 57,
+  corners: 15,
+  direction: 'clockwise',
+  lapRecord: { time: '1:31.447', driver: 'P. de la Rosa (McLaren)', year: 2005 },
+  firstGrandPrix: 2004,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+    { pt: 'Da Curva 3 até a Curva 4', en: 'From Turn 3 into Turn 4' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Turn 1',
+      pt: 'Frenada pesada logo após a reta principal, no deserto; ponto de ultrapassagem clássico desde a corrida inaugural de 2004.',
+      en: 'Heavy braking right after the main straight, in the desert; a classic overtaking point since the inaugural 2004 race.',
+    },
+    {
+      turn: 'C4',
+      name: 'Turn 4',
+      pt: 'Segunda maior zona de frenada da pista, ao fim de uma pequena reta que sai da Curva 3.',
+      en: "The track's second-biggest braking zone, at the end of a short straight out of Turn 3.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'A areia do deserto que se acumula na pista aumenta o desgaste dos pneus ao longo do fim de semana; combinado com o asfalto abrasivo, isso historicamente favorece estratégias de dois pit stops.',
+    en: "Desert sand that builds up on the track surface increases tyre wear over the weekend; combined with the abrasive asphalt, this has historically favoured two-stop strategies.",
+  },
+};
+
+// Dados reais do Miami International Autodrome, usados só na página de teste do GP de Miami. Fonte: Wikipedia.
+const MIAMI_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/miami.png',
+  lengthKm: 5.412,
+  raceDistanceKm: 308.326,
+  laps: 57,
+  corners: 19,
+  direction: 'counterclockwise',
+  lapRecord: { time: '1:29.708', driver: 'M. Verstappen (Red Bull)', year: 2023 },
+  firstGrandPrix: 2022,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+    { pt: 'Da Curva 16 até a Curva 17', en: 'From Turn 16 into Turn 17' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Turn 1',
+      pt: 'Frenada pesada logo após a reta principal, ao redor do estádio do Hard Rock Stadium.',
+      en: 'Heavy braking right after the main straight, around the Hard Rock Stadium.',
+    },
+    {
+      turn: 'C11',
+      name: 'Turn 11',
+      pt: 'Frenada tardia ao fim de uma sequência rápida, um dos pontos de ultrapassagem mais usados da pista.',
+      en: "Late braking at the end of a fast sequence, one of the track's most-used overtaking points.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Pista híbrida (rua e permanente) com asfalto relativamente liso; o calor e a umidade da Flórida elevam a temperatura dos pneus, mas o desgaste em si é moderado, favorecendo estratégias de uma parada.',
+    en: "A hybrid street/permanent layout with relatively smooth asphalt; Florida's heat and humidity raise tyre temperatures, but wear itself is moderate, favouring one-stop strategies.",
+  },
+};
+
+// Dados reais do Circuit Gilles Villeneuve, usados só na página de teste do GP do Canadá. Fonte: Wikipedia.
+const CANADA_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/canada.png',
+  lengthKm: 4.361,
+  raceDistanceKm: 305.270,
+  laps: 70,
+  corners: 14,
+  direction: 'counterclockwise',
+  lapRecord: { time: '1:13.078', driver: 'V. Bottas (Mercedes)', year: 2019 },
+  firstGrandPrix: 1978,
+  drsZones: [
+    { pt: 'Reta dos boxes, entrando na Curva 1', en: 'Pit straight, into Turn 1' },
+    { pt: 'Reta oposta, entrando no Muro dos Campeões', en: 'Back straight, into the Wall of Champions' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1-C2',
+      name: 'Turn 1-2',
+      pt: 'Chicane pesada logo após a reta dos boxes, principal ponto de ultrapassagem na largada.',
+      en: 'A heavy chicane right after the pit straight, the main overtaking point off the start.',
+    },
+    {
+      turn: 'C13-C14',
+      name: 'Muro dos Campeões',
+      pt: 'Chicane final ao fim da reta oposta, batizada assim depois que vários campeões mundiais bateram no muro de saída ali em anos diferentes.',
+      en: "The final chicane at the end of the back straight, nicknamed after several world champions crashed into the exit wall there over the years.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Pista semi-urbana de baixa carga aerodinâmica, com frenadas fortes e muitos toques em zebras; o desgaste dos pneus costuma ser baixo, mas o risco de dano por impacto é alto, o que historicamente favorece uma parada.',
+    en: 'A low-downforce semi-street track with hard braking zones and lots of kerb contact; tyre wear tends to be low, but impact-damage risk is high, historically favouring a one-stop strategy.',
+  },
+};
+
+// Dados reais do Circuit de Monaco, usados só na página de teste do GP de Mônaco. Fonte: Wikipedia.
+const MONACO_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/monaco.png',
+  lengthKm: 3.337,
+  raceDistanceKm: 260.286,
+  laps: 78,
+  corners: 19,
+  direction: 'clockwise',
+  lapRecord: { time: '1:12.909', driver: 'L. Hamilton (Mercedes)', year: 2021 },
+  firstGrandPrix: 1950,
+  drsZones: [
+    { pt: 'Reta dos boxes, entrando na Curva 1 (Sainte Dévote)', en: 'Pit straight, into Turn 1 (Sainte Dévote)' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Sainte Dévote',
+      pt: 'Primeira curva depois da largada, um funil estreito que costuma decidir a corrida logo na primeira volta.',
+      en: 'The first corner after the start, a narrow funnel that often decides the race on the opening lap.',
+    },
+    {
+      turn: 'C10',
+      name: 'Chicane do Porto',
+      pt: 'Freada brusca ao sair do túnel, vindo da maior velocidade do traçado; um dos raros pontos onde uma ultrapassagem é fisicamente possível.',
+      en: "A sharp brake right out of the tunnel, arriving at the layout's highest speed; one of the few points where an overtake is physically possible.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'A pista mais estreita e mais lenta do calendário torna ultrapassar quase impossível, então a estratégia gira em torno da classificação e do undercut nos boxes; o desgaste dos pneus é o mais baixo do ano, e a corrida é quase sempre decidida com uma única parada obrigatória.',
+    en: "The narrowest, slowest track on the calendar makes overtaking almost impossible, so strategy revolves around qualifying and the pit-stop undercut; tyre wear is the lowest of the year, and the race is almost always settled with a single mandatory stop.",
+  },
+};
+
+// Dados reais do Circuit de Barcelona-Catalunya (traçado atual, sem chicane final), usados só na página de teste do GP da Espanha. Fonte: Wikipedia.
+const SPAIN_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/spain.png',
+  lengthKm: 4.657,
+  raceDistanceKm: 307.362,
+  laps: 66,
+  corners: 14,
+  direction: 'clockwise',
+  lapRecord: { time: '1:15.743', driver: 'O. Piastri (McLaren)', year: 2025 },
+  firstGrandPrix: 1991,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+    { pt: 'Da Curva 10 até a Curva 11', en: 'From Turn 10 into Turn 11' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Elf',
+      pt: 'Frenada pesada logo após a reta principal, principal ponto de ultrapassagem desde a remoção da chicane final em 2023.',
+      en: "Heavy braking right after the main straight, the main overtaking point since the final chicane was removed in 2023.",
+    },
+    {
+      turn: 'C10',
+      name: 'Campsa',
+      pt: 'Curva rápida à direita que antecede uma pequena reta, testando a confiança do carro em alta velocidade.',
+      en: 'A fast right-hander ahead of a short straight, testing the car under high-speed load.',
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Pista de referência para testes pré-temporada, com curvas de longa duração (como a Curva 3) que geram desgaste elevado no pneu dianteiro esquerdo; costuma ser decidida com uma ou duas paradas, dependendo da temperatura do asfalto.',
+    en: "A benchmark pre-season testing venue, with long-duration corners (like Turn 3) that create heavy front-left tyre wear; usually decided with one or two stops, depending on track temperature.",
+  },
+};
+
+// Dados reais do Red Bull Ring, usados só na página de teste do GP da Áustria. Fonte: Wikipedia.
+const AUSTRIA_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/austria.png',
+  lengthKm: 4.326,
+  raceDistanceKm: 307.146,
+  laps: 71,
+  corners: 10,
+  direction: 'clockwise',
+  lapRecord: { time: '1:07.924', driver: 'O. Piastri (McLaren)', year: 2025 },
+  firstGrandPrix: 1970,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+    { pt: 'Da Curva 2 até a Curva 3', en: 'From Turn 2 into Turn 3' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Turn 1',
+      pt: 'Frenada pesada em subida logo após a reta principal, o traçado mais curto do calendário e um dos com mais ultrapassagens por volta.',
+      en: "Heavy uphill braking right after the main straight, the shortest lap on the calendar and one of the most overtaking-heavy.",
+    },
+    {
+      turn: 'C3',
+      name: 'Turn 3',
+      pt: 'Segunda frenada pesada em sequência, ao fim de uma reta curta que sai da Curva 2.',
+      en: 'A second heavy braking zone in sequence, at the end of a short straight out of Turn 2.',
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Volta curta e cheia de curvas de subida/descida gera baixo desgaste de pneu, mas o asfalto costuma ter pouca aderência por ser pouco usado fora do fim de semana de corrida; a maioria das estratégias é de uma parada.',
+    en: "The short lap full of uphill and downhill corners produces low tyre wear, but the track surface tends to have low grip since it sees little use outside race weekend; most strategies are one-stop.",
+  },
+};
+
+// Dados reais do Hungaroring, usados só na página de teste do GP da Hungria. Fonte: Wikipedia.
+const HUNGARY_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/hungary.png',
+  lengthKm: 4.381,
+  raceDistanceKm: 306.670,
+  laps: 70,
+  corners: 14,
+  direction: 'clockwise',
+  lapRecord: { time: '1:16.627', driver: 'L. Hamilton (Mercedes)', year: 2020 },
+  firstGrandPrix: 1986,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Turn 1',
+      pt: 'Frenada pesada em subida logo após a reta principal, praticamente o único ponto de ultrapassagem real do traçado.',
+      en: "Heavy uphill braking right after the main straight, practically the layout's only real overtaking point.",
+    },
+    {
+      turn: 'C4',
+      name: 'Turn 4',
+      pt: 'Curva lenta em subida que costuma embaralhar o pelotão logo no início da volta, especialmente em caso de safety car.',
+      en: 'A slow uphill corner that often shuffles the field early in the lap, especially after a safety car.',
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Apelidada de "Mônaco sem muros" por ter curvas de baixa velocidade e pouquíssimas retas, o que historicamente torna a ultrapassagem rara e favorece a estratégia de uma parada baseada na classificação e no undercut.',
+    en: 'Nicknamed "Monaco without the walls" for its low-speed corners and very few straights, which historically makes overtaking rare and favours a one-stop strategy built around qualifying and the undercut.',
+  },
+};
+
+// Dados reais do Circuit Zandvoort, usados só na página de teste do GP dos Países Baixos. Fonte: Wikipedia.
+const NETHERLANDS_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/netherlands.png',
+  lengthKm: 4.259,
+  raceDistanceKm: 306.648,
+  laps: 72,
+  corners: 14,
+  direction: 'clockwise',
+  lapRecord: { time: '1:11.097', driver: 'L. Hamilton (Mercedes)', year: 2021 },
+  firstGrandPrix: 1952,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1 (Tarzan)', en: 'Main straight, into Turn 1 (Tarzan)' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Tarzan',
+      pt: 'Frenada pesada de raio fechado logo após a reta principal, com múltiplas linhas de ataque possíveis; principal ponto de ultrapassagem da pista.',
+      en: "Heavy, tight-radius braking right after the main straight, with multiple possible lines of attack; the track's main overtaking point.",
+    },
+    {
+      turn: 'C13',
+      name: 'Arie Luyendyk',
+      pt: 'Curva final banked (inclinada) que leva à reta dos boxes, uma das únicas curvas com sobrelevação do calendário atual.',
+      en: "A banked final corner leading onto the pit straight, one of the only banked turns on the current calendar.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'As curvas banked (inclinadas) permitem velocidades de curva mais altas que o normal, elevando a carga lateral sobre os pneus; o clima costeiro instável da Holanda é o principal fator de risco para a estratégia.',
+    en: "The banked corners allow higher-than-normal cornering speeds, raising lateral tyre load; the Netherlands' unstable coastal weather is the main strategic risk factor.",
+  },
+};
+
+// Dados reais do Autodromo Nazionale Monza, usados só na página de teste do GP da Itália. Fonte: Wikipedia.
+const ITALY_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/italy.png',
+  lengthKm: 5.793,
+  raceDistanceKm: 307.029,
+  laps: 53,
+  corners: 11,
+  direction: 'clockwise',
+  lapRecord: { time: '1:20.901', driver: 'L. Norris (McLaren)', year: 2025 },
+  firstGrandPrix: 1950,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1 (Rettifilo)', en: 'Main straight, into Turn 1 (Rettifilo)' },
+    { pt: 'Reta de Curva Grande, entrando na chicane della Roggia', en: 'Curva Grande straight, into the Roggia chicane' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Rettifilo',
+      pt: 'Chicane pesada logo após a reta mais longa do calendário; principal ponto de ultrapassagem do "templo da velocidade".',
+      en: "A heavy chicane right after the calendar's longest straight; the main overtaking point at the 'temple of speed'.",
+    },
+    {
+      turn: 'C8',
+      name: 'Ascari',
+      pt: 'Sequência de três curvas rápidas em forma de S, uma das mais icônicas do calendário.',
+      en: 'A fast three-part S-shaped sequence, one of the most iconic on the calendar.',
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'A pista de menor carga aerodinâmica do calendário, com longas retas e frenadas curtas, gera o menor desgaste de pneu do ano; a estratégia quase sempre é de uma única parada.',
+    en: "The lowest-downforce track on the calendar, with long straights and short braking zones, produces the lowest tyre wear of the year; strategy is almost always a single stop.",
+  },
+};
+
+// Dados do Madring (Madrid Street Circuit), estreante no calendário em 2026 -- ainda sem
+// corrida disputada, entao sem recorde de volta. Fonte: The Race, Motorsport.com.
+const MADRID_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/madrid.png',
+  lengthKm: 5.474,
+  raceDistanceKm: 308.0,
+  laps: 57,
+  corners: 22,
+  direction: 'clockwise',
+  firstGrandPrix: 2026,
+  drsZones: [
+    { pt: 'Reta dos boxes, entrando na chicane das Curvas 1-2', en: 'Pit straight, into the Turn 1-2 chicane' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1-C2',
+      name: 'Chicane inicial',
+      pt: 'Chicane em alta velocidade logo após a reta dos boxes de 589 metros, com os carros freando de mais de 320 km/h para cerca de 100 km/h.',
+      en: 'A high-speed chicane right after the 589-metre pit straight, with cars braking from over 320 km/h down to around 100 km/h.',
+    },
+    {
+      turn: 'C5-C6',
+      name: 'Chicane sob o viaduto',
+      pt: 'Considerada a melhor zona de ultrapassagem do traçado pelos organizadores, fica logo abaixo de um viaduto de rodovia que corta o circuito.',
+      en: "Rated by organisers as the layout's best overtaking zone, it sits right beneath a motorway overpass that cuts through the circuit.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Traçado inédito com uma curva banked (inclinada a 24°) de 500 metros batizada de "La Monumental", inspirada na Arena de Las Ventas e na curva de Zandvoort; sem histórico de corridas, a estratégia ideal de pneus ainda é uma incógnita para todas as equipes.',
+    en: 'A brand-new layout featuring a 500-metre, 24-degree banked corner nicknamed "La Monumental", inspired by the Las Ventas bullring and Zandvoort\'s banked turn; with no race history, the ideal tyre strategy remains an unknown for every team.',
+  },
+};
+
+// Dados reais do Baku City Circuit, usados só na página de teste do GP do Azerbaijão. Fonte: Wikipedia.
+const AZERBAIJAN_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/azerbaijan.png',
+  lengthKm: 6.003,
+  raceDistanceKm: 306.153,
+  laps: 51,
+  corners: 20,
+  direction: 'counterclockwise',
+  lapRecord: { time: '1:43.009', driver: 'C. Leclerc (Ferrari)', year: 2019 },
+  firstGrandPrix: 2016,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+    { pt: 'Reta ao lado do Mar Cáspio, entrando na Curva 16', en: 'Straight alongside the Caspian Sea, into Turn 16' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1-C2',
+      name: 'Turn 1-2',
+      pt: 'Frenada pesada logo após a reta principal, primeiro ponto de ultrapassagem do traçado urbano de Baku.',
+      en: "Heavy braking right after the main straight, the first overtaking point on Baku's street layout.",
+    },
+    {
+      turn: 'C16',
+      name: 'Turn 16',
+      pt: 'Frenada tardia ao fim da reta mais longa do calendário, que passa pela Cidade Velha de Baku, chegando a mais de 340 km/h.',
+      en: "Late braking at the end of the calendar's longest straight, which runs past Baku's Old City, with cars arriving at over 340 km/h.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Combina a reta mais longa do calendário com um trecho estreito e sinuoso ao lado do castelo medieval; o desgaste de pneu é moderado, mas a alta chance de safety car por causa dos muros próximos torna a estratégia imprevisível.',
+    en: "Combines the calendar's longest straight with a narrow, twisty section alongside the medieval castle; tyre wear is moderate, but the high chance of a safety car due to the close walls makes strategy unpredictable.",
+  },
+};
+
+// Dados reais do Marina Bay Street Circuit (traçado atual, sem a curva 16-17), usados só na página de teste do GP de Singapura. Fonte: Wikipedia.
+const SINGAPORE_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/singapore.png',
+  lengthKm: 4.927,
+  raceDistanceKm: 305.474,
+  laps: 62,
+  corners: 19,
+  direction: 'counterclockwise',
+  lapRecord: { time: '1:33.808', driver: 'L. Hamilton (Ferrari)', year: 2025 },
+  firstGrandPrix: 2008,
+  drsZones: [
+    { pt: 'Reta dos boxes, entrando na Curva 1', en: 'Pit straight, into Turn 1' },
+    { pt: 'Da Curva 5 até a Curva 7', en: 'From Turn 5 into Turn 7' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C7',
+      name: 'Turn 7',
+      pt: 'Frenada pesada ao fim de uma sequência rápida, um dos poucos pontos de ultrapassagem sob as luzes de Marina Bay.',
+      en: "Heavy braking at the end of a fast sequence, one of the few overtaking points under Marina Bay's floodlights.",
+    },
+    {
+      turn: 'C14',
+      name: 'Turn 14',
+      pt: 'Curva lenta perto do fim da volta, historicamente palco de incidentes por causa da pouca visibilidade e dos muros próximos.',
+      en: 'A slow corner near the end of the lap, historically the scene of incidents due to poor visibility and close walls.',
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'A corrida noturna mais longa do calendário (cerca de 2 horas) em pista urbana estreita e cheia de zebras eleva muito o risco de safety car; o desgaste térmico costuma favorecer duas paradas, mas quase toda corrida é decidida pela estratégia em torno das interrupções.',
+    en: "The calendar's longest night race (around 2 hours) on a narrow street track full of kerbs greatly raises the safety-car risk; thermal degradation tends to favour two stops, but almost every race is decided by strategy around the interruptions.",
+  },
+};
+
+// Dados reais do Circuit of the Americas, usados só na página de teste do GP dos EUA. Fonte: Wikipedia.
+const USA_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/usa.png',
+  lengthKm: 5.513,
+  raceDistanceKm: 308.728,
+  laps: 56,
+  corners: 20,
+  direction: 'counterclockwise',
+  lapRecord: { time: '1:36.169', driver: 'C. Leclerc (Ferrari)', year: 2019 },
+  firstGrandPrix: 2012,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 12', en: 'Main straight, into Turn 12' },
+    { pt: 'Da Curva 11 até a Curva 12', en: 'From Turn 11 into Turn 12' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Turn 1',
+      pt: 'Subida íngreme seguida de frenada pesada em uma curva cega, inspirada em Silverstone e Nürburgring.',
+      en: 'A steep uphill run followed by heavy braking into a blind corner, inspired by Silverstone and the Nürburgring.',
+    },
+    {
+      turn: 'C12',
+      name: 'Turn 12',
+      pt: 'Principal ponto de ultrapassagem do traçado, ao fim da reta mais longa do circuito.',
+      en: "The layout's main overtaking point, at the end of the circuit's longest straight.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'O setor 1, em subida e com curvas de alta carga lateral inspiradas em Silverstone, é o que mais desgasta os pneus; a maioria das corridas é decidida com uma parada.',
+    en: 'Sector 1, uphill with high-lateral-load corners inspired by Silverstone, wears the tyres the most; most races are decided with one stop.',
+  },
+};
+
+// Dados reais do Autódromo Hermanos Rodríguez, usados só na página de teste do GP do México. Fonte: Wikipedia.
+const MEXICO_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/mexico.png',
+  lengthKm: 4.304,
+  raceDistanceKm: 305.584,
+  laps: 71,
+  corners: 17,
+  direction: 'clockwise',
+  lapRecord: { time: '1:17.774', driver: 'V. Bottas (Mercedes)', year: 2021 },
+  firstGrandPrix: 1963,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+    { pt: 'Reta oposta, entrando na Curva 4', en: 'Back straight, into Turn 4' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Peraltada / Turn 1',
+      pt: 'Frenada pesada logo após a reta principal; a altitude de mais de 2.200m reduz a carga aerodinâmica disponível, tornando a frenada mais longa que em pistas ao nível do mar.',
+      en: "Heavy braking right after the main straight; the venue's altitude above 2,200m reduces available downforce, making the braking zone longer than at sea-level tracks.",
+    },
+    {
+      turn: 'C17',
+      name: 'Foro Sol',
+      pt: 'Curva lenta dentro do antigo autódromo de beisebol Foro Sol, com a torcida praticamente em cima da pista.',
+      en: "A slow corner inside the former Foro Sol baseball stadium, with the crowd almost on top of the track.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'A altitude elevada reduz o downforce e o resfriamento dos pneus, mas também reduz o desgaste em si; a estratégia mais comum é de uma parada, com o setor do estádio (Foro Sol) sendo o ponto mais lento da volta.',
+    en: "The high altitude reduces both downforce and tyre cooling, but also reduces wear itself; a one-stop strategy is most common, with the stadium section (Foro Sol) the slowest point of the lap.",
+  },
+};
+
+// Dados reais do Las Vegas Strip Circuit, usados só na página de teste do GP de Las Vegas. Fonte: Wikipedia.
+const VEGAS_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/vegas.png',
+  lengthKm: 6.201,
+  raceDistanceKm: 310.050,
+  laps: 50,
+  corners: 17,
+  direction: 'counterclockwise',
+  lapRecord: { time: '1:33.365', driver: 'M. Verstappen (Red Bull)', year: 2025 },
+  firstGrandPrix: 2023,
+  drsZones: [
+    { pt: 'Reta da Las Vegas Boulevard, entrando na Curva 14', en: 'Las Vegas Boulevard straight, into Turn 14' },
+    { pt: 'Reta dos boxes, entrando na Curva 1', en: 'Pit straight, into Turn 1' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Turn 1',
+      pt: 'Frenada pesada logo após a reta dos boxes, com temperaturas noturnas do deserto que deixam a pista e os pneus mais frios que o normal.',
+      en: 'Heavy braking right after the pit straight, with cold desert night temperatures leaving the track and tyres cooler than usual.',
+    },
+    {
+      turn: 'C14',
+      name: 'Turn 14',
+      pt: 'Frenada tardia ao fim da reta da Strip, vindo de mais de 340 km/h passando pelos cassinos e pela Torre Eiffel do Paris Las Vegas.',
+      en: 'Late braking at the end of the Strip straight, arriving at over 340 km/h past the casinos and the Paris Las Vegas Eiffel Tower replica.',
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Corrida noturna com temperaturas de pista baixas para os padrões da F1, o que reduz drasticamente o desgaste térmico dos pneus e favorece a estratégia de uma única parada, apesar das longas retas em alta velocidade.',
+    en: "A night race with track temperatures low by F1 standards, which drastically reduces thermal tyre degradation and favours a single-stop strategy despite the long, high-speed straights.",
+  },
+};
+
+// Dados reais do Lusail International Circuit, usados só na página de teste do GP do Catar. Fonte: Wikipedia.
+const QATAR_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/qatar.png',
+  lengthKm: 5.419,
+  raceDistanceKm: 308.883,
+  laps: 57,
+  corners: 16,
+  direction: 'clockwise',
+  lapRecord: { time: '1:22.384', driver: 'L. Norris (McLaren)', year: 2024 },
+  firstGrandPrix: 2021,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Turn 1',
+      pt: 'Frenada pesada logo após a reta principal, sob luzes artificiais no deserto do Catar.',
+      en: "Heavy braking right after the main straight, under floodlights in the Qatari desert.",
+    },
+    {
+      turn: 'C12-C13',
+      name: 'Turn 12-13',
+      pt: 'Sequência rápida de curvas encadeadas que testa a resistência lateral dos pneus por vários segundos seguidos.',
+      en: 'A fast, flowing sequence of linked corners that tests tyre lateral endurance for several seconds in a row.',
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Uma das pistas mais exigentes para os pneus do calendário, com curvas rápidas e de longa duração em sequência; a força-tarefa aerodinâmica e a energia lateral levaram a limites de idade de pneu em edições anteriores.',
+    en: "One of the most tyre-demanding tracks on the calendar, with a sequence of fast, long-duration corners; the aerodynamic load and lateral energy led to tyre-age limits in previous editions.",
+  },
+};
+
+// Dados reais do Yas Marina Circuit (traçado atual, pós-2021), usados só na página de teste do GP de Abu Dhabi. Fonte: Wikipedia.
+const ABUDHABI_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/abudhabi.png',
+  lengthKm: 5.281,
+  raceDistanceKm: 306.298,
+  laps: 58,
+  corners: 16,
+  direction: 'counterclockwise',
+  lapRecord: { time: '1:25.637', driver: 'K. Magnussen (Haas)', year: 2024 },
+  firstGrandPrix: 2009,
+  drsZones: [
+    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
+    { pt: 'Da Curva 6 até a Curva 7', en: 'From Turn 6 into Turn 7' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Turn 1',
+      pt: 'Frenada pesada logo após a reta principal, remodelada em 2021 para ser mais rápida e favorecer a ultrapassagem.',
+      en: 'Heavy braking right after the main straight, reconfigured in 2021 to be faster and more overtaking-friendly.',
+    },
+    {
+      turn: 'C7',
+      name: 'Turn 7',
+      pt: 'Ponto de frenada tardia criado na remodelagem de 2021, no lugar do antigo setor lento perto do hotel Yas Viceroy.',
+      en: "A late-braking point created in the 2021 remodel, replacing the old slow sector near the Yas Viceroy hotel.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Corrida noturna que encerra a temporada, com queda de temperatura ao longo da corrida; a remodelagem de 2021 reduziu curvas lentas e aumentou a velocidade média, mas o desgaste de pneu segue moderado, favorecendo uma parada.',
+    en: "A night race that closes out the season, with falling temperatures as it progresses; the 2021 remodel removed slow corners and raised average speed, but tyre wear remains moderate, favouring a one-stop strategy.",
+  },
+};
+
 // Biografia real do Lando Norris, usada só na página de teste do piloto.
 // Fonte: Wikipedia (verificado até a etapa da Hungria de 2026).
 const NORRIS_BIO = {
@@ -625,12 +1268,127 @@ function isSpaRace(race: Race): boolean {
   return haystack.includes('francorchamps') || haystack.includes('belgian grand prix');
 }
 
-// Paginas de teste habilitadas ate agora: Interlagos, Silverstone, Albert Park e Spa-Francorchamps.
+function isChinaRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('shanghai') || haystack.includes('chinese grand prix');
+}
+
+function isJapanRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('suzuka') || haystack.includes('japanese grand prix');
+}
+
+function isBahrainRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('bahrain') || haystack.includes('sakhir');
+}
+
+function isMiamiRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('miami');
+}
+
+function isCanadaRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('gilles villeneuve') || haystack.includes('montreal') || haystack.includes('canadian grand prix');
+}
+
+function isMonacoRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('monaco') || haystack.includes('monte carlo');
+}
+
+function isSpainRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('barcelona') || haystack.includes('catalunya') || haystack.includes('spanish grand prix');
+}
+
+function isAustriaRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('red bull ring') || haystack.includes('spielberg') || haystack.includes('austrian grand prix');
+}
+
+function isHungaryRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('hungaroring') || haystack.includes('budapest') || haystack.includes('hungarian grand prix');
+}
+
+function isNetherlandsRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('zandvoort') || haystack.includes('dutch grand prix');
+}
+
+function isItalyRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('monza') || haystack.includes('italian grand prix');
+}
+
+function isMadridRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('madrid') || haystack.includes('madring');
+}
+
+function isAzerbaijanRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('baku') || haystack.includes('azerbaijan');
+}
+
+function isSingaporeRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('marina bay') || haystack.includes('singapore');
+}
+
+function isUsaRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('circuit of the americas') || haystack.includes('austin') || haystack.includes('united states grand prix');
+}
+
+function isMexicoRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('hermanos rodriguez') || haystack.includes('mexico city') || haystack.includes('mexican grand prix');
+}
+
+function isVegasRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('las vegas');
+}
+
+function isQatarRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('lusail') || haystack.includes('qatar');
+}
+
+function isAbuDhabiRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('yas marina') || haystack.includes('abu dhabi');
+}
+
+// Paginas de teste habilitadas ate agora: as 23 pistas do calendario de F1 2026, exceto a
+// Arabia Saudita (Jeddah Corniche), que segue sem pagina dedicada.
 const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[] = [
   { match: isInterlagosRace, info: INTERLAGOS_CIRCUIT_INFO },
   { match: isSilverstoneRace, info: SILVERSTONE_CIRCUIT_INFO },
   { match: isAlbertParkRace, info: ALBERT_PARK_CIRCUIT_INFO },
   { match: isSpaRace, info: SPA_CIRCUIT_INFO },
+  { match: isChinaRace, info: SHANGHAI_CIRCUIT_INFO },
+  { match: isJapanRace, info: SUZUKA_CIRCUIT_INFO },
+  { match: isBahrainRace, info: BAHRAIN_CIRCUIT_INFO },
+  { match: isMiamiRace, info: MIAMI_CIRCUIT_INFO },
+  { match: isCanadaRace, info: CANADA_CIRCUIT_INFO },
+  { match: isMonacoRace, info: MONACO_CIRCUIT_INFO },
+  { match: isSpainRace, info: SPAIN_CIRCUIT_INFO },
+  { match: isAustriaRace, info: AUSTRIA_CIRCUIT_INFO },
+  { match: isHungaryRace, info: HUNGARY_CIRCUIT_INFO },
+  { match: isNetherlandsRace, info: NETHERLANDS_CIRCUIT_INFO },
+  { match: isItalyRace, info: ITALY_CIRCUIT_INFO },
+  { match: isMadridRace, info: MADRID_CIRCUIT_INFO },
+  { match: isAzerbaijanRace, info: AZERBAIJAN_CIRCUIT_INFO },
+  { match: isSingaporeRace, info: SINGAPORE_CIRCUIT_INFO },
+  { match: isUsaRace, info: USA_CIRCUIT_INFO },
+  { match: isMexicoRace, info: MEXICO_CIRCUIT_INFO },
+  { match: isVegasRace, info: VEGAS_CIRCUIT_INFO },
+  { match: isQatarRace, info: QATAR_CIRCUIT_INFO },
+  { match: isAbuDhabiRace, info: ABUDHABI_CIRCUIT_INFO },
 ];
 
 function getRaceCircuitInfo(race: Race): CircuitInfo | null {
@@ -2260,7 +3018,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           [UI_TRANSLATIONS[language].laps, String(selectedRaceCircuitInfo.laps)],
                           [UI_TRANSLATIONS[language].corners, String(selectedRaceCircuitInfo.corners)],
                           [UI_TRANSLATIONS[language].direction, selectedRaceCircuitInfo.direction === 'clockwise' ? UI_TRANSLATIONS[language].clockwise : UI_TRANSLATIONS[language].counterclockwise],
-                          [UI_TRANSLATIONS[language].lapRecord, `${selectedRaceCircuitInfo.lapRecord.time} — ${selectedRaceCircuitInfo.lapRecord.driver} (${selectedRaceCircuitInfo.lapRecord.year})`],
+                          [
+                            UI_TRANSLATIONS[language].lapRecord,
+                            selectedRaceCircuitInfo.lapRecord
+                              ? `${selectedRaceCircuitInfo.lapRecord.time} — ${selectedRaceCircuitInfo.lapRecord.driver} (${selectedRaceCircuitInfo.lapRecord.year})`
+                              : UI_TRANSLATIONS[language].lapRecordPending,
+                          ],
                           [UI_TRANSLATIONS[language].firstGrandPrix, String(selectedRaceCircuitInfo.firstGrandPrix)],
                         ].map(([label, value]) => (
                           <div key={label} className="flex items-center justify-between border-b border-white/5 pb-3 gap-4">
