@@ -3127,7 +3127,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               transition={SPRING_SOFT}
               className="xl:hidden border-t border-[var(--card-border)] overflow-hidden"
             >
-              <div className="bg-[var(--header-bg)] px-4 py-6 space-y-6 max-h-[80vh] overflow-y-auto no-scrollbar">
+              <div className="bg-[var(--header-bg)] px-4 py-6 space-y-6 max-h-[80dvh] overflow-y-auto no-scrollbar">
                 {currentUser ? (
  <div className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/5">
                     <div className="flex items-center gap-3 min-w-0">
@@ -3654,7 +3654,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             exit={{ opacity: 0, y: -6 }}
             transition={SPRING}
           >
-            <section className="relative py-12 md:py-20 overflow-hidden min-h-[70vh]">
+            <section className="relative py-12 md:py-20 overflow-hidden min-h-[70dvh]">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
                 <div className="absolute inset-0 bg-gradient-to-b from-[var(--cat-accent)]/20 to-transparent" />
               </div>
@@ -3844,7 +3844,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             transition={SPRING}
           >
             <section
-              className="relative py-12 md:py-20 overflow-hidden min-h-[70vh]"
+              className="relative py-12 md:py-20 overflow-hidden min-h-[70dvh]"
               style={{ '--driver-accent': driverAccent } as React.CSSProperties}
             >
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
@@ -4147,7 +4147,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             exit={{ opacity: 0, y: -6 }}
             transition={SPRING}
           >
-            <section className="relative py-12 md:py-16 min-h-[70vh]">
+            <section className="relative py-12 md:py-16 min-h-[70dvh]">
               <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
                 <button
                   onClick={() => setView('home')}
@@ -5023,7 +5023,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 16 }}
               transition={SPRING}
-              className="relative w-full max-w-3xl apex-card p-6 md:p-10 overflow-hidden max-h-[88vh] flex flex-col"
+              className="relative w-full max-w-3xl apex-card p-6 md:p-10 overflow-hidden max-h-[88dvh] flex flex-col"
             >
               <div className="absolute top-0 right-0 w-64 h-64 -mr-32 -mt-32 bg-[var(--cat-accent)]/10 rounded-full pointer-events-none" />
 
