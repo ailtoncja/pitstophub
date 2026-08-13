@@ -3262,12 +3262,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
                 <div className="hero-bg-lines absolute inset-0" />
                 <motion.div
-                  className="absolute -top-32 -left-32 w-96 h-96 rounded-full blur-[120px] bg-brand-red/20"
+                  className="absolute -top-32 -left-32 w-96 h-96 rounded-full blur-[60px] bg-brand-red/20"
                   animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
                   transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
                 />
                 <motion.div
-                  className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] rounded-full blur-[130px] bg-blue-500/10"
+                  className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] rounded-full blur-[65px] bg-blue-500/10"
                   animate={{ x: [0, -30, 0], y: [0, 40, 0] }}
                   transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
                 />
