@@ -194,7 +194,24 @@ async function syncCategory(categoryId, leagueId) {
     }
   }
 
-  return { rows: applyManualOverrides(categoryId, rows), standings: latestStandings, standingsRound: latestStandingsRound };
+  return {
+    rows: applyManualOverrides(categoryId, dropOtherSeasonRows(rows, season)),
+    standings: latestStandings,
+    standingsRound: latestStandingsRound,
+  };
+}
+
+// eventspastleague.php as vezes devolve uma rodada de uma temporada anterior
+// que calhou de compartilhar numero de rodada com uma da atual (ex.: achamos
+// um "3 Hours of Monza" de 2025 junto com o de 2026 na GT World Challenge, e
+// um "Las Vegas Race 2" de 2025 na F1 Academy) -- groupByRound/pickMainEvent
+// nao tem como saber que sao anos diferentes, entao filtra pelo ano da
+// temporada resolvida (resolveCurrentSeason) depois de montar as linhas. So
+// filtra quando a temporada e um ano de 4 digitos limpo -- se vier num
+// formato diferente (ex. "2025-2026"), nao arrisca descartar tudo por engano.
+function dropOtherSeasonRows(rows, season) {
+  if (!/^\d{4}$/.test(season)) return rows;
+  return rows.filter((row) => row.date?.slice(0, 4) === season);
 }
 
 // A TheSportsDB e mantida pela comunidade e as vezes demora dias/semanas pra
@@ -205,6 +222,33 @@ async function syncCategory(categoryId, leagueId) {
 // nova aparecendo, status batendo), a correcao correspondente vira no-op
 // sozinha (ver os checks de "ja existe"/"status ja bate" abaixo).
 const MANUAL_OVERRIDES = {
+  indy: (rows) => {
+    // "Freedom 250 GP of Washington, D.C." (Aug 23) foi adicionada ao
+    // calendario da IndyCar depois que a temporada 2026 ja tinha sido
+    // divulgada -- a TheSportsDB nao tem essa rodada ainda. Fonte:
+    // indycar.com (calendario oficial 2026).
+    if (rows.some((r) => /washington/i.test(r.en_name ?? ''))) return rows;
+    const maxRound = rows.reduce((max, r) => Math.max(max, r.round ?? 0), 0);
+    return [
+      ...rows,
+      {
+        category_id: 'indy',
+        round: maxRound + 1,
+        race_id: 'r-manual-washington-dc',
+        name: `Rodada ${maxRound + 1}`,
+        en_name: 'Freedom 250 GP of Washington, D.C.',
+        location: 'Washington, D.C.',
+        en_location: 'Washington, D.C.',
+        circuit: 'Streets of Washington',
+        date: '2026-08-23',
+        status: 'upcoming',
+        winner: null,
+        external_id: null,
+        source: 'manual-override',
+        updated_at: new Date().toISOString(),
+      },
+    ];
+  },
   wec: (rows) => {
     // Catar e Bahrein foram cancelados (logistica no Oriente Medio, jul/2026)
     // e substituidos por Barcelona e Monza. A TheSportsDB ainda lista Bahrein
