@@ -226,11 +226,42 @@ button, [role="button"] {
   opacity: 0;
 }
 
-.pitstop-intro-skip {
+.pitstop-intro-controls {
   position: fixed;
   right: 26px;
   bottom: max(24px, env(safe-area-inset-bottom, 24px));
   z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  opacity: 0;
+}
+
+.pitstop-intro-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  color: #9aa1ab;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  transition: color 0.2s;
+}
+
+.pitstop-intro-remember:hover {
+  color: #fff;
+}
+
+.pitstop-intro-remember input[type='checkbox'] {
+  width: 15px;
+  height: 15px;
+  accent-color: #e01f32;
+  cursor: pointer;
+}
+
+.pitstop-intro-skip {
   pointer-events: auto;
   cursor: pointer;
   border: 1px solid rgba(255, 255, 255, 0.28);
@@ -242,7 +273,6 @@ button, [role="button"] {
   font-size: 13px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  opacity: 0;
   transition: 0.2s;
 }
 
@@ -252,8 +282,18 @@ button, [role="button"] {
 }
 
 @media (max-width: 640px) {
-  .pitstop-intro-skip {
+  .pitstop-intro-controls {
     right: 16px;
+    gap: 10px;
+  }
+
+  .pitstop-intro-remember {
+    font-size: 11px;
+  }
+
+  .pitstop-intro-skip {
+    padding: 8px 14px;
+    font-size: 11px;
   }
 }
 

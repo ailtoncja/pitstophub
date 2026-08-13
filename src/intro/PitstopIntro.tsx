@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const WORDMARK = 'PITSTOPHUB';
 const HUB_START = 7;
@@ -14,7 +14,7 @@ const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
 const seg = (t: number, a: number, b: number) => clamp01((t - a) / (b - a));
 
 interface PitstopIntroProps {
-  onDone: () => void;
+  onDone: (disableForever: boolean) => void;
 }
 
 export default function PitstopIntro({ onDone }: PitstopIntroProps) {
@@ -25,10 +25,13 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
   const letterRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const ruleRef = useRef<HTMLDivElement | null>(null);
   const tagRef = useRef<HTMLDivElement | null>(null);
-  const skipRef = useRef<HTMLButtonElement | null>(null);
+  const controlsRef = useRef<HTMLDivElement | null>(null);
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
   const finishRef = useRef<(() => void) | null>(null);
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+  const dontShowAgainRef = useRef(dontShowAgain);
+  dontShowAgainRef.current = dontShowAgain;
 
   const lineMeta = useMemo(
     () =>
@@ -48,7 +51,7 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
     // Quem pede menos movimento nao deveria levar 4s+ de carro em 3D girando na cara --
     // pula direto pro app.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      onDoneRef.current();
+      onDoneRef.current(dontShowAgainRef.current);
       return;
     }
 
@@ -62,7 +65,7 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
       root.style.transition = `opacity ${FADE_MS}ms ease`;
       root.style.opacity = '0';
       root.style.pointerEvents = 'none';
-      window.setTimeout(() => onDoneRef.current(), FADE_MS);
+      window.setTimeout(() => onDoneRef.current(dontShowAgainRef.current), FADE_MS);
     };
     finishRef.current = finish;
 
@@ -176,7 +179,7 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
         });
         if (ruleRef.current) ruleRef.current.style.width = `${easeInOut(seg(t, 2.15, 2.85)) * 340}px`;
         if (tagRef.current) tagRef.current.style.opacity = String(seg(t, 2.5, 3.2));
-        if (skipRef.current) skipRef.current.style.opacity = String(seg(t, 2.5, 3.2));
+        if (controlsRef.current) controlsRef.current.style.opacity = String(seg(t, 2.5, 3.2));
 
         // segura o quadro final com orbita leve + rodas girando em marcha lenta
         if (t > 3.2) {
@@ -258,14 +261,19 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
           Tudo sobre automobilismo
         </div>
       </div>
-      <button
-        ref={skipRef}
-        type="button"
-        onClick={() => finishRef.current?.()}
-        className="pitstop-intro-skip"
-      >
-        Pular
-      </button>
+      <div ref={controlsRef} className="pitstop-intro-controls">
+        <label className="pitstop-intro-remember">
+          <input
+            type="checkbox"
+            checked={dontShowAgain}
+            onChange={(e) => setDontShowAgain(e.target.checked)}
+          />
+          Não mostrar novamente
+        </label>
+        <button type="button" onClick={() => finishRef.current?.()} className="pitstop-intro-skip">
+          Pular
+        </button>
+      </div>
     </div>
   );
 }

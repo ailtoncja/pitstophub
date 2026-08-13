@@ -24,12 +24,14 @@ import {
   Share2,
   Route,
   Zap,
-  AlertTriangle
+  AlertTriangle,
+  Film
 } from 'lucide-react';
 import { MOTORSPORT_DATA, Category } from './types';
 import { OpenWheelCarIcon, HypercarIcon, GtCarIcon, RallyCarIcon, StockCarIcon } from './category-icons';
 import { cn } from './lib/utils';
 import { getUserSettings, saveUserSettings, type AuthUser } from './auth';
+import { isIntroDisabled, setIntroDisabled } from './IntroGate';
 import {
   fetchCategoryLiveData,
   fetchCategoryLiveSummary,
@@ -132,6 +134,9 @@ const UI_TRANSLATIONS = {
     liveData: 'Dados ao Vivo',
     language: 'Idioma',
     appearance: 'Tema',
+    introAnimation: 'Animação',
+    introAnimationOn: 'Animação de abertura ativada. Clique para desativar.',
+    introAnimationOff: 'Animação de abertura desativada. Clique para ativar.',
     tagline: 'Explore os calendários, equipes e pilotos das principais competições do automobilismo mundial em 2026.',
     drivers: 'Pilotos',
     constructors: 'Construtores',
@@ -245,6 +250,9 @@ const UI_TRANSLATIONS = {
     liveData: 'Live Data',
     language: 'Language',
     appearance: 'Theme',
+    introAnimation: 'Intro',
+    introAnimationOn: 'Boot animation enabled. Click to disable.',
+    introAnimationOff: 'Boot animation disabled. Click to enable.',
     tagline: 'Explore the calendars, teams and drivers of the world\'s main motorsport competitions in 2026.',
     drivers: 'Drivers',
     constructors: 'Constructors',
@@ -2208,6 +2216,7 @@ type BeforeInstallPromptEvent = Event & {
 export default function App({ currentUser, onLogout, onLoginRequest }: AppProps) {
   const [language, setLanguage] = useState<'pt' | 'en'>('pt');
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [introEnabled, setIntroEnabled] = useState(() => !isIntroDisabled());
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -4978,6 +4987,21 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             >
               {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               {UI_TRANSLATIONS[language].appearance}
+            </button>
+            <button
+              onClick={() => {
+                const next = !introEnabled;
+                setIntroEnabled(next);
+                setIntroDisabled(!next);
+              }}
+              title={introEnabled ? UI_TRANSLATIONS[language].introAnimationOn : UI_TRANSLATIONS[language].introAnimationOff}
+              className={cn(
+                "inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--card-bg)] border border-[var(--card-border)] text-[10px] font-black uppercase tracking-widest transition-colors",
+                introEnabled ? "text-[var(--text-main)] hover:text-brand-red" : "text-gray-500 line-through"
+              )}
+            >
+              <Film className="w-4 h-4" />
+              {UI_TRANSLATIONS[language].introAnimation}
             </button>
           </div>
         </div>
