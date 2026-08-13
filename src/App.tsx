@@ -2877,7 +2877,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
   return (
     <div
-      className="relative min-h-screen flex flex-col xl:flex-row transition-colors duration-300 overflow-x-hidden"
+      className="relative min-h-dvh flex flex-col xl:flex-row transition-colors duration-300 overflow-x-hidden"
       style={{ '--cat-accent': categoryAccent, '--cat-accent-ink': categoryAccentInk, '--nav-accent': navAccent } as React.CSSProperties}
     >
       {isDarkMode && (
@@ -2887,7 +2887,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         </>
       )}
 
-      <aside className="hidden xl:flex xl:flex-col w-64 shrink-0 relative z-10 bg-[var(--sidebar-bg)] border-r border-[var(--card-border)] sticky top-0 h-screen overflow-y-auto no-scrollbar">
+      <aside className="hidden xl:flex xl:flex-col w-64 shrink-0 relative z-10 bg-[var(--sidebar-bg)] border-r border-[var(--card-border)] sticky top-0 h-dvh overflow-y-auto no-scrollbar">
         <button
           onClick={() => setView('home')}
           className="flex items-center gap-3 px-5 py-6 shrink-0 hover:opacity-90 transition-opacity"
