@@ -1142,6 +1142,43 @@ const ABUDHABI_CIRCUIT_INFO: CircuitInfo = {
   },
 };
 
+// Dados reais do Autodromo Enzo e Dino Ferrari (Imola), usados na pagina de teste
+// das etapas de Imola da F3 e da WEC -- a F1 nao corre la em 2026, entao os dados
+// de prova (recorde de volta, distancia, DRS) sao da ultima vez que a F1 esteve
+// la, o GP da Emilia-Romagna de 2020-2022. Fontes: Wikipedia (Imola Circuit,
+// 2022 Emilia Romagna Grand Prix) e Motorsport Week (zonas de DRS de 2022).
+const IMOLA_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/imola.png',
+  lengthKm: 4.909,
+  raceDistanceKm: 309.049,
+  laps: 63,
+  corners: 19,
+  direction: 'counterclockwise',
+  lapRecord: { time: '1:15.484', driver: 'L. Hamilton (Mercedes)', year: 2020 },
+  firstGrandPrix: 1980,
+  drsZones: [
+    { pt: 'Reta principal, da saída da Curva 19 até a Curva 2 (Tamburello)', en: 'Main straight, from the exit of Turn 19 into Turn 2 (Tamburello)' },
+  ],
+  brakingZones: [
+    {
+      turn: 'C2',
+      name: 'Tamburello',
+      pt: 'Frenada pesada logo após a reta principal e a única zona de DRS da pista; ponto mais provável de ultrapassagem em Ímola.',
+      en: "Heavy braking right after the main straight and the track's only DRS zone; the most likely overtaking point at Imola.",
+    },
+    {
+      turn: 'C17',
+      name: 'Rivazza',
+      pt: 'Curva dupla à esquerda no fim da volta, estreita e apertada; tentativas de frenada tardia aqui são o principal plano B quando o DRS na reta principal não é suficiente.',
+      en: 'A tight, narrow double-left near the end of the lap; late-braking lunges here are the main backup plan when the main-straight DRS zone alone is not enough.',
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Traçado estreito e técnico, historicamente um dos mais difíceis do calendário para ultrapassar — a posição no grid pesa mais do que o ritmo de corrida, o que empurra as equipes para estratégias de um só pit stop e disputas decididas nos boxes (undercut) em vez de na pista.',
+    en: 'A narrow, technical layout that is historically one of the hardest on the calendar to overtake on -- grid position matters more than race pace, which pushes teams toward one-stop strategies and battles decided in the pits (the undercut) rather than on track.',
+  },
+};
+
 // Biografia real do Lando Norris, usada só na página de teste do piloto.
 // Fonte: Wikipedia (verificado até a etapa da Hungria de 2026).
 const NORRIS_BIO = {
@@ -2084,8 +2121,14 @@ function isAbuDhabiRace(race: Race): boolean {
   return haystack.includes('yas marina') || haystack.includes('abu dhabi');
 }
 
-// Paginas de teste habilitadas ate agora: as 23 pistas do calendario de F1 2026, exceto a
-// Arabia Saudita (Jeddah Corniche), que segue sem pagina dedicada.
+function isImolaRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('imola') || haystack.includes('enzo e dino ferrari') || haystack.includes('emilia');
+}
+
+// Paginas de teste habilitadas ate agora: as 23 pistas do calendario de F1 2026 (exceto a
+// Arabia Saudita/Jeddah Corniche, que segue sem pagina dedicada), mais Imola -- fora do
+// calendario da F1 em 2026, mas onde F3 e WEC ainda correm.
 const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[] = [
   { match: isInterlagosRace, info: INTERLAGOS_CIRCUIT_INFO },
   { match: isSilverstoneRace, info: SILVERSTONE_CIRCUIT_INFO },
@@ -2110,13 +2153,14 @@ const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[
   { match: isVegasRace, info: VEGAS_CIRCUIT_INFO },
   { match: isQatarRace, info: QATAR_CIRCUIT_INFO },
   { match: isAbuDhabiRace, info: ABUDHABI_CIRCUIT_INFO },
+  { match: isImolaRace, info: IMOLA_CIRCUIT_INFO },
 ];
 
 function getRaceCircuitInfo(race: Race): CircuitInfo | null {
   return RACE_TEST_CIRCUITS.find(({ match }) => match(race))?.info ?? null;
 }
 
-// Categorias que, em pesquisa, realmente correm em algum dos 23 circuitos acima
+// Categorias que, em pesquisa, realmente correm em algum dos 24 circuitos acima
 // (mesmo tracado fisico, nao so a mesma cidade). F2/F3/F1 Academy dividem varios
 // finais de semana com a F1; WEC, DTM, GT World Challenge e NASCAR passam por
 // algumas dessas pistas em seus proprios calendarios. IMSA e IndyCar, nos
@@ -2770,9 +2814,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   }, [selectedRace, now]);
 
   const selectedRaceCircuitInfo = useMemo(() => {
-    if (!selectedRace || selectedCategory.id !== 'f1') return null;
+    // Antes so liberava para a F1; isso deixava a pagina de circuito muda pra
+    // qualquer corrida de F2/F3/WEC/etc. que a propria lista de calendario ja
+    // marcava como clicavel via hasCircuitPage (ring de destaque no card).
+    if (!selectedRace || !hasCircuitPage(selectedCategory, selectedRace)) return null;
     return getRaceCircuitInfo(selectedRace);
-  }, [selectedRace, selectedCategory.id]);
+  }, [selectedRace, selectedCategory]);
 
   // "Ultimo vencedor" e "lider do campeonato" sempre mostram a MESMA categoria entre si
   // (logado/seguindo ou não): busca a corrida concluida mais recente cuja categoria tambem
