@@ -76,11 +76,13 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
       const { buildCar } = await import('./buildCar');
       if (disposed) return;
 
-      // Sem antialias, sem shadow map: numa cena com ~50 meshes separados isso e
-      // de longe o maior custo por frame (a passada de sombra sozinha praticamente
-      // dobra os draw calls). E so uma intro de ~4s, nao precisa ser foto-realista.
+      // Sem antialias: numa cena com ~50 meshes separados, MSAA custa caro. A
+      // sombra volta, mas so na silhueta principal (ver SHADOW_CASTERS abaixo) --
+      // fazer as ~50 pecas do carro todas projetarem sombra e que pesava de verdade.
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x08090b);
@@ -90,6 +92,16 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
       scene.add(new THREE.HemisphereLight(0x556070, 0x090a0c, 0.55));
       const key = new THREE.DirectionalLight(0xffffff, 2.6);
       key.position.set(4, 6, 5);
+      key.castShadow = true;
+      key.shadow.mapSize.set(1024, 1024);
+      key.shadow.radius = 6;
+      key.shadow.bias = -0.0006;
+      const shadowCam = key.shadow.camera;
+      shadowCam.left = -6;
+      shadowCam.right = 6;
+      shadowCam.top = 6;
+      shadowCam.bottom = -6;
+      shadowCam.far = 25;
       scene.add(key);
       const rimR = new THREE.DirectionalLight(0xff2b3f, 3.2);
       rimR.position.set(-6, 2.2, -4);
@@ -103,9 +115,24 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
         new THREE.MeshStandardMaterial({ color: 0x101216, roughness: 0.55, metalness: 0.1 })
       );
       ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
       scene.add(ground);
 
       const car = buildCar();
+      // So a silhueta principal (monocoque + pneus) entra na passada de sombra --
+      // as outras ~45 pecas (asas, espelhos, halo, suspensao...) continuam recebendo
+      // luz normalmente, so nao projetam sombra propria.
+      const SHADOW_CASTERS = new Set([
+        'monocoque',
+        'wheel_front_left_tyre',
+        'wheel_front_right_tyre',
+        'wheel_rear_left_tyre',
+        'wheel_rear_right_tyre',
+      ]);
+      car.traverse((obj) => {
+        const mesh = obj as THREE.Mesh;
+        if (mesh.isMesh) mesh.castShadow = SHADOW_CASTERS.has(mesh.name);
+      });
       const pivot = new THREE.Group();
       pivot.add(car);
       scene.add(pivot);
