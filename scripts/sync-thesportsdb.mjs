@@ -194,7 +194,69 @@ async function syncCategory(categoryId, leagueId) {
     }
   }
 
-  return { rows, standings: latestStandings, standingsRound: latestStandingsRound };
+  return { rows: applyManualOverrides(categoryId, rows), standings: latestStandings, standingsRound: latestStandingsRound };
+}
+
+// A TheSportsDB e mantida pela comunidade e as vezes demora dias/semanas pra
+// refletir uma mudanca de calendario no meio da temporada (evento cancelado,
+// etapa nova substituindo outra). Isso corrige manualmente os casos que ja
+// confirmamos em fontes oficiais mas que a API ainda nao atualizou -- e
+// auto-neutralizante: assim que a TheSportsDB trouxer o dado certo (rodada
+// nova aparecendo, status batendo), a correcao correspondente vira no-op
+// sozinha (ver os checks de "ja existe"/"status ja bate" abaixo).
+const MANUAL_OVERRIDES = {
+  wec: (rows) => {
+    // Catar e Bahrein foram cancelados (logistica no Oriente Medio, jul/2026)
+    // e substituidos por Barcelona e Monza. A TheSportsDB ainda lista Bahrein
+    // como upcoming e nao tem as duas rodadas novas. Fontes: DailySportsCar e
+    // Motorsport.com, jul/2026 ("WEC replaces Middle East rounds with new
+    // races in Barcelona and Monza").
+    const patched = rows.map((row) =>
+      /bahrain/i.test(row.en_name ?? '') ? { ...row, status: 'cancelled' } : row
+    );
+
+    const nowIso = new Date().toISOString();
+    const maxRound = patched.reduce((max, r) => Math.max(max, r.round ?? 0), 0);
+    const addIfMissing = (matcher, extra) => {
+      if (patched.some((r) => matcher.test(r.en_name ?? ''))) return;
+      patched.push({
+        category_id: 'wec',
+        round: extra.round,
+        name: `Rodada ${extra.round}`,
+        status: 'upcoming',
+        winner: null,
+        external_id: null,
+        source: 'manual-override',
+        updated_at: nowIso,
+        ...extra,
+      });
+    };
+    addIfMissing(/barcelona/i, {
+      round: maxRound + 1,
+      race_id: 'r-manual-6-hours-of-barcelona',
+      en_name: '6 Hours of Barcelona',
+      location: 'Barcelona',
+      en_location: 'Barcelona',
+      circuit: 'Circuit de Barcelona-Catalunya',
+      date: '2026-10-18',
+    });
+    addIfMissing(/monza/i, {
+      round: maxRound + 2,
+      race_id: 'r-manual-6-hours-of-monza',
+      en_name: '6 Hours of Monza',
+      location: 'Monza',
+      en_location: 'Monza',
+      circuit: 'Autodromo Nazionale Monza',
+      date: '2026-11-08',
+    });
+
+    return patched;
+  },
+};
+
+function applyManualOverrides(categoryId, rows) {
+  const override = MANUAL_OVERRIDES[categoryId];
+  return override ? override(rows) : rows;
 }
 
 // Junta eventos de varias fontes (dedupe por idEvent) e agrupa por rodada,
