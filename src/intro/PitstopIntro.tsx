@@ -76,8 +76,10 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
       const { buildCar } = await import('./buildCar');
       if (disposed) return;
 
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'low-power' });
+      // Cap mais baixo que o devicePixelRatio real (ate 3x em muitos celulares) --
+      // e so uma intro de ~4s, nao vale queimar GPU/bateria por nitidez marginal.
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFShadowMap;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -92,7 +94,7 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
       const key = new THREE.DirectionalLight(0xffffff, 2.6);
       key.position.set(4, 6, 5);
       key.castShadow = true;
-      key.shadow.mapSize.set(2048, 2048);
+      key.shadow.mapSize.set(1024, 1024);
       const shadowCam = key.shadow.camera;
       shadowCam.left = -6;
       shadowCam.right = 6;
@@ -207,6 +209,10 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
           else mat?.dispose();
         });
         renderer.dispose();
+        // dispose() sozinho nao garante que o navegador devolve a memoria de GPU na
+        // hora -- forceContextLoss forca a liberacao imediata do contexto WebGL, pra
+        // essa intro nao deixar sobra pesando no resto do app depois que ela some.
+        renderer.forceContextLoss();
       };
     })();
 
