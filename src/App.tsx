@@ -46,6 +46,7 @@ import {
   fetchSyncedCalendar,
   fetchSyncedStandings,
   getSyncedCategoryIds,
+  isCategorySynced,
   mergeCategoryWithSyncedCalendar,
   mergeCategoryWithSyncedStandings,
 } from './synced-races';
@@ -2258,6 +2259,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [liveCategoryData, setLiveCategoryData] = useState<JolpicaCategoryData | null>(null);
   const [liveCategoryState, setLiveCategoryState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
   const [syncedCalendars, setSyncedCalendars] = useState<Partial<Record<Category['id'], Race[] | null>>>({});
+  // Fica false ate a 1a sincronizacao das categorias terminar. Antes disso, o
+  // calendario/classificacao de uma categoria sincronizada ainda e so o fallback
+  // estatico -- pode ter uma contagem de etapas diferente da real, e mostrar esse
+  // numero errado por 1-2s so pra depois trocar sozinho e o que causava o "pulo"
+  // de layout que a pessoa via ao rolar a Home logo apos abrir o app.
+  const [syncedDataReady, setSyncedDataReady] = useState(false);
   const [driverSeasonResults, setDriverSeasonResults] = useState<DriverResultRow[] | null>(null);
   const [driverResultsState, setDriverResultsState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
 
@@ -2455,6 +2462,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
           console.error('Falha ao sincronizar dados de categoria.', result.reason);
         }
       }
+
+      setSyncedDataReady(true);
     };
 
     void syncCalendars();
@@ -3435,7 +3444,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           <div className="font-apex-mono text-[9px] text-gray-500 uppercase tracking-widest font-medium">{UI_TRANSLATIONS[language].categoriesLabel}</div>
                         </div>
                         <div>
-                          <div className="font-apex text-xl font-extrabold italic text-[var(--text-main)]">{overviewStats.races}</div>
+                          <div className="font-apex text-xl font-extrabold italic text-[var(--text-main)]">{syncedDataReady ? overviewStats.races : '···'}</div>
                           <div className="font-apex-mono text-[9px] text-gray-500 uppercase tracking-widest font-medium">{UI_TRANSLATIONS[language].racesInSeason}</div>
                         </div>
                         <div>
@@ -3649,7 +3658,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
                                   </div>
                                   <div className="text-[10px] text-gray-500 truncate">
-                                    {cat.teams.length} {UI_TRANSLATIONS[language].teams} · {cat.calendar.length} {UI_TRANSLATIONS[language].rounds}
+                                    {cat.teams.length} {UI_TRANSLATIONS[language].teams} · {!syncedDataReady && isCategorySynced(cat.id) ? '···' : cat.calendar.length} {UI_TRANSLATIONS[language].rounds}
                                   </div>
                                 </div>
                                 <button
@@ -4393,7 +4402,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             <Calendar className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].rounds}
                           </h3>
                           <div className="text-4xl font-display font-black text-[var(--cat-accent)] mb-2">
-                            {selectedCategory.calendar.length}
+                            {!syncedDataReady && isCategorySynced(selectedCategory.id) ? '···' : selectedCategory.calendar.length}
                           </div>
                           <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">{UI_TRANSLATIONS[language].racesInSeason}</p>
                         </div>
