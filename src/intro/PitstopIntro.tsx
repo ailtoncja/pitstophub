@@ -76,14 +76,11 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
       const { buildCar } = await import('./buildCar');
       if (disposed) return;
 
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'low-power' });
-      // Cap mais baixo que o devicePixelRatio real (ate 3x em muitos celulares) --
-      // e so uma intro de ~4s, nao vale queimar GPU/bateria por nitidez marginal.
+      // Sem antialias, sem shadow map: numa cena com ~50 meshes separados isso e
+      // de longe o maior custo por frame (a passada de sombra sozinha praticamente
+      // dobra os draw calls). E so uma intro de ~4s, nao precisa ser foto-realista.
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFShadowMap;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.15;
 
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x08090b);
@@ -93,14 +90,6 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
       scene.add(new THREE.HemisphereLight(0x556070, 0x090a0c, 0.55));
       const key = new THREE.DirectionalLight(0xffffff, 2.6);
       key.position.set(4, 6, 5);
-      key.castShadow = true;
-      key.shadow.mapSize.set(1024, 1024);
-      const shadowCam = key.shadow.camera;
-      shadowCam.left = -6;
-      shadowCam.right = 6;
-      shadowCam.top = 6;
-      shadowCam.bottom = -6;
-      shadowCam.far = 25;
       scene.add(key);
       const rimR = new THREE.DirectionalLight(0xff2b3f, 3.2);
       rimR.position.set(-6, 2.2, -4);
@@ -108,16 +97,12 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
       const rimB = new THREE.DirectionalLight(0x5b8bff, 1.6);
       rimB.position.set(6, 1.6, -5);
       scene.add(rimB);
-      const fillLight = new THREE.PointLight(0xffffff, 18, 14);
-      fillLight.position.set(1.5, 2.4, 4);
-      scene.add(fillLight);
 
       const ground = new THREE.Mesh(
         new THREE.PlaneGeometry(80, 80),
         new THREE.MeshStandardMaterial({ color: 0x101216, roughness: 0.55, metalness: 0.1 })
       );
       ground.rotation.x = -Math.PI / 2;
-      ground.receiveShadow = true;
       scene.add(ground);
 
       const car = buildCar();
