@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import PitstopIntro from './intro/PitstopIntro';
 
 const SESSION_KEY = 'ph-intro-shown';
+const DISABLED_KEY = 'ph-intro-disabled';
 
 function hasShownIntro() {
   try {
@@ -20,8 +21,28 @@ function markIntroShown() {
   }
 }
 
+// Flag em localStorage (nao sessionStorage) para persistir "nao mostrar mais" entre
+// sessoes -- funciona igual para quem tem conta e para visitantes, ja que nao depende
+// de login nem do Supabase, so do navegador/dispositivo.
+export function isIntroDisabled() {
+  try {
+    return localStorage.getItem(DISABLED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function setIntroDisabled(disabled: boolean) {
+  try {
+    if (disabled) localStorage.setItem(DISABLED_KEY, '1');
+    else localStorage.removeItem(DISABLED_KEY);
+  } catch {
+    // Sem storage disponivel, a preferencia so nao persiste.
+  }
+}
+
 export default function IntroGate({ children }: { children: ReactNode }) {
-  const [showIntro, setShowIntro] = useState(() => !hasShownIntro());
+  const [showIntro, setShowIntro] = useState(() => !isIntroDisabled() && !hasShownIntro());
 
   // O app real ja monta por baixo (comeca a buscar dados em paralelo); so trava o
   // scroll do body enquanto a intro cobre a tela por cima.
@@ -39,8 +60,9 @@ export default function IntroGate({ children }: { children: ReactNode }) {
       {children}
       {showIntro && (
         <PitstopIntro
-          onDone={() => {
+          onDone={(disableForever) => {
             markIntroShown();
+            if (disableForever) setIntroDisabled(true);
             setShowIntro(false);
           }}
         />
