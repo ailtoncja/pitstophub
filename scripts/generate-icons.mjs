@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import { readFileSync, mkdirSync } from 'fs';
+import { mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -7,23 +7,34 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const iconsDir = join(__dirname, '../public/icons');
 mkdirSync(iconsDir, { recursive: true });
 
-const svg = readFileSync(join(iconsDir, 'icon-512.svg'));
+const source = join(iconsDir, 'source.png');
 
-const BG = { r: 15, g: 23, b: 32, alpha: 1 };
+// Cor de fundo do app (mesma de theme_color/background_color no manifest e no
+// meta theme-color do index.html), usada onde o icone precisa ficar opaco.
+const BG = { r: 10, g: 10, b: 11, alpha: 1 };
 
-await sharp(svg).resize(192, 192).png().toFile(join(iconsDir, 'icon-192.png'));
+await sharp(source).resize(192, 192).png().toFile(join(iconsDir, 'icon-192.png'));
 console.log('✓ icon-192.png');
 
-await sharp(svg).resize(512, 512).png().toFile(join(iconsDir, 'icon-512.png'));
+await sharp(source).resize(512, 512).png().toFile(join(iconsDir, 'icon-512.png'));
 console.log('✓ icon-512.png');
 
-await sharp(svg).resize(180, 180).png().toFile(join(iconsDir, 'apple-touch-icon.png'));
+await sharp(source).resize(48, 48).png().toFile(join(iconsDir, 'favicon-48.png'));
+console.log('✓ favicon-48.png');
+
+// iOS aplica sua propria mascara de cantos arredondados e nao lida bem com
+// transparencia, entao achata num fundo opaco (como o icone anterior ja era).
+await sharp(source)
+  .resize(180, 180)
+  .flatten({ background: BG })
+  .png()
+  .toFile(join(iconsDir, 'apple-touch-icon.png'));
 console.log('✓ apple-touch-icon.png');
 
-// Maskable icon: content at 80% with 10% safe zone padding on each side
+// Icone maskable: conteudo a 80% com 10% de padding de "zona segura" em cada lado
 const content = Math.round(512 * 0.8);
 const pad = Math.round((512 - content) / 2);
-await sharp(svg)
+await sharp(source)
   .resize(content, content)
   .extend({ top: pad, bottom: pad, left: pad, right: pad, background: BG })
   .png()
