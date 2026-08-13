@@ -220,7 +220,39 @@ function dropOtherSeasonRows(rows, season) {
 // auto-neutralizante: assim que a TheSportsDB trouxer o dado certo (rodada
 // nova aparecendo, status batendo), a correcao correspondente vira no-op
 // sozinha (ver os checks de "ja existe"/"status ja bate" abaixo).
+// TheSportsDB as vezes marca a corrida como completed (pela data ja ter
+// passado) bem antes de preencher o texto do resultado (strResult) que
+// parseWinner() precisa -- o status vem certo, mas o vencedor fica null por
+// dias/semanas. fillKnownWinners tapa esse buraco especifico com vencedores
+// ja confirmados em fontes oficiais, sem mexer em nada que a API ja preencheu
+// sozinha (so entra quando row.winner ainda e null).
+function fillKnownWinners(rows, winnersByName) {
+  return rows.map((row) => {
+    if (row.winner) return row;
+    const key = (row.en_name ?? '').replace(/\s+/g, ' ').trim();
+    const known = winnersByName[key];
+    return known ? { ...row, winner: known } : row;
+  });
+}
+
 const MANUAL_OVERRIDES = {
+  nascar: (rows) =>
+    fillKnownWinners(rows, {
+      'Cracker Barrel 400': 'Denny Hamlin',
+      'FireKeepers Casino 400': 'Denny Hamlin',
+      'The Great American Getaway 400': 'Denny Hamlin',
+      'Anduril 250': 'Corey Heim',
+      'Toyota Save Mart 350': 'Shane van Gisbergen',
+      'Eero 400': 'Chase Briscoe',
+      'Quaker State 400': 'Ryan Blaney',
+      'Window World 450': 'Joey Logano',
+      'Brickyard 400': 'Corey Heim',
+      'Iowa Corn 350': 'Ty Gibbs',
+    }),
+  'f1-academy': (rows) =>
+    fillKnownWinners(rows, {
+      'Shanghai Feature Race': 'Emma Felbermayr',
+    }),
   indy: (rows) => {
     // "Freedom 250 GP of Washington, D.C." (Aug 23) foi adicionada ao
     // calendario da IndyCar depois que a temporada 2026 ja tinha sido
