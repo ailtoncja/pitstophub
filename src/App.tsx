@@ -2417,21 +2417,44 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     let isMounted = true;
 
     const syncCalendars = async (force = false) => {
-      await Promise.allSettled(
+      // As 10 categorias sincronizadas resolvem em momentos diferentes -- aplicar
+      // cada uma assim que chega (como era antes) dispara ate 10 re-renders
+      // separados logo apos abrir o app, cada um podendo mudar a altura da pagina
+      // (mais/menos corridas do que o fallback estatico tinha). Junta tudo num
+      // unico update depois que todas resolverem, pra dar so um "salto" em vez
+      // de varios enquanto a pessoa esta rolando a tela.
+      const results = await Promise.allSettled(
         getSyncedCategoryIds().map(async (categoryId) => {
-          try {
-            const [calendar, standings] = await Promise.all([
-              fetchSyncedCalendar(categoryId, force),
-              fetchSyncedStandings(categoryId, force),
-            ]);
-            if (!isMounted) return;
-            setSyncedCalendars((prev) => ({ ...prev, [categoryId]: calendar }));
-            setSyncedStandings((prev) => ({ ...prev, [categoryId]: standings }));
-          } catch (error) {
-            console.error(`Falha ao sincronizar dados de ${categoryId}.`, error);
-          }
+          const [calendar, standings] = await Promise.all([
+            fetchSyncedCalendar(categoryId, force),
+            fetchSyncedStandings(categoryId, force),
+          ]);
+          return { categoryId, calendar, standings };
         }),
       );
+
+      if (!isMounted) return;
+
+      setSyncedCalendars((prev) => {
+        const next = { ...prev };
+        for (const result of results) {
+          if (result.status === 'fulfilled') next[result.value.categoryId] = result.value.calendar;
+        }
+        return next;
+      });
+      setSyncedStandings((prev) => {
+        const next = { ...prev };
+        for (const result of results) {
+          if (result.status === 'fulfilled') next[result.value.categoryId] = result.value.standings;
+        }
+        return next;
+      });
+
+      for (const result of results) {
+        if (result.status === 'rejected') {
+          console.error('Falha ao sincronizar dados de categoria.', result.reason);
+        }
+      }
     };
 
     void syncCalendars();
