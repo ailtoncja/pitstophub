@@ -138,3 +138,122 @@ button, [role="button"] {
   }
 }
 
+/* Animacao de abertura (carro 3D + wordmark), tocada uma vez por sessao antes do app. */
+.pitstop-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: block;
+  overflow: hidden;
+  background: #08090b;
+  font-family: 'Barlow Condensed', var(--font-sans);
+}
+
+.pitstop-intro-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.pitstop-intro-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 55% at 50% 62%, rgba(220, 32, 50, 0.22), transparent 70%),
+    radial-gradient(120% 90% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.85) 100%);
+}
+
+.pitstop-intro-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.pitstop-intro-line {
+  position: absolute;
+  left: -30%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+}
+
+.pitstop-intro-ui {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  text-align: center;
+}
+
+.pitstop-intro-mark {
+  display: flex;
+  gap: 0;
+  overflow: hidden;
+}
+
+.pitstop-intro-mark span {
+  display: block;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 0.92;
+  font-size: clamp(44px, 9vw, 132px);
+  color: #fff;
+  transform: translateY(110%);
+}
+
+.pitstop-intro-hub {
+  color: #e01f32;
+}
+
+.pitstop-intro-rule {
+  height: 3px;
+  width: 0;
+  background: #e01f32;
+  margin: 18px 0 14px;
+}
+
+.pitstop-intro-tag {
+  color: #9aa1ab;
+  font-size: clamp(13px, 1.5vw, 20px);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  opacity: 0;
+}
+
+.pitstop-intro-skip {
+  position: fixed;
+  right: 26px;
+  bottom: max(24px, env(safe-area-inset-bottom, 24px));
+  z-index: 1;
+  pointer-events: auto;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: transparent;
+  color: #c8ccd2;
+  border-radius: 999px;
+  padding: 9px 20px;
+  font-family: 'Barlow Condensed', var(--font-sans);
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: 0.2s;
+}
+
+.pitstop-intro-skip:hover {
+  border-color: #e01f32;
+  color: #fff;
+}
+
+@media (max-width: 640px) {
+  .pitstop-intro-skip {
+    right: 16px;
+  }
+}
+
