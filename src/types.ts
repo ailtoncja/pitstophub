@@ -416,15 +416,14 @@ export const MOTORSPORT_DATA: Category[] = [
     ],
     calendar: [
       { id: 'melbourne-f3', name: 'Rodada de Melbourne', enName: 'Melbourne Round', location: 'Melbourne', enLocation: 'Melbourne', date: '2026-03-08', circuit: 'Albert Park', status: 'completed', winner: 'U. Ugochukwu' },
-      { id: 'sakhir-f3', name: 'Rodada de Sakhir', enName: 'Sakhir Round', location: 'Sakhir', enLocation: 'Sakhir', date: '2026-04-12', circuit: 'Bahrain International Circuit', status: 'upcoming' },
-      { id: 'imola-f3', name: 'Rodada de Ímola', enName: 'Imola Round', location: 'Ímola', enLocation: 'Imola', date: '2026-05-17', circuit: 'Autodromo Enzo e Dino Ferrari', status: 'upcoming' },
-      { id: 'monaco-f3', name: 'Rodada de Mônaco', enName: 'Monaco Round', location: 'Monte Carlo', enLocation: 'Monte Carlo', date: '2026-06-07', circuit: 'Circuit de Monaco', status: 'upcoming' },
-      { id: 'barcelona-f3', name: 'Rodada de Barcelona', enName: 'Barcelona Round', location: 'Barcelona', enLocation: 'Barcelona', date: '2026-06-14', circuit: 'Circuit de Barcelona-Catalunya', status: 'upcoming' },
-      { id: 'spielberg-f3', name: 'Rodada de Spielberg', enName: 'Spielberg Round', location: 'Spielberg', enLocation: 'Spielberg', date: '2026-06-28', circuit: 'Red Bull Ring', status: 'upcoming' },
-      { id: 'silverstone-f3', name: 'Rodada de Silverstone', enName: 'Silverstone Round', location: 'Silverstone', enLocation: 'Silverstone', date: '2026-07-05', circuit: 'Silverstone Circuit', status: 'upcoming' },
-      { id: 'spa-f3', name: 'Rodada de Spa', enName: 'Spa Round', location: 'Spa', enLocation: 'Spa', date: '2026-07-19', circuit: 'Circuit de Spa-Francorchamps', status: 'upcoming' },
-      { id: 'budapest-f3', name: 'Rodada de Budapeste', enName: 'Budapest Round', location: 'Budapeste', enLocation: 'Budapest', date: '2026-07-26', circuit: 'Hungaroring', status: 'upcoming' },
+      { id: 'monaco-f3', name: 'Rodada de Mônaco', enName: 'Monaco Round', location: 'Monte Carlo', enLocation: 'Monte Carlo', date: '2026-06-07', circuit: 'Circuit de Monaco', status: 'completed' },
+      { id: 'barcelona-f3', name: 'Rodada de Barcelona', enName: 'Barcelona Round', location: 'Barcelona', enLocation: 'Barcelona', date: '2026-06-14', circuit: 'Circuit de Barcelona-Catalunya', status: 'completed', winner: 'U. Ugochukwu' },
+      { id: 'spielberg-f3', name: 'Rodada de Spielberg', enName: 'Spielberg Round', location: 'Spielberg', enLocation: 'Spielberg', date: '2026-06-28', circuit: 'Red Bull Ring', status: 'completed', winner: 'U. Ugochukwu' },
+      { id: 'silverstone-f3', name: 'Rodada de Silverstone', enName: 'Silverstone Round', location: 'Silverstone', enLocation: 'Silverstone', date: '2026-07-05', circuit: 'Silverstone Circuit', status: 'completed' },
+      { id: 'spa-f3', name: 'Rodada de Spa', enName: 'Spa Round', location: 'Spa', enLocation: 'Spa', date: '2026-07-19', circuit: 'Circuit de Spa-Francorchamps', status: 'completed' },
+      { id: 'budapest-f3', name: 'Rodada de Budapeste', enName: 'Budapest Round', location: 'Budapeste', enLocation: 'Budapest', date: '2026-07-26', circuit: 'Hungaroring', status: 'completed' },
       { id: 'monza-f3', name: 'Rodada de Monza', enName: 'Monza Round', location: 'Monza', enLocation: 'Monza', date: '2026-09-06', circuit: 'Autodromo Nazionale Monza', status: 'upcoming' },
+      { id: 'madrid-f3', name: 'Rodada de Madri', enName: 'Madrid Round', location: 'Madri', enLocation: 'Madrid', date: '2026-09-13', circuit: 'Madring', status: 'upcoming' },
     ],
     standings: {
       drivers: [
