@@ -225,7 +225,7 @@ export function FavoritesOnboardingModal({ onSkip, onFinish, language, ...picker
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 24 }}
         transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-        className="relative w-full sm:max-w-lg max-h-[90vh] flex flex-col rounded-2xl overflow-hidden bg-[var(--header-bg)] border border-[var(--card-border)] shadow-2xl"
+        className="relative w-full sm:max-w-lg max-h-[90dvh] flex flex-col rounded-2xl overflow-hidden bg-[var(--header-bg)] border border-[var(--card-border)] shadow-2xl"
       >
         <div className="flex items-start justify-between gap-4 p-5 border-b border-[var(--card-border)] shrink-0">
           <div>
