@@ -7,9 +7,8 @@
 // Jolpica, sem parsing de texto) e F2/F3/DTM/IMSA/IndyCar/NASCAR (texto da
 // TheSportsDB com posicao por piloto, validado contra o elenco que a gente
 // mantem -- so notifica quando o nome do piloto/time e encontrado no texto).
-// GT World Challenge nao tem esse texto preenchido (conferido: 100% vazio
-// nos ultimos 3 anos) e WRC mistura formatos (resultado da etapa vs
-// classificacao acumulada) -- as duas ficam de fora por enquanto.
+// WRC mistura formatos (resultado da etapa vs classificacao acumulada) --
+// fica de fora por enquanto.
 //
 // Env vars necessarias: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY,
 // THESPORTSDB_API_KEY, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY

@@ -78,7 +78,6 @@ const CATEGORY_ACCENTS: Record<string, string> = {
   wec: '#00A19B',
   imsa: '#FFC107',
   dtm: '#6C63FF',
-  'gt-world-challenge': '#2ECC71',
   indy: '#003DA5',
   nascar: '#D62828',
   wrc: '#2E7D32',
@@ -103,7 +102,7 @@ const NAV_GROUPS = [
   },
   {
     name: { pt: 'Endurance/GT', en: 'Endurance/GT' },
-    ids: ['wec', 'imsa', 'dtm', 'gt-world-challenge']
+    ids: ['wec', 'imsa', 'dtm']
   },
   {
     name: { pt: 'Americanas', en: 'American' },
@@ -2162,13 +2161,13 @@ function getRaceCircuitInfo(race: Race): CircuitInfo | null {
 
 // Categorias que, em pesquisa, realmente correm em algum dos 24 circuitos acima
 // (mesmo tracado fisico, nao so a mesma cidade). F2/F3/F1 Academy dividem varios
-// finais de semana com a F1; WEC, DTM, GT World Challenge e NASCAR passam por
-// algumas dessas pistas em seus proprios calendarios. IMSA e IndyCar, nos
-// calendarios atuais do site, nao tocam nenhuma delas. WRC fica de fora de
-// proposito: mesmo quando o nome da etapa cita a mesma cidade (ex.: Rallye
-// Monte-Carlo), a prova roda em estradas de montanha, nao no circuito de verdade.
+// finais de semana com a F1; WEC, DTM e NASCAR passam por algumas dessas pistas
+// em seus proprios calendarios. IMSA e IndyCar, nos calendarios atuais do site,
+// nao tocam nenhuma delas. WRC fica de fora de proposito: mesmo quando o nome
+// da etapa cita a mesma cidade (ex.: Rallye Monte-Carlo), a prova roda em
+// estradas de montanha, nao no circuito de verdade.
 const CIRCUIT_PAGE_CATEGORY_IDS = new Set([
-  'f1', 'f2', 'f3', 'f1-academy', 'wec', 'dtm', 'gt-world-challenge', 'nascar',
+  'f1', 'f2', 'f3', 'f1-academy', 'wec', 'dtm', 'nascar',
 ]);
 
 function hasCircuitPage(category: Category, race: Race): boolean {

@@ -6,7 +6,7 @@ import type { Category, Race, StandingItem } from './types';
 // public.synced_races. O job roda 1x/dia, entao um cache local generoso
 // evita bater no Supabase toda hora sem necessidade.
 const SYNCED_CATEGORY_IDS = [
-  'f2', 'f3', 'f1-academy', 'wec', 'imsa', 'dtm', 'gt-world-challenge', 'indy', 'nascar', 'wrc',
+  'f2', 'f3', 'f1-academy', 'wec', 'imsa', 'dtm', 'indy', 'nascar', 'wrc',
 ] as const;
 
 const CACHE_TTL_MS = 30 * 60 * 1000;

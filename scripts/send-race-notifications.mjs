@@ -36,7 +36,6 @@ const SYNCED_CATEGORY_NAMES = {
   wec: 'WEC',
   imsa: 'IMSA',
   dtm: 'DTM',
-  'gt-world-challenge': 'GT World Challenge',
   indy: 'IndyCar',
   nascar: 'NASCAR',
   wrc: 'WRC',
