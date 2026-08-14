@@ -293,8 +293,10 @@ async function processRace(race, allSettings, allCategories) {
       body: messages.join(' '),
       url: '/',
     });
-    await markNotified(race.categoryId, race.raceId, settings.user_id);
-    if (sent) sentCount++;
+    if (sent) {
+      await markNotified(race.categoryId, race.raceId, settings.user_id);
+      sentCount++;
+    }
   }
 
   return sentCount;

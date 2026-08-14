@@ -2467,7 +2467,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     let isMounted = true;
 
     const syncCalendars = async (force = false) => {
-      // As 10 categorias sincronizadas resolvem em momentos diferentes -- aplicar
+      // As 9 categorias sincronizadas resolvem em momentos diferentes -- aplicar
       // cada uma assim que chega (como era antes) dispara ate 10 re-renders
       // separados logo apos abrir o app, cada um podendo mudar a altura da pagina
       // (mais/menos corridas do que o fallback estatico tinha). Junta tudo num
