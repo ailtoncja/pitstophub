@@ -287,7 +287,7 @@ const MANUAL_OVERRIDES = {
     // Motorsport.com, jul/2026 ("WEC replaces Middle East rounds with new
     // races in Barcelona and Monza").
     const patched = rows.map((row) =>
-      /bahrain/i.test(row.en_name ?? '') ? { ...row, status: 'cancelled' } : row
+      /bahrain|qatar|lusail/i.test(row.en_name ?? '') ? { ...row, status: 'cancelled' } : row
     );
 
     const nowIso = new Date().toISOString();
