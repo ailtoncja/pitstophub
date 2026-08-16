@@ -3064,7 +3064,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         </div>
       </aside>
 
-      <div className="relative z-10 flex-1 min-w-0 flex flex-col">
+      <div className="relative z-10 flex-1 min-w-0 flex flex-col min-h-dvh">
       <header className="pt-safe sticky top-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-[var(--card-border)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center">
 
