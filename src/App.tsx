@@ -2955,7 +2955,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
   return (
     <div
-      className="relative min-h-dvh flex flex-col xl:flex-row transition-colors duration-300 overflow-x-hidden"
+      className="relative min-h-dvh flex flex-col xl:flex-row transition-colors duration-300"
       style={{ '--cat-accent': categoryAccent, '--cat-accent-ink': categoryAccentInk, '--nav-accent': navAccent } as React.CSSProperties}
     >
       {isDarkMode && (
