@@ -3006,7 +3006,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       className={cn(
                         "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left",
                         active
-                          ? "bg-[#1d1d21] text-[var(--nav-accent)] border border-[var(--card-border)]"
+                          ? "bg-[var(--nav-accent)]/10 text-[var(--nav-accent)] border border-[var(--nav-accent)]/20"
                           : "text-gray-500 border border-transparent hover:bg-white/5 hover:text-[var(--text-main)]"
                       )}
                     >
@@ -3064,7 +3064,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         </div>
       </aside>
 
-      <div className="relative z-10 flex-1 min-w-0 flex flex-col min-h-dvh">
+      <div className="relative z-10 flex-1 min-w-0 flex flex-col self-start">
       <header className="pt-safe sticky top-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-[var(--card-border)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center">
 
