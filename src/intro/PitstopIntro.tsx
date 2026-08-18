@@ -13,6 +13,22 @@ const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t 
 const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
 const seg = (t: number, a: number, b: number) => clamp01((t - a) / (b - a));
 
+// A cena foi enquadrada olhando pra uma janela larga (>= 16:9). O FOV do Three.js
+// e vertical, entao numa tela estreita/retrato de celular (aspect < 1) o FOV
+// horizontal efetivo encolhe junto com o aspect e o carro sai cortado nas laterais
+// -- "desenquadrado". Isso recalcula o FOV vertical pra manter o FOV HORIZONTAL
+// constante em relacao a essa largura de referencia, entao o carro continua
+// aparecendo inteiro (so mais "de longe") em qualquer proporcao de tela.
+const REFERENCE_ASPECT = 16 / 9;
+const BASE_FOV_DEG = 38;
+function fovForAspect(aspect: number): number {
+  if (aspect >= REFERENCE_ASPECT) return BASE_FOV_DEG;
+  const baseVFovRad = (BASE_FOV_DEG * Math.PI) / 180;
+  const hFovRad = 2 * Math.atan(Math.tan(baseVFovRad / 2) * REFERENCE_ASPECT);
+  const vFovRad = 2 * Math.atan(Math.tan(hFovRad / 2) / aspect);
+  return (vFovRad * 180) / Math.PI;
+}
+
 interface PitstopIntroProps {
   onDone: (disableForever: boolean) => void;
 }
@@ -87,7 +103,7 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x08090b);
       scene.fog = new THREE.Fog(0x08090b, 12, 30);
-      const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+      const camera = new THREE.PerspectiveCamera(BASE_FOV_DEG, 1, 0.1, 100);
 
       scene.add(new THREE.HemisphereLight(0x556070, 0x090a0c, 0.55));
       const key = new THREE.DirectionalLight(0xffffff, 2.6);
@@ -142,10 +158,13 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
         const w = root.clientWidth || window.innerWidth;
         const h = root.clientHeight || window.innerHeight;
         renderer.setSize(w, h, false);
-        camera.aspect = w / h;
+        const aspect = w / h;
+        camera.aspect = aspect;
+        camera.fov = fovForAspect(aspect);
         camera.updateProjectionMatrix();
       };
       window.addEventListener('resize', resize);
+      window.addEventListener('orientationchange', resize);
       resize();
 
       const t0 = performance.now();
@@ -213,6 +232,7 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
 
       teardownScene = () => {
         window.removeEventListener('resize', resize);
+        window.removeEventListener('orientationchange', resize);
         scene.traverse((obj) => {
           const asMesh = obj as THREE.Mesh;
           if (asMesh.geometry) asMesh.geometry.dispose();
