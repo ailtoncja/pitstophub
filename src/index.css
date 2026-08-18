@@ -67,9 +67,13 @@
   border-radius: 0.875rem;
 }
 
-/* Manchas radiais decorativas atras do conteudo, estilo dashboard TranGo. */
+/* Manchas radiais decorativas atras do conteudo, estilo dashboard TranGo. Fixed
+   (nao absolute) de proposito: presas aos cantos da viewport, nao aos cantos do
+   documento -- a sidebar forca o wrapper raiz a ter pelo menos 1 viewport de
+   altura mesmo quando o conteudo real e mais curto, entao um blob "absolute"
+   podia flutuar sozinho nesse sobra abaixo do rodape de verdade. */
 .tg-glow {
-  position: absolute;
+  position: fixed;
   border-radius: 9999px;
   pointer-events: none;
   filter: blur(2px);
