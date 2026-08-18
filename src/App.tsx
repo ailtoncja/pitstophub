@@ -2304,6 +2304,22 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       hamiltonTapCountRef.current = 0;
     }, 2500);
   };
+  // Easter egg: segurar a foto do Hamilton por 5s (em vez de 5 toques rapidos)
+  // revela uma segunda homenagem pessoal, para quem torce pela Ferrari dele.
+  const [showNayTribute, setShowNayTribute] = useState(false);
+  const hamiltonHoldTimerRef = useRef<number | null>(null);
+  const handleHamiltonPhotoHoldStart = () => {
+    if (hamiltonHoldTimerRef.current) window.clearTimeout(hamiltonHoldTimerRef.current);
+    hamiltonHoldTimerRef.current = window.setTimeout(() => {
+      setShowNayTribute(true);
+    }, 5000);
+  };
+  const handleHamiltonPhotoHoldEnd = () => {
+    if (hamiltonHoldTimerRef.current) {
+      window.clearTimeout(hamiltonHoldTimerRef.current);
+      hamiltonHoldTimerRef.current = null;
+    }
+  };
   // Easter egg: 5 toques no logo do rodape (aparece em toda pagina, nao depende
   // de acompanhar corrida) revelam uma homenagem "Bug Hunters" pro Lucas.
   const [showBugHunterTribute, setShowBugHunterTribute] = useState(false);
@@ -3987,6 +4003,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 <div className="lg:col-span-5 flex flex-col gap-6">
                   <div
                     onClick={selectedDriver.id === 'hamilton' ? handleHamiltonPhotoTap : undefined}
+                    onMouseDown={selectedDriver.id === 'hamilton' ? handleHamiltonPhotoHoldStart : undefined}
+                    onMouseUp={selectedDriver.id === 'hamilton' ? handleHamiltonPhotoHoldEnd : undefined}
+                    onMouseLeave={selectedDriver.id === 'hamilton' ? handleHamiltonPhotoHoldEnd : undefined}
+                    onTouchStart={selectedDriver.id === 'hamilton' ? handleHamiltonPhotoHoldStart : undefined}
+                    onTouchEnd={selectedDriver.id === 'hamilton' ? handleHamiltonPhotoHoldEnd : undefined}
+                    onTouchCancel={selectedDriver.id === 'hamilton' ? handleHamiltonPhotoHoldEnd : undefined}
                     className={cn(
                     "apex-card relative overflow-hidden min-h-[420px] flex flex-col",
                     selectedDriver.cutout ? "justify-between" : "justify-end"
@@ -5302,6 +5324,46 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               </div>
               <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
                 Obrigado pelas lições de vida e pela ajuda no app, sou eternamente grato.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showNayTribute && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowNayTribute(false)}
+            className="fixed inset-0 z-[400] flex items-center justify-center p-6 bg-black/85 backdrop-blur-sm cursor-pointer"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 16 }}
+              transition={SPRING}
+              className="relative max-w-sm w-full text-center"
+            >
+              <div
+                className="absolute inset-0 -z-10 blur-3xl opacity-40 rounded-full"
+                style={{ backgroundColor: '#DC0000' }}
+              />
+              <div
+                className="w-14 h-14 mx-auto mb-6 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: '#DC0000' }}
+              >
+                <Heart className="w-6 h-6 text-white" fill="currentColor" />
+              </div>
+              <div
+                className="font-apex-mono text-xs uppercase tracking-[0.3em] mb-3"
+                style={{ color: '#DC0000' }}
+              >
+                Para Nay
+              </div>
+              <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
+                Obrigado pela ajuda na facul e no app, você é incrível.
               </p>
             </motion.div>
           </motion.div>
