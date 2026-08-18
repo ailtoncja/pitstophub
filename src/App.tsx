@@ -5283,7 +5283,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 Para Thata
               </div>
               <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
-                Obrigado pela ajuda no app e na vida também.
+                Obrigado pelas lições de vida e pela ajuda no app, sou eternamente grato.
               </p>
             </motion.div>
           </motion.div>
