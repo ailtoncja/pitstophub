@@ -4707,8 +4707,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     <div className="p-6">
                                       <div className="flex items-center justify-between mb-6">
                                         <div
-                                          className={cn("flex items-center gap-3", team.id === 'ferrari-af' && "cursor-pointer select-none")}
-                                          onClick={team.id === 'ferrari-af' ? handleFerrariWecCardTap : undefined}
+                                          className={cn("flex items-center gap-3", team.id === 'af-corse-wec' && "cursor-pointer select-none")}
+                                          onClick={team.id === 'af-corse-wec' ? handleFerrariWecCardTap : undefined}
                                         >
                                           {team.badge && (
                                             <img
