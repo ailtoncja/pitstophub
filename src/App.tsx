@@ -53,6 +53,7 @@ import {
 } from './synced-races';
 import type { Driver, Race, StandingItem } from './types';
 import { FavoritesPicker, FavoritesOnboardingModal, NotificationsToggle } from './Favorites';
+import { flagForNationality } from './nationality-flags';
 
 const IconMap: Record<string, React.ElementType> = {
   OpenWheelCar: OpenWheelCarIcon,
@@ -4111,7 +4112,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       <h1 className="font-apex font-extrabold italic uppercase text-4xl sm:text-5xl leading-[0.95] text-white">
                         {selectedDriver.name.split(' ').slice(0, -1).join(' ')}
                         <br />
-                        <span className="text-[var(--driver-accent)]">{selectedDriver.name.split(' ').slice(-1)}</span>
+                        <span className="text-[var(--driver-accent)]">{selectedDriver.name.split(' ').slice(-1)}</span>{' '}
+                        <span className="not-italic align-middle text-2xl sm:text-3xl">{flagForNationality(selectedDriver.nationality)}</span>
                       </h1>
                       <p className="font-apex-mono text-xs uppercase tracking-widest text-gray-300 mt-4">
                         {selectedDriver.nationality}
@@ -4153,7 +4155,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 )}
                               </div>
                               <div className="min-w-0">
-                                <div className="font-apex font-extrabold italic text-[var(--text-main)] leading-tight">{t.name}</div>
+                                <div className="font-apex font-extrabold italic text-[var(--text-main)] leading-tight">{t.name} <span className="not-italic">{flagForNationality(t.nationality)}</span></div>
                                 <div className="font-apex-mono text-[10px] text-gray-500 uppercase tracking-widest mt-0.5">#{t.number}</div>
                               </div>
                             </>
@@ -4798,7 +4800,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                                                 <div className="min-w-0 flex-1">
                                                   <div className="font-apex font-extrabold italic text-lg text-[var(--text-main)] group-hover/driver:text-[var(--team-accent)] transition-colors">
-                                                    {driver.name.split(' ')[0]} <span className="text-[var(--team-accent)] group-hover/driver:text-[var(--text-main)]">{driver.name.split(' ').slice(1).join(' ')}</span>
+                                                    {driver.name.split(' ')[0]} <span className="text-[var(--team-accent)] group-hover/driver:text-[var(--text-main)]">{driver.name.split(' ').slice(1).join(' ')}</span>{' '}
+                                                    <span className="not-italic">{flagForNationality(driver.nationality)}</span>
                                                   </div>
                                                   <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest flex items-center gap-1">
                                                     <Flag className="w-2 h-2" />
@@ -4987,7 +4990,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                                     <Users className="w-4 h-4 text-gray-600" />
                                                   </div>
                                                 )}
-                                                <span>{item.name}</span>
+                                                <span>{item.name} {flagForNationality(driver?.nationality)}</span>
                                               </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-500">

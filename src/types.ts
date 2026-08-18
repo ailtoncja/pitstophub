@@ -953,7 +953,7 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'daniel-serra', name: 'Daniel Serra', number: '62', nationality: 'Brasil', teamId: 'risi-competizione-gtdp', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/09y4bw1627656882.png' },
       { id: 'alessandro-pier-guidi', name: 'Alessandro Pier Guidi', number: '62', nationality: 'Itália', teamId: 'risi-competizione-gtdp', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/rqzri41710017779.png' },
       { id: 'ben-barker', name: 'Ben Barker', number: '64', nationality: 'Reino Unido', teamId: 'ford-racing-gtdp', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/ve5m4f1747080277.png' },
-      { id: 'dennis-olsen', name: 'Dennis Olsen', number: '64', nationality: 'NOR', teamId: 'ford-racing-gtdp', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/r7bji41747080362.png' },
+      { id: 'dennis-olsen', name: 'Dennis Olsen', number: '64', nationality: 'Noruega', teamId: 'ford-racing-gtdp', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/r7bji41747080362.png' },
       { id: 'mike-rockenfeller', name: 'Mike Rockenfeller', number: '64', nationality: 'Alemanha', teamId: 'ford-racing-gtdp', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/397mal1600977844.png' },
       { id: 'christopher-mies', name: 'Christopher Mies', number: '65', nationality: 'Alemanha', teamId: 'ford-racing-gtdp' },
       { id: 'frederic-vervisch', name: 'Frédéric Vervisch', number: '65', nationality: 'Bélgica', teamId: 'ford-racing-gtdp', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/mpav2l1577735799.png' },
