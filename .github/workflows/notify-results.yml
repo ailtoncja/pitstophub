@@ -2,7 +2,11 @@ name: Send race result notifications
 
 on:
   schedule:
-    - cron: '0 7 * * *' # 07:00 UTC todo dia, depois do sync das 06:17 UTC
+    # A cada 15min, 24/7 -- bem mais barato que o sync completo (1x/dia) porque
+    # check-recent-results.mjs so re-consulta corridas especificas que ja
+    # deviam ter acabado, nao a temporada inteira das 9 categorias. Na maioria
+    # das execucoes nao ha corrida nenhuma pra checar (0 requests extras).
+    - cron: '*/15 * * * *'
   workflow_dispatch: {}
 
 jobs:
@@ -16,6 +20,16 @@ jobs:
           node-version: 20
 
       - run: npm ci
+
+      # Atualiza o status/vencedor de corridas que a gente ainda tinha como
+      # "upcoming" mas cuja data ja chegou, ANTES de checar quem notificar --
+      # sem isso, o resultado so aparece como "completed" no proximo sync
+      # completo do dia seguinte (scripts/sync-thesportsdb.mjs).
+      - run: node scripts/check-recent-results.mjs
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          THESPORTSDB_API_KEY: ${{ secrets.THESPORTSDB_API_KEY }}
 
       - run: npx tsx scripts/send-result-notifications.mjs
         env:

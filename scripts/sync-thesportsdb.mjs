@@ -15,6 +15,7 @@
 
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
+import { apiBaseFor, fetchJson as fetchJsonRaw, getStatus, parseWinner, sleep, REQUEST_DELAY_MS } from './lib/thesportsdb.mjs';
 
 const THESPORTSDB_API_KEY = process.env.THESPORTSDB_API_KEY;
 const SUPABASE_URL = process.env.SUPABASE_URL;
@@ -25,14 +26,8 @@ if (!THESPORTSDB_API_KEY || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   process.exit(1);
 }
 
-const API_BASE = `https://www.thesportsdb.com/api/v1/json/${THESPORTSDB_API_KEY}`;
-// "123" e a chave publica de teste da propria TheSportsDB (sem cadastro, sem
-// custo). Se a nossa chave parar de responder por qualquer motivo (endpoint
-// descontinuado como o eventsround.php, assinatura vencida, chave revogada),
-// fetchJson tenta de novo com essa chave antes de desistir - degrada pro
-// nivel gratuito em vez de parar de sincronizar.
-const FALLBACK_API_BASE = 'https://www.thesportsdb.com/api/v1/json/123';
-const REQUEST_DELAY_MS = 700; // ~85 req/min, folga sob o limite Premium de 100/min
+const API_BASE = apiBaseFor(THESPORTSDB_API_KEY);
+const fetchJson = (path) => fetchJsonRaw(API_BASE, path);
 const MAX_ROUNDS = 60; // sanidade: descarta rodadas fora desse intervalo (ex.: eventos de pre-temporada com intRound estranho). NASCAR ja chega a 36 rodadas reais, entao a margem e generosa de proposito.
 
 // id da categoria no app -> id da liga na TheSportsDB
@@ -404,45 +399,6 @@ function buildRow(categoryId, round, event) {
   };
 }
 
-function getStatus(event) {
-  if (event.strPostponed === 'yes') return 'cancelled';
-  if (event.strStatus === 'FT' || (event.strResult && event.strResult.trim().length > 0)) return 'completed';
-  if (event.dateEvent && new Date(`${event.dateEvent}T23:59:59Z`) < new Date()) return 'completed';
-  return 'upcoming';
-}
-
-// O texto de resultado da TheSportsDB nao segue um formato unico entre ligas
-// (F2/F3/DTM/IndyCar usam "posicao\t/piloto\t/equipe\t/tempo", NASCAR usa os
-// mesmos campos sem a barra e as vezes com uma linha de cabecalho antes dos
-// dados, WEC usa "posicao /equipe #carro /tempo" sem tabs). IMSA e GT World
-// Challenge usam texto corrido em prosa (varia a cada corrida) - nunca da pra
-// extrair com seguranca, entao essas linhas nunca batem com o padrao abaixo e
-// o vencedor fica em branco de propósito. Percorremos as linhas ate achar uma
-// que bata exatamente com "posicao 1"; caso contrario preferimos deixar em
-// branco a arriscar um nome errado.
-function parseWinner(strResult) {
-  if (!strResult) return null;
-  const lines = strResult.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-
-  for (const line of lines) {
-    const fields = splitResultFields(line);
-    if (fields.length < 2) continue;
-
-    const position = fields[0].replace(/^0+(?=\d)/, '');
-    if (position !== '1') continue;
-
-    const name = fields.slice(1).find((f) => /[a-zA-Z]{3,}/.test(f) && !/^[\d:.+\s]+$/.test(f));
-    if (name) return name;
-  }
-
-  return null;
-}
-
-function splitResultFields(line) {
-  const raw = line.includes('\t') ? line.split('\t') : line.split('/');
-  return raw.map((f) => f.replace(/^\//, '').trim()).filter(Boolean);
-}
-
 // Alguns eventos trazem um bloco extra tipo "Driver Standings after X" ou
 // "Current Championship Standings After X" no fim do texto de resultado, com
 // linhas "posicao /piloto /equipe /pontos". Nao aparece em toda corrida, entao
@@ -494,33 +450,6 @@ function parseStandings(strResult) {
   }
 
   return rows;
-}
-
-async function fetchJson(path) {
-  try {
-    return await fetchFrom(API_BASE, path);
-  } catch (primaryError) {
-    console.warn(`[fallback] chave paga falhou em ${path} (${primaryError.message}) - tentando chave publica de teste`);
-    try {
-      return await fetchFrom(FALLBACK_API_BASE, path);
-    } catch {
-      throw primaryError; // erro da chave paga e mais util pro resumo final
-    }
-  }
-}
-
-async function fetchFrom(base, path, attempt = 0) {
-  const res = await fetch(`${base}${path}`);
-  if ((res.status === 429 || res.status >= 500) && attempt < 2) {
-    await sleep(3000 * (attempt + 1));
-    return fetchFrom(base, path, attempt + 1);
-  }
-  if (!res.ok) throw new Error(`TheSportsDB HTTP ${res.status} em ${path}`);
-  return res.json();
-}
-
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function slugify(value) {
