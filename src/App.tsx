@@ -2287,7 +2287,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   });
   const [activeHomeGroup, setActiveHomeGroup] = useState<string>(NAV_GROUPS[0].name.en);
   // Easter egg: 5 toques na foto do Hamilton (onde ele estiver -- hoje Ferrari, mas quem
-  // torce pra Mercedes vai continuar visitando essa pagina) revelam uma homenagem pessoal.
+  // torce pra Mercedes vai continuar visitando essa página) revelam uma homenagem pessoal.
   const [showHamiltonTribute, setShowHamiltonTribute] = useState(false);
   const hamiltonTapCountRef = useRef(0);
   const hamiltonTapTimerRef = useRef<number | null>(null);
