@@ -25,7 +25,8 @@ import {
   Route,
   Zap,
   AlertTriangle,
-  Film
+  Film,
+  Bug
 } from 'lucide-react';
 import { MOTORSPORT_DATA, Category } from './types';
 import { OpenWheelCarIcon, HypercarIcon, GtCarIcon, RallyCarIcon, StockCarIcon } from './category-icons';
@@ -2301,6 +2302,23 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     }
     hamiltonTapTimerRef.current = window.setTimeout(() => {
       hamiltonTapCountRef.current = 0;
+    }, 2500);
+  };
+  // Easter egg: 5 toques no logo do rodape (aparece em toda pagina, nao depende
+  // de acompanhar corrida) revelam uma homenagem "Bug Hunters" pro Lucas.
+  const [showBugHunterTribute, setShowBugHunterTribute] = useState(false);
+  const bugHunterTapCountRef = useRef(0);
+  const bugHunterTapTimerRef = useRef<number | null>(null);
+  const handleFooterLogoTap = () => {
+    bugHunterTapCountRef.current += 1;
+    if (bugHunterTapTimerRef.current) window.clearTimeout(bugHunterTapTimerRef.current);
+    if (bugHunterTapCountRef.current >= 5) {
+      bugHunterTapCountRef.current = 0;
+      setShowBugHunterTribute(true);
+      return;
+    }
+    bugHunterTapTimerRef.current = window.setTimeout(() => {
+      bugHunterTapCountRef.current = 0;
     }, 2500);
   };
   const [settingsLoaded, setSettingsLoaded] = useState(false);
@@ -5025,7 +5043,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       <footer className="bg-[var(--bg-main)] py-12 border-t border-[var(--card-border)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 cursor-pointer" onClick={handleFooterLogoTap}>
               <div className="w-8 h-8 bg-brand-red rounded flex items-center justify-center rotate-3">
                 <Trophy className="text-white w-5 h-5 -rotate-3" />
               </div>
@@ -5284,6 +5302,46 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               </div>
               <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
                 Obrigado pelas lições de vida e pela ajuda no app, sou eternamente grato.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showBugHunterTribute && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowBugHunterTribute(false)}
+            className="fixed inset-0 z-[400] flex items-center justify-center p-6 bg-black/85 backdrop-blur-sm cursor-pointer"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 16 }}
+              transition={SPRING}
+              className="relative max-w-sm w-full text-center"
+            >
+              <div
+                className="absolute inset-0 -z-10 blur-3xl opacity-40 rounded-full"
+                style={{ backgroundColor: '#4ADE80' }}
+              />
+              <div
+                className="w-14 h-14 mx-auto mb-6 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: '#4ADE80' }}
+              >
+                <Bug className="w-6 h-6 text-black" />
+              </div>
+              <div
+                className="font-apex-mono text-xs uppercase tracking-[0.3em] mb-3"
+                style={{ color: '#4ADE80' }}
+              >
+                Bug Hunters — Para Lucas
+              </div>
+              <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
+                Obrigado pela ajuda em tudo, não só no app.
               </p>
             </motion.div>
           </motion.div>
