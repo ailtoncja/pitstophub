@@ -2321,7 +2321,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     }
   };
   // Easter egg: 5 toques no logo do rodape (aparece em toda pagina, nao depende
-  // de acompanhar corrida) revelam uma homenagem "Bug Hunters" pro Lucas e pra Nayara.
+  // de acompanhar corrida) revelam uma homenagem "Bug Hunters" pro Lucas.
   const [showBugHunterTribute, setShowBugHunterTribute] = useState(false);
   const bugHunterTapCountRef = useRef(0);
   const bugHunterTapTimerRef = useRef<number | null>(null);
@@ -5369,7 +5369,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 className="font-apex-mono text-xs uppercase tracking-[0.3em] mb-3"
                 style={{ color: '#DC0000' }}
               >
-                Para Nay
+                Bug Hunters — Para Nay
               </div>
               <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
                 Obrigado pela ajuda na facul e no app, você é incrível.
@@ -5409,7 +5409,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 className="font-apex-mono text-xs uppercase tracking-[0.3em] mb-3"
                 style={{ color: '#4ADE80' }}
               >
-                Bug Hunters — Para Lucas e Nayara
+                Bug Hunters — Para Lucas
               </div>
               <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
                 Obrigado pela ajuda em tudo, não só no app.
