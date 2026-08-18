@@ -1,0 +1,58 @@
+// Bandeiras (emoji) por nacionalidade. Os dados de piloto guardam o pais em
+// portugues (ex.: "Reino Unido"), nao em codigo ISO, entao o mapa usa o mesmo
+// texto como chave em vez de introduzir uma segunda fonte de verdade.
+const NATIONALITY_FLAGS: Record<string, string> = {
+  'África do Sul': '🇿🇦',
+  'Alemanha': '🇩🇪',
+  'Andorra': '🇦🇩',
+  'Angola': '🇦🇴',
+  'Argentina': '🇦🇷',
+  'Austrália': '🇦🇺',
+  'Áustria': '🇦🇹',
+  'Bélgica': '🇧🇪',
+  'Brasil': '🇧🇷',
+  'Bulgária': '🇧🇬',
+  'Canadá': '🇨🇦',
+  'Chile': '🇨🇱',
+  'China': '🇨🇳',
+  'Cingapura': '🇸🇬',
+  'Colômbia': '🇨🇴',
+  'Coreia do Sul': '🇰🇷',
+  'Costa Rica': '🇨🇷',
+  'Dinamarca': '🇩🇰',
+  'Espanha': '🇪🇸',
+  'Estônia': '🇪🇪',
+  'EUA': '🇺🇸',
+  'Finlândia': '🇫🇮',
+  'França': '🇫🇷',
+  'Hong Kong': '🇭🇰',
+  'Ilhas Cayman': '🇰🇾',
+  'Índia': '🇮🇳',
+  'Indonésia': '🇮🇩',
+  'Irlanda': '🇮🇪',
+  'Itália': '🇮🇹',
+  'Japão': '🇯🇵',
+  'Letônia': '🇱🇻',
+  'Luxemburgo': '🇱🇺',
+  'México': '🇲🇽',
+  'Mônaco': '🇲🇨',
+  'Noruega': '🇳🇴',
+  'Nova Zelândia': '🇳🇿',
+  'Países Baixos': '🇳🇱',
+  'Paraguai': '🇵🇾',
+  'Polônia': '🇵🇱',
+  'Portugal': '🇵🇹',
+  'Reino Unido': '🇬🇧',
+  'Romênia': '🇷🇴',
+  'Rússia': '🇷🇺',
+  'Sri Lanka': '🇱🇰',
+  'Suécia': '🇸🇪',
+  'Suíça': '🇨🇭',
+  'Tailândia': '🇹🇭',
+  'Turquia': '🇹🇷',
+};
+
+export function flagForNationality(nationality: string | undefined | null): string {
+  if (!nationality) return '';
+  return NATIONALITY_FLAGS[nationality] ?? '';
+}
