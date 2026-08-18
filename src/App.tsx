@@ -2308,6 +2308,18 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   // revela uma segunda homenagem pessoal, para quem torce pela Ferrari dele.
   const [showNayTribute, setShowNayTribute] = useState(false);
   const hamiltonHoldTimerRef = useRef<number | null>(null);
+  // O toque que solta o dedo apos os 5s de segurar vira, no mobile, um "clique
+  // fantasma" logo em seguida -- que cai bem em cima do overlay recem-aberto e
+  // fecha ele quase na hora (mensagem "pisca"). Exigir 2 toques pra fechar
+  // absorve esse toque fantasma sem precisar mexer em preventDefault/touch.
+  const nayDismissTapCountRef = useRef(0);
+  const handleNayTributeDismissTap = () => {
+    nayDismissTapCountRef.current += 1;
+    if (nayDismissTapCountRef.current >= 2) {
+      nayDismissTapCountRef.current = 0;
+      setShowNayTribute(false);
+    }
+  };
   const handleHamiltonPhotoHoldStart = () => {
     if (hamiltonHoldTimerRef.current) window.clearTimeout(hamiltonHoldTimerRef.current);
     hamiltonHoldTimerRef.current = window.setTimeout(() => {
@@ -5366,7 +5378,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setShowNayTribute(false)}
+            onClick={handleNayTributeDismissTap}
             className="fixed inset-0 z-[400] flex items-center justify-center p-6 bg-black/85 backdrop-blur-sm cursor-pointer"
           >
             <motion.div
@@ -5394,6 +5406,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               </div>
               <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
                 Obrigado pela ajuda na facul e no app, você é incrível.
+              </p>
+              <p className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mt-6">
+                (toque 2x pra fechar)
               </p>
             </motion.div>
           </motion.div>
