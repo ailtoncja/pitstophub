@@ -2376,6 +2376,15 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       // localStorage indisponivel (modo privado, etc.) -- ignora, so afeta a persistencia.
     }
   }, [view, selectedCategoryBase.id, activeTab, selectedRace?.id, selectedDriver?.id]);
+
+  // Varios pontos de navegacao (linha de companheiro de equipe, tabela de pilotos/
+  // resultados, etc.) trocam de pagina sem resetar o scroll -- sem isso, abrir o
+  // card de um piloto/corrida enquanto voce ja tinha rolado a pagina anterior
+  // pra baixo abre a pagina nova no meio, nao no topo.
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [view, selectedCategoryBase.id, selectedRace?.id, selectedDriver?.id]);
+
   const [syncedStandings, setSyncedStandings] = useState<Partial<Record<Category['id'], StandingItem[] | null>>>({});
 
   React.useEffect(() => {
