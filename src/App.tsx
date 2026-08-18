@@ -2286,6 +2286,23 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     return category?.drivers.find((d) => d.id === stored.driverId) ?? null;
   });
   const [activeHomeGroup, setActiveHomeGroup] = useState<string>(NAV_GROUPS[0].name.en);
+  // Easter egg: 5 toques na foto do Hamilton (onde ele estiver -- hoje Ferrari, mas quem
+  // torce pra Mercedes vai continuar visitando essa pagina) revelam uma homenagem pessoal.
+  const [showHamiltonTribute, setShowHamiltonTribute] = useState(false);
+  const hamiltonTapCountRef = useRef(0);
+  const hamiltonTapTimerRef = useRef<number | null>(null);
+  const handleHamiltonPhotoTap = () => {
+    hamiltonTapCountRef.current += 1;
+    if (hamiltonTapTimerRef.current) window.clearTimeout(hamiltonTapTimerRef.current);
+    if (hamiltonTapCountRef.current >= 5) {
+      hamiltonTapCountRef.current = 0;
+      setShowHamiltonTribute(true);
+      return;
+    }
+    hamiltonTapTimerRef.current = window.setTimeout(() => {
+      hamiltonTapCountRef.current = 0;
+    }, 2500);
+  };
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [followedCategoryIds, setFollowedCategoryIds] = useState<string[]>([]);
   const [followedTeamIds, setFollowedTeamIds] = useState<string[]>([]);
@@ -3950,7 +3967,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     empurrada pro fundo pelo justify-between, abrindo um vao vazio enorme. */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6 items-start">
                 <div className="lg:col-span-5 flex flex-col gap-6">
-                  <div className={cn(
+                  <div
+                    onClick={selectedDriver.id === 'hamilton' ? handleHamiltonPhotoTap : undefined}
+                    className={cn(
                     "apex-card relative overflow-hidden min-h-[420px] flex flex-col",
                     selectedDriver.cutout ? "justify-between" : "justify-end"
                   )}>
@@ -5228,6 +5247,46 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             onSkip={dismissFavoritesOnboarding}
             onFinish={dismissFavoritesOnboarding}
           />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showHamiltonTribute && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowHamiltonTribute(false)}
+            className="fixed inset-0 z-[400] flex items-center justify-center p-6 bg-black/85 backdrop-blur-sm cursor-pointer"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 16 }}
+              transition={SPRING}
+              className="relative max-w-sm w-full text-center"
+            >
+              <div
+                className="absolute inset-0 -z-10 blur-3xl opacity-40 rounded-full"
+                style={{ backgroundColor: '#00D2BE' }}
+              />
+              <div
+                className="w-14 h-14 mx-auto mb-6 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: '#00D2BE' }}
+              >
+                <Heart className="w-6 h-6 text-black" fill="currentColor" />
+              </div>
+              <div
+                className="font-apex-mono text-xs uppercase tracking-[0.3em] mb-3"
+                style={{ color: '#00D2BE' }}
+              >
+                Para Thata
+              </div>
+              <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
+                Obrigado pela ajuda no app e na vida também.
+              </p>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
