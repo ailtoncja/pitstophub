@@ -5074,7 +5074,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       <footer className="bg-[var(--bg-main)] py-12 border-t border-[var(--card-border)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={handleFooterLogoTap}>
+            <div className="flex items-center gap-3 cursor-pointer select-none" onClick={handleFooterLogoTap}>
               <div className="w-8 h-8 bg-brand-red rounded flex items-center justify-center rotate-3">
                 <Trophy className="text-white w-5 h-5 -rotate-3" />
               </div>
