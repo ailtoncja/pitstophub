@@ -2337,6 +2337,24 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       bugHunterTapCountRef.current = 0;
     }, 2500);
   };
+  // Easter egg: 5 toques no brasao/carro da Ferrari na aba Equipes do WEC
+  // (ele curte o time/carro, nao os pilotos) revelam uma homenagem "Bug Hunters"
+  // pro Brunao.
+  const [showBrunaoTribute, setShowBrunaoTribute] = useState(false);
+  const brunaoTapCountRef = useRef(0);
+  const brunaoTapTimerRef = useRef<number | null>(null);
+  const handleFerrariWecCardTap = () => {
+    brunaoTapCountRef.current += 1;
+    if (brunaoTapTimerRef.current) window.clearTimeout(brunaoTapTimerRef.current);
+    if (brunaoTapCountRef.current >= 5) {
+      brunaoTapCountRef.current = 0;
+      setShowBrunaoTribute(true);
+      return;
+    }
+    brunaoTapTimerRef.current = window.setTimeout(() => {
+      brunaoTapCountRef.current = 0;
+    }, 2500);
+  };
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [followedCategoryIds, setFollowedCategoryIds] = useState<string[]>([]);
   const [followedTeamIds, setFollowedTeamIds] = useState<string[]>([]);
@@ -4650,7 +4668,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     <div className="h-2 w-full" style={{ backgroundColor: team.color }} />
                                     <div className="p-6">
                                       <div className="flex items-center justify-between mb-6">
-                                        <div className="flex items-center gap-3">
+                                        <div
+                                          className={cn("flex items-center gap-3", team.id === 'ferrari-af' && "cursor-pointer select-none")}
+                                          onClick={team.id === 'ferrari-af' ? handleFerrariWecCardTap : undefined}
+                                        >
                                           {team.badge && (
                                             <img
                                               src={team.badge}
@@ -5413,6 +5434,46 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               </div>
               <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
                 Obrigado pela ajuda em tudo, não só no app.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showBrunaoTribute && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowBrunaoTribute(false)}
+            className="fixed inset-0 z-[400] flex items-center justify-center p-6 bg-black/85 backdrop-blur-sm cursor-pointer"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 16 }}
+              transition={SPRING}
+              className="relative max-w-sm w-full text-center"
+            >
+              <div
+                className="absolute inset-0 -z-10 blur-3xl opacity-40 rounded-full"
+                style={{ backgroundColor: '#4ADE80' }}
+              />
+              <div
+                className="w-14 h-14 mx-auto mb-6 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: '#4ADE80' }}
+              >
+                <Bug className="w-6 h-6 text-black" />
+              </div>
+              <div
+                className="font-apex-mono text-xs uppercase tracking-[0.3em] mb-3"
+                style={{ color: '#4ADE80' }}
+              >
+                Bug Hunters — Para Brunão
+              </div>
+              <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
+                Vlw por me ajudar a voltar pros eixos meu querido, sem você eu não estaria aqui, tmj irmão.
               </p>
             </motion.div>
           </motion.div>
