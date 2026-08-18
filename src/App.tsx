@@ -2304,6 +2304,16 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       hamiltonTapCountRef.current = 0;
     }, 2500);
   };
+  // Exige 2 toques pra fechar cada homenagem, por consistencia entre as 4
+  // (evita fechar sem querer com um toque perdido logo que o card aparece).
+  const hamiltonDismissTapCountRef = useRef(0);
+  const handleHamiltonTributeDismissTap = () => {
+    hamiltonDismissTapCountRef.current += 1;
+    if (hamiltonDismissTapCountRef.current >= 2) {
+      hamiltonDismissTapCountRef.current = 0;
+      setShowHamiltonTribute(false);
+    }
+  };
   // Easter egg: segurar a foto do Hamilton por 5s (em vez de 5 toques rapidos)
   // revela uma segunda homenagem pessoal, para quem torce pela Ferrari dele.
   const [showNayTribute, setShowNayTribute] = useState(false);
@@ -2349,6 +2359,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       bugHunterTapCountRef.current = 0;
     }, 2500);
   };
+  const bugHunterDismissTapCountRef = useRef(0);
+  const handleBugHunterTributeDismissTap = () => {
+    bugHunterDismissTapCountRef.current += 1;
+    if (bugHunterDismissTapCountRef.current >= 2) {
+      bugHunterDismissTapCountRef.current = 0;
+      setShowBugHunterTribute(false);
+    }
+  };
   // Easter egg: 5 toques no brasao/carro da Ferrari na aba Equipes do WEC
   // (ele curte o time/carro, nao os pilotos) revelam uma homenagem "Bug Hunters"
   // pro Brunao.
@@ -2366,6 +2384,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     brunaoTapTimerRef.current = window.setTimeout(() => {
       brunaoTapCountRef.current = 0;
     }, 2500);
+  };
+  const brunaoDismissTapCountRef = useRef(0);
+  const handleBrunaoTributeDismissTap = () => {
+    brunaoDismissTapCountRef.current += 1;
+    if (brunaoDismissTapCountRef.current >= 2) {
+      brunaoDismissTapCountRef.current = 0;
+      setShowBrunaoTribute(false);
+    }
   };
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [followedCategoryIds, setFollowedCategoryIds] = useState<string[]>([]);
@@ -5338,7 +5364,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setShowHamiltonTribute(false)}
+            onClick={handleHamiltonTributeDismissTap}
             className="fixed inset-0 z-[400] flex items-center justify-center p-6 bg-black/85 backdrop-blur-sm cursor-pointer"
           >
             <motion.div
@@ -5366,6 +5392,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               </div>
               <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
                 Obrigado pelas lições de vida e pela ajuda no app, sou eternamente grato.
+              </p>
+              <p className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mt-6">
+                (toque 2x pra fechar)
               </p>
             </motion.div>
           </motion.div>
@@ -5421,7 +5450,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setShowBugHunterTribute(false)}
+            onClick={handleBugHunterTributeDismissTap}
             className="fixed inset-0 z-[400] flex items-center justify-center p-6 bg-black/85 backdrop-blur-sm cursor-pointer"
           >
             <motion.div
@@ -5450,6 +5479,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
                 Obrigado pela ajuda em tudo, não só no app.
               </p>
+              <p className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mt-6">
+                (toque 2x pra fechar)
+              </p>
             </motion.div>
           </motion.div>
         )}
@@ -5461,7 +5493,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setShowBrunaoTribute(false)}
+            onClick={handleBrunaoTributeDismissTap}
             className="fixed inset-0 z-[400] flex items-center justify-center p-6 bg-black/85 backdrop-blur-sm cursor-pointer"
           >
             <motion.div
@@ -5489,6 +5521,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
               </div>
               <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">
                 Vlw por me ajudar a voltar pros eixos meu querido, sem você eu não estaria aqui, tmj irmão.
+              </p>
+              <p className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mt-6">
+                (toque 2x pra fechar)
               </p>
             </motion.div>
           </motion.div>
