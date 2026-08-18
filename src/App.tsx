@@ -3503,24 +3503,31 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 </div>
 
                 <div className="mb-16">
-                  <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 mb-6">
-                    {NAV_GROUPS.map((group) => {
-                      const isActiveGroup = activeHomeGroup === group.name.en;
-                      return (
-                        <button
-                          key={group.name.en}
-                          onClick={() => setActiveHomeGroup(group.name.en)}
-                          className={cn(
-                            "px-4 py-2 rounded-lg font-apex-mono text-xs font-semibold uppercase tracking-widest whitespace-nowrap transition-all border shrink-0",
-                            isActiveGroup
-                              ? "bg-brand-red text-white border-brand-red"
-                              : "bg-[var(--card-bg)] text-gray-500 border-[var(--card-border)] hover:text-brand-red"
-                          )}
-                        >
-                          {language === 'pt' ? group.name.pt : group.name.en}
-                        </button>
-                      );
-                    })}
+                  <div className="relative">
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 mb-6 pr-8">
+                      {NAV_GROUPS.map((group) => {
+                        const isActiveGroup = activeHomeGroup === group.name.en;
+                        return (
+                          <button
+                            key={group.name.en}
+                            onClick={() => setActiveHomeGroup(group.name.en)}
+                            className={cn(
+                              "px-4 py-2 rounded-lg font-apex-mono text-xs font-semibold uppercase tracking-widest whitespace-nowrap transition-all border shrink-0",
+                              isActiveGroup
+                                ? "bg-brand-red text-white border-brand-red"
+                                : "bg-[var(--card-bg)] text-gray-500 border-[var(--card-border)] hover:text-brand-red"
+                            )}
+                          >
+                            {language === 'pt' ? group.name.pt : group.name.en}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {/* Sinaliza que da pra arrastar pra ver mais grupos -- sem isso, com a
+                        barra de rolagem escondida (no-scrollbar), a fileira parecia
+                        simplesmente cortada na borda direita em telas estreitas, sem
+                        nenhuma pista visual de que havia mais botao pra alem dela. */}
+                    <div className="pointer-events-none absolute top-0 right-0 bottom-6 w-10 bg-gradient-to-l from-[var(--bg-main)] to-transparent md:hidden" />
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6 items-start">
