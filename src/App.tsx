@@ -51,6 +51,17 @@ import {
   mergeCategoryWithSyncedCalendar,
   mergeCategoryWithSyncedStandings,
 } from './synced-races';
+import {
+  fetchGtwcCalendar,
+  fetchGtwcRaceEntryList,
+  fetchGtwcRoster,
+  getGtwcCategoryIds,
+  isGtwcCategory,
+  mergeCategoryWithGtwcCalendar,
+  mergeCategoryWithGtwcRoster,
+  type GtwcEntry,
+  type GtwcRoster,
+} from './gtwc-live';
 import type { Driver, Race, StandingItem } from './types';
 import { FavoritesPicker, FavoritesOnboardingModal, NotificationsToggle } from './Favorites';
 import { flagForNationality } from './nationality-flags';
@@ -83,6 +94,9 @@ const CATEGORY_ACCENTS: Record<string, string> = {
   indy: '#003DA5',
   nascar: '#D62828',
   wrc: '#2E7D32',
+  'gtwc-europe': '#2ECC71',
+  'gtwc-america': '#F39C12',
+  'gtwc-asia': '#9B59B6',
 };
 
 const getCategoryAccent = (id: string) => CATEGORY_ACCENTS[id] ?? '#e10600';
@@ -104,7 +118,7 @@ const NAV_GROUPS = [
   },
   {
     name: { pt: 'Endurance/GT', en: 'Endurance/GT' },
-    ids: ['wec', 'imsa', 'dtm']
+    ids: ['wec', 'imsa', 'dtm', 'gtwc-europe', 'gtwc-america', 'gtwc-asia']
   },
   {
     name: { pt: 'Americanas', en: 'American' },
@@ -2443,6 +2457,23 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   }, [view, selectedCategoryBase.id, selectedRace?.id, selectedDriver?.id]);
 
   const [syncedStandings, setSyncedStandings] = useState<Partial<Record<Category['id'], StandingItem[] | null>>>({});
+  const [gtwcCalendars, setGtwcCalendars] = useState<Partial<Record<Category['id'], Race[] | null>>>({});
+  const [gtwcRosters, setGtwcRosters] = useState<Partial<Record<Category['id'], GtwcRoster | null>>>({});
+  const [gtwcDataReady, setGtwcDataReady] = useState(false);
+  const [expandedGtwcRaceId, setExpandedGtwcRaceId] = useState<string | null>(null);
+  const [gtwcEntryLists, setGtwcEntryLists] = useState<Record<string, GtwcEntry[] | null | 'loading'>>({});
+
+  const handleGtwcRaceRowClick = React.useCallback((categoryId: string, raceId: string) => {
+    setExpandedGtwcRaceId((prev) => (prev === raceId ? null : raceId));
+    const cacheKey = `${categoryId}:${raceId}`;
+    setGtwcEntryLists((prev) => {
+      if (prev[cacheKey] !== undefined) return prev;
+      void fetchGtwcRaceEntryList(categoryId, raceId).then((entryList) => {
+        setGtwcEntryLists((current) => ({ ...current, [cacheKey]: entryList }));
+      });
+      return { ...prev, [cacheKey]: 'loading' };
+    });
+  }, []);
 
   React.useEffect(() => {
     if (!currentUser) {
@@ -2638,6 +2669,61 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     };
   }, []);
 
+  // GT World Challenge (Europe/America/Asia) nao usa o pipeline TheSportsDB
+  // acima -- e uma API propria (api-motorsports) buscada direto do navegador,
+  // no mesmo padrao do F1/Jolpica. Ver src/gtwc-live.ts.
+  React.useEffect(() => {
+    let isMounted = true;
+
+    const syncGtwc = async (force = false) => {
+      const results = await Promise.allSettled(
+        getGtwcCategoryIds().map(async (categoryId) => {
+          const [calendar, roster] = await Promise.all([
+            fetchGtwcCalendar(categoryId, force),
+            fetchGtwcRoster(categoryId, force),
+          ]);
+          return { categoryId, calendar, roster };
+        }),
+      );
+
+      if (!isMounted) return;
+
+      setGtwcCalendars((prev) => {
+        const next = { ...prev };
+        for (const result of results) {
+          if (result.status === 'fulfilled') next[result.value.categoryId] = result.value.calendar;
+        }
+        return next;
+      });
+      setGtwcRosters((prev) => {
+        const next = { ...prev };
+        for (const result of results) {
+          if (result.status === 'fulfilled') next[result.value.categoryId] = result.value.roster;
+        }
+        return next;
+      });
+
+      for (const result of results) {
+        if (result.status === 'rejected') {
+          console.error('Falha ao sincronizar dados GT World Challenge.', result.reason);
+        }
+      }
+
+      setGtwcDataReady(true);
+    };
+
+    void syncGtwc();
+
+    const intervalId = window.setInterval(() => {
+      void syncGtwc(true);
+    }, 30 * 60 * 1000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
   React.useEffect(() => {
     let isMounted = true;
 
@@ -2695,9 +2781,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       const detailData = selectedCategoryBase.id === category.id ? liveCategoryData : null;
       const liveMerged = mergeCategoryWithLiveData(mergeCategoryWithLiveData(normalizedCategory, summaryData), detailData);
       const calendarMerged = mergeCategoryWithSyncedCalendar(liveMerged, syncedCalendars[category.id] ?? null);
-      return mergeCategoryWithSyncedStandings(calendarMerged, syncedStandings[category.id] ?? null);
+      const standingsMerged = mergeCategoryWithSyncedStandings(calendarMerged, syncedStandings[category.id] ?? null);
+      const gtwcCalendarMerged = mergeCategoryWithGtwcCalendar(standingsMerged, gtwcCalendars[category.id] ?? null);
+      return mergeCategoryWithGtwcRoster(gtwcCalendarMerged, gtwcRosters[category.id] ?? null);
     }),
-    [liveCategorySummaries, selectedCategoryBase.id, liveCategoryData, syncedCalendars, syncedStandings]
+    [liveCategorySummaries, selectedCategoryBase.id, liveCategoryData, syncedCalendars, syncedStandings, gtwcCalendars, gtwcRosters]
   );
 
   const allCategoriesById = useMemo(
@@ -3607,7 +3695,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           <div className="font-apex-mono text-[9px] text-gray-500 uppercase tracking-widest font-medium">{UI_TRANSLATIONS[language].categoriesLabel}</div>
                         </div>
                         <div>
-                          <div className="font-apex text-xl font-extrabold italic text-[var(--text-main)]">{syncedDataReady ? overviewStats.races : '···'}</div>
+                          <div className="font-apex text-xl font-extrabold italic text-[var(--text-main)]">{syncedDataReady && gtwcDataReady ? overviewStats.races : '···'}</div>
                           <div className="font-apex-mono text-[9px] text-gray-500 uppercase tracking-widest font-medium">{UI_TRANSLATIONS[language].racesInSeason}</div>
                         </div>
                         <div>
@@ -3828,7 +3916,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
                                   </div>
                                   <div className="text-[10px] text-gray-500 truncate">
-                                    {cat.teams.length} {UI_TRANSLATIONS[language].teams} · {!syncedDataReady && isCategorySynced(cat.id) ? '···' : cat.calendar.length} {UI_TRANSLATIONS[language].rounds}
+                                    {cat.teams.length} {UI_TRANSLATIONS[language].teams} · {(!syncedDataReady && isCategorySynced(cat.id)) || (!gtwcDataReady && isGtwcCategory(cat.id)) ? '···' : cat.calendar.length} {UI_TRANSLATIONS[language].rounds}
                                   </div>
                                 </div>
                                 <button
@@ -4581,7 +4669,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             <Calendar className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].rounds}
                           </h3>
                           <div className="text-4xl font-display font-black text-[var(--cat-accent)] mb-2">
-                            {!syncedDataReady && isCategorySynced(selectedCategory.id) ? '···' : selectedCategory.calendar.length}
+                            {(!syncedDataReady && isCategorySynced(selectedCategory.id)) || (!gtwcDataReady && isGtwcCategory(selectedCategory.id)) ? '···' : selectedCategory.calendar.length}
                           </div>
                           <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">{UI_TRANSLATIONS[language].racesInSeason}</p>
                         </div>
@@ -4861,13 +4949,22 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           {selectedCategory.calendar.map((race) => {
                             const winnerDriver = race.winner ? driverByName.get(race.winner) : undefined;
                             const isRacePageTest = hasCircuitPage(selectedCategory, race);
+                            const isGtwc = isGtwcCategory(selectedCategory.id);
+                            const isGtwcExpanded = isGtwc && expandedGtwcRaceId === race.id;
+                            const gtwcEntryList = isGtwc ? gtwcEntryLists[`${selectedCategory.id}:${race.id}`] : undefined;
+                            const rowOnClick = isRacePageTest
+                              ? () => { setSelectedRace(race); setView('race'); }
+                              : isGtwc
+                              ? () => handleGtwcRaceRowClick(selectedCategory.id, race.id)
+                              : undefined;
                             return (
+                            <div key={race.id}>
                             <div
-                              key={race.id}
-                              onClick={isRacePageTest ? () => { setSelectedRace(race); setView('race'); } : undefined}
+                              onClick={rowOnClick}
                               className={cn(
                                 "flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 apex-card items-center transition-all hover:bg-white/10",
-                                isRacePageTest && "cursor-pointer ring-1 ring-[var(--cat-accent)]/40",
+                                (isRacePageTest || isGtwc) && "cursor-pointer ring-1 ring-[var(--cat-accent)]/40",
+                                isGtwcExpanded && "ring-2",
                                 race.status === 'upcoming' ? "border-l-4 border-l-[var(--cat-accent)]" :
                                 race.status === 'cancelled' ? "border-l-4 border-l-red-500 opacity-60" : ""
                               )}
@@ -4922,6 +5019,47 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   <span className="text-gray-600">-</span>
                                 )}
                               </div>
+                            </div>
+                            {isGtwcExpanded && (
+                              <div className="apex-card mt-2 overflow-x-auto no-scrollbar">
+                                {gtwcEntryList === 'loading' || gtwcEntryList === undefined ? (
+                                  <div className="px-6 py-8 text-center text-sm text-gray-500">
+                                    {language === 'pt' ? 'Carregando grid da corrida...' : 'Loading race entry list...'}
+                                  </div>
+                                ) : gtwcEntryList === null ? (
+                                  <div className="px-6 py-8 text-center text-sm text-gray-500">
+                                    {language === 'pt'
+                                      ? 'Grid ainda não publicado pra essa corrida.'
+                                      : 'Entry list not published yet for this race.'}
+                                  </div>
+                                ) : (
+                                  <table className="w-full text-left min-w-[600px]">
+                                    <thead>
+                                      <tr className="border-b border-[var(--card-border)] bg-white/5">
+                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">#</th>
+                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].team}</th>
+                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].drivers}</th>
+                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{language === 'pt' ? 'Carro' : 'Car'}</th>
+                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{language === 'pt' ? 'Classe' : 'Class'}</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-[var(--card-border)]">
+                                      {gtwcEntryList.map((entry, index) => (
+                                        <tr key={`${entry.teamName}-${entry.carNumber ?? index}`} className="hover:bg-white/5 transition-colors">
+                                          <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--cat-accent)]">{entry.carNumber ?? '-'}</td>
+                                          <td className="px-6 py-4 font-bold text-[var(--text-main)]">{entry.teamName}</td>
+                                          <td className="px-6 py-4 text-sm text-gray-400">
+                                            {entry.drivers.map((d) => `${d.name} ${flagForNationality(d.nationality)}`).join(' / ')}
+                                          </td>
+                                          <td className="px-6 py-4 text-sm text-gray-500">{entry.car ?? '-'}</td>
+                                          <td className="px-6 py-4 text-sm text-gray-500">{entry.class ?? '-'}</td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                )}
+                              </div>
+                            )}
                             </div>
                           )})}
                         </div>
