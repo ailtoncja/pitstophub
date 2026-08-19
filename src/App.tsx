@@ -54,13 +54,15 @@ import {
 import {
   fetchGtwcCalendar,
   fetchGtwcRoster,
+  fetchGtwcStandings,
   getGtwcCategoryIds,
   isGtwcCategory,
   mergeCategoryWithGtwcCalendar,
   mergeCategoryWithGtwcRoster,
+  mergeCategoryWithGtwcStandings,
   type GtwcRoster,
 } from './gtwc-live';
-import type { Driver, Race, StandingItem } from './types';
+import type { CategoryStandings, Driver, Race, StandingItem } from './types';
 import { FavoritesPicker, FavoritesOnboardingModal, NotificationsToggle } from './Favorites';
 import { flagForNationality } from './nationality-flags';
 
@@ -2457,6 +2459,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [syncedStandings, setSyncedStandings] = useState<Partial<Record<Category['id'], StandingItem[] | null>>>({});
   const [gtwcCalendars, setGtwcCalendars] = useState<Partial<Record<Category['id'], Race[] | null>>>({});
   const [gtwcRosters, setGtwcRosters] = useState<Partial<Record<Category['id'], GtwcRoster | null>>>({});
+  const [gtwcStandings, setGtwcStandings] = useState<Partial<Record<Category['id'], CategoryStandings | null>>>({});
   const [gtwcDataReady, setGtwcDataReady] = useState(false);
 
   React.useEffect(() => {
@@ -2662,11 +2665,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     const syncGtwc = async (force = false) => {
       const results = await Promise.allSettled(
         getGtwcCategoryIds().map(async (categoryId) => {
-          const [calendar, roster] = await Promise.all([
+          const [calendar, roster, standings] = await Promise.all([
             fetchGtwcCalendar(categoryId, force),
             fetchGtwcRoster(categoryId, force),
+            fetchGtwcStandings(categoryId, force),
           ]);
-          return { categoryId, calendar, roster };
+          return { categoryId, calendar, roster, standings };
         }),
       );
 
@@ -2683,6 +2687,13 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         const next = { ...prev };
         for (const result of results) {
           if (result.status === 'fulfilled') next[result.value.categoryId] = result.value.roster;
+        }
+        return next;
+      });
+      setGtwcStandings((prev) => {
+        const next = { ...prev };
+        for (const result of results) {
+          if (result.status === 'fulfilled') next[result.value.categoryId] = result.value.standings;
         }
         return next;
       });
@@ -2767,9 +2778,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       const calendarMerged = mergeCategoryWithSyncedCalendar(liveMerged, syncedCalendars[category.id] ?? null);
       const standingsMerged = mergeCategoryWithSyncedStandings(calendarMerged, syncedStandings[category.id] ?? null);
       const gtwcCalendarMerged = mergeCategoryWithGtwcCalendar(standingsMerged, gtwcCalendars[category.id] ?? null);
-      return mergeCategoryWithGtwcRoster(gtwcCalendarMerged, gtwcRosters[category.id] ?? null);
+      const gtwcRosterMerged = mergeCategoryWithGtwcRoster(gtwcCalendarMerged, gtwcRosters[category.id] ?? null);
+      return mergeCategoryWithGtwcStandings(gtwcRosterMerged, gtwcStandings[category.id] ?? null);
     }),
-    [liveCategorySummaries, selectedCategoryBase.id, liveCategoryData, syncedCalendars, syncedStandings, gtwcCalendars, gtwcRosters]
+    [liveCategorySummaries, selectedCategoryBase.id, liveCategoryData, syncedCalendars, syncedStandings, gtwcCalendars, gtwcRosters, gtwcStandings]
   );
 
   const allCategoriesById = useMemo(
