@@ -53,13 +53,11 @@ import {
 } from './synced-races';
 import {
   fetchGtwcCalendar,
-  fetchGtwcRaceEntryList,
   fetchGtwcRoster,
   getGtwcCategoryIds,
   isGtwcCategory,
   mergeCategoryWithGtwcCalendar,
   mergeCategoryWithGtwcRoster,
-  type GtwcEntry,
   type GtwcRoster,
 } from './gtwc-live';
 import type { Driver, Race, StandingItem } from './types';
@@ -2460,20 +2458,6 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [gtwcCalendars, setGtwcCalendars] = useState<Partial<Record<Category['id'], Race[] | null>>>({});
   const [gtwcRosters, setGtwcRosters] = useState<Partial<Record<Category['id'], GtwcRoster | null>>>({});
   const [gtwcDataReady, setGtwcDataReady] = useState(false);
-  const [expandedGtwcRaceId, setExpandedGtwcRaceId] = useState<string | null>(null);
-  const [gtwcEntryLists, setGtwcEntryLists] = useState<Record<string, GtwcEntry[] | null | 'loading'>>({});
-
-  const handleGtwcRaceRowClick = React.useCallback((categoryId: string, raceId: string) => {
-    setExpandedGtwcRaceId((prev) => (prev === raceId ? null : raceId));
-    const cacheKey = `${categoryId}:${raceId}`;
-    setGtwcEntryLists((prev) => {
-      if (prev[cacheKey] !== undefined) return prev;
-      void fetchGtwcRaceEntryList(categoryId, raceId).then((entryList) => {
-        setGtwcEntryLists((current) => ({ ...current, [cacheKey]: entryList }));
-      });
-      return { ...prev, [cacheKey]: 'loading' };
-    });
-  }, []);
 
   React.useEffect(() => {
     if (!currentUser) {
@@ -4949,22 +4933,13 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           {selectedCategory.calendar.map((race) => {
                             const winnerDriver = race.winner ? driverByName.get(race.winner) : undefined;
                             const isRacePageTest = hasCircuitPage(selectedCategory, race);
-                            const isGtwc = isGtwcCategory(selectedCategory.id);
-                            const isGtwcExpanded = isGtwc && expandedGtwcRaceId === race.id;
-                            const gtwcEntryList = isGtwc ? gtwcEntryLists[`${selectedCategory.id}:${race.id}`] : undefined;
-                            const rowOnClick = isRacePageTest
-                              ? () => { setSelectedRace(race); setView('race'); }
-                              : isGtwc
-                              ? () => handleGtwcRaceRowClick(selectedCategory.id, race.id)
-                              : undefined;
                             return (
-                            <div key={race.id}>
                             <div
-                              onClick={rowOnClick}
+                              key={race.id}
+                              onClick={isRacePageTest ? () => { setSelectedRace(race); setView('race'); } : undefined}
                               className={cn(
                                 "flex flex-col md:grid md:grid-cols-12 gap-4 px-6 py-6 apex-card items-center transition-all hover:bg-white/10",
-                                (isRacePageTest || isGtwc) && "cursor-pointer ring-1 ring-[var(--cat-accent)]/40",
-                                isGtwcExpanded && "ring-2",
+                                isRacePageTest && "cursor-pointer ring-1 ring-[var(--cat-accent)]/40",
                                 race.status === 'upcoming' ? "border-l-4 border-l-[var(--cat-accent)]" :
                                 race.status === 'cancelled' ? "border-l-4 border-l-red-500 opacity-60" : ""
                               )}
@@ -5019,47 +4994,6 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   <span className="text-gray-600">-</span>
                                 )}
                               </div>
-                            </div>
-                            {isGtwcExpanded && (
-                              <div className="apex-card mt-2 overflow-x-auto no-scrollbar">
-                                {gtwcEntryList === 'loading' || gtwcEntryList === undefined ? (
-                                  <div className="px-6 py-8 text-center text-sm text-gray-500">
-                                    {language === 'pt' ? 'Carregando grid da corrida...' : 'Loading race entry list...'}
-                                  </div>
-                                ) : gtwcEntryList === null ? (
-                                  <div className="px-6 py-8 text-center text-sm text-gray-500">
-                                    {language === 'pt'
-                                      ? 'Grid ainda não publicado pra essa corrida.'
-                                      : 'Entry list not published yet for this race.'}
-                                  </div>
-                                ) : (
-                                  <table className="w-full text-left min-w-[600px]">
-                                    <thead>
-                                      <tr className="border-b border-[var(--card-border)] bg-white/5">
-                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">#</th>
-                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].team}</th>
-                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].drivers}</th>
-                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{language === 'pt' ? 'Carro' : 'Car'}</th>
-                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{language === 'pt' ? 'Classe' : 'Class'}</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-[var(--card-border)]">
-                                      {gtwcEntryList.map((entry, index) => (
-                                        <tr key={`${entry.teamName}-${entry.carNumber ?? index}`} className="hover:bg-white/5 transition-colors">
-                                          <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--cat-accent)]">{entry.carNumber ?? '-'}</td>
-                                          <td className="px-6 py-4 font-bold text-[var(--text-main)]">{entry.teamName}</td>
-                                          <td className="px-6 py-4 text-sm text-gray-400">
-                                            {entry.drivers.map((d) => `${d.name} ${flagForNationality(d.nationality)}`).join(' / ')}
-                                          </td>
-                                          <td className="px-6 py-4 text-sm text-gray-500">{entry.car ?? '-'}</td>
-                                          <td className="px-6 py-4 text-sm text-gray-500">{entry.class ?? '-'}</td>
-                                        </tr>
-                                      ))}
-                                    </tbody>
-                                  </table>
-                                )}
-                              </div>
-                            )}
                             </div>
                           )})}
                         </div>

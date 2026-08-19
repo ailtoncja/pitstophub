@@ -33,22 +33,13 @@ type ApiRace = {
   location: string | null;
   date: string;
   sourceUrl: string | null;
+  winner: string | null;
 };
 
 type ApiDriver = {
   name: string;
   nationality: string;
 };
-
-type ApiEntry = {
-  carNumber: string | null;
-  teamName: string;
-  car: string | null;
-  class: string | null;
-  drivers: ApiDriver[];
-};
-
-type ApiRaceWithEntryList = ApiRace & { entryList: ApiEntry[] };
 
 type ApiTeamSummary = {
   name: string;
@@ -62,20 +53,11 @@ type ApiTeamSummary = {
 
 export type GtwcRoster = { teams: Team[]; drivers: Driver[] };
 
-export type GtwcEntry = {
-  carNumber: string | null;
-  teamName: string;
-  car: string | null;
-  class: string | null;
-  drivers: Driver[];
-};
-
 // ─── Cache ──────────────────────────────────────────────────────────────────
 
 type CacheEntry<T> = { expiresAt: number; value: Promise<T> };
 const calendarCache = new Map<string, CacheEntry<Race[] | null>>();
 const rosterCache = new Map<string, CacheEntry<GtwcRoster | null>>();
-const entryListCache = new Map<string, CacheEntry<GtwcEntry[] | null>>();
 
 export async function fetchGtwcCalendar(categoryId: string, force = false): Promise<Race[] | null> {
   const seriesId = GTWC_SERIES_BY_CATEGORY[categoryId];
@@ -135,34 +117,6 @@ export function mergeCategoryWithGtwcRoster(category: Category, roster: GtwcRost
   return { ...category, teams: roster.teams, drivers: roster.drivers };
 }
 
-// Grid completo de uma corrida especifica -- usado sob demanda (ex.: expandir
-// uma linha do calendario), nao carregado junto com o resto da categoria.
-export async function fetchGtwcRaceEntryList(
-  categoryId: string,
-  raceId: string,
-  force = false,
-): Promise<GtwcEntry[] | null> {
-  const seriesId = GTWC_SERIES_BY_CATEGORY[categoryId];
-  if (!seriesId) return null;
-  return getCached(entryListCache, `${categoryId}:${raceId}`, force, async () => {
-    const race = await fetchJson<ApiRaceWithEntryList>(`/series/${seriesId}/races/${raceId}`);
-    if (!race.entryList?.length) return null;
-    return race.entryList.map((entry) => ({
-      carNumber: entry.carNumber,
-      teamName: entry.teamName,
-      car: entry.car,
-      class: entry.class ? toTitleCase(entry.class) : null,
-      drivers: entry.drivers.map((d) => ({
-        id: slugify(d.name),
-        name: toDriverName(d.name),
-        number: entry.carNumber ?? '',
-        nationality: d.nationality,
-        teamId: slugify(entry.teamName),
-      })),
-    }));
-  });
-}
-
 // ─── Mapping helpers ────────────────────────────────────────────────────────
 
 function toRace(race: ApiRace): Race {
@@ -175,6 +129,7 @@ function toRace(race: ApiRace): Race {
     enLocation: race.location ?? undefined,
     date: race.date,
     status,
+    winner: race.winner ?? undefined,
   };
 }
 
