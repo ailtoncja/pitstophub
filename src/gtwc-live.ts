@@ -1,4 +1,4 @@
-import type { Category, Driver, Race, Team } from './types';
+import type { Category, CategoryStandings, Driver, Race, StandingItem, Team } from './types';
 
 // GT World Challenge (Europe/America/Asia) nao usa TheSportsDB nem o pipeline
 // de synced_races/synced_standings -- e uma API propria (api-motorsports),
@@ -49,6 +49,10 @@ type ApiTeamSummary = {
   drivers: ApiDriver[];
 };
 
+type ApiStandingEntry = { position: number; name: string; points: number };
+type ApiStandingsClass = { classLabel: string; entries: ApiStandingEntry[] };
+type ApiSeriesStandings = { drivers: ApiStandingsClass[] | null; teams: ApiStandingsClass[] | null };
+
 // ─── Public types ───────────────────────────────────────────────────────────
 
 export type GtwcRoster = { teams: Team[]; drivers: Driver[] };
@@ -58,6 +62,7 @@ export type GtwcRoster = { teams: Team[]; drivers: Driver[] };
 type CacheEntry<T> = { expiresAt: number; value: Promise<T> };
 const calendarCache = new Map<string, CacheEntry<Race[] | null>>();
 const rosterCache = new Map<string, CacheEntry<GtwcRoster | null>>();
+const standingsCache = new Map<string, CacheEntry<CategoryStandings | null>>();
 
 export async function fetchGtwcCalendar(categoryId: string, force = false): Promise<Race[] | null> {
   const seriesId = GTWC_SERIES_BY_CATEGORY[categoryId];
@@ -115,6 +120,35 @@ export async function fetchGtwcRoster(categoryId: string, force = false): Promis
 export function mergeCategoryWithGtwcRoster(category: Category, roster: GtwcRoster | null): Category {
   if (!roster || roster.teams.length === 0) return category;
   return { ...category, teams: roster.teams, drivers: roster.drivers };
+}
+
+// So expoe uma classificacao quando ela tem uma unica classe "geral" -- ex.:
+// America so tem classificacao de times dividida em Pro/Pro-Am/Am (sem
+// classificacao de pilotos), e misturar 3 classes numa lista so de posicoes
+// reintroduziria o mesmo tipo de erro (misturar classificacoes que nao devem
+// se misturar) que tirou o GT World Challenge do pitstophub da primeira vez.
+// Nesse caso a aba Classificacao cai no fallback "nao disponivel" ja
+// existente, em vez de mostrar um ranking enganoso.
+export async function fetchGtwcStandings(categoryId: string, force = false): Promise<CategoryStandings | null> {
+  const seriesId = GTWC_SERIES_BY_CATEGORY[categoryId];
+  if (!seriesId) return null;
+  return getCached(standingsCache, `${categoryId}:standings`, force, async () => {
+    const data = await fetchJson<ApiSeriesStandings>(`/series/${seriesId}/standings`);
+    const drivers = toSingleClassEntries(data.drivers);
+    const teams = toSingleClassEntries(data.teams);
+    if (!drivers && !teams) return null;
+    return { drivers: drivers ?? undefined, teams: teams ?? undefined };
+  });
+}
+
+function toSingleClassEntries(classes: ApiStandingsClass[] | null): StandingItem[] | null {
+  if (!classes || classes.length !== 1) return null;
+  return classes[0].entries.map((e) => ({ position: e.position, name: toDriverName(e.name), points: e.points }));
+}
+
+export function mergeCategoryWithGtwcStandings(category: Category, standings: CategoryStandings | null): Category {
+  if (!standings) return category;
+  return { ...category, standings };
 }
 
 // ─── Mapping helpers ────────────────────────────────────────────────────────
