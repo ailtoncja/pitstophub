@@ -73,7 +73,7 @@ import {
   mergeCategoryWithEbStandings,
   type EbRoster,
 } from './endurance-brasil-live';
-import type { CategoryStandings, Driver, Race, StandingItem } from './types';
+import type { CategoryStandings, Driver, Race, StandingItem, Team } from './types';
 import { FavoritesPicker, FavoritesOnboardingModal, NotificationsToggle } from './Favorites';
 import { flagForNationality } from './nationality-flags';
 
@@ -251,6 +251,9 @@ const UI_TRANSLATIONS = {
     winsThisSeason: 'Vitórias na Temporada',
     noWinsYet: 'Nenhuma vitória nesta temporada ainda.',
     driverProfile: 'Perfil do Piloto',
+    teamProfile: 'Perfil da Equipe',
+    noRosterYet: 'Nenhum piloto listado ainda.',
+    teamColor: 'Cor',
     careerOverview: 'Carreira',
     grid: 'Grid',
     finish: 'Chegada',
@@ -369,6 +372,9 @@ const UI_TRANSLATIONS = {
     winsThisSeason: 'Wins This Season',
     noWinsYet: 'No wins this season yet.',
     driverProfile: 'Driver Profile',
+    teamProfile: 'Team Profile',
+    noRosterYet: 'No drivers listed yet.',
+    teamColor: 'Color',
     careerOverview: 'Career Overview',
     grid: 'Grid',
     finish: 'Finish',
@@ -2273,11 +2279,12 @@ function getIsIOSInstallable(): boolean {
 const NAV_STORAGE_KEY = 'pitstophub_nav_state';
 
 type StoredNav = {
-  view: 'home' | 'category' | 'race' | 'driver' | 'favorites';
+  view: 'home' | 'category' | 'race' | 'driver' | 'team' | 'favorites';
   categoryId: string;
   activeTab: 'overview' | 'teams' | 'calendar' | 'standings';
   raceId: string | null;
   driverId: string | null;
+  teamId: string | null;
 };
 
 function isReloadNavigation(): boolean {
@@ -2321,7 +2328,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [view, setView] = useState<'home' | 'category' | 'race' | 'driver' | 'favorites'>(() => readStoredNav()?.view ?? 'home');
+  const [view, setView] = useState<'home' | 'category' | 'race' | 'driver' | 'team' | 'favorites'>(() => readStoredNav()?.view ?? 'home');
   const [selectedCategoryBase, setSelectedCategoryBase] = useState<Category>(() => {
     const stored = readStoredNav();
     return (stored && CATEGORY_BY_ID.get(stored.categoryId)) || MOTORSPORT_DATA[0];
@@ -2341,6 +2348,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     if (!stored?.driverId) return null;
     const category = CATEGORY_BY_ID.get(stored.categoryId);
     return category?.drivers.find((d) => d.id === stored.driverId) ?? null;
+  });
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(() => {
+    const stored = readStoredNav();
+    if (!stored?.teamId) return null;
+    const category = CATEGORY_BY_ID.get(stored.categoryId);
+    return category?.teams.find((t) => t.id === stored.teamId) ?? null;
   });
   const [activeHomeGroup, setActiveHomeGroup] = useState<string>(NAV_GROUPS[0].name.en);
   // Easter egg: 5 toques na foto do Hamilton (onde ele estiver -- hoje Ferrari, mas quem
@@ -2482,12 +2495,13 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         activeTab,
         raceId: selectedRace?.id ?? null,
         driverId: selectedDriver?.id ?? null,
+        teamId: selectedTeam?.id ?? null,
       };
       window.localStorage.setItem(NAV_STORAGE_KEY, JSON.stringify(payload));
     } catch {
       // localStorage indisponivel (modo privado, etc.) -- ignora, so afeta a persistencia.
     }
-  }, [view, selectedCategoryBase.id, activeTab, selectedRace?.id, selectedDriver?.id]);
+  }, [view, selectedCategoryBase.id, activeTab, selectedRace?.id, selectedDriver?.id, selectedTeam?.id]);
 
   // Varios pontos de navegacao (linha de companheiro de equipe, tabela de pilotos/
   // resultados, etc.) trocam de pagina sem resetar o scroll -- sem isso, abrir o
@@ -2495,7 +2509,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   // pra baixo abre a pagina nova no meio, nao no topo.
   React.useEffect(() => {
     window.scrollTo(0, 0);
-  }, [view, selectedCategoryBase.id, selectedRace?.id, selectedDriver?.id]);
+  }, [view, selectedCategoryBase.id, selectedRace?.id, selectedDriver?.id, selectedTeam?.id]);
 
   const [syncedStandings, setSyncedStandings] = useState<Partial<Record<Category['id'], StandingItem[] | null>>>({});
   const [gtwcCalendars, setGtwcCalendars] = useState<Partial<Record<Category['id'], Race[] | null>>>({});
@@ -2932,9 +2946,15 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     setSelectedCategoryBase(cat);
     setView('category');
     setActiveTab('overview');
+    setSelectedTeam(null);
     setIsMobileMenuOpen(false);
     setActiveDropdown(null);
     requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  }, []);
+
+  const openTeamPage = useCallback((team: Team) => {
+    setSelectedTeam(team);
+    setView('team');
   }, []);
 
   const followedCategorySet = useMemo(() => new Set(followedCategoryIds), [followedCategoryIds]);
@@ -3239,20 +3259,43 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     () => (selectedDriver ? getDriverBio(selectedCategory.id, selectedDriver.id) : undefined),
     [selectedCategory.id, selectedDriver]
   );
+  const displayedTeam = useMemo(() => {
+    if (!selectedTeam) return null;
+    return selectedCategory.teams.find((t) => t.id === selectedTeam.id) ?? selectedTeam;
+  }, [selectedCategory.teams, selectedTeam]);
+  const selectedTeamDrivers = useMemo(() => {
+    if (!displayedTeam) return [];
+    return driversByTeamId.get(displayedTeam.id) ?? [];
+  }, [driversByTeamId, displayedTeam]);
+  const selectedTeamStanding = useMemo(() => {
+    if (!displayedTeam) return null;
+    return selectedCategory.standings?.constructors?.find((c) => c.name === displayedTeam.name)
+      ?? selectedCategory.standings?.teams?.find((c) => c.name === displayedTeam.name)
+      ?? null;
+  }, [selectedCategory.standings, displayedTeam]);
+  const selectedTeamWins = useMemo(() => {
+    if (!displayedTeam) return [];
+    return selectedCategory.calendar
+      .filter((race) => selectedTeamDrivers.some((driver) => raceWonByDriver(race, driver.name)))
+      .sort((a, b) => b.date.localeCompare(a.date));
+  }, [selectedCategory.calendar, displayedTeam, selectedTeamDrivers]);
   // Pagina de piloto usa a cor da equipe do piloto como destaque, nao a cor fixa da categoria.
   const driverAccent = selectedDriverTeam?.color ?? categoryAccent;
+  const teamAccent = displayedTeam?.color ?? categoryAccent;
   // O menu FORMULAS/ENDURANCE do cabecalho normalmente usa o vermelho fixo da
   // marca, mas acompanha a cor de quem esta sendo visto: a cor da equipe numa
-  // pagina de piloto, ou a cor da propria categoria em qualquer pagina dela
+  // pagina de piloto ou equipe, ou a cor da propria categoria em qualquer pagina dela
   // (visao geral, corrida). Fora disso (home, favoritos) fica no vermelho
   // padrao. Resto do cabecalho -- logo, botao de login -- continua vermelho
   // de proposito, e' identidade fixa do site.
   const navAccent =
     view === 'driver' && selectedDriver
       ? driverAccent
-      : view === 'category' || view === 'race'
-        ? categoryAccent
-        : '#e8232a';
+      : view === 'team' && displayedTeam
+        ? teamAccent
+        : view === 'category' || view === 'race'
+          ? categoryAccent
+          : '#e8232a';
 
   const selectedDriverStanding = useMemo(
     () => {
@@ -3344,7 +3387,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   const cat = allCategoriesById.get(id);
                   if (!cat) return null;
                   const Icon = IconMap[cat.icon];
-                  const active = (view === 'category' || view === 'driver' || view === 'race') && selectedCategory.id === cat.id;
+                  const active = (view === 'category' || view === 'driver' || view === 'team' || view === 'race') && selectedCategory.id === cat.id;
                   return (
                     <button
                       key={cat.id}
@@ -3447,7 +3490,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 <button
                   className={cn(
                     "flex items-center gap-1 px-3 py-2 font-apex-mono text-xs font-semibold uppercase tracking-wide transition-colors hover:text-[var(--nav-accent)] whitespace-nowrap",
-                    group.ids.includes(selectedCategory.id) && (view === 'category' || view === 'driver') ? "text-[var(--nav-accent)]" : "text-gray-500"
+                    group.ids.includes(selectedCategory.id) && (view === 'category' || view === 'driver' || view === 'team') ? "text-[var(--nav-accent)]" : "text-gray-500"
                   )}
                 >
                   {language === 'pt' ? group.name.pt : group.name.en}
@@ -3472,7 +3515,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             onClick={() => handleCategorySelect(cat)}
                             className={cn(
                               "w-full text-left px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-[var(--nav-accent)] hover:text-white",
-                              (view === 'category' || view === 'driver') && selectedCategory.id === cat.id ? "text-[var(--nav-accent)] bg-[var(--nav-accent)]/5" : "text-gray-500"
+                              (view === 'category' || view === 'driver' || view === 'team') && selectedCategory.id === cat.id ? "text-[var(--nav-accent)] bg-[var(--nav-accent)]/5" : "text-gray-500"
                             )}
                           >
                             {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
@@ -3626,7 +3669,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         <span
                           className={cn(
                             "text-[10px] font-black uppercase tracking-[0.2em] shrink-0",
-                            group.ids.includes(selectedCategory.id) && (view === 'category' || view === 'driver') ? "text-[var(--nav-accent)]" : "text-brand-red"
+                            group.ids.includes(selectedCategory.id) && (view === 'category' || view === 'driver' || view === 'team') ? "text-[var(--nav-accent)]" : "text-brand-red"
                           )}
                         >
                           {language === 'pt' ? group.name.pt : group.name.en}
@@ -3644,7 +3687,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               onClick={() => { handleCategorySelect(cat); setIsMobileMenuOpen(false); }}
                               className={cn(
                                 "w-full flex items-center justify-between px-5 py-4  text-sm font-bold uppercase tracking-widest transition-all border",
-                                (view === 'category' || view === 'driver') && selectedCategory.id === cat.id
+                                (view === 'category' || view === 'driver' || view === 'team') && selectedCategory.id === cat.id
                                   ? "bg-[var(--nav-accent)]/10 text-[var(--nav-accent)] border-[var(--nav-accent)]/20"
                                   : "bg-white/5 text-gray-400 border-white/5 hover:bg-white/10"
                               )}
@@ -3652,7 +3695,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               <div className="flex items-center gap-3">
                                 <div className={cn(
                                   "w-8 h-8  flex items-center justify-center shrink-0",
-                                  (view === 'category' || view === 'driver') && selectedCategory.id === cat.id ? "bg-[var(--nav-accent)] text-white" : "bg-white/10 text-gray-500"
+                                  (view === 'category' || view === 'driver' || view === 'team') && selectedCategory.id === cat.id ? "bg-[var(--nav-accent)] text-white" : "bg-white/10 text-gray-500"
                                 )}>
                                   <Icon className="w-4 h-4" />
                                 </div>
@@ -4384,9 +4427,13 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     <div className="relative z-10 p-8">
                       <div className="flex items-center gap-3 mb-3">
                         {selectedDriverTeam && (
-                          <span className="text-[var(--driver-accent)] font-apex-mono text-xs font-semibold border border-[var(--driver-accent)] px-2 py-1 uppercase">
+                          <button
+                            type="button"
+                            onClick={() => openTeamPage(selectedDriverTeam)}
+                            className="text-[var(--driver-accent)] font-apex-mono text-xs font-semibold border border-[var(--driver-accent)] px-2 py-1 uppercase hover:bg-[var(--driver-accent)]/10 transition-colors"
+                          >
                             {selectedDriverTeam.name}
-                          </span>
+                          </button>
                         )}
                         <span className="font-apex-mono text-xs text-gray-300">#{selectedDriver.number}</span>
                       </div>
@@ -4521,10 +4568,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
                                     {UI_TRANSLATIONS[language].team}
                                   </div>
-                                  <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => openTeamPage(selectedDriverTeam)}
+                                    className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                                  >
                                     <span className="w-4 h-4 shrink-0" style={{ backgroundColor: selectedDriverTeam.color }} />
                                     <span className="font-bold text-[var(--text-main)]">{selectedDriverTeam.name}</span>
-                                  </div>
+                                  </button>
                                 </div>
                               )}
                               {selectedDriverTeam?.car && (
@@ -4557,10 +4608,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
                                 {UI_TRANSLATIONS[language].team}
                               </div>
-                              <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => openTeamPage(selectedDriverTeam)}
+                                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                              >
                                 <span className="w-4 h-4 shrink-0" style={{ backgroundColor: selectedDriverTeam.color }} />
                                 <span className="font-bold text-[var(--text-main)]">{selectedDriverTeam.name}</span>
-                              </div>
+                              </button>
                             </div>
                           )}
                           {selectedDriverTeam?.car && (
@@ -4619,6 +4674,251 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               {language === 'pt' ? race.name : (race.enName || race.name)}
                             </div>
                             <div className="text-xs text-gray-500">{race.location}</div>
+                          </div>
+                          <div className="font-apex-mono text-xs text-gray-400">
+                            {race.date.split('-').reverse().join('/')}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+          </motion.div>
+        ) : view === 'team' && displayedTeam ? (
+          <motion.div
+            key="team-page"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={SPRING}
+          >
+            <section
+              className="relative py-12 md:py-20 overflow-hidden min-h-[70dvh]"
+              style={{
+                '--team-accent': teamAccent,
+                '--team-accent-ink': getAccentTextColor(teamAccent),
+              } as React.CSSProperties}
+            >
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
+                <div className="absolute inset-0 bg-gradient-to-b from-[var(--team-accent)]/20 to-transparent" />
+              </div>
+
+              <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <button
+                  onClick={() => { setView('category'); setActiveTab('teams'); setSelectedTeam(null); }}
+                  className="inline-flex items-center gap-2 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500 hover:text-[var(--team-accent)] transition-colors mb-10"
+                >
+                  <ChevronLeft className="w-4 h-4" /> {UI_TRANSLATIONS[language].teams}
+                </button>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6 items-start">
+                  <div className="lg:col-span-5 flex flex-col gap-6">
+                    <div className="apex-card relative overflow-hidden min-h-[420px] flex flex-col justify-between">
+                      <div className="absolute inset-0 bg-gradient-to-b from-[var(--team-accent)]/20 via-transparent to-black/60" />
+                      <div
+                        className="absolute left-1/2 bottom-0 w-64 h-64 -translate-x-1/2 translate-y-1/4 rounded-full blur-3xl opacity-30"
+                        style={{ backgroundColor: teamAccent }}
+                      />
+                      <div className="relative z-10 p-8">
+                        <div className="flex items-center gap-3 mb-3 flex-wrap">
+                          {displayedTeam.class && (
+                            <span className="text-[var(--team-accent)] font-apex-mono text-xs font-semibold border border-[var(--team-accent)] px-2 py-1 uppercase">
+                              {displayedTeam.class}
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => toggleFollowTeam(selectedCategory.id, displayedTeam.id)}
+                            className={cn(
+                              "px-3 py-1.5 text-[10px] font-black uppercase tracking-widest border transition-colors",
+                              followedTeamSet.has(`${selectedCategory.id}::${displayedTeam.id}`)
+                                ? "bg-[var(--team-accent)]/10 border-[var(--team-accent)]/30 text-[var(--team-accent)]"
+                                : "bg-white/5 border-white/10 text-gray-300 hover:text-[var(--team-accent)]"
+                            )}
+                          >
+                            {followedTeamSet.has(`${selectedCategory.id}::${displayedTeam.id}`)
+                              ? UI_TRANSLATIONS[language].following
+                              : UI_TRANSLATIONS[language].follow}
+                          </button>
+                        </div>
+                        <h1 className="font-apex font-extrabold italic uppercase text-4xl sm:text-5xl leading-[0.95] text-white">
+                          {displayedTeam.name}
+                        </h1>
+                        {displayedTeam.car && (
+                          <p className="font-apex-mono text-xs uppercase tracking-widest text-gray-300 mt-4">
+                            {displayedTeam.car}
+                          </p>
+                        )}
+                      </div>
+                      {displayedTeam.clearart ? (
+                        <img
+                          src={displayedTeam.clearart}
+                          alt={displayedTeam.car ?? displayedTeam.name}
+                          className="relative z-10 mx-auto max-h-[220px] w-auto object-contain drop-shadow-2xl mb-8"
+                          referrerPolicy="no-referrer"
+                          loading="eager"
+                          decoding="async"
+                        />
+                      ) : displayedTeam.badge ? (
+                        <img
+                          src={displayedTeam.badge}
+                          alt={displayedTeam.name}
+                          className="relative z-10 mx-auto max-h-[160px] w-auto object-contain drop-shadow-2xl mb-8"
+                          referrerPolicy="no-referrer"
+                          loading="eager"
+                          decoding="async"
+                        />
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-7 flex flex-col gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      <div className="apex-card p-4">
+                        <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                          {UI_TRANSLATIONS[language].position}
+                        </div>
+                        <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                          {selectedTeamStanding ? (
+                            <>
+                              {formatOrdinal(selectedTeamStanding.position, language).number}
+                              <span className="text-[var(--team-accent)] text-base align-top">
+                                {formatOrdinal(selectedTeamStanding.position, language).suffix}
+                              </span>
+                            </>
+                          ) : '-'}
+                        </div>
+                      </div>
+                      <div className="apex-card p-4">
+                        <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                          {UI_TRANSLATIONS[language].points}
+                        </div>
+                        <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                          {selectedTeamStanding?.points ?? '-'}
+                        </div>
+                      </div>
+                      <div className="apex-card p-4">
+                        <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                          {UI_TRANSLATIONS[language].wins}
+                        </div>
+                        <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                          {selectedTeamWins.length}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="apex-card p-8 flex-grow">
+                      <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
+                        {UI_TRANSLATIONS[language].teamProfile}
+                      </h3>
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-8">
+                        {displayedTeam.car && (
+                          <div>
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                              {UI_TRANSLATIONS[language].chassis}
+                            </div>
+                            <div className="font-bold text-[var(--text-main)]">{displayedTeam.car}</div>
+                          </div>
+                        )}
+                        <div>
+                          <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                            {UI_TRANSLATIONS[language].teamColor}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-4 h-4 shrink-0" style={{ backgroundColor: displayedTeam.color }} />
+                            <span className="font-apex-mono text-sm text-[var(--text-main)] uppercase">{displayedTeam.color}</span>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                            {UI_TRANSLATIONS[language].drivers}
+                          </div>
+                          <div className="font-bold text-[var(--text-main)]">{selectedTeamDrivers.length || '-'}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="apex-card p-8 mb-6">
+                  <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
+                    {UI_TRANSLATIONS[language].drivers}
+                  </h3>
+                  {selectedTeamDrivers.length === 0 ? (
+                    <p className="text-gray-500 text-sm">{UI_TRANSLATIONS[language].noRosterYet}</p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {selectedTeamDrivers.map((driver) => {
+                        const canOpenDriver = Boolean(getDriverBio(selectedCategory.id, driver.id));
+                        const driverPhoto = driver.cutout || driver.image;
+                        const content = (
+                          <>
+                            <div className="relative shrink-0">
+                              {driverPhoto ? (
+                                <img
+                                  src={driverPhoto}
+                                  alt={driver.name}
+                                  className="w-14 h-14 object-cover object-top bg-[var(--team-accent)]/10 border border-[var(--team-accent)]/30"
+                                  referrerPolicy="no-referrer"
+                                  loading="lazy"
+                                  decoding="async"
+                                />
+                              ) : (
+                                <div className="w-14 h-14 bg-white/5 border border-white/10 flex items-center justify-center">
+                                  <Users className="w-5 h-5 text-gray-600" />
+                                </div>
+                              )}
+                              <div className="absolute -bottom-1 -right-1 bg-[var(--team-accent)] text-[var(--team-accent-ink)] text-[9px] font-black px-1.5 py-0.5">
+                                #{driver.number}
+                              </div>
+                            </div>
+                            <div className="min-w-0">
+                              <div className="font-apex font-extrabold italic text-[var(--text-main)] leading-tight">
+                                {driver.name} <span className="not-italic">{flagForNationality(driver.nationality)}</span>
+                              </div>
+                              <div className="font-apex-mono text-[10px] text-gray-500 uppercase tracking-widest mt-0.5">
+                                {driver.nationality}
+                              </div>
+                            </div>
+                          </>
+                        );
+                        return canOpenDriver ? (
+                          <button
+                            key={driver.id}
+                            type="button"
+                            onClick={() => { setSelectedDriver(driver); setView('driver'); }}
+                            className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[var(--team-accent)]/40 transition-colors text-left group/roster"
+                          >
+                            {content}
+                            <ChevronRight className="w-4 h-4 text-[var(--team-accent)] ml-auto shrink-0 opacity-0 group-hover/roster:opacity-100 group-hover/roster:translate-x-1 transition-all" />
+                          </button>
+                        ) : (
+                          <div key={driver.id} className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                            {content}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                <div className="apex-card p-8">
+                  <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
+                    {UI_TRANSLATIONS[language].winsThisSeason}
+                  </h3>
+                  {selectedTeamWins.length === 0 ? (
+                    <p className="text-gray-500 text-sm">{UI_TRANSLATIONS[language].noWinsYet}</p>
+                  ) : (
+                    <div className="divide-y divide-white/5">
+                      {selectedTeamWins.map((race) => (
+                        <div key={race.id} className="flex items-center justify-between py-3">
+                          <div>
+                            <div className="font-bold text-[var(--text-main)]">
+                              {language === 'pt' ? race.name : (race.enName || race.name)}
+                            </div>
+                            <div className="text-xs text-gray-500">{race.winner ? `${race.winner} · ${race.location}` : race.location}</div>
                           </div>
                           <div className="font-apex-mono text-xs text-gray-400">
                             {race.date.split('-').reverse().join('/')}
@@ -4980,7 +5280,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 .map((team) => (
                                   <div
                                     key={team.id}
-                                    className="apex-card overflow-hidden group"
+                                    onClick={() => openTeamPage(team)}
+                                    className="apex-card overflow-hidden group cursor-pointer ring-1 ring-[var(--team-accent)]/40 hover:bg-white/5 transition-colors"
                                     style={{
                                       '--team-accent': team.color ?? 'var(--cat-accent)',
                                       '--team-accent-ink': team.color ? getAccentTextColor(team.color) : 'var(--cat-accent-ink)',
@@ -4989,18 +5290,16 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     <div className="h-2 w-full" style={{ backgroundColor: team.color }} />
                                     <div className="p-6">
                                       <div className="flex items-center justify-between mb-6">
-                                        <div
-                                          className={cn("flex items-center gap-3", team.id === 'af-corse-wec' && "cursor-pointer select-none")}
-                                          onClick={team.id === 'af-corse-wec' ? handleFerrariWecCardTap : undefined}
-                                        >
+                                        <div className="flex items-center gap-3 min-w-0">
                                           {team.badge && (
                                             <img
                                               src={team.badge}
                                               alt={team.name}
-                                              className="w-10 h-10 object-contain shrink-0"
+                                              className={cn("w-10 h-10 object-contain shrink-0", team.id === 'af-corse-wec' && "cursor-pointer select-none")}
                                               referrerPolicy="no-referrer"
                                               loading="lazy"
                                               decoding="async"
+                                              onClick={team.id === 'af-corse-wec' ? (e) => { e.stopPropagation(); handleFerrariWecCardTap(); } : undefined}
                                             />
                                           )}
                                           {team.clearart && (
@@ -5013,7 +5312,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                               decoding="async"
                                             />
                                           )}
-                                          <div>
+                                          <div className="min-w-0">
                                             <h4 className="text-xl font-apex font-extrabold italic text-[var(--text-main)]">{team.name}</h4>
                                             {team.car && (
                                               <div className="text-xs font-mono text-[var(--team-accent)] font-bold uppercase tracking-widest mt-1">
@@ -5023,9 +5322,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                           </div>
                                         </div>
                                         <button
-                                          onClick={() => toggleFollowTeam(selectedCategory.id, team.id)}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleFollowTeam(selectedCategory.id, team.id);
+                                          }}
                                           className={cn(
-                                            "px-3 py-1.5  text-[10px] font-black uppercase tracking-widest border transition-colors",
+                                            "px-3 py-1.5  text-[10px] font-black uppercase tracking-widest border transition-colors shrink-0",
                                             followedTeamSet.has(`${selectedCategory.id}::${team.id}`)
                                               ? "bg-[var(--team-accent)]/10 border-[var(--team-accent)]/30 text-[var(--team-accent)]"
                                               : "bg-white/5 border-white/10 text-gray-400 hover:text-[var(--team-accent)]"
@@ -5041,7 +5343,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                             return (
                                             <div
                                               key={driver.id}
-                                              onClick={isDriverPageTest ? () => { setSelectedDriver(driver); setView('driver'); } : undefined}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (!isDriverPageTest) return;
+                                                setSelectedDriver(driver);
+                                                setView('driver');
+                                              }}
                                               className={cn(
                                                 "relative flex flex-col p-4  bg-black/20 hover:bg-black/30 transition-all group/driver overflow-hidden border border-white/5",
                                                 isDriverPageTest && "cursor-pointer ring-1 ring-inset ring-[var(--team-accent)]/40"
@@ -5275,19 +5582,30 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                               </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-500">
-                                              <div className="flex items-center gap-2">
-                                                {team?.badge && (
-                                                  <img
-                                                    src={team.badge}
-                                                    alt={item.team}
-                                                    className="w-5 h-5 object-contain shrink-0"
-                                                    referrerPolicy="no-referrer"
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                  />
-                                                )}
+                                              {team ? (
+                                                <button
+                                                  type="button"
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openTeamPage(team);
+                                                  }}
+                                                  className="flex items-center gap-2 hover:text-[var(--row-accent)] transition-colors"
+                                                >
+                                                  {team.badge && (
+                                                    <img
+                                                      src={team.badge}
+                                                      alt={item.team}
+                                                      className="w-5 h-5 object-contain shrink-0"
+                                                      referrerPolicy="no-referrer"
+                                                      loading="lazy"
+                                                      decoding="async"
+                                                    />
+                                                  )}
+                                                  <span>{item.team}</span>
+                                                </button>
+                                              ) : (
                                                 <span>{item.team || '-'}</span>
-                                              </div>
+                                              )}
                                             </td>
                                             <td className="px-6 py-4 font-apex-mono font-bold text-right text-[var(--text-main)]">{item.points}</td>
                                           </tr>
@@ -5353,19 +5671,30 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                               </div>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-gray-500">
-                                              <div className="flex items-center gap-2">
-                                                {team?.badge && (
-                                                  <img
-                                                    src={team.badge}
-                                                    alt={item.team}
-                                                    className="w-5 h-5 object-contain shrink-0"
-                                                    referrerPolicy="no-referrer"
-                                                    loading="lazy"
-                                                    decoding="async"
-                                                  />
-                                                )}
+                                              {team ? (
+                                                <button
+                                                  type="button"
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openTeamPage(team);
+                                                  }}
+                                                  className="flex items-center gap-2 hover:text-[var(--row-accent)] transition-colors"
+                                                >
+                                                  {team.badge && (
+                                                    <img
+                                                      src={team.badge}
+                                                      alt={item.team}
+                                                      className="w-5 h-5 object-contain shrink-0"
+                                                      referrerPolicy="no-referrer"
+                                                      loading="lazy"
+                                                      decoding="async"
+                                                    />
+                                                  )}
+                                                  <span>{item.team}</span>
+                                                </button>
+                                              ) : (
                                                 <span>{item.team || '-'}</span>
-                                              </div>
+                                              )}
                                             </td>
                                             <td className="px-6 py-4 font-apex-mono font-bold text-right text-[var(--text-main)]">{item.points}</td>
                                           </tr>
@@ -5395,7 +5724,15 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                       {selectedCategory.standings.constructors.map((item) => {
                                         const team = selectedCategory.teams.find((t) => t.name === item.name);
                                         return (
-                                          <tr key={item.name} className="hover:bg-white/5 transition-colors border-l-2" style={{ borderLeftColor: team?.color ?? 'transparent' }}>
+                                          <tr
+                                            key={item.name}
+                                            onClick={team ? () => openTeamPage(team) : undefined}
+                                            className={cn(
+                                              "hover:bg-white/5 transition-colors border-l-2",
+                                              team && "cursor-pointer"
+                                            )}
+                                            style={{ borderLeftColor: team?.color ?? 'transparent' }}
+                                          >
                                             <td className="px-6 py-4 font-apex font-extrabold italic" style={{ color: team?.color ?? 'var(--cat-accent)' }}>{item.position}</td>
                                             <td className="px-6 py-4 font-bold text-[var(--text-main)]">
                                               <div className="flex items-center gap-3">
@@ -5441,7 +5778,15 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                       {selectedCategory.standings.teams.map((item) => {
                                         const team = selectedCategory.teams.find((t) => t.name === item.name);
                                         return (
-                                          <tr key={item.name + item.extra} className="hover:bg-white/5 transition-colors border-l-2" style={{ borderLeftColor: team?.color ?? 'transparent' }}>
+                                          <tr
+                                            key={item.name + item.extra}
+                                            onClick={team ? () => openTeamPage(team) : undefined}
+                                            className={cn(
+                                              "hover:bg-white/5 transition-colors border-l-2",
+                                              team && "cursor-pointer"
+                                            )}
+                                            style={{ borderLeftColor: team?.color ?? 'transparent' }}
+                                          >
                                             <td className="px-6 py-4 font-apex font-extrabold italic" style={{ color: team?.color ?? 'var(--cat-accent)' }}>{item.position}</td>
                                             <td className="px-6 py-4 font-mono font-bold text-gray-400">{item.extra || '-'}</td>
                                             <td className="px-6 py-4 font-bold text-[var(--text-main)]">
