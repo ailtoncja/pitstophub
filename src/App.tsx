@@ -62,6 +62,17 @@ import {
   mergeCategoryWithGtwcStandings,
   type GtwcRoster,
 } from './gtwc-live';
+import {
+  fetchEbCalendar,
+  fetchEbRoster,
+  fetchEbStandings,
+  getEnduranceBrasilCategoryIds,
+  isEnduranceBrasilCategory,
+  mergeCategoryWithEbCalendar,
+  mergeCategoryWithEbRoster,
+  mergeCategoryWithEbStandings,
+  type EbRoster,
+} from './endurance-brasil-live';
 import type { CategoryStandings, Driver, Race, StandingItem } from './types';
 import { FavoritesPicker, FavoritesOnboardingModal, NotificationsToggle } from './Favorites';
 import { flagForNationality } from './nationality-flags';
@@ -97,6 +108,7 @@ const CATEGORY_ACCENTS: Record<string, string> = {
   'gtwc-europe': '#2ECC71',
   'gtwc-america': '#F39C12',
   'gtwc-asia': '#9B59B6',
+  'endurance-brasil': '#009B3A',
 };
 
 const getCategoryAccent = (id: string) => CATEGORY_ACCENTS[id] ?? '#e10600';
@@ -118,7 +130,7 @@ const NAV_GROUPS = [
   },
   {
     name: { pt: 'Endurance/GT', en: 'Endurance/GT' },
-    ids: ['wec', 'imsa', 'dtm', 'gtwc-europe', 'gtwc-america', 'gtwc-asia']
+    ids: ['wec', 'imsa', 'dtm', 'gtwc-europe', 'gtwc-america', 'gtwc-asia', 'endurance-brasil']
   },
   {
     name: { pt: 'Americanas', en: 'American' },
@@ -2461,6 +2473,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [gtwcRosters, setGtwcRosters] = useState<Partial<Record<Category['id'], GtwcRoster | null>>>({});
   const [gtwcStandings, setGtwcStandings] = useState<Partial<Record<Category['id'], CategoryStandings | null>>>({});
   const [gtwcDataReady, setGtwcDataReady] = useState(false);
+  const [ebCalendars, setEbCalendars] = useState<Partial<Record<Category['id'], Race[] | null>>>({});
+  const [ebRosters, setEbRosters] = useState<Partial<Record<Category['id'], EbRoster | null>>>({});
+  const [ebStandings, setEbStandings] = useState<Partial<Record<Category['id'], CategoryStandings | null>>>({});
+  const [ebDataReady, setEbDataReady] = useState(false);
 
   React.useEffect(() => {
     if (!currentUser) {
@@ -2722,6 +2738,66 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   React.useEffect(() => {
     let isMounted = true;
 
+    const syncEb = async (force = false) => {
+      const results = await Promise.allSettled(
+        getEnduranceBrasilCategoryIds().map(async (categoryId) => {
+          const [calendar, roster, standings] = await Promise.all([
+            fetchEbCalendar(categoryId, force),
+            fetchEbRoster(categoryId, force),
+            fetchEbStandings(categoryId, force),
+          ]);
+          return { categoryId, calendar, roster, standings };
+        }),
+      );
+
+      if (!isMounted) return;
+
+      setEbCalendars((prev) => {
+        const next = { ...prev };
+        for (const result of results) {
+          if (result.status === 'fulfilled') next[result.value.categoryId] = result.value.calendar;
+        }
+        return next;
+      });
+      setEbRosters((prev) => {
+        const next = { ...prev };
+        for (const result of results) {
+          if (result.status === 'fulfilled') next[result.value.categoryId] = result.value.roster;
+        }
+        return next;
+      });
+      setEbStandings((prev) => {
+        const next = { ...prev };
+        for (const result of results) {
+          if (result.status === 'fulfilled') next[result.value.categoryId] = result.value.standings;
+        }
+        return next;
+      });
+
+      for (const result of results) {
+        if (result.status === 'rejected') {
+          console.error('Falha ao sincronizar dados Endurance Brasil.', result.reason);
+        }
+      }
+
+      setEbDataReady(true);
+    };
+
+    void syncEb();
+
+    const intervalId = window.setInterval(() => {
+      void syncEb(true);
+    }, 30 * 60 * 1000);
+
+    return () => {
+      isMounted = false;
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    let isMounted = true;
+
     if (!isCategoryLiveSupported(selectedCategoryBase.id)) {
       setLiveCategoryData(null);
       setLiveCategoryState('idle');
@@ -2779,9 +2855,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       const standingsMerged = mergeCategoryWithSyncedStandings(calendarMerged, syncedStandings[category.id] ?? null);
       const gtwcCalendarMerged = mergeCategoryWithGtwcCalendar(standingsMerged, gtwcCalendars[category.id] ?? null);
       const gtwcRosterMerged = mergeCategoryWithGtwcRoster(gtwcCalendarMerged, gtwcRosters[category.id] ?? null);
-      return mergeCategoryWithGtwcStandings(gtwcRosterMerged, gtwcStandings[category.id] ?? null);
+      const gtwcStandingsMerged = mergeCategoryWithGtwcStandings(gtwcRosterMerged, gtwcStandings[category.id] ?? null);
+      const ebCalendarMerged = mergeCategoryWithEbCalendar(gtwcStandingsMerged, ebCalendars[category.id] ?? null);
+      const ebRosterMerged = mergeCategoryWithEbRoster(ebCalendarMerged, ebRosters[category.id] ?? null);
+      return mergeCategoryWithEbStandings(ebRosterMerged, ebStandings[category.id] ?? null);
     }),
-    [liveCategorySummaries, selectedCategoryBase.id, liveCategoryData, syncedCalendars, syncedStandings, gtwcCalendars, gtwcRosters, gtwcStandings]
+    [liveCategorySummaries, selectedCategoryBase.id, liveCategoryData, syncedCalendars, syncedStandings, gtwcCalendars, gtwcRosters, gtwcStandings, ebCalendars, ebRosters, ebStandings]
   );
 
   const allCategoriesById = useMemo(
@@ -2960,7 +3039,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     [currentSeasonLabel, language]
   );
 
-  const championshipLeader = selectedCategory.standings?.drivers?.[0] ?? null;
+  const championshipLeader = selectedCategory.standings?.drivers?.[0]
+    ?? selectedCategory.standings?.driverClasses?.[0]?.entries?.[0]
+    ?? null;
   const constructorsLeader = selectedCategory.standings?.constructors?.[0] ?? selectedCategory.standings?.teams?.[0] ?? null;
 
   const [now, setNow] = useState(() => new Date());
@@ -3028,7 +3109,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const hasStandingsData = (category: Category) =>
     (category.standings?.drivers?.length ?? 0) > 0 ||
     (category.standings?.constructors?.length ?? 0) > 0 ||
-    (category.standings?.teams?.length ?? 0) > 0;
+    (category.standings?.teams?.length ?? 0) > 0 ||
+    (category.standings?.driverClasses?.some((cls) => cls.entries.length > 0) ?? false);
 
   const pickLastResultWithStandings = (categories: Category[]) =>
     categories
@@ -3057,7 +3139,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     // que a categoria escolhida tem classificacao. Nem toda categoria tem por piloto (ex.:
     // IMSA so tem por equipe), entao cai pra construtores/equipes antes de desistir.
     const category = lastGlobalResult?.category;
-    const entry = category?.standings?.drivers?.[0] ?? category?.standings?.constructors?.[0] ?? category?.standings?.teams?.[0] ?? null;
+    const entry = category?.standings?.drivers?.[0]
+      ?? category?.standings?.driverClasses?.[0]?.entries?.[0]
+      ?? category?.standings?.constructors?.[0]
+      ?? category?.standings?.teams?.[0]
+      ?? null;
     return entry && category ? { entry, category } : null;
   }, [lastGlobalResult]);
 
@@ -3119,7 +3205,16 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         : '#e8232a';
 
   const selectedDriverStanding = useMemo(
-    () => (selectedDriver ? selectedCategory.standings?.drivers?.find((d) => d.name === selectedDriver.name) ?? null : null),
+    () => {
+      if (!selectedDriver) return null;
+      const fromDrivers = selectedCategory.standings?.drivers?.find((d) => d.name === selectedDriver.name);
+      if (fromDrivers) return fromDrivers;
+      for (const cls of selectedCategory.standings?.driverClasses ?? []) {
+        const hit = cls.entries.find((d) => d.name === selectedDriver.name);
+        if (hit) return hit;
+      }
+      return null;
+    },
     [selectedCategory.standings, selectedDriver]
   );
 
@@ -3691,7 +3786,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           <div className="font-apex-mono text-[9px] text-gray-500 uppercase tracking-widest font-medium">{UI_TRANSLATIONS[language].categoriesLabel}</div>
                         </div>
                         <div>
-                          <div className="font-apex text-xl font-extrabold italic text-[var(--text-main)]">{syncedDataReady && gtwcDataReady ? overviewStats.races : '···'}</div>
+                          <div className="font-apex text-xl font-extrabold italic text-[var(--text-main)]">{syncedDataReady && gtwcDataReady && ebDataReady ? overviewStats.races : '···'}</div>
                           <div className="font-apex-mono text-[9px] text-gray-500 uppercase tracking-widest font-medium">{UI_TRANSLATIONS[language].racesInSeason}</div>
                         </div>
                         <div>
@@ -3836,6 +3931,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           }
                           const leaderCategory = lastGlobalResult.category;
                           const board = leaderCategory.standings?.drivers
+                            ?? leaderCategory.standings?.driverClasses?.[0]?.entries
                             ?? leaderCategory.standings?.constructors
                             ?? leaderCategory.standings?.teams
                             ?? [];
@@ -3912,7 +4008,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
                                   </div>
                                   <div className="text-[10px] text-gray-500 truncate">
-                                    {cat.teams.length} {UI_TRANSLATIONS[language].teams} · {(!syncedDataReady && isCategorySynced(cat.id)) || (!gtwcDataReady && isGtwcCategory(cat.id)) ? '···' : cat.calendar.length} {UI_TRANSLATIONS[language].rounds}
+                                    {cat.teams.length} {UI_TRANSLATIONS[language].teams} · {(!syncedDataReady && isCategorySynced(cat.id)) || (!gtwcDataReady && isGtwcCategory(cat.id)) || (!ebDataReady && isEnduranceBrasilCategory(cat.id)) ? '···' : cat.calendar.length} {UI_TRANSLATIONS[language].rounds}
                                   </div>
                                 </div>
                                 <button
@@ -4665,7 +4761,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             <Calendar className="text-[var(--cat-accent)]" /> {UI_TRANSLATIONS[language].rounds}
                           </h3>
                           <div className="text-4xl font-display font-black text-[var(--cat-accent)] mb-2">
-                            {(!syncedDataReady && isCategorySynced(selectedCategory.id)) || (!gtwcDataReady && isGtwcCategory(selectedCategory.id)) ? '···' : selectedCategory.calendar.length}
+                            {(!syncedDataReady && isCategorySynced(selectedCategory.id)) || (!gtwcDataReady && isGtwcCategory(selectedCategory.id)) || (!ebDataReady && isEnduranceBrasilCategory(selectedCategory.id)) ? '···' : selectedCategory.calendar.length}
                           </div>
                           <p className="text-gray-500 text-sm uppercase tracking-widest font-bold">{UI_TRANSLATIONS[language].racesInSeason}</p>
                         </div>
@@ -5023,6 +5119,84 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       >
                         {selectedCategory.standings ? (
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                            {selectedCategory.standings.driverClasses?.map((cls) => (
+                              <div key={cls.classLabel} className="space-y-6 lg:col-span-2">
+                                <h3 className="text-2xl font-apex font-extrabold italic border-l-4 border-[var(--cat-accent)] pl-4 text-[var(--text-main)]">
+                                  {UI_TRANSLATIONS[language].driversChampionship} · {cls.classLabel}
+                                </h3>
+                                <div className="apex-card overflow-x-auto no-scrollbar">
+                                  <table className="w-full text-left min-w-[500px]">
+                                    <thead>
+                                      <tr className="border-b border-[var(--card-border)] bg-white/5">
+                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].position}</th>
+                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].drivers}</th>
+                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].team}</th>
+                                        <th className="px-6 py-4 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500 text-right">{UI_TRANSLATIONS[language].points}</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-[var(--card-border)]">
+                                      {cls.entries.map((item) => {
+                                        const team = selectedCategory.teams.find((t) => t.name === item.team);
+                                        const driver = driverByName.get(item.name);
+                                        const driverPhoto = driver?.cutout || driver?.image;
+                                        const isDriverPageTest = Boolean(driver && getDriverBio(selectedCategory.id, driver.id));
+                                        return (
+                                          <tr
+                                            key={`${cls.classLabel}-${item.position}-${item.name}`}
+                                            onClick={isDriverPageTest ? () => { setSelectedDriver(driver!); setView('driver'); } : undefined}
+                                            className={cn(
+                                              "hover:bg-white/5 transition-colors border-l-2",
+                                              isDriverPageTest && "cursor-pointer ring-1 ring-inset ring-[var(--row-accent)]/40"
+                                            )}
+                                            style={{
+                                              '--row-accent': team?.color ?? 'var(--cat-accent)',
+                                              borderLeftColor: team?.color ?? 'var(--cat-accent)',
+                                            } as React.CSSProperties}
+                                          >
+                                            <td className="px-6 py-4 font-apex font-extrabold italic text-[var(--row-accent)]">{item.position}</td>
+                                            <td className="px-6 py-4 font-bold text-[var(--text-main)]">
+                                              <div className="flex items-center gap-3">
+                                                {driverPhoto ? (
+                                                  <img
+                                                    src={driverPhoto}
+                                                    alt={item.name}
+                                                    className="w-9 h-9 object-cover object-top bg-[var(--row-accent)]/10 border border-[var(--row-accent)]/30 shrink-0"
+                                                    referrerPolicy="no-referrer"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                  />
+                                                ) : (
+                                                  <div className="w-9 h-9 bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                                                    <Users className="w-4 h-4 text-gray-600" />
+                                                  </div>
+                                                )}
+                                                <span>{item.name} {flagForNationality(driver?.nationality)}</span>
+                                              </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-500">
+                                              <div className="flex items-center gap-2">
+                                                {team?.badge && (
+                                                  <img
+                                                    src={team.badge}
+                                                    alt={item.team}
+                                                    className="w-5 h-5 object-contain shrink-0"
+                                                    referrerPolicy="no-referrer"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                  />
+                                                )}
+                                                <span>{item.team || '-'}</span>
+                                              </div>
+                                            </td>
+                                            <td className="px-6 py-4 font-apex-mono font-bold text-right text-[var(--text-main)]">{item.points}</td>
+                                          </tr>
+                                        );
+                                      })}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            ))}
                             {selectedCategory.standings.drivers && (
                               <div className="space-y-6">
                                 <h3 className="text-2xl font-apex font-extrabold italic border-l-4 border-[var(--cat-accent)] pl-4 text-[var(--text-main)]">

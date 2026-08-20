@@ -39,10 +39,18 @@ export interface StandingItem {
   extra?: string;
 }
 
+export interface StandingsClassGroup {
+  classLabel: string;
+  entries: StandingItem[];
+}
+
 export interface CategoryStandings {
   drivers?: StandingItem[];
   constructors?: StandingItem[];
   teams?: StandingItem[];
+  // Classificacao por classe (ex.: Endurance Brasil P1/GT3/GT4). Nao misturar
+  // numa unica lista de posicoes -- o mesmo criterio do GTWC America.
+  driverClasses?: StandingsClassGroup[];
 }
 
 export interface RuleSection {
@@ -1722,6 +1730,40 @@ export const MOTORSPORT_DATA: Category[] = [
         enTitle: 'Driver ratings',
         body: 'Mesmo sistema de classificação SRO (Platinum, Gold, Silver, Bronze) das outras versões do campeonato, definindo a classe de cada carro na corrida.',
         enBody: "Same SRO rating system (Platinum, Gold, Silver, Bronze) used across the rest of the championship, defining each car's class for the race.",
+      },
+    ],
+    icon: 'GtCar',
+    teams: [],
+    drivers: [],
+    calendar: [],
+  },
+  {
+    id: 'endurance-brasil',
+    name: 'Endurance BR',
+    fullName: 'Endurance Brasil',
+    enFullName: 'Endurance Brasil',
+    description: 'O Campeonato Brasileiro de Endurance: protótipos P1/P2 e Gran Turismo GT3/GT4 em provas de três e quatro horas.',
+    enDescription: 'The Brazilian Endurance Championship: P1/P2 prototypes and GT3/GT4 cars in three- and four-hour races.',
+    longDescription: 'O Endurance Brasil é o campeonato nacional de longa duração, com protótipos (P1 e P2) e carros de Gran Turismo (GT3 e GT4) dividindo a pista. As etapas duram em geral três ou quatro horas, com tripulações de dois ou três pilotos se revezando. Calendário, equipes, pilotos e classificação vêm direto do site oficial — a pontuação é guardada por classe, sem misturar P1 com GT3 ou GT4.',
+    enLongDescription: 'Endurance Brasil is the national long-distance championship, with prototypes (P1 and P2) and GT cars (GT3 and GT4) sharing the track. Rounds usually last three or four hours, with two- or three-driver crews sharing the car. Calendar, teams, drivers and standings come straight from the official site — points are kept per class, so P1 is never mixed with GT3 or GT4.',
+    rulesFormat: [
+      {
+        title: 'Classes',
+        enTitle: 'Classes',
+        body: 'Protótipos correm em P1 e P2; os Gran Turismo em GT3 e GT4, no regulamento FIA. Há ainda troféus paralelos (AM, PRO, Legends) no regulamento da CBA, mas a classificação publicada no site oficial — e a que o app mostra — é a de pilotos por classe de carro.',
+        enBody: 'Prototypes race in P1 and P2; GTs in GT3 and GT4 under FIA rules. The CBA rulebook also has parallel trophies (AM, PRO, Legends), but the standings published on the official site — and the ones this app shows — are the driver tables by car class.',
+      },
+      {
+        title: 'Formato das corridas',
+        enTitle: 'Race format',
+        body: 'O calendário mistura provas de três e quatro horas em autódromos brasileiros (Interlagos, Brasília, Velopark, Santa Cruz do Sul, Goiânia). Cada carro é dividido entre dois ou três pilotos, que se revezam ao longo da prova.',
+        enBody: 'The calendar mixes three- and four-hour races at Brazilian circuits (Interlagos, Brasília, Velopark, Santa Cruz do Sul, Goiânia). Each car is shared by two or three drivers who rotate through the stint.',
+      },
+      {
+        title: 'Classificação',
+        enTitle: 'Standings',
+        body: 'A pontuação é por piloto e por classe. Tripulações que dividem o mesmo carro somam os mesmos pontos e aparecem na mesma posição — nunca misturadas com outra classe.',
+        enBody: 'Points are scored per driver and per class. Crews sharing a car take the same points and the same position — never mixed with another class.',
       },
     ],
     icon: 'GtCar',
