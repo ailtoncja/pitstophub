@@ -1,4 +1,5 @@
 import type { Category, CategoryStandings, Driver, Race, StandingItem, Team } from './types';
+import { lookupTeamAssets } from './team-bios';
 
 // Endurance Brasil nao usa TheSportsDB -- e a mesma API propria do GTWC
 // (api-motorsports), em /endurance-brasil. Buscamos direto no navegador.
@@ -86,11 +87,15 @@ export async function fetchEbRoster(categoryId: string, force = false): Promise<
       const teamClass = apiTeam.drivers
         .map((d) => classByDriverId.get(d.driverId))
         .find((value) => Boolean(value)) ?? null;
+      const assets = lookupTeamAssets(apiTeam.name);
       return {
         id: apiTeam.teamId,
         name: apiTeam.name,
         color: classColor(teamClass),
         class: teamClass ?? undefined,
+        principal: apiTeam.teamPrincipal ?? undefined,
+        badge: assets?.badge,
+        clearart: assets?.clearart,
       };
     });
 
