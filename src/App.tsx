@@ -256,6 +256,7 @@ const UI_TRANSLATIONS = {
     teamOverview: 'Sobre a Equipe',
     noRosterYet: 'Nenhum piloto listado ainda.',
     clickToLearnMore: 'Clique para saber mais',
+    teamPhotosNote: 'Nem toda equipe tem foto. Quando o brasão ou o carro ainda não foram divulgados, aparece só o nome.',
     teamColor: 'Cor',
     teamPrincipal: 'Chefe de equipe',
     careerOverview: 'Carreira',
@@ -380,6 +381,7 @@ const UI_TRANSLATIONS = {
     teamOverview: 'About the Team',
     noRosterYet: 'No drivers listed yet.',
     clickToLearnMore: 'Click to learn more',
+    teamPhotosNote: 'Not every team has a photo. When the badge or car has not been published yet, only the name is shown.',
     teamColor: 'Color',
     teamPrincipal: 'Team principal',
     careerOverview: 'Career Overview',
@@ -5438,6 +5440,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             </div>
                           </div>
                         ))}
+                        {selectedCategory.teams.some((team) => !team.badge && !team.clearart) && (
+                          <p className="text-[11px] text-gray-600 font-apex-mono">
+                            {UI_TRANSLATIONS[language].teamPhotosNote}
+                          </p>
+                        )}
                       </motion.div>
                     )}
 
