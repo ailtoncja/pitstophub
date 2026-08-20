@@ -186,14 +186,21 @@ export async function fetchCategoryLiveSummary(
     if (category.id !== 'f1') return null;
 
     const year = getCategoryYear(category);
-    const [races, winnerMap] = await Promise.all([fetchRaces(year), fetchWinners(year)]);
+    const [races, winnerMap, driverStandings, constructorStandings] = await Promise.all([
+      fetchRaces(year),
+      fetchWinners(year),
+      fetchDriverStandings(year).catch((): JolpicaDriverStanding[] => []),
+      fetchConstructorStandings(year).catch((): JolpicaConstructorStanding[] => []),
+    ]);
     const calendar = buildCalendar(category, races, winnerMap);
+    const standings = buildStandings(category, driverStandings, constructorStandings);
     const next = getNextRace(calendar);
     const last = getLastRace(calendar);
 
     return {
       currentSeason: year,
       calendar,
+      standings: standings ?? undefined,
       nextEvent: next ? toEvent(next) : null,
       lastEvent: last ? toEvent(last) : null,
       matchedCalendarCount: calendar.length,
