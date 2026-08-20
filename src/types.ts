@@ -1096,7 +1096,6 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'richard-lietz', name: 'Richard Lietz', number: '912', nationality: 'Áustria', teamId: 'manthey-1st-phorm-gtd', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/nmc0q61746997118.png' },
     ],
     calendar: [
-      { id: 'roar', name: 'Roar Before The Rolex 24', enName: 'Roar Before The Rolex 24', location: 'Daytona', enLocation: 'Daytona', date: '2026-01-18', circuit: 'Daytona International Speedway', status: 'completed' },
       // Vencedores gerais (piloto da tripulacao). Fontes: imsa.com
       // (Daytona/Sebring: #7 Penske Nasr; Long Beach: #93 MSR van der Zande;
       // Laguna: #5 JDC van der Helm; Detroit/Watkins: #31 Whelen Aitken;
