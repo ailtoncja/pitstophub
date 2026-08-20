@@ -62,7 +62,23 @@ export async function fetchSyncedCalendar(categoryId: string, force = false): Pr
 
 export function mergeCategoryWithSyncedCalendar(category: Category, calendar: Race[] | null): Category {
   if (!calendar || calendar.length === 0) return category;
-  return { ...category, calendar: calendar.map((race) => normalizeRaceWinner(race, category)) };
+  return {
+    ...category,
+    calendar: calendar.map((race) =>
+      normalizeRaceWinner(preferOfficialWinner(category, race), category)
+    ),
+  };
+}
+
+// WEC/IMSA: a TheSportsDB devolve "equipe #carro" (e as vezes o carro errado,
+// ex. Imola 2026 como Toyota #7 em vez do #8). O catalogo estatico em types.ts
+// guarda o piloto confirmado em fiawec.com / imsa.com; se a data bater, esse
+// nome ganha do texto da API pra foto/link na UI nao quebrarem.
+function preferOfficialWinner(category: Category, race: Race): Race {
+  if (category.id !== 'wec' && category.id !== 'imsa') return race;
+  if (race.status === 'cancelled') return race;
+  const official = category.calendar.find((base) => base.date === race.date && base.winner);
+  return official?.winner ? { ...race, winner: official.winner } : race;
 }
 
 // A TheSportsDB traz o vencedor em formatos abreviados tipo "U. Ugochukwu"

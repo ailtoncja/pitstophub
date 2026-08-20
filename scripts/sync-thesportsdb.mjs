@@ -230,6 +230,38 @@ function fillKnownWinners(rows, winnersByName) {
   });
 }
 
+// WEC/IMSA: parseWinner() extrai "equipe #carro" do strResult (e as vezes o
+// numero errado — Imola 2026 veio como Toyota #7, mas o vencedor oficial e o
+// #8). Sobrescreve mesmo quando a API ja preencheu. Fontes: fiawec.com, imsa.com.
+function forceKnownWinners(rows, patterns) {
+  return rows.map((row) => {
+    if (row.status === 'cancelled') return row;
+    const haystack = `${row.en_name ?? ''} ${row.name ?? ''}`;
+    for (const { test, winner } of patterns) {
+      if (test(haystack)) return { ...row, winner };
+    }
+    return row;
+  });
+}
+
+const WEC_OFFICIAL_WINNERS = [
+  { test: (s) => /imola/i.test(s), winner: 'Sébastien Buemi' },
+  { test: (s) => /spa[- ]francorchamps/i.test(s), winner: 'Robin Frijns' },
+  { test: (s) => /le mans/i.test(s), winner: 'Mike Conway' },
+  { test: (s) => /s[aã]o paulo/i.test(s), winner: 'Kevin Magnussen' },
+];
+
+const IMSA_OFFICIAL_WINNERS = [
+  { test: (s) => /rolex 24/i.test(s) && !/roar/i.test(s), winner: 'Felipe Nasr' },
+  { test: (s) => /sebring/i.test(s), winner: 'Felipe Nasr' },
+  { test: (s) => /long beach/i.test(s), winner: 'Renger van der Zande' },
+  { test: (s) => /laguna seca/i.test(s), winner: 'Tijmen van der Helm' },
+  { test: (s) => /detroit/i.test(s), winner: 'Jack Aitken' },
+  { test: (s) => /watkins|the glen/i.test(s), winner: 'Jack Aitken' },
+  { test: (s) => /canadian tire|mosport|bowmanville/i.test(s), winner: 'Tom Dillmann' },
+  { test: (s) => /road america/i.test(s), winner: 'Filipe Albuquerque' },
+];
+
 const MANUAL_OVERRIDES = {
   nascar: (rows) =>
     fillKnownWinners(rows, {
@@ -320,8 +352,9 @@ const MANUAL_OVERRIDES = {
       date: '2026-11-08',
     });
 
-    return patched;
+    return forceKnownWinners(patched, WEC_OFFICIAL_WINNERS);
   },
+  imsa: (rows) => forceKnownWinners(rows, IMSA_OFFICIAL_WINNERS),
 };
 
 function applyManualOverrides(categoryId, rows) {
