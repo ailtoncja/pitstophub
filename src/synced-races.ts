@@ -67,9 +67,10 @@ export function mergeCategoryWithSyncedCalendar(category: Category, calendar: Ra
   );
   return {
     ...category,
-    calendar: fillMissingOfficialRaces(category, synced).map((race) =>
-      normalizeRaceWinner(race, category)
-    ),
+    calendar: dropNonChampionshipImsaRaces(
+      category,
+      fillMissingOfficialRaces(category, synced)
+    ).map((race) => normalizeRaceWinner(race, category)),
   };
 }
 
@@ -88,6 +89,14 @@ function preferOfficialWinner(category: Category, race: Race): Race {
 // rodada regular da liga WEC na TheSportsDB, e o GP de Long Beach da IMSA
 // as vezes vem com intRound fora de 1..60 (cai no groupByRound). Sem isso o
 // merge substituia o calendario inteiro e as duas etapas sumiam da UI.
+// O Roar Before the Rolex 24 (18/jan) e teste de pre-temporada, nao pontua.
+// A TheSportsDB ja descarta (intRound 500), mas o fallback estatico e o
+// fillMissingOfficialRaces recolocavam a etapa na UI da IMSA.
+function dropNonChampionshipImsaRaces(category: Category, races: Race[]): Race[] {
+  if (category.id !== 'imsa') return races;
+  return races.filter((race) => !/roar before/i.test(raceLabel(race)));
+}
+
 function fillMissingOfficialRaces(category: Category, synced: Race[]): Race[] {
   if (category.id !== 'wec' && category.id !== 'imsa') return synced;
   const missing = category.calendar.filter(
