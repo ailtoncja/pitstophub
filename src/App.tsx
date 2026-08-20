@@ -255,6 +255,7 @@ const UI_TRANSLATIONS = {
     teamProfile: 'Perfil da Equipe',
     teamOverview: 'Sobre a Equipe',
     noRosterYet: 'Nenhum piloto listado ainda.',
+    clickToLearnMore: 'Clique para saber mais',
     teamColor: 'Cor',
     teamPrincipal: 'Chefe de equipe',
     careerOverview: 'Carreira',
@@ -378,6 +379,7 @@ const UI_TRANSLATIONS = {
     teamProfile: 'Team Profile',
     teamOverview: 'About the Team',
     noRosterYet: 'No drivers listed yet.',
+    clickToLearnMore: 'Click to learn more',
     teamColor: 'Color',
     teamPrincipal: 'Team principal',
     careerOverview: 'Career Overview',
@@ -5362,7 +5364,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             <h3 className="text-2xl font-apex font-extrabold italic border-l-4 border-[var(--cat-accent)] pl-4 text-[var(--text-main)]">
                               {className}
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                               {selectedCategory.teams
                                 .filter(t => (t.class || 'Geral') === className)
                                 .map((team) => (
@@ -5377,7 +5379,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   >
                                     <div className="h-2 w-full" style={{ backgroundColor: team.color }} />
                                     <div className="p-6">
-                                      <div className="flex items-center justify-between mb-6">
+                                      <div className="flex items-center justify-between gap-3 mb-4">
                                         <div className="flex items-center gap-3 min-w-0">
                                           {team.badge && (
                                             <img
@@ -5424,88 +5426,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                           {followedTeamSet.has(`${selectedCategory.id}::${team.id}`) ? UI_TRANSLATIONS[language].following : UI_TRANSLATIONS[language].follow}
                                         </button>
                                       </div>
-                                      <div className="space-y-3">
-                                        {(driversByTeamId.get(team.id) ?? [])
-                                          .map(driver => {
-                                            const isDriverPageTest = Boolean(getDriverBio(selectedCategory.id, driver.id));
-                                            return (
-                                            <div
-                                              key={driver.id}
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                if (!isDriverPageTest) return;
-                                                setSelectedDriver(driver);
-                                                setView('driver');
-                                              }}
-                                              className={cn(
-                                                "relative flex flex-col p-4  bg-black/20 hover:bg-black/30 transition-all group/driver overflow-hidden border border-white/5",
-                                                isDriverPageTest && "cursor-pointer ring-1 ring-inset ring-[var(--team-accent)]/40"
-                                              )}
-                                            >
-                                              <div className="absolute top-0 right-0 w-24 h-24 -mr-8 -mt-8 bg-[var(--team-accent)]/5 rounded-full group-hover/driver:bg-[var(--team-accent)]/10 transition-colors" />
-
-                                              <div className="flex items-center gap-4 mb-4 relative z-10">
-                                                <div className="relative">
-                                                  {driver.cutout ? (
-                                                    <img
-                                                      src={driver.cutout}
-                                                      alt={driver.name}
-                                                      className="w-16 h-16 object-cover object-top bg-[var(--team-accent)]/10 border-2 border-[var(--team-accent)]/30 shadow-lg"
-                                                      referrerPolicy="no-referrer"
-                                                      loading="lazy"
-                                                      decoding="async"
-                                                    />
-                                                  ) : driver.image ? (
-                                                    <img
-                                                      src={driver.image}
-                                                      alt={driver.name}
- className="w-16 h-16 rounded-xl object-cover border-2 border-[var(--team-accent)]/30 shadow-lg"
-                                                      referrerPolicy="no-referrer"
-                                                      loading="lazy"
-                                                      decoding="async"
-                                                    />
-                                                  ) : (
- <div className="w-16 h-16 rounded-xl bg-[var(--team-accent)]/10 flex items-center justify-center border-2 border-[var(--team-accent)]/30">
-                                                      <Users className="w-8 h-8 text-[var(--team-accent)]/40" />
-                                                    </div>
-                                                  )}
-                                                  <div className="absolute -bottom-2 -right-2 bg-[var(--team-accent)] text-[var(--team-accent-ink)] text-[10px] font-black px-2 py-0.5 rounded-md shadow-lg">
-                                                    #{driver.number}
-                                                  </div>
-                                                </div>
-
-                                                <div className="min-w-0 flex-1">
-                                                  <div className="font-apex font-extrabold italic text-lg text-[var(--text-main)] group-hover/driver:text-[var(--team-accent)] transition-colors">
-                                                    {driver.name.split(' ')[0]} <span className="text-[var(--team-accent)] group-hover/driver:text-[var(--text-main)]">{driver.name.split(' ').slice(1).join(' ')}</span>{' '}
-                                                    <span className="not-italic">{flagForNationality(driver.nationality)}</span>
-                                                  </div>
-                                                  <div className="text-[10px] text-gray-500 uppercase font-bold tracking-widest flex items-center gap-1">
-                                                    <Flag className="w-2 h-2" />
-                                                    {driver.nationality}
-                                                  </div>
-                                                </div>
-                                                <button
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    toggleFollowDriver(selectedCategory.id, driver.id);
-                                                  }}
-                                                  className={cn(
-                                                    "px-2 py-1 rounded-md text-[10px] font-black uppercase tracking-widest border transition-colors shrink-0",
-                                                    followedDriverSet.has(`${selectedCategory.id}::${driver.id}`)
-                                                      ? "bg-[var(--team-accent)]/10 border-[var(--team-accent)]/30 text-[var(--team-accent)]"
-                                                      : "bg-white/5 border-white/10 text-gray-400 hover:text-[var(--team-accent)]"
-                                                  )}
-                                                >
-                                                  {followedDriverSet.has(`${selectedCategory.id}::${driver.id}`) ? UI_TRANSLATIONS[language].following : UI_TRANSLATIONS[language].follow}
-                                                </button>
-                                              </div>
-
-                                              <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
-                                                <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].grid2026}</div>
-                                                <ChevronRight className="w-4 h-4 text-[var(--team-accent)] opacity-0 group-hover/driver:opacity-100 group-hover/driver:translate-x-1 transition-all" />
-                                              </div>
-                                            </div>
-                                          );})}
+                                      <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                                        <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">
+                                          {UI_TRANSLATIONS[language].clickToLearnMore}
+                                        </div>
+                                        <ChevronRight className="w-4 h-4 text-[var(--team-accent)] opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                                       </div>
                                     </div>
                                   </div>
