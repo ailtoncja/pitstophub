@@ -5387,8 +5387,8 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   >
                                     <div className="h-2 w-full" style={{ backgroundColor: team.color }} />
                                     <div className="p-6">
-                                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                                        <div className="flex items-center gap-3 min-w-0">
+                                      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-between gap-3 mb-4">
+                                        <div className="flex items-center gap-3 min-w-0 sm:shrink-0">
                                           {team.badge && (
                                             <img
                                               src={team.badge}
@@ -5410,10 +5410,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                               decoding="async"
                                             />
                                           )}
-                                          <div className="min-w-0 flex-1">
-                                            <h4 className="text-xl font-apex font-extrabold italic text-[var(--text-main)] leading-tight break-words">{team.name}</h4>
+                                          <div className="min-w-0 max-sm:flex-1">
+                                            <h4 className="text-xl font-apex font-extrabold italic text-[var(--text-main)] leading-tight sm:whitespace-nowrap">{team.name}</h4>
                                             {team.car && (
-                                              <div className="text-xs font-mono text-[var(--team-accent)] font-bold uppercase tracking-widest mt-1 break-words">
+                                              <div className="text-xs font-mono text-[var(--team-accent)] font-bold uppercase tracking-widest mt-1 sm:whitespace-nowrap">
                                                 {team.car}
                                               </div>
                                             )}
