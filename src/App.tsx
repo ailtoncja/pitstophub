@@ -2017,6 +2017,29 @@ function getDriverBio(categoryId: string, driverId: string): { pt: string; en: s
   return DRIVER_BIOS[`${categoryId}:${driverId}`];
 }
 
+// Sprint/DTM guardam "piloto A / piloto B" no mesmo round. A foto e a
+// contagem de vitorias precisam achar qualquer um dos nomes, nao so o texto
+// inteiro -- senao driverByName.get(race.winner) nunca bate.
+function winnerNameParts(winner: string): string[] {
+  return winner.split(/\s*\/\s*/).map((part) => part.trim()).filter(Boolean);
+}
+
+function findWinnerDriver(winner: string | undefined, driverByName: Map<string, Driver>): Driver | undefined {
+  if (!winner) return undefined;
+  const exact = driverByName.get(winner);
+  if (exact) return exact;
+  for (const part of winnerNameParts(winner)) {
+    const hit = driverByName.get(part);
+    if (hit) return hit;
+  }
+  return undefined;
+}
+
+function raceWonByDriver(race: Race, driverName: string): boolean {
+  if (!race.winner) return false;
+  return race.winner === driverName || winnerNameParts(race.winner).includes(driverName);
+}
+
 // Identifica GPs por texto (circuito/local/nome), nao pelo id estatico: o calendario de F1
 // e substituido pelos dados ao vivo da Jolpica, que pode gerar um id diferente do id local
 // quando o casamento por data/nome com a base local falha.
@@ -3167,6 +3190,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     [selectedCategory.drivers]
   );
 
+  const selectedRaceWinnerDriver = useMemo(
+    () => findWinnerDriver(selectedRace?.winner, driverByName),
+    [selectedRace?.winner, driverByName]
+  );
+
   // Destaques da aba Visao Geral (lider do campeonato, lider de construtores,
   // ultimo resultado) usam a cor da equipe de quem esta sendo mostrado, em vez
   // da cor fixa da categoria.
@@ -3176,7 +3204,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const constructorsLeaderTeam = constructorsLeader
     ? selectedCategory.teams.find((t) => t.name === constructorsLeader.name) ?? null
     : null;
-  const lastRaceWinnerDriver = lastCompletedRace?.winner ? driverByName.get(lastCompletedRace.winner) ?? null : null;
+  const lastRaceWinnerDriver = findWinnerDriver(lastCompletedRace?.winner, driverByName) ?? null;
   const lastRaceWinnerTeam = lastRaceWinnerDriver
     ? selectedCategory.teams.find((t) => t.id === lastRaceWinnerDriver.teamId) ?? null
     : null;
@@ -3223,7 +3251,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const selectedDriverWins = useMemo(() => {
     if (!selectedDriver) return [];
     return selectedCategory.calendar
-      .filter((race) => race.winner === selectedDriver.name)
+      .filter((race) => raceWonByDriver(race, selectedDriver.name))
       .sort((a, b) => b.date.localeCompare(a.date));
   }, [selectedCategory.calendar, selectedDriver]);
 
@@ -4103,9 +4131,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                 {selectedRace.status === 'completed' && selectedRace.winner && (
                   <div className="apex-card p-8 flex items-center gap-6 max-w-md">
-                    {(driverByName.get(selectedRace.winner)?.cutout || driverByName.get(selectedRace.winner)?.image) && (
+                    {(selectedRaceWinnerDriver?.cutout || selectedRaceWinnerDriver?.image) && (
                       <img
-                        src={driverByName.get(selectedRace.winner)!.cutout || driverByName.get(selectedRace.winner)!.image}
+                        src={selectedRaceWinnerDriver.cutout || selectedRaceWinnerDriver.image}
                         alt={selectedRace.winner}
                         className="w-20 h-20 rounded-full object-cover object-top border-2 border-yellow-500/50"
                         referrerPolicy="no-referrer"
@@ -5039,7 +5067,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         
                         <div className="space-y-4">
                           {selectedCategory.calendar.map((race) => {
-                            const winnerDriver = race.winner ? driverByName.get(race.winner) : undefined;
+                            const winnerDriver = findWinnerDriver(race.winner, driverByName);
                             const isRacePageTest = hasCircuitPage(selectedCategory, race);
                             return (
                             <div

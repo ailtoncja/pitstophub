@@ -119,7 +119,41 @@ export async function fetchGtwcRoster(categoryId: string, force = false): Promis
 
 export function mergeCategoryWithGtwcRoster(category: Category, roster: GtwcRoster | null): Category {
   if (!roster || roster.teams.length === 0) return category;
-  return { ...category, teams: roster.teams, drivers: roster.drivers };
+  return {
+    ...category,
+    teams: roster.teams,
+    drivers: roster.drivers,
+    calendar: category.calendar.map((race) => ({
+      ...race,
+      winner: race.winner ? matchWinnerToRoster(race.winner, roster.drivers) : race.winner,
+    })),
+  };
+}
+
+function matchWinnerToRoster(winner: string, drivers: Driver[]): string {
+  return winner
+    .split(/\s*\/\s*/)
+    .map((part) => matchDriverName(part.trim(), drivers))
+    .join(' / ');
+}
+
+function matchDriverName(name: string, drivers: Driver[]): string {
+  const norm = normalizePersonName(name);
+  const exact = drivers.find((driver) => normalizePersonName(driver.name) === norm);
+  if (exact) return exact.name;
+  // Sites da Asia invertem dado/familia ("Wei Lu" vs "Lu Wei").
+  const swapped = norm.split(' ').reverse().join(' ');
+  const swappedHit = drivers.find((driver) => normalizePersonName(driver.name) === swapped);
+  return swappedHit ? swappedHit.name : name;
+}
+
+function normalizePersonName(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, ' ')
+    .trim()
+    .toLowerCase();
 }
 
 // So expoe uma classificacao quando ela tem uma unica classe "geral" -- ex.:
@@ -163,8 +197,44 @@ function toRace(race: ApiRace): Race {
     enLocation: race.location ?? undefined,
     date: race.date,
     status,
-    winner: race.winner ?? undefined,
+    winner: preferOfficialWinner(race) ?? undefined,
   };
+}
+
+// A api-motorsports guarda o time (e em Sprint "time A / time B" pras duas
+// corridas do fim de semana). A UI procura foto/link por nome de piloto, igual
+// WEC/IMSA -- troca pelo piloto confirmado nos sites oficiais da SRO.
+// Endurance / America (1 corrida): quem levou a bandeirada. Sprint (2 corridas
+// no mesmo round da API): "piloto da Race 1 / piloto da Race 2".
+const GTWC_OFFICIAL_WINNERS: Record<string, Record<string, string>> = {
+  europe: {
+    'circuit-paul-ricard': 'Nicki Thiim',
+    'brands-hatch': 'Arthur Leclerc / Bastian Buus',
+    monza: 'Rocco Mazzola',
+    'crowdstrike-24-hours-of-spa': 'Bastian Buus',
+    misano: 'Kelvin van der Linde',
+    'magny-cours': 'Jules Gounon / Bastian Buus',
+  },
+  america: {
+    'sonoma-raceway': 'Mikael Grenier',
+    'circuit-of-the-americas': 'Ryan Yardley',
+    'sebring-international-raceway': 'Robby Foley',
+    'road-atlanta': 'Philip Ellis',
+  },
+  asia: {
+    sepang: 'Alessandro Ghiretti / Lu Wei',
+    'pertamina-mandalika-international-circuit': 'Congfu Cheng / Loek Hartog',
+    'fuji-international-speedway': 'Weian Chen / Lu Wei',
+  },
+};
+
+function preferOfficialWinner(race: ApiRace): string | null {
+  const official = GTWC_OFFICIAL_WINNERS[race.seriesId]?.[race.raceId];
+  if (!official) return race.winner;
+  return official
+    .split(/\s*\/\s*/)
+    .map((name) => toDriverName(name))
+    .join(' / ');
 }
 
 // Times/pilotos que ja apareceram em alguma corrida sincronizada da
