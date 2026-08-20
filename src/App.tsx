@@ -76,6 +76,7 @@ import {
 import type { CategoryStandings, Driver, Race, StandingItem, Team } from './types';
 import { FavoritesPicker, FavoritesOnboardingModal, NotificationsToggle } from './Favorites';
 import { flagForNationality } from './nationality-flags';
+import { getTeamBio } from './team-bios';
 
 const IconMap: Record<string, React.ElementType> = {
   OpenWheelCar: OpenWheelCarIcon,
@@ -252,6 +253,7 @@ const UI_TRANSLATIONS = {
     noWinsYet: 'Nenhuma vitória nesta temporada ainda.',
     driverProfile: 'Perfil do Piloto',
     teamProfile: 'Perfil da Equipe',
+    teamOverview: 'Sobre a Equipe',
     noRosterYet: 'Nenhum piloto listado ainda.',
     teamColor: 'Cor',
     careerOverview: 'Carreira',
@@ -373,6 +375,7 @@ const UI_TRANSLATIONS = {
     noWinsYet: 'No wins this season yet.',
     driverProfile: 'Driver Profile',
     teamProfile: 'Team Profile',
+    teamOverview: 'About the Team',
     noRosterYet: 'No drivers listed yet.',
     teamColor: 'Color',
     careerOverview: 'Career Overview',
@@ -3279,6 +3282,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       .filter((race) => selectedTeamDrivers.some((driver) => raceWonByDriver(race, driver.name)))
       .sort((a, b) => b.date.localeCompare(a.date));
   }, [selectedCategory.calendar, displayedTeam, selectedTeamDrivers]);
+  const selectedTeamBio = useMemo(
+    () => (displayedTeam ? getTeamBio(selectedCategory.id, displayedTeam.id) : undefined),
+    [selectedCategory.id, displayedTeam]
+  );
   // Pagina de piloto usa a cor da equipe do piloto como destaque, nao a cor fixa da categoria.
   const driverAccent = selectedDriverTeam?.color ?? categoryAccent;
   const teamAccent = displayedTeam?.color ?? categoryAccent;
@@ -4723,6 +4730,16 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       />
                       <div className="relative z-10 p-8">
                         <div className="flex items-center gap-3 mb-3 flex-wrap">
+                          {displayedTeam.badge && (
+                            <img
+                              src={displayedTeam.badge}
+                              alt={displayedTeam.name}
+                              className="w-10 h-10 object-contain shrink-0"
+                              referrerPolicy="no-referrer"
+                              loading="eager"
+                              decoding="async"
+                            />
+                          )}
                           {displayedTeam.class && (
                             <span className="text-[var(--team-accent)] font-apex-mono text-xs font-semibold border border-[var(--team-accent)] px-2 py-1 uppercase">
                               {displayedTeam.class}
@@ -4811,33 +4828,86 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
                     <div className="apex-card p-8 flex-grow">
                       <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
-                        {UI_TRANSLATIONS[language].teamProfile}
+                        {selectedTeamBio ? UI_TRANSLATIONS[language].teamOverview : UI_TRANSLATIONS[language].teamProfile}
                       </h3>
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-8">
-                        {displayedTeam.car && (
+                      {selectedTeamBio ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                          <div>
+                            <p className="text-gray-400 leading-relaxed mb-8">
+                              {language === 'pt' ? selectedTeamBio.pt : selectedTeamBio.en}
+                            </p>
+                            <div className="grid grid-cols-2 gap-x-6 gap-y-6">
+                              {displayedTeam.car && (
+                                <div>
+                                  <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                                    {UI_TRANSLATIONS[language].chassis}
+                                  </div>
+                                  <div className="font-bold text-[var(--text-main)]">{displayedTeam.car}</div>
+                                </div>
+                              )}
+                              <div>
+                                <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                                  {UI_TRANSLATIONS[language].teamColor}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="w-4 h-4 shrink-0" style={{ backgroundColor: displayedTeam.color }} />
+                                  <span className="font-apex-mono text-sm text-[var(--text-main)] uppercase">{displayedTeam.color}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          {displayedTeam.badge && (
+                            <div className="bg-black/20 border border-white/5 p-8 flex items-center justify-center min-h-[180px]">
+                              <img
+                                src={displayedTeam.badge}
+                                alt={displayedTeam.name}
+                                className="max-h-36 w-auto object-contain"
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-8">
+                          {displayedTeam.car && (
+                            <div>
+                              <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                                {UI_TRANSLATIONS[language].chassis}
+                              </div>
+                              <div className="font-bold text-[var(--text-main)]">{displayedTeam.car}</div>
+                            </div>
+                          )}
                           <div>
                             <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
-                              {UI_TRANSLATIONS[language].chassis}
+                              {UI_TRANSLATIONS[language].teamColor}
                             </div>
-                            <div className="font-bold text-[var(--text-main)]">{displayedTeam.car}</div>
+                            <div className="flex items-center gap-2">
+                              <span className="w-4 h-4 shrink-0" style={{ backgroundColor: displayedTeam.color }} />
+                              <span className="font-apex-mono text-sm text-[var(--text-main)] uppercase">{displayedTeam.color}</span>
+                            </div>
                           </div>
-                        )}
-                        <div>
-                          <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
-                            {UI_TRANSLATIONS[language].teamColor}
+                          <div>
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                              {UI_TRANSLATIONS[language].drivers}
+                            </div>
+                            <div className="font-bold text-[var(--text-main)]">{selectedTeamDrivers.length || '-'}</div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="w-4 h-4 shrink-0" style={{ backgroundColor: displayedTeam.color }} />
-                            <span className="font-apex-mono text-sm text-[var(--text-main)] uppercase">{displayedTeam.color}</span>
-                          </div>
+                          {displayedTeam.badge && (
+                            <div className="col-span-2 bg-black/20 border border-white/5 p-6 flex items-center justify-center">
+                              <img
+                                src={displayedTeam.badge}
+                                alt={displayedTeam.name}
+                                className="h-16 w-auto object-contain"
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            </div>
+                          )}
                         </div>
-                        <div>
-                          <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
-                            {UI_TRANSLATIONS[language].drivers}
-                          </div>
-                          <div className="font-bold text-[var(--text-main)]">{selectedTeamDrivers.length || '-'}</div>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>
