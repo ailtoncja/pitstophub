@@ -89,10 +89,6 @@ const SPRING = { type: 'spring' as const, stiffness: 380, damping: 32 };
 const SPRING_SOFT = { type: 'spring' as const, stiffness: 280, damping: 28 };
 
 const CATEGORY_BY_ID = new Map(MOTORSPORT_DATA.map(c => [c.id, c]));
-const F1_STATIC_FALLBACK: Partial<Category> = {
-  calendar: [],
-  standings: undefined,
-};
 
 const CATEGORY_ACCENTS: Record<string, string> = {
   f1: '#e10600',
@@ -121,6 +117,12 @@ function getAccentTextColor(hex: string): string {
   const b = parseInt(hex.slice(5, 7), 16);
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
   return brightness > 150 ? '#12121a' : '#ffffff';
+}
+
+function roundsLeftLabel(count: number, language: 'pt' | 'en'): string {
+  if (count <= 0) return UI_TRANSLATIONS[language].seasonWrapped;
+  if (language === 'pt') return count === 1 ? 'Falta 1 etapa' : `Faltam ${count} etapas`;
+  return count === 1 ? '1 round left' : `${count} rounds left`;
 }
 
 const NAV_GROUPS = [
@@ -224,7 +226,9 @@ const UI_TRANSLATIONS = {
     noUpcomingRace: 'Nenhuma corrida agendada no momento.',
     featuredTitle: 'Destaques',
     latestWinner: 'Último Vencedor',
-    seasonPanorama: 'Panorama 2026',
+    afterThis: 'Depois desta',
+    whatIsThis: 'O que é',
+    seasonWrapped: 'Temporada encerrada',
     categoriesLabel: 'Categorias',
     trackLayout: 'Traçado do Circuito',
     trackSpecs: 'Ficha Técnica',
@@ -340,7 +344,9 @@ const UI_TRANSLATIONS = {
     noUpcomingRace: 'No races scheduled right now.',
     featuredTitle: 'Highlights',
     latestWinner: 'Latest Winner',
-    seasonPanorama: '2026 Overview',
+    afterThis: 'After this',
+    whatIsThis: 'What is this',
+    seasonWrapped: 'Season complete',
     categoriesLabel: 'Categories',
     trackLayout: 'Track Layout',
     trackSpecs: 'Track Specs',
@@ -2868,12 +2874,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
   const allCategories = useMemo(
     () => MOTORSPORT_DATA.map((category) => {
-      const normalizedCategory = category.id === 'f1'
-        ? { ...category, ...F1_STATIC_FALLBACK }
-        : category;
       const summaryData = liveCategorySummaries[category.id] ?? null;
       const detailData = selectedCategoryBase.id === category.id ? liveCategoryData : null;
-      const liveMerged = mergeCategoryWithLiveData(mergeCategoryWithLiveData(normalizedCategory, summaryData), detailData);
+      const liveMerged = mergeCategoryWithLiveData(mergeCategoryWithLiveData(category, summaryData), detailData);
       const calendarMerged = mergeCategoryWithSyncedCalendar(liveMerged, syncedCalendars[category.id] ?? null);
       const standingsMerged = mergeCategoryWithSyncedStandings(calendarMerged, syncedStandings[category.id] ?? null);
       const gtwcCalendarMerged = mergeCategoryWithGtwcCalendar(standingsMerged, gtwcCalendars[category.id] ?? null);
@@ -3125,10 +3128,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     return getRaceCircuitInfo(selectedRace);
   }, [selectedRace, selectedCategory]);
 
-  // "Ultimo vencedor" e "lider do campeonato" sempre mostram a MESMA categoria entre si
-  // (logado/seguindo ou não): busca a corrida concluida mais recente cuja categoria tambem
-  // tenha classificacao (senao os dois cards nunca bateriam), preferindo categorias seguidas
-  // quando o usuario estiver logado e seguindo algo.
+  // Destaques da home seguem a MESMA categoria da proxima largada (hero).
+  // Antes o "ultimo vencedor" pegava a corrida concluida mais recente de
+  // qualquer serie com classificacao -- o hero podia ser F1 e os cards IndyCar.
   const hasStandingsData = (category: Category) =>
     (category.standings?.drivers?.length ?? 0) > 0 ||
     (category.standings?.constructors?.length ?? 0) > 0 ||
@@ -3143,32 +3145,52 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       .filter((item) => hasStandingsData(item.category))
       .sort((a, b) => b.race.date.localeCompare(a.race.date))[0] ?? null;
 
-  const lastGlobalResult = useMemo(() => {
+  const lastHomeResult = useMemo(() => {
+    const focus = heroNextRace?.category;
+    if (focus) {
+      const last = [...focus.calendar]
+        .filter((race) => race.status === 'completed' && race.winner)
+        .sort((a, b) => b.date.localeCompare(a.date))[0];
+      if (last) return { category: focus, race: last };
+    }
     if (currentUser && followedCategoryObjects.length > 0) {
       const followed = pickLastResultWithStandings(followedCategoryObjects);
       if (followed) return followed;
     }
     return pickLastResultWithStandings(allCategories);
-  }, [allCategories, currentUser, followedCategoryObjects]);
+  }, [allCategories, currentUser, followedCategoryObjects, heroNextRace]);
 
-  const overviewStats = useMemo(() => ({
-    categories: allCategories.length,
-    races: allCategories.reduce((sum, category) => sum + category.calendar.length, 0),
-    teams: allCategories.reduce((sum, category) => sum + category.teams.length, 0),
-  }), [allCategories]);
+  const homeLeaderCategory = heroNextRace?.category ?? lastHomeResult?.category ?? null;
 
   const featuredLeader = useMemo(() => {
-    // Sempre a mesma categoria do card "ultimo vencedor" (lastGlobalResult), que ja garante
-    // que a categoria escolhida tem classificacao. Nem toda categoria tem por piloto (ex.:
-    // IMSA so tem por equipe), entao cai pra construtores/equipes antes de desistir.
-    const category = lastGlobalResult?.category;
+    const category = homeLeaderCategory;
     const entry = category?.standings?.drivers?.[0]
       ?? category?.standings?.driverClasses?.[0]?.entries?.[0]
       ?? category?.standings?.constructors?.[0]
       ?? category?.standings?.teams?.[0]
       ?? null;
     return entry && category ? { entry, category } : null;
-  }, [lastGlobalResult]);
+  }, [homeLeaderCategory]);
+
+  const heroRaceAfter = useMemo(() => {
+    if (!heroNextRace) return null;
+    return [...heroNextRace.category.calendar]
+      .filter((race) => race.status === 'upcoming' && race.date > heroNextRace.race.date)
+      .sort((a, b) => a.date.localeCompare(b.date))[0] ?? null;
+  }, [heroNextRace]);
+
+  const heroRoundsAfter = useMemo(() => {
+    if (!heroNextRace) return 0;
+    return heroNextRace.category.calendar.filter(
+      (race) => race.status === 'upcoming' && race.date > heroNextRace.race.date
+    ).length;
+  }, [heroNextRace]);
+
+  React.useEffect(() => {
+    if (view !== 'home' || !heroNextRace) return;
+    const group = NAV_GROUPS.find((item) => item.ids.includes(heroNextRace.category.id));
+    if (group) setActiveHomeGroup(group.name.en);
+  }, [view, heroNextRace?.category.id]);
 
   const teamClasses = useMemo(
     () => Array.from(new Set(selectedCategory.teams.map(team => team.class || 'Geral'))),
@@ -3769,7 +3791,15 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     <div className="h-px flex-1 bg-gradient-to-r from-[var(--card-border)] to-transparent" />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="apex-card p-6">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!featuredLeader) return;
+                        handleCategorySelect(featuredLeader.category);
+                        setActiveTab('standings');
+                      }}
+                      className="apex-card p-6 text-left w-full hover:bg-white/5 transition-colors"
+                    >
                       <div className="flex items-center gap-2 mb-4 text-brand-red">
                         <Trophy className="w-4 h-4" />
                         <span className="font-apex-mono text-[10px] font-semibold uppercase tracking-widest">
@@ -3780,11 +3810,21 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         {featuredLeader?.entry.name || '--'}
                       </div>
                       <div className="font-apex-mono text-xs text-gray-500 uppercase tracking-widest font-medium truncate">
-                        {featuredLeader ? `${featuredLeader.entry.team ?? (language === 'pt' ? featuredLeader.category.name : (featuredLeader.category.enFullName || featuredLeader.category.name))} • ${featuredLeader.entry.points} ${UI_TRANSLATIONS[language].points}` : UI_TRANSLATIONS[language].notAvailableShort}
+                        {featuredLeader
+                          ? `${language === 'pt' ? featuredLeader.category.name : (featuredLeader.category.enFullName || featuredLeader.category.name)}${featuredLeader.entry.team ? ` • ${featuredLeader.entry.team}` : ''} • ${featuredLeader.entry.points} ${UI_TRANSLATIONS[language].points}`
+                          : UI_TRANSLATIONS[language].notAvailableShort}
                       </div>
-                    </div>
+                    </button>
 
-                    <div className="apex-card p-6">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!lastHomeResult) return;
+                        handleCategorySelect(lastHomeResult.category);
+                        setActiveTab('calendar');
+                      }}
+                      className="apex-card p-6 text-left w-full hover:bg-white/5 transition-colors"
+                    >
                       <div className="flex items-center gap-2 mb-4 text-brand-red">
                         <CheckCircle2 className="w-4 h-4" />
                         <span className="font-apex-mono text-[10px] font-semibold uppercase tracking-widest">
@@ -3792,37 +3832,70 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         </span>
                       </div>
                       <div className="font-apex text-2xl font-extrabold italic text-[var(--text-main)] mb-1 truncate">
-                        {lastGlobalResult?.race.winner || '--'}
+                        {lastHomeResult?.race.winner || '--'}
                       </div>
                       <div className="font-apex-mono text-xs text-gray-500 uppercase tracking-widest font-medium truncate">
-                        {lastGlobalResult
-                          ? `${lastGlobalResult.category.name} • ${language === 'pt' ? lastGlobalResult.race.name : (lastGlobalResult.race.enName || lastGlobalResult.race.name)}`
+                        {lastHomeResult
+                          ? `${language === 'pt' ? lastHomeResult.category.name : (lastHomeResult.category.enFullName || lastHomeResult.category.name)} • ${language === 'pt' ? lastHomeResult.race.name : (lastHomeResult.race.enName || lastHomeResult.race.name)}`
                           : UI_TRANSLATIONS[language].notAvailableShort}
                       </div>
-                    </div>
+                    </button>
 
-                    <div className="apex-card p-6">
-                      <div className="flex items-center gap-2 mb-4 text-brand-red">
-                        <LayoutGrid className="w-4 h-4" />
-                        <span className="font-apex-mono text-[10px] font-semibold uppercase tracking-widest">
-                          {UI_TRANSLATIONS[language].seasonPanorama}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <div>
-                          <div className="font-apex text-xl font-extrabold italic text-[var(--text-main)]">{overviewStats.categories}</div>
-                          <div className="font-apex-mono text-[9px] text-gray-500 uppercase tracking-widest font-medium">{UI_TRANSLATIONS[language].categoriesLabel}</div>
+                    {heroRaceAfter && heroNextRace ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleCategorySelect(heroNextRace.category);
+                          if (hasCircuitPage(heroNextRace.category, heroRaceAfter)) {
+                            setSelectedRace(heroRaceAfter);
+                            setView('race');
+                          } else {
+                            setActiveTab('calendar');
+                          }
+                        }}
+                        className="apex-card p-6 text-left w-full hover:bg-white/5 transition-colors"
+                      >
+                        <div className="flex items-center gap-2 mb-4 text-brand-red">
+                          <Calendar className="w-4 h-4" />
+                          <span className="font-apex-mono text-[10px] font-semibold uppercase tracking-widest">
+                            {UI_TRANSLATIONS[language].afterThis}
+                          </span>
                         </div>
-                        <div>
-                          <div className="font-apex text-xl font-extrabold italic text-[var(--text-main)]">{syncedDataReady && gtwcDataReady && ebDataReady ? overviewStats.races : '···'}</div>
-                          <div className="font-apex-mono text-[9px] text-gray-500 uppercase tracking-widest font-medium">{UI_TRANSLATIONS[language].racesInSeason}</div>
+                        <div className="font-apex text-2xl font-extrabold italic text-[var(--text-main)] mb-1 truncate">
+                          {language === 'pt' ? heroRaceAfter.name : (heroRaceAfter.enName || heroRaceAfter.name)}
                         </div>
-                        <div>
-                          <div className="font-apex text-xl font-extrabold italic text-[var(--text-main)]">{overviewStats.teams}</div>
-                          <div className="font-apex-mono text-[9px] text-gray-500 uppercase tracking-widest font-medium">{UI_TRANSLATIONS[language].teams}</div>
+                        <div className="font-apex-mono text-xs text-gray-500 uppercase tracking-widest font-medium truncate">
+                          {heroRaceAfter.date.split('-').reverse().join('/')} • {roundsLeftLabel(heroRoundsAfter, language)}
                         </div>
-                      </div>
-                    </div>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!heroNextRace) return;
+                          handleCategorySelect(heroNextRace.category);
+                          setActiveTab('overview');
+                        }}
+                        className="apex-card p-6 text-left w-full hover:bg-white/5 transition-colors"
+                      >
+                        <div className="flex items-center gap-2 mb-4 text-brand-red">
+                          <Info className="w-4 h-4" />
+                          <span className="font-apex-mono text-[10px] font-semibold uppercase tracking-widest">
+                            {UI_TRANSLATIONS[language].whatIsThis}
+                          </span>
+                        </div>
+                        <div className="font-apex text-2xl font-extrabold italic text-[var(--text-main)] mb-1 truncate">
+                          {heroNextRace
+                            ? (language === 'pt' ? heroNextRace.category.fullName : (heroNextRace.category.enFullName || heroNextRace.category.fullName))
+                            : '--'}
+                        </div>
+                        <div className="text-xs text-gray-500 font-medium line-clamp-2">
+                          {heroNextRace
+                            ? (language === 'pt' ? heroNextRace.category.description : (heroNextRace.category.enDescription || heroNextRace.category.description))
+                            : UI_TRANSLATIONS[language].notAvailableShort}
+                        </div>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -3954,10 +4027,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           {UI_TRANSLATIONS[language].championshipLeaders}
                         </h2>
                         {(() => {
-                          if (!lastGlobalResult) {
+                          if (!homeLeaderCategory) {
                             return <p className="text-xs text-gray-500">{UI_TRANSLATIONS[language].notAvailableShort}</p>;
                           }
-                          const leaderCategory = lastGlobalResult.category;
+                          const leaderCategory = homeLeaderCategory;
                           const board = leaderCategory.standings?.drivers
                             ?? leaderCategory.standings?.driverClasses?.[0]?.entries
                             ?? leaderCategory.standings?.constructors
@@ -3993,9 +4066,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             </div>
                           );
                         })()}
-                        {lastGlobalResult && (
+                        {homeLeaderCategory && (
                           <button
-                            onClick={() => { handleCategorySelect(lastGlobalResult.category); setActiveTab('standings'); }}
+                            onClick={() => { handleCategorySelect(homeLeaderCategory); setActiveTab('standings'); }}
                             className="mt-5 w-full px-4 py-2.5 bg-[var(--bg-main)] border border-[var(--card-border)] rounded-lg font-apex-mono text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-brand-red transition-colors"
                           >
                             {UI_TRANSLATIONS[language].standings}
