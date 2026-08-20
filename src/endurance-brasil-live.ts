@@ -151,12 +151,30 @@ function toRace(race: ApiRace): Race {
   return {
     id: race.raceId,
     name: race.name,
+    enName: translateRaceName(race.name),
     circuit: race.location ?? race.name,
     location: race.location ?? '',
+    enLocation: translateLocation(race.location),
     date: race.date,
     status: race.completed ? 'completed' : 'upcoming',
     winner: race.winner ?? undefined,
   };
+}
+
+function translateRaceName(name: string): string {
+  return name
+    .replace(/Etapa\s+(\d+)/gi, 'Round $1')
+    .replace(/Quatro Horas d[eo]\s+/gi, 'Four Hours of ')
+    .replace(/Tr[eê]s Horas d[eo]\s+/gi, 'Three Hours of ')
+    .replace(/Horas d[eo]\s+/gi, 'Hours of ');
+}
+
+function translateLocation(location: string | null): string | undefined {
+  if (!location) return undefined;
+  return location
+    .replace(/^Autódromo Internacional de\s+/i, '')
+    .replace(/^Autódromo de\s+/i, '')
+    .replace(/^Autódromo\s+/i, '');
 }
 
 function classRank(label: string): number {
