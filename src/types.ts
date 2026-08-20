@@ -721,10 +721,13 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'shahin', name: 'Yasser Shahin', number: '92', nationality: 'Austrália', teamId: 'bend-manthey', image: 'https://r2.thesportsdb.com/images/media/player/thumb/avofx51710080312.jpg', cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/aj9ufm1747135667.png'},
     ],
     calendar: [
-      { id: 'imola', name: '6 Horas de Imola', enName: '6 Hours of Imola', location: 'Imola', enLocation: 'Imola', date: '2026-04-19', circuit: 'Autodromo Enzo e Dino Ferrari', status: 'completed', winner: 'Toyota Racing #7' },
-      { id: 'spa', name: '6 Horas de Spa-Francorchamps', enName: '6 Hours of Spa-Francorchamps', location: 'Spa', enLocation: 'Spa', date: '2026-05-09', circuit: 'Circuit de Spa-Francorchamps', status: 'completed', winner: 'BMW M Team WRT #20' },
-      { id: 'lemans', name: '24 Horas de Le Mans', enName: '24 Hours of Le Mans', location: 'Le Mans', enLocation: 'Le Mans', date: '2026-06-14', circuit: 'Circuit de la Sarthe', status: 'completed', winner: 'Toyota Racing #7' },
-      { id: 'saopaulo', name: '6 Horas de São Paulo', enName: '6 Hours of São Paulo', location: 'São Paulo', enLocation: 'São Paulo', date: '2026-07-12', circuit: 'Autódromo de Interlagos', status: 'completed', winner: 'BMW M Team WRT #15' },
+      // Vencedores Hypercar (piloto que levou a bandeirada). Fontes: fiawec.com
+      // (Imola: #8 Toyota Buemi/Hartley/Hirakawa — nao o #7; Spa: #20 BMW;
+      // Le Mans: #7 Toyota; Sao Paulo: #15 BMW).
+      { id: 'imola', name: '6 Horas de Imola', enName: '6 Hours of Imola', location: 'Imola', enLocation: 'Imola', date: '2026-04-19', circuit: 'Autodromo Enzo e Dino Ferrari', status: 'completed', winner: 'Sébastien Buemi' },
+      { id: 'spa', name: '6 Horas de Spa-Francorchamps', enName: '6 Hours of Spa-Francorchamps', location: 'Spa', enLocation: 'Spa', date: '2026-05-09', circuit: 'Circuit de Spa-Francorchamps', status: 'completed', winner: 'Robin Frijns' },
+      { id: 'lemans', name: '24 Horas de Le Mans', enName: '24 Hours of Le Mans', location: 'Le Mans', enLocation: 'Le Mans', date: '2026-06-14', circuit: 'Circuit de la Sarthe', status: 'completed', winner: 'Mike Conway' },
+      { id: 'saopaulo', name: '6 Horas de São Paulo', enName: '6 Hours of São Paulo', location: 'São Paulo', enLocation: 'São Paulo', date: '2026-07-12', circuit: 'Autódromo de Interlagos', status: 'completed', winner: 'Kevin Magnussen' },
       { id: 'cota', name: 'Lone Star Le Mans', enName: 'Lone Star Le Mans', location: 'Austin', enLocation: 'Austin', date: '2026-09-06', circuit: 'Circuit of the Americas', status: 'upcoming' },
       { id: 'fuji', name: '6 Horas de Fuji', enName: '6 Hours of Fuji', location: 'Fuji', enLocation: 'Fuji', date: '2026-09-27', circuit: 'Fuji Speedway', status: 'upcoming' },
       { id: 'barcelona-wec', name: '6 Horas de Barcelona', enName: '6 Hours of Barcelona', location: 'Barcelona', enLocation: 'Barcelona', date: '2026-10-18', circuit: 'Circuit de Barcelona-Catalunya', status: 'upcoming' },
@@ -1094,14 +1097,18 @@ export const MOTORSPORT_DATA: Category[] = [
     ],
     calendar: [
       { id: 'roar', name: 'Roar Before The Rolex 24', enName: 'Roar Before The Rolex 24', location: 'Daytona', enLocation: 'Daytona', date: '2026-01-18', circuit: 'Daytona International Speedway', status: 'completed' },
-      { id: 'daytona', name: 'Rolex 24 At Daytona', enName: 'Rolex 24 At Daytona', location: 'Daytona', enLocation: 'Daytona', date: '2026-01-25', circuit: 'Daytona International Speedway', status: 'completed', winner: 'Porsche Penske Motorsport #7' },
-      { id: 'sebring', name: '12 Horas de Sebring', enName: '12 Hours of Sebring', location: 'Sebring', enLocation: 'Sebring', date: '2026-03-21', circuit: 'Sebring International Raceway', status: 'completed', winner: 'Porsche Penske Motorsport #7' },
-      { id: 'longbeach', name: 'Grand Prix of Long Beach', enName: 'Grand Prix of Long Beach', location: 'Long Beach', enLocation: 'Long Beach', date: '2026-04-19', circuit: 'Long Beach Street Circuit', status: 'completed', winner: 'Meyer Shank Racing #93' },
-      { id: 'lagunaseca', name: 'Laguna Seca', enName: 'Laguna Seca', location: 'Monterey', enLocation: 'Monterey', date: '2026-05-03', circuit: 'WeatherTech Raceway Laguna Seca', status: 'completed', winner: 'JDC-Miller MotorSports #5' },
-      { id: 'detroit', name: 'Detroit Grand Prix', enName: 'Detroit Grand Prix', location: 'Detroit', enLocation: 'Detroit', date: '2026-05-30', circuit: 'Detroit Street Circuit', status: 'completed', winner: 'Cadillac Whelen #31' },
-      { id: 'watkins', name: 'Six Hours of The Glen', enName: 'Six Hours of The Glen', location: 'Watkins Glen', enLocation: 'Watkins Glen', date: '2026-06-28', circuit: 'Watkins Glen International', status: 'completed', winner: 'Cadillac Whelen #31' },
-      { id: 'mosport', name: 'Canadian Tire Motorsport Park', enName: 'Canadian Tire Motorsport Park', location: 'Bowmanville', enLocation: 'Bowmanville', date: '2026-07-12', circuit: 'Canadian Tire Motorsport Park', status: 'completed', winner: 'Inter Europol Competition #43' },
-      { id: 'roadamerica', name: '6 Horas de Road America', enName: '6 Hours of Road America', location: 'Elkhart Lake', enLocation: 'Elkhart Lake', date: '2026-08-02', circuit: 'Road America', status: 'completed', winner: 'Cadillac Wayne Taylor Racing #10' },
+      // Vencedores gerais (piloto da tripulacao). Fontes: imsa.com
+      // (Daytona/Sebring: #7 Penske Nasr; Long Beach: #93 MSR van der Zande;
+      // Laguna: #5 JDC van der Helm; Detroit/Watkins: #31 Whelen Aitken;
+      // CTMP sem GTP, geral foi LMP2 #43 Dillmann; Road America: #10 WTR Albuquerque).
+      { id: 'daytona', name: 'Rolex 24 At Daytona', enName: 'Rolex 24 At Daytona', location: 'Daytona', enLocation: 'Daytona', date: '2026-01-25', circuit: 'Daytona International Speedway', status: 'completed', winner: 'Felipe Nasr' },
+      { id: 'sebring', name: '12 Horas de Sebring', enName: '12 Hours of Sebring', location: 'Sebring', enLocation: 'Sebring', date: '2026-03-21', circuit: 'Sebring International Raceway', status: 'completed', winner: 'Felipe Nasr' },
+      { id: 'longbeach', name: 'Grand Prix of Long Beach', enName: 'Grand Prix of Long Beach', location: 'Long Beach', enLocation: 'Long Beach', date: '2026-04-19', circuit: 'Long Beach Street Circuit', status: 'completed', winner: 'Renger van der Zande' },
+      { id: 'lagunaseca', name: 'Laguna Seca', enName: 'Laguna Seca', location: 'Monterey', enLocation: 'Monterey', date: '2026-05-03', circuit: 'WeatherTech Raceway Laguna Seca', status: 'completed', winner: 'Tijmen van der Helm' },
+      { id: 'detroit', name: 'Detroit Grand Prix', enName: 'Detroit Grand Prix', location: 'Detroit', enLocation: 'Detroit', date: '2026-05-30', circuit: 'Detroit Street Circuit', status: 'completed', winner: 'Jack Aitken' },
+      { id: 'watkins', name: 'Six Hours of The Glen', enName: 'Six Hours of The Glen', location: 'Watkins Glen', enLocation: 'Watkins Glen', date: '2026-06-28', circuit: 'Watkins Glen International', status: 'completed', winner: 'Jack Aitken' },
+      { id: 'mosport', name: 'Canadian Tire Motorsport Park', enName: 'Canadian Tire Motorsport Park', location: 'Bowmanville', enLocation: 'Bowmanville', date: '2026-07-12', circuit: 'Canadian Tire Motorsport Park', status: 'completed', winner: 'Tom Dillmann' },
+      { id: 'roadamerica', name: '6 Horas de Road America', enName: '6 Hours of Road America', location: 'Elkhart Lake', enLocation: 'Elkhart Lake', date: '2026-08-02', circuit: 'Road America', status: 'completed', winner: 'Filipe Albuquerque' },
       { id: 'vir', name: 'GT Challenge at VIR', enName: 'GT Challenge at VIR', location: 'Alton', enLocation: 'Alton', date: '2026-08-23', circuit: 'Virginia International Raceway', status: 'upcoming' },
       { id: 'indianapolis', name: 'Battle On The Bricks', enName: 'Battle On The Bricks', location: 'Indianapolis', enLocation: 'Indianapolis', date: '2026-09-20', circuit: 'Indianapolis Motor Speedway', status: 'upcoming' },
       { id: 'roadatlanta', name: 'Petit Le Mans', enName: 'Petit Le Mans', location: 'Braselton', enLocation: 'Braselton', date: '2026-10-03', circuit: 'Michelin Raceway Road Atlanta', status: 'upcoming' },
