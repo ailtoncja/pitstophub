@@ -17,6 +17,7 @@ export interface Team {
   badge?: string;
   clearart?: string;
   class?: string;
+  principal?: string;
 }
 
 export interface Race {

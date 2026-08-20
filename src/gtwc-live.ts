@@ -1,4 +1,5 @@
 import type { Category, CategoryStandings, Driver, Race, StandingItem, Team } from './types';
+import { lookupTeamAssets } from './team-bios';
 
 // GT World Challenge (Europe/America/Asia) nao usa TheSportsDB nem o pipeline
 // de synced_races/synced_standings -- e uma API propria (api-motorsports),
@@ -92,12 +93,15 @@ export async function fetchGtwcRoster(categoryId: string, force = false): Promis
 
     for (const apiTeam of apiTeams) {
       const teamId = slugify(apiTeam.name);
+      const assets = lookupTeamAssets(apiTeam.name);
       teams.push({
         id: teamId,
         name: apiTeam.name,
         color: classColor(apiTeam.class),
         car: apiTeam.car ?? undefined,
         class: apiTeam.class ? toTitleCase(apiTeam.class) : undefined,
+        badge: assets?.badge,
+        clearart: assets?.clearart,
       });
       for (const apiDriver of apiTeam.drivers) {
         const driverId = `${teamId}-${slugify(apiDriver.name)}`;

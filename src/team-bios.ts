@@ -1,3 +1,5 @@
+import type { Team } from './types';
+
 export type TeamBio = { pt: string; en: string };
 
 function b(pt: string, en: string): TeamBio {
@@ -572,8 +574,184 @@ export const TEAM_BIOS: Record<string, TeamBio> = {
     'Land-Motorsport is a German Porsche GT3 specialist, a regular in ADAC GT Masters and DTM. The Nürburgring operation lives on the 911 and the domestic tracks.',
   ),
   'dtm:manthey-racing': inSeries(MANTHEY, 'No DTM, a Manthey aplica o acerto de Nürburgring ao formato sprint do campeonato alemão.', 'In DTM, Manthey applies its Nürburgring setup to the German championship’s sprint format.'),
+
+  'endurance-brasil:foresti-sports': b(
+    'A Foresti Sports, dirigida por Pedro Henrique Moises, é uma das operações do Endurance Brasil. O time alinha um elenco amplo no campeonato nacional de resistência, que mistura protótipos e GTs em provas de 3 e 4 horas.',
+    'Foresti Sports, led by Pedro Henrique Moises, is one of the Endurance Brasil operations. The team fields a large roster in the national endurance championship, which mixes prototypes and GTs in 3- and 4-hour races.',
+  ),
+  'endurance-brasil:ftr-motorsport': b(
+    'A FTR Motorsport, de Cassiano Frigieri, compete no Endurance Brasil. A equipe entra no grid nacional de resistência ao lado de programas de GT e protótipo nos autódromos brasileiros.',
+    'FTR Motorsport, led by Cassiano Frigieri, contests Endurance Brasil. The team joins the national endurance grid alongside GT and prototype programmes at Brazilian circuits.',
+  ),
+  'endurance-brasil:gforce-autorsport': b(
+    'A GForce Autorsport, dirigida por Guilherme Ferro, é uma das equipes do Endurance Brasil. O time leva um grupo fechado de pilotos ao campeonato nacional de endurance.',
+    'GForce Autorsport, led by Guilherme Ferro, is one of the Endurance Brasil teams. The squad takes a closed group of drivers to the national endurance championship.',
+  ),
+  'endurance-brasil:acme-racing': b(
+    'A MC Tubarão, dirigida por Geciel de Andrade, representa o programa catarinense no Endurance Brasil. O time mistura identidade regional com o grid nacional de GT e protótipo.',
+    'MC Tubarão, led by Geciel de Andrade, is the Santa Catarina programme in Endurance Brasil. The team mixes regional identity with the national GT and prototype grid.',
+  ),
+  'endurance-brasil:mottin-racing': b(
+    'A Mottin Racing, de Luciano Mottin, é uma das operações mais visíveis do GT brasileiro. No Endurance Brasil, o time gaúcho leva a rotina de cliente Porsche/GT3 para as provas longas do calendário nacional.',
+    'Mottin Racing, Luciano Mottin’s team, is one of the most visible operations in Brazilian GT racing. In Endurance Brasil, the Rio Grande do Sul squad takes its Porsche/GT3 customer routine into the national calendar’s long races.',
+  ),
+  'endurance-brasil:stuttgart-motorsport-gt3': b(
+    'A Stuttgart Motorsport GT3, dirigida por Felipe Grizzi, é o braço de ponta da operação Porsche no Endurance Brasil. O time separa o programa GT3 do GT4 para disputar a classe mais rápida dos GTs nacionais.',
+    'Stuttgart Motorsport GT3, led by Felipe Grizzi, is the sharp end of the Porsche operation in Endurance Brasil. The team splits its GT3 programme from GT4 to contest the fastest national GT class.',
+  ),
+  'endurance-brasil:stuttgart-motorsport-gt4': b(
+    'A Stuttgart Motorsport GT4, também de Felipe Grizzi, é o programa de acesso da mesma operação Porsche no Endurance Brasil. A classe GT4 abre o grid de endurance a gentleman drivers e a estreantes em prova longa.',
+    'Stuttgart Motorsport GT4, also led by Felipe Grizzi, is the same Porsche operation’s access programme in Endurance Brasil. The GT4 class opens the endurance grid to gentleman drivers and long-race rookies.',
+  ),
+  'endurance-brasil:tech-force': b(
+    'A Tech Force, dirigida por Ariel Luis Schaellenberger, compete no Endurance Brasil. A equipe entra no campeonato nacional de resistência com um elenco enxuto nas classes de GT e protótipo.',
+    'Tech Force, led by Ariel Luis Schaellenberger, contests Endurance Brasil. The team joins the national endurance championship with a lean roster across the GT and prototype classes.',
+  ),
+  'endurance-brasil:tmg-racing': b(
+    'A TMG Racing, de Thiago Meneghel, é uma das estruturas mais conhecidas do automobilismo brasileiro de turismo e GT. No Endurance Brasil, o time leva a mesma disciplina de Stock Car e GT Sprint Race para as provas de 3 e 4 horas.',
+    'TMG Racing, Thiago Meneghel’s team, is one of the best-known structures in Brazilian touring-car and GT racing. In Endurance Brasil, the squad takes the same Stock Car and GT Sprint Race discipline into the 3- and 4-hour races.',
+  ),
 };
 
-export function getTeamBio(categoryId: string, teamId: string): TeamBio | undefined {
-  return TEAM_BIOS[`${categoryId}:${teamId}`];
+const AF_CORSE_BADGE = 'https://r2.thesportsdb.com/images/media/team/badge/duhqtg1705867755.png';
+const AF_CORSE_296 = 'https://r2.thesportsdb.com/images/media/team/equipment/n89ezn1746910564.png';
+const WRT_BADGE = 'https://r2.thesportsdb.com/images/media/team/badge/0jrxwn1705580515.png';
+const WRT_M4 = 'https://r2.thesportsdb.com/images/media/team/equipment/allcr81747131210.png';
+
+const AF_CORSE_GT3 = b(
+  'A AF Corse, de Piacenza, é a equipe cliente mais ligada à Ferrari no GT3 mundial. No GT World Challenge corre com a 296 GT3 Evo, o mesmo método de fábrica que usa no WEC — gentleman drivers ao lado de oficiais da marca.',
+  'AF Corse, from Piacenza, is the customer team most closely tied to Ferrari in worldwide GT3. In GT World Challenge it races the 296 GT3 Evo, the same works method it uses in the WEC — gentleman drivers alongside factory professionals.',
+);
+
+const WRT_GT3 = b(
+  'A Team WRT, belga, é uma das operações BMW mais tituladas do GT3 europeu e pentacampeã do GT World Challenge. Poucas equipes no mundo equilibram tão bem programa de clientes e ritmo de fábrica no M4 GT3.',
+  'Belgium’s Team WRT is one of BMW’s most decorated GT3 operations in Europe and a multiple GT World Challenge champion. Few teams in the world balance a customer programme and works pace so well in the M4 GT3.',
+);
+
+const GARAGE_59_GT3 = b(
+  'A Garage 59, britânica, é uma das operações McLaren mais respeitadas do GT3 europeu. No GT World Challenge leva o 720S Evo ao grid da SRO, o mesmo pacote que já brilhou no WEC.',
+  'Britain’s Garage 59 is one of the most respected McLaren GT3 operations in Europe. In GT World Challenge it takes the 720S Evo onto the SRO grid, the same package that has already shone in the WEC.',
+);
+
+const GETSPEED = b(
+  'A GetSpeed é uma das operações Mercedes-AMG mais presentes no GT World Challenge Europe, com vários carros e parcerias (Bartone Bros, Dubai, Noble, PCX). A estrutura alemã vive de Spa e das sprints da SRO.',
+  'GetSpeed is one of the Mercedes-AMG operations most present in GT World Challenge Europe, with several cars and partnerships (Bartone Bros, Dubai, Noble, PCX). The German structure lives for Spa and the SRO sprints.',
+);
+
+const ROWE = b(
+  'A Rowe Racing é o programa BMW de endurance mais clássico da Alemanha, vencedor das 24 Horas de Spa e de Nürburgring. No GT World Challenge o M4 GT3 Evo segue como uma das referências da classe Pro.',
+  'Rowe Racing is Germany’s most classic BMW endurance programme, a winner of the 24 Hours of Spa and the Nürburgring. In GT World Challenge the M4 GT3 Evo remains one of the Pro class benchmarks.',
+);
+
+const KESSEL = b(
+  'A Kessel Racing, suíça, é uma das equipes Ferrari mais tradicionais do GT3 europeu. No GT World Challenge corre com a 296 GT3 Evo, misturando gentleman drivers e profissionais nas classes Bronze e Silver.',
+  'Switzerland’s Kessel Racing is one of the most traditional Ferrari teams in European GT3. In GT World Challenge it races the 296 GT3 Evo, mixing gentleman drivers and professionals in the Bronze and Silver classes.',
+);
+
+const RUTRONIK = b(
+  'A Rutronik Racing, alemã, passou de Porsche a Lamborghini no GT World Challenge e corre na classe Pro com o Temerario GT3. O time de Winnenden é conhecido por um pacote agressivo de classificação.',
+  'Germany’s Rutronik Racing moved from Porsche to Lamborghini in GT World Challenge and contests the Pro class with the Temerario GT3. The Winnenden team is known for an aggressive qualifying package.',
+);
+
+const VERSTAPPEN_GT = b(
+  'A Mercedes-AMG Team Verstappen Racing é o programa GT da família Verstappen no GT World Challenge. O time holandês alinha o GT3 Evo na classe Pro, no mesmo grupo Red Bull que a Fórmula 1 já conhece.',
+  'Mercedes-AMG Team Verstappen Racing is the Verstappen family’s GT programme in GT World Challenge. The Dutch team fields the GT3 Evo in the Pro class, in the same Red Bull orbit already familiar from Formula 1.',
+);
+
+const CRAFT_BAMBOO = b(
+  'A Craft-Bamboo Racing, de Hong Kong, é uma das operações Mercedes-AMG mais fortes da Ásia. No GT World Challenge Asia o time mistura endurance local com o pacote GT3 Evo usado na Europa.',
+  'Hong Kong’s Craft-Bamboo Racing is one of Asia’s strongest Mercedes-AMG operations. In GT World Challenge Asia the team mixes local endurance racing with the GT3 Evo package used in Europe.',
+);
+
+export type TeamAssets = {
+  badge?: string;
+  clearart?: string;
+  bio?: TeamBio;
+};
+
+function normName(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+const KNOWN_LIVE_TEAMS: { needle: string; assets: TeamAssets }[] = [
+  { needle: 'af corse usa', assets: { badge: AF_CORSE_BADGE, clearart: AF_CORSE_296, bio: AF_CORSE_GT3 } },
+  { needle: 'af corse', assets: { badge: AF_CORSE_BADGE, clearart: AF_CORSE_296, bio: AF_CORSE_GT3 } },
+  { needle: 'team wrt', assets: { badge: WRT_BADGE, clearart: WRT_M4, bio: WRT_GT3 } },
+  { needle: 'wrt', assets: { badge: WRT_BADGE, clearart: WRT_M4, bio: WRT_GT3 } },
+  { needle: 'garage 59', assets: { bio: GARAGE_59_GT3 } },
+  { needle: 'comtoyou', assets: { badge: 'https://r2.thesportsdb.com/images/media/team/badge/n44t3f1757929207.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/y2xoo41779805600.png', bio: TEAM_BIOS['dtm:comtoyou'] } },
+  { needle: 'emil frey', assets: { badge: 'https://r2.thesportsdb.com/images/media/team/badge/a6usmg1711453030.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/7pe86l1779553314.png', bio: TEAM_BIOS['dtm:emil-frey'] } },
+  { needle: 'hrt ford', assets: { badge: 'https://r2.thesportsdb.com/images/media/team/badge/loigud1757931732.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/90fh9m1779805985.png', bio: TEAM_BIOS['dtm:hrt-ford'] } },
+  { needle: 'winward', assets: { badge: 'https://r2.thesportsdb.com/images/media/team/badge/66sakt1711454724.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/437u5n1779806766.png', bio: WINWARD } },
+  { needle: 'tgi team', assets: { badge: 'https://r2.thesportsdb.com/images/media/team/badge/foi45v1560270079.png', bio: TEAM_BIOS['dtm:grt'] } },
+  { needle: 'getspeed', assets: { bio: GETSPEED } },
+  { needle: 'bartone', assets: { bio: GETSPEED } },
+  { needle: 'rowe racing', assets: { bio: ROWE } },
+  { needle: 'kessel', assets: { bio: KESSEL } },
+  { needle: 'rutronik', assets: { bio: RUTRONIK } },
+  { needle: 'verstappen racing', assets: { bio: VERSTAPPEN_GT } },
+  { needle: 'craft bamboo', assets: { bio: CRAFT_BAMBOO } },
+  { needle: 'turner motorsport', assets: { badge: 'https://r2.thesportsdb.com/images/media/team/badge/eyoonu1589117766.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/lnmagf1589117806.png', bio: TEAM_BIOS['imsa:turner-motorsport-gtd'] } },
+  { needle: 'wright motorsports', assets: { badge: 'https://r2.thesportsdb.com/images/media/team/badge/mhpwu31588604957.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/m3ap641768427038.png', bio: TEAM_BIOS['imsa:wright-motorsports-gtd'] } },
+  { needle: 'triarsi', assets: { bio: TRIARSI } },
+  { needle: 'muehlner', assets: { bio: TEAM_BIOS['imsa:muhlner-motorsport-gtd'] } },
+  { needle: 'muhlner', assets: { bio: TEAM_BIOS['imsa:muhlner-motorsport-gtd'] } },
+  { needle: 'lone star', assets: { bio: TEAM_BIOS['imsa:lone-star-racing-gtd'] } },
+  { needle: 'rs1', assets: { bio: TEAM_BIOS['imsa:rs1-gtd'] } },
+  { needle: 'manthey', assets: { badge: 'https://r2.thesportsdb.com/images/media/team/badge/n1o0eq1711454879.png', clearart: 'https://r2.thesportsdb.com/images/media/team/equipment/wdxgtd1779806327.png', bio: MANTHEY } },
+];
+
+export function lookupTeamAssets(name: string): TeamAssets | undefined {
+  const n = normName(name);
+  return KNOWN_LIVE_TEAMS.find((row) => n.includes(row.needle) || n === row.needle)?.assets;
+}
+
+const LIVE_SERIES: Record<string, { pt: string; en: string }> = {
+  'gtwc-europe': { pt: 'GT World Challenge Europe', en: 'GT World Challenge Europe' },
+  'gtwc-america': { pt: 'GT World Challenge America', en: 'GT World Challenge America' },
+  'gtwc-asia': { pt: 'GT World Challenge Asia', en: 'GT World Challenge Asia' },
+  'endurance-brasil': { pt: 'Endurance Brasil', en: 'Endurance Brasil' },
+};
+
+function generateLiveTeamBio(categoryId: string, team: Team): TeamBio {
+  const series = LIVE_SERIES[categoryId];
+  const classPt = team.class ? ` na classe ${team.class}` : '';
+  const classEn = team.class ? ` in the ${team.class} class` : '';
+  const carPt = team.car ? ` com o ${team.car}` : '';
+  const carEn = team.car ? ` with the ${team.car}` : '';
+  const principalPt = team.principal ? `, dirigida por ${team.principal}` : '';
+  const principalEn = team.principal ? `, led by ${team.principal}` : '';
+
+  if (categoryId === 'endurance-brasil') {
+    return b(
+      `A ${team.name}${principalPt} compete no Endurance Brasil${classPt}. O campeonato nacional reúne protótipos e GTs em provas de 3 e 4 horas nos principais autódromos do país.`,
+      `${team.name}${principalEn} contests Endurance Brasil${classEn}. The national championship mixes prototypes and GTs in 3- and 4-hour races at Brazil’s main circuits.`,
+    );
+  }
+
+  if (!series) {
+    return b(
+      `A ${team.name} compete nesta categoria${classPt}${carPt}.`,
+      `${team.name} contests this championship${classEn}${carEn}.`,
+    );
+  }
+
+  return b(
+    `A ${team.name} compete no ${series.pt}${classPt}${carPt}. O grid da SRO reúne fabricantes de GT3 de todo o mundo, com Balance of Performance entre os modelos.`,
+    `${team.name} contests ${series.en}${classEn}${carEn}. The SRO grid brings together GT3 manufacturers from around the world, with Balance of Performance between the models.`,
+  );
+}
+
+export function getTeamBio(categoryId: string, team: Team): TeamBio | undefined {
+  const exact = TEAM_BIOS[`${categoryId}:${team.id}`];
+  if (exact) return exact;
+  const known = lookupTeamAssets(team.name)?.bio;
+  if (known) return known;
+  if (LIVE_SERIES[categoryId]) return generateLiveTeamBio(categoryId, team);
+  return undefined;
 }

@@ -256,6 +256,7 @@ const UI_TRANSLATIONS = {
     teamOverview: 'Sobre a Equipe',
     noRosterYet: 'Nenhum piloto listado ainda.',
     teamColor: 'Cor',
+    teamPrincipal: 'Chefe de equipe',
     careerOverview: 'Carreira',
     grid: 'Grid',
     finish: 'Chegada',
@@ -378,6 +379,7 @@ const UI_TRANSLATIONS = {
     teamOverview: 'About the Team',
     noRosterYet: 'No drivers listed yet.',
     teamColor: 'Color',
+    teamPrincipal: 'Team principal',
     careerOverview: 'Career Overview',
     grid: 'Grid',
     finish: 'Finish',
@@ -3283,7 +3285,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       .sort((a, b) => b.date.localeCompare(a.date));
   }, [selectedCategory.calendar, displayedTeam, selectedTeamDrivers]);
   const selectedTeamBio = useMemo(
-    () => (displayedTeam ? getTeamBio(selectedCategory.id, displayedTeam.id) : undefined),
+    () => (displayedTeam ? getTeamBio(selectedCategory.id, displayedTeam) : undefined),
     [selectedCategory.id, displayedTeam]
   );
   // Pagina de piloto usa a cor da equipe do piloto como destaque, nao a cor fixa da categoria.
@@ -4845,6 +4847,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   <div className="font-bold text-[var(--text-main)]">{displayedTeam.car}</div>
                                 </div>
                               )}
+                              {displayedTeam.principal && (
+                                <div>
+                                  <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                                    {UI_TRANSLATIONS[language].teamPrincipal}
+                                  </div>
+                                  <div className="font-bold text-[var(--text-main)]">{displayedTeam.principal}</div>
+                                </div>
+                              )}
                               <div>
                                 <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
                                   {UI_TRANSLATIONS[language].teamColor}
@@ -4877,6 +4887,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 {UI_TRANSLATIONS[language].chassis}
                               </div>
                               <div className="font-bold text-[var(--text-main)]">{displayedTeam.car}</div>
+                            </div>
+                          )}
+                          {displayedTeam.principal && (
+                            <div>
+                              <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                                {UI_TRANSLATIONS[language].teamPrincipal}
+                              </div>
+                              <div className="font-bold text-[var(--text-main)]">{displayedTeam.principal}</div>
                             </div>
                           )}
                           <div>
