@@ -247,7 +247,8 @@ function forceKnownWinners(rows, patterns) {
 const WEC_OFFICIAL_WINNERS = [
   { test: (s) => /imola/i.test(s), winner: 'Sébastien Buemi' },
   { test: (s) => /spa[- ]francorchamps/i.test(s), winner: 'Robin Frijns' },
-  { test: (s) => /le mans/i.test(s), winner: 'Mike Conway' },
+  // Nao usar /le mans/ sozinho: casa com "Lone Star Le Mans" (Austin).
+  { test: (s) => /le mans/i.test(s) && !/lone star/i.test(s), winner: 'Mike Conway' },
   { test: (s) => /s[aã]o paulo/i.test(s), winner: 'Kevin Magnussen' },
 ];
 
@@ -320,7 +321,9 @@ const MANUAL_OVERRIDES = {
     const nowIso = new Date().toISOString();
     const maxRound = patched.reduce((max, r) => Math.max(max, r.round ?? 0), 0);
     const addIfMissing = (matcher, extra) => {
-      if (patched.some((r) => matcher.test(r.en_name ?? ''))) return;
+      const matches = (name) =>
+        typeof matcher === 'function' ? matcher(name) : matcher.test(name);
+      if (patched.some((r) => matches(r.en_name ?? ''))) return;
       patched.push({
         category_id: 'wec',
         round: extra.round,
@@ -351,10 +354,49 @@ const MANUAL_OVERRIDES = {
       circuit: 'Autodromo Nazionale Monza',
       date: '2026-11-08',
     });
+    // A 24h de Le Mans muitas vezes nao entra como rodada da liga WEC na
+    // TheSportsDB (evento ACO separado / intRound 0). Sem isso o calendario
+    // sincronizado apaga a etapa. Nao casar "Lone Star Le Mans".
+    addIfMissing((name) => /le mans/i.test(name) && !/lone star/i.test(name), {
+      round: 3,
+      race_id: 'r-manual-24-hours-of-le-mans',
+      name: '24 Horas de Le Mans',
+      en_name: '24 Hours of Le Mans',
+      location: 'Le Mans',
+      en_location: 'Le Mans',
+      circuit: 'Circuit de la Sarthe',
+      date: '2026-06-14',
+      status: 'completed',
+      winner: 'Mike Conway',
+    });
 
     return forceKnownWinners(patched, WEC_OFFICIAL_WINNERS);
   },
-  imsa: (rows) => forceKnownWinners(rows, IMSA_OFFICIAL_WINNERS),
+  imsa: (rows) => {
+    const patched = [...rows];
+    // O GP de Long Beach da IMSA as vezes vem com intRound invalido e o
+    // groupByRound descarta. Fonte: imsa.com (Acura Grand Prix of Long Beach).
+    if (!patched.some((r) => /long beach/i.test(`${r.en_name ?? ''} ${r.name ?? ''}`))) {
+      const maxRound = patched.reduce((max, r) => Math.max(max, r.round ?? 0), 0);
+      patched.push({
+        category_id: 'imsa',
+        round: maxRound + 1,
+        race_id: 'r-manual-grand-prix-of-long-beach',
+        name: 'Grand Prix of Long Beach',
+        en_name: 'Grand Prix of Long Beach',
+        location: 'Long Beach',
+        en_location: 'Long Beach',
+        circuit: 'Long Beach Street Circuit',
+        date: '2026-04-18',
+        status: 'completed',
+        winner: 'Renger van der Zande',
+        external_id: null,
+        source: 'manual-override',
+        updated_at: new Date().toISOString(),
+      });
+    }
+    return forceKnownWinners(patched, IMSA_OFFICIAL_WINNERS);
+  },
 };
 
 function applyManualOverrides(categoryId, rows) {
