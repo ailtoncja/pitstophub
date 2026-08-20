@@ -5359,8 +5359,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
                         transition={SPRING}
-                        className="space-y-12"
+                        className="space-y-6"
                       >
+                        {selectedCategory.teams.some((team) => !team.badge && !team.clearart) && (
+                          <p className="text-[11px] text-[var(--cat-accent)] font-apex-mono">
+                            {UI_TRANSLATIONS[language].teamPhotosNote}
+                          </p>
+                        )}
+                        <div className="space-y-12">
                         {teamClasses.map(className => (
                           <div key={className} className="space-y-6">
                             <h3 className="text-2xl font-apex font-extrabold italic border-l-4 border-[var(--cat-accent)] pl-4 text-[var(--text-main)]">
@@ -5387,7 +5393,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                             <img
                                               src={team.badge}
                                               alt={team.name}
-                                              className={cn("w-10 h-10 object-contain shrink-0", team.id === 'af-corse-wec' && "cursor-pointer select-none")}
+                                              className={cn("w-12 h-12 object-contain shrink-0", team.id === 'af-corse-wec' && "cursor-pointer select-none")}
                                               referrerPolicy="no-referrer"
                                               loading="lazy"
                                               decoding="async"
@@ -5398,7 +5404,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                             <img
                                               src={team.clearart}
                                               alt={team.car ?? team.name}
-                                              className="h-10 w-16 object-contain shrink-0"
+                                              className="h-12 w-20 object-contain shrink-0"
                                               referrerPolicy="no-referrer"
                                               loading="lazy"
                                               decoding="async"
@@ -5440,11 +5446,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             </div>
                           </div>
                         ))}
-                        {selectedCategory.teams.some((team) => !team.badge && !team.clearart) && (
-                          <p className="text-[11px] text-gray-600 font-apex-mono">
-                            {UI_TRANSLATIONS[language].teamPhotosNote}
-                          </p>
-                        )}
+                        </div>
                       </motion.div>
                     )}
 
