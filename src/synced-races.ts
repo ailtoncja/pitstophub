@@ -62,23 +62,61 @@ export async function fetchSyncedCalendar(categoryId: string, force = false): Pr
 
 export function mergeCategoryWithSyncedCalendar(category: Category, calendar: Race[] | null): Category {
   if (!calendar || calendar.length === 0) return category;
+  const synced = calendar.map((race) =>
+    normalizeRaceWinner(preferOfficialWinner(category, race), category)
+  );
   return {
     ...category,
-    calendar: calendar.map((race) =>
-      normalizeRaceWinner(preferOfficialWinner(category, race), category)
+    calendar: fillMissingOfficialRaces(category, synced).map((race) =>
+      normalizeRaceWinner(race, category)
     ),
   };
 }
 
 // WEC/IMSA: a TheSportsDB devolve "equipe #carro" (e as vezes o carro errado,
 // ex. Imola 2026 como Toyota #7 em vez do #8). O catalogo estatico em types.ts
-// guarda o piloto confirmado em fiawec.com / imsa.com; se a data bater, esse
-// nome ganha do texto da API pra foto/link na UI nao quebrarem.
+// guarda o piloto confirmado em fiawec.com / imsa.com. Casa por data OU nome
+// (Le Mans e 13-14/jun; Long Beach oficial foi 18/abr).
 function preferOfficialWinner(category: Category, race: Race): Race {
   if (category.id !== 'wec' && category.id !== 'imsa') return race;
   if (race.status === 'cancelled') return race;
-  const official = category.calendar.find((base) => base.date === race.date && base.winner);
+  const official = category.calendar.find((base) => base.winner && isSameEnduranceRace(base, race));
   return official?.winner ? { ...race, winner: official.winner } : race;
+}
+
+// Le Mans e Long Beach costumam faltar no synced_races: a 24h nao entra como
+// rodada regular da liga WEC na TheSportsDB, e o GP de Long Beach da IMSA
+// as vezes vem com intRound fora de 1..60 (cai no groupByRound). Sem isso o
+// merge substituia o calendario inteiro e as duas etapas sumiam da UI.
+function fillMissingOfficialRaces(category: Category, synced: Race[]): Race[] {
+  if (category.id !== 'wec' && category.id !== 'imsa') return synced;
+  const missing = category.calendar.filter(
+    (base) => !synced.some((race) => isSameEnduranceRace(base, race))
+  );
+  if (missing.length === 0) return synced;
+  return [...synced, ...missing].sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function isSameEnduranceRace(a: Race, b: Race): boolean {
+  if (a.date && a.date === b.date) return true;
+  if (isWecLeMans(a) && isWecLeMans(b)) return true;
+  if (isLongBeach(a) && isLongBeach(b)) return true;
+  const an = normalizeText(a.enName ?? a.name);
+  const bn = normalizeText(b.enName ?? b.name);
+  return Boolean(an && bn && an === bn);
+}
+
+function raceLabel(race: Race): string {
+  return `${race.enName ?? ''} ${race.name} ${race.location} ${race.enLocation ?? ''}`;
+}
+
+function isWecLeMans(race: Race): boolean {
+  const n = raceLabel(race).toLowerCase();
+  return /le mans/.test(n) && !/lone star/.test(n);
+}
+
+function isLongBeach(race: Race): boolean {
+  return /long beach/i.test(raceLabel(race));
 }
 
 // A TheSportsDB traz o vencedor em formatos abreviados tipo "U. Ugochukwu"
