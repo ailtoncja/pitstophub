@@ -77,6 +77,7 @@ import type { CategoryStandings, Driver, Race, StandingItem, Team } from './type
 import { FavoritesPicker, FavoritesOnboardingModal, NotificationsToggle } from './Favorites';
 import { flagForNationality } from './nationality-flags';
 import { getTeamBio } from './team-bios';
+import { countDriverTitles, formatDriverTitleYears, getDriverTitles } from './driver-titles';
 
 const IconMap: Record<string, React.ElementType> = {
   OpenWheelCar: OpenWheelCarIcon,
@@ -260,6 +261,7 @@ const UI_TRANSLATIONS = {
     teamColor: 'Cor',
     teamPrincipal: 'Chefe de equipe',
     careerOverview: 'Carreira',
+    titles: 'Títulos',
     grid: 'Grid',
     finish: 'Chegada',
     recentResults: 'Resultados Recentes',
@@ -385,6 +387,7 @@ const UI_TRANSLATIONS = {
     teamColor: 'Color',
     teamPrincipal: 'Team principal',
     careerOverview: 'Career Overview',
+    titles: 'Titles',
     grid: 'Grid',
     finish: 'Finish',
     recentResults: 'Recent Results',
@@ -3268,6 +3271,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     () => (selectedDriver ? getDriverBio(selectedCategory.id, selectedDriver.id) : undefined),
     [selectedCategory.id, selectedDriver]
   );
+  const selectedDriverTitles = useMemo(
+    () => (selectedDriver ? getDriverTitles(selectedCategory.id, selectedDriver.id) : []),
+    [selectedCategory.id, selectedDriver]
+  );
+  const selectedDriverTitlesCount = useMemo(
+    () => countDriverTitles(selectedDriverTitles),
+    [selectedDriverTitles]
+  );
   const displayedTeam = useMemo(() => {
     if (!selectedTeam) return null;
     return selectedCategory.teams.find((t) => t.id === selectedTeam.id) ?? selectedTeam;
@@ -4459,6 +4470,23 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       <p className="font-apex-mono text-xs uppercase tracking-widest text-gray-300 mt-4">
                         {selectedDriver.nationality}
                       </p>
+                      {selectedDriverTitles.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-4">
+                          {selectedDriverTitles.map((title) => {
+                            const count = title.years.length || 1;
+                            const label = language === 'pt' ? title.pt : title.en;
+                            return (
+                              <span
+                                key={`${title.en}-${title.years.join(',')}`}
+                                className="inline-flex items-center gap-1.5 font-apex-mono text-[10px] uppercase tracking-widest text-white/90 border border-white/25 bg-black/30 px-2 py-1"
+                              >
+                                <Trophy className="w-3 h-3 text-[var(--driver-accent)]" />
+                                {count > 1 ? `${count}× ${label}` : label}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                     {selectedDriver.cutout && (
                       <img
@@ -4523,7 +4551,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 </div>
 
                   <div className="lg:col-span-7 flex flex-col gap-6">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className={cn(
+                      "grid gap-4",
+                      selectedDriverTitles.length > 0 ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5" : "grid-cols-2 sm:grid-cols-4"
+                    )}>
                       <div className="apex-card p-4">
                         <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
                           {UI_TRANSLATIONS[language].position}
@@ -4563,6 +4594,16 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           {selectedDriverPodiumsCount ?? '-'}
                         </div>
                       </div>
+                      {selectedDriverTitles.length > 0 && (
+                        <div className="apex-card p-4">
+                          <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                            {UI_TRANSLATIONS[language].titles}
+                          </div>
+                          <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                            {selectedDriverTitlesCount}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="apex-card p-8 flex-grow">
@@ -4644,6 +4685,40 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     </div>
                   </div>
                 </div>
+
+                {selectedDriverTitles.length > 0 && (
+                  <div className="apex-card p-8 mb-6">
+                    <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
+                      {UI_TRANSLATIONS[language].titles}
+                    </h3>
+                    <ul className="divide-y divide-white/5">
+                      {selectedDriverTitles.map((title) => {
+                        const yearsLabel = formatDriverTitleYears(title.years);
+                        const count = title.years.length;
+                        return (
+                          <li key={`${title.en}-${title.years.join(',')}`} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
+                            <Trophy className="w-4 h-4 text-[var(--driver-accent)] shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <div className="font-bold text-[var(--text-main)]">
+                                {language === 'pt' ? title.pt : title.en}
+                              </div>
+                              {yearsLabel && (
+                                <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mt-0.5">
+                                  {yearsLabel}
+                                </div>
+                              )}
+                            </div>
+                            {count > 1 && (
+                              <div className="font-apex text-lg font-extrabold italic text-[var(--driver-accent)] shrink-0">
+                                {count}×
+                              </div>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
 
                 <div className="apex-card p-8">
                   <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
