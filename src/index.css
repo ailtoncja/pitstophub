@@ -12,6 +12,14 @@
   --color-apex-accent: #ffb4a8;
 }
 
+html.champions-mono {
+  filter: grayscale(1);
+}
+
+html {
+  transition: filter 0.45s ease;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

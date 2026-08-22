@@ -3368,6 +3368,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     () => (selectedDriver && selectedCategory.id === 'f1' ? findF1Champion(selectedDriver.id) : undefined),
     [selectedCategory.id, selectedDriver]
   );
+  const championsMono =
+    (view === 'category' && activeTab === 'champions' && selectedCategory.id === 'f1')
+    || (view === 'driver' && Boolean(selectedChampion));
+
+  React.useEffect(() => {
+    document.documentElement.classList.toggle('champions-mono', championsMono);
+    return () => document.documentElement.classList.remove('champions-mono');
+  }, [championsMono]);
   const displayedTeam = useMemo(() => {
     if (!selectedTeam) return null;
     return selectedCategory.teams.find((t) => t.id === selectedTeam.id) ?? selectedTeam;
