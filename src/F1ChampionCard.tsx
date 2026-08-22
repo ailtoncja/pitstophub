@@ -1,4 +1,5 @@
 import { Crown } from 'lucide-react';
+import { cn } from './lib/utils';
 import { flagForNationality } from './nationality-flags';
 import type { F1Champion } from './f1-champions';
 
@@ -47,7 +48,10 @@ export function F1ChampionCard({ champion, language, onOpen }: F1ChampionCardPro
           </div>
         </div>
         <div className="f1-icon-card-footer">
-          <div className="font-apex text-[1.35rem] font-extrabold italic tracking-[0.18em] text-[#2b2416]">
+          <div className={cn(
+            "font-apex font-extrabold italic text-[#2b2416]",
+            lastName.length > 8 ? "text-[1.05rem] tracking-[0.08em]" : "text-[1.35rem] tracking-[0.18em]"
+          )}>
             {lastName}
           </div>
           <div className="f1-icon-card-rule" />
