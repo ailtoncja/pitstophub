@@ -16,6 +16,15 @@ html.champions-mono {
   filter: grayscale(1);
 }
 
+html.champions-mono.dark {
+  --bg-main: #f4f2ec;
+  --text-main: #161616;
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.14);
+  --header-bg: rgba(244, 242, 236, 0.92);
+  --sidebar-bg: #ebe8e1;
+}
+
 html {
   transition: filter 0.45s ease;
 }

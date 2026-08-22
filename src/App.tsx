@@ -3468,7 +3468,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       className="relative min-h-dvh flex flex-col xl:flex-row transition-colors duration-300"
       style={{ '--cat-accent': categoryAccent, '--cat-accent-ink': categoryAccentInk, '--nav-accent': navAccent } as React.CSSProperties}
     >
-      {isDarkMode && (
+      {isDarkMode && !championsMono && (
         <>
           <div className="tg-glow tg-glow-red -left-32 -top-20 w-[420px] h-[420px] xl:w-[560px] xl:h-[560px] xl:-left-48 xl:-top-32" />
           <div className="tg-glow tg-glow-crimson -right-24 -bottom-32 w-[420px] h-[420px] xl:w-[600px] xl:h-[600px] xl:-right-40 xl:-bottom-52" />
