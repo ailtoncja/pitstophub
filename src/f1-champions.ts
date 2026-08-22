@@ -1,5 +1,13 @@
 import type { Driver } from './types';
 
+export type ChampionTeamStint = {
+  name: string;
+  years: string;
+  championYears?: number[];
+  series?: { pt: string; en: string };
+  teamId?: string;
+};
+
 export type F1Champion = Driver & {
   championYears: number[];
   cardRating: number;
@@ -9,6 +17,7 @@ export type F1Champion = Driver & {
   careerStarts: number;
   careerFastestLaps: number;
   grayscalePhoto: boolean;
+  teams: ChampionTeamStint[];
 };
 
 export const F1_CHAMPIONS: F1Champion[] = [
@@ -27,6 +36,13 @@ export const F1_CHAMPIONS: F1Champion[] = [
     careerStarts: 144,
     careerFastestLaps: 6,
     grayscalePhoto: true,
+    teams: [
+      { name: 'Lotus', years: '1970–1973', championYears: [1972] },
+      { name: 'McLaren', years: '1974–1975', championYears: [1974], teamId: 'mclaren' },
+      { name: 'Fittipaldi', years: '1976–1980' },
+      { name: 'Patrick Racing', years: '1984–1990', championYears: [1989], series: { pt: 'CART / Indy 500', en: 'CART / Indy 500' } },
+      { name: 'Penske', years: '1990–1996', championYears: [1993], series: { pt: 'CART / Indy 500', en: 'CART / Indy 500' } },
+    ],
   },
   {
     id: 'piquet',
@@ -43,6 +59,14 @@ export const F1_CHAMPIONS: F1Champion[] = [
     careerStarts: 204,
     careerFastestLaps: 23,
     grayscalePhoto: true,
+    teams: [
+      { name: 'Ensign', years: '1978' },
+      { name: 'McLaren', years: '1978', teamId: 'mclaren' },
+      { name: 'Brabham', years: '1978–1985', championYears: [1981, 1983] },
+      { name: 'Williams', years: '1986–1987', championYears: [1987], teamId: 'williams' },
+      { name: 'Lotus', years: '1988–1989' },
+      { name: 'Benetton', years: '1990–1991' },
+    ],
   },
   {
     id: 'senna',
@@ -60,6 +84,12 @@ export const F1_CHAMPIONS: F1Champion[] = [
     careerStarts: 161,
     careerFastestLaps: 19,
     grayscalePhoto: true,
+    teams: [
+      { name: 'Toleman', years: '1984' },
+      { name: 'Lotus', years: '1985–1987' },
+      { name: 'McLaren', years: '1988–1993', championYears: [1988, 1990, 1991], teamId: 'mclaren' },
+      { name: 'Williams', years: '1994', teamId: 'williams' },
+    ],
   },
 ];
 
