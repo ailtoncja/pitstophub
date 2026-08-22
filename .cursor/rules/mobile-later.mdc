@@ -1,0 +1,19 @@
+---
+description: Native mobile is deferred; keep shipping the browser PWA until Ailton says otherwise
+alwaysApply: true
+---
+
+# Mobile later, PWA now
+
+The product to work on is the **browser PWA** (Vite/React in this repo). Do not scaffold Expo, Capacitor, TWA, or a `mobile/` app unless Ailton explicitly asks to start the native app.
+
+When that happens, the agreed path is:
+
+- **Expo** (React Native) for App Store / Play Store — native screens, not a WebView wrapper
+- Keep the **PWA on Vercel** as the web client
+- Share data/logic (types, bios, titles, fetchers, Supabase), rewrite UI for native
+- No Capacitor / WKWebView as a stepping stone
+- First native slice later: login + home + F1 (standings, driver, team, calendar)
+- Test without emulator: **Expo Go on a physical phone** (`npx expo start`, same Wi‑Fi or `--tunnel`); iOS TestFlight via EAS when Expo Go is no longer enough
+
+Until then, new features (titles, team pages, live data, etc.) land on the web app only.
