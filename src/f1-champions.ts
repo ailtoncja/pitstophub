@@ -1,5 +1,7 @@
 import type { Driver } from './types';
 
+// Arte das cartas em public/champions/<id>.png
+
 export type ChampionTeamStint = {
   name: string;
   years: string;
@@ -27,15 +29,15 @@ export const F1_CHAMPIONS: F1Champion[] = [
     number: '1',
     nationality: 'Brasil',
     teamId: 'mclaren',
-    image: 'https://r2.thesportsdb.com/images/media/player/cutout/77ayyz1657203130.png',
+    image: '/champions/fittipaldi.png',
     championYears: [1972, 1974],
-    cardRating: 91,
+    cardRating: 99,
     careerWins: 14,
     careerPodiums: 35,
     careerPoles: 6,
     careerStarts: 144,
     careerFastestLaps: 6,
-    grayscalePhoto: true,
+    grayscalePhoto: false,
     teams: [
       { name: 'Lotus', years: '1970–1973', championYears: [1972] },
       { name: 'McLaren', years: '1974–1975', championYears: [1974], teamId: 'mclaren' },
@@ -50,15 +52,15 @@ export const F1_CHAMPIONS: F1Champion[] = [
     number: '5',
     nationality: 'Brasil',
     teamId: 'williams',
-    image: '/champions/piquet.jpg',
+    image: '/champions/piquet.png',
     championYears: [1981, 1983, 1987],
-    cardRating: 94,
+    cardRating: 99,
     careerWins: 23,
     careerPodiums: 60,
     careerPoles: 24,
     careerStarts: 204,
     careerFastestLaps: 23,
-    grayscalePhoto: true,
+    grayscalePhoto: false,
     teams: [
       { name: 'Ensign', years: '1978' },
       { name: 'McLaren', years: '1978', teamId: 'mclaren' },
@@ -74,16 +76,15 @@ export const F1_CHAMPIONS: F1Champion[] = [
     number: '1',
     nationality: 'Brasil',
     teamId: 'mclaren',
-    image: 'https://r2.thesportsdb.com/images/media/player/thumb/ta00pl1749884913.jpg',
-    cutout: 'https://r2.thesportsdb.com/images/media/player/cutout/sw5a8z1657203008.png',
+    image: '/champions/senna.png',
     championYears: [1988, 1990, 1991],
-    cardRating: 98,
+    cardRating: 99,
     careerWins: 41,
     careerPodiums: 80,
     careerPoles: 65,
     careerStarts: 161,
     careerFastestLaps: 19,
-    grayscalePhoto: true,
+    grayscalePhoto: false,
     teams: [
       { name: 'Toleman', years: '1984' },
       { name: 'Lotus', years: '1985–1987' },
