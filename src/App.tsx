@@ -3468,7 +3468,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       className="relative min-h-dvh flex flex-col xl:flex-row transition-colors duration-300"
       style={{ '--cat-accent': categoryAccent, '--cat-accent-ink': categoryAccentInk, '--nav-accent': navAccent } as React.CSSProperties}
     >
-      {isDarkMode && !championsMono && (
+      {isDarkMode && (
         <>
           <div className="tg-glow tg-glow-red -left-32 -top-20 w-[420px] h-[420px] xl:w-[560px] xl:h-[560px] xl:-left-48 xl:-top-32" />
           <div className="tg-glow tg-glow-crimson -right-24 -bottom-32 w-[420px] h-[420px] xl:w-[600px] xl:h-[600px] xl:-right-40 xl:-bottom-52" />
@@ -3516,7 +3516,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       className={cn(
                         "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-left",
                         active
-                          ? "bg-[var(--nav-accent)]/10 text-[var(--nav-accent)] border border-[var(--nav-accent)]/20"
+                          ? cn("bg-[var(--nav-accent)]/10 text-[var(--nav-accent)] border border-[var(--nav-accent)]/20", championsMono && "champions-current")
                           : "text-gray-500 border border-transparent hover:bg-white/5 hover:text-[var(--text-main)]"
                       )}
                     >
@@ -3636,7 +3636,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             onClick={() => handleCategorySelect(cat)}
                             className={cn(
                               "w-full text-left px-4 py-2.5 text-xs font-bold uppercase tracking-widest transition-colors hover:bg-[var(--nav-accent)] hover:text-white",
-                              (view === 'category' || view === 'driver' || view === 'team') && selectedCategory.id === cat.id ? "text-[var(--nav-accent)] bg-[var(--nav-accent)]/5" : "text-gray-500"
+                              (view === 'category' || view === 'driver' || view === 'team') && selectedCategory.id === cat.id
+                                ? cn("text-[var(--nav-accent)] bg-[var(--nav-accent)]/5", championsMono && "champions-current")
+                                : "text-gray-500"
                             )}
                           >
                             {language === 'pt' ? cat.name : (cat.enFullName || cat.name)}
@@ -3809,7 +3811,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               className={cn(
                                 "w-full flex items-center justify-between px-5 py-4  text-sm font-bold uppercase tracking-widest transition-all border",
                                 (view === 'category' || view === 'driver' || view === 'team') && selectedCategory.id === cat.id
-                                  ? "bg-[var(--nav-accent)]/10 text-[var(--nav-accent)] border-[var(--nav-accent)]/20"
+                                  ? cn("bg-[var(--nav-accent)]/10 text-[var(--nav-accent)] border-[var(--nav-accent)]/20", championsMono && "champions-current")
                                   : "bg-white/5 text-gray-400 border-white/5 hover:bg-white/10"
                               )}
                             >
@@ -5554,7 +5556,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         className={cn(
                           "flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold uppercase tracking-widest transition-all whitespace-nowrap",
                           activeTab === tab.id 
-                            ? "bg-[var(--cat-accent)] text-[var(--cat-accent-ink)] shadow-lg shadow-[var(--cat-accent)]/20"
+                            ? cn("bg-[var(--cat-accent)] text-[var(--cat-accent-ink)] shadow-lg shadow-[var(--cat-accent)]/20", championsMono && "champions-current")
                             : "bg-[var(--card-bg)] text-gray-500 border border-[var(--card-border)] hover:text-[var(--cat-accent)]"
                         )}
                       >
@@ -6280,7 +6282,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 onClick={() => setLanguage('pt')}
                 className={cn(
                   "px-2 py-1 text-[10px] font-black  transition-all",
-                  language === 'pt' ? "bg-brand-red text-white" : "text-gray-500 hover:text-brand-red"
+                  language === 'pt' ? cn("bg-brand-red text-white", championsMono && "champions-current") : "text-gray-500 hover:text-brand-red"
                 )}
               >
                 PT
@@ -6289,7 +6291,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 onClick={() => setLanguage('en')}
                 className={cn(
                   "px-2 py-1 text-[10px] font-black  transition-all",
-                  language === 'en' ? "bg-brand-red text-white" : "text-gray-500 hover:text-brand-red"
+                  language === 'en' ? cn("bg-brand-red text-white", championsMono && "champions-current") : "text-gray-500 hover:text-brand-red"
                 )}
               >
                 EN

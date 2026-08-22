@@ -16,13 +16,18 @@ html.champions-mono {
   filter: grayscale(1);
 }
 
-html.champions-mono.dark {
-  --bg-main: #f4f2ec;
-  --text-main: #161616;
-  --card-bg: #ffffff;
-  --card-border: rgba(0, 0, 0, 0.14);
-  --header-bg: rgba(244, 242, 236, 0.92);
-  --sidebar-bg: #ebe8e1;
+html.champions-mono button:not(.f1-icon-card):not(.champions-current),
+html.champions-mono [role="button"]:not(.champions-current) {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.7);
+  background-color: transparent;
+}
+
+html.champions-mono .champions-current {
+  background: #fff !important;
+  color: #111 !important;
+  border-color: #fff !important;
+  box-shadow: none !important;
 }
 
 html {
