@@ -2059,6 +2059,22 @@ function findWinnerDriver(winner: string | undefined, driverByName: Map<string, 
   return undefined;
 }
 
+function findCategoryDriver(category: Category, name: string | undefined): Driver | undefined {
+  if (!name) return undefined;
+  const exact = category.drivers.find((driver) => driver.name === name);
+  if (exact) return exact;
+  for (const part of winnerNameParts(name)) {
+    const hit = category.drivers.find((driver) => driver.name === part);
+    if (hit) return hit;
+  }
+  return undefined;
+}
+
+function findCategoryTeam(category: Category, name: string | undefined): Team | undefined {
+  if (!name) return undefined;
+  return category.teams.find((team) => team.name === name);
+}
+
 function raceWonByDriver(race: Race, driverName: string): boolean {
   if (!race.winner) return false;
   return race.winner === driverName || winnerNameParts(race.winner).includes(driverName);
@@ -2969,6 +2985,41 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     setView('team');
   }, []);
 
+  const openFromHome = useCallback((options: {
+    category: Category;
+    driver?: Driver | null;
+    team?: Team | null;
+    race?: Race | null;
+    tab?: 'overview' | 'teams' | 'calendar' | 'standings';
+  }) => {
+    setSelectedCategoryBase(options.category);
+    setIsMobileMenuOpen(false);
+    setActiveDropdown(null);
+    if (options.driver && getDriverBio(options.category.id, options.driver.id)) {
+      setSelectedDriver(options.driver);
+      setSelectedTeam(null);
+      setSelectedRace(null);
+      setView('driver');
+    } else if (options.team) {
+      setSelectedTeam(options.team);
+      setSelectedDriver(null);
+      setSelectedRace(null);
+      setView('team');
+    } else if (options.race && hasCircuitPage(options.category, options.race)) {
+      setSelectedRace(options.race);
+      setSelectedDriver(null);
+      setSelectedTeam(null);
+      setView('race');
+    } else {
+      setSelectedDriver(null);
+      setSelectedTeam(null);
+      setSelectedRace(null);
+      setView('category');
+      setActiveTab(options.tab ?? 'overview');
+    }
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  }, []);
+
   const followedCategorySet = useMemo(() => new Set(followedCategoryIds), [followedCategoryIds]);
   const followedTeamSet = useMemo(() => new Set(followedTeamIds), [followedTeamIds]);
   const followedDriverSet = useMemo(() => new Set(followedDriverIds), [followedDriverIds]);
@@ -3775,7 +3826,27 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={SPRING}
-                  className="relative overflow-hidden rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] mb-10 sm:mb-16"
+                  className={cn(
+                    "relative overflow-hidden rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] mb-10 sm:mb-16",
+                    heroNextRace && "cursor-pointer hover:border-brand-red/40 transition-colors"
+                  )}
+                  onClick={heroNextRace ? () => openFromHome({
+                    category: heroNextRace.category,
+                    race: heroNextRace.race,
+                    tab: 'calendar',
+                  }) : undefined}
+                  role={heroNextRace ? 'button' : undefined}
+                  tabIndex={heroNextRace ? 0 : undefined}
+                  onKeyDown={heroNextRace ? (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      openFromHome({
+                        category: heroNextRace.category,
+                        race: heroNextRace.race,
+                        tab: 'calendar',
+                      });
+                    }
+                  } : undefined}
                 >
                   <div className="relative p-8 sm:p-12 md:p-16">
                     {heroNextRace ? (
@@ -3826,13 +3897,23 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         </div>
                         <div className="flex flex-wrap gap-3 mt-10">
                           <button
-                            onClick={() => { handleCategorySelect(heroNextRace.category); setActiveTab('calendar'); }}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCategorySelect(heroNextRace.category);
+                              setActiveTab('calendar');
+                            }}
                             className="px-6 py-3 rounded-lg bg-brand-red text-white font-apex-mono text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-opacity"
                           >
                             {UI_TRANSLATIONS[language].viewCalendar}
                           </button>
                           <button
-                            onClick={() => { handleCategorySelect(heroNextRace.category); setActiveTab('teams'); }}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCategorySelect(heroNextRace.category);
+                              setActiveTab('teams');
+                            }}
                             className="px-6 py-3 rounded-lg bg-[var(--bg-main)] border border-[var(--card-border)] text-[var(--text-main)] font-apex-mono text-xs font-bold uppercase tracking-widest hover:border-brand-red hover:text-brand-red transition-colors"
                           >
                             {UI_TRANSLATIONS[language].teams}
@@ -3862,8 +3943,15 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       type="button"
                       onClick={() => {
                         if (!featuredLeader) return;
-                        handleCategorySelect(featuredLeader.category);
-                        setActiveTab('standings');
+                        const driver = findCategoryDriver(featuredLeader.category, featuredLeader.entry.name);
+                        const team = findCategoryTeam(featuredLeader.category, featuredLeader.entry.name)
+                          ?? findCategoryTeam(featuredLeader.category, featuredLeader.entry.team);
+                        openFromHome({
+                          category: featuredLeader.category,
+                          driver,
+                          team,
+                          tab: 'standings',
+                        });
                       }}
                       className="apex-card p-6 text-left w-full hover:bg-white/5 transition-colors"
                     >
@@ -3887,8 +3975,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       type="button"
                       onClick={() => {
                         if (!lastHomeResult) return;
-                        handleCategorySelect(lastHomeResult.category);
-                        setActiveTab('calendar');
+                        openFromHome({
+                          category: lastHomeResult.category,
+                          driver: findCategoryDriver(lastHomeResult.category, lastHomeResult.race.winner),
+                          race: lastHomeResult.race,
+                          tab: 'calendar',
+                        });
                       }}
                       className="apex-card p-6 text-left w-full hover:bg-white/5 transition-colors"
                     >
@@ -3912,13 +4004,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       <button
                         type="button"
                         onClick={() => {
-                          handleCategorySelect(heroNextRace.category);
-                          if (hasCircuitPage(heroNextRace.category, heroRaceAfter)) {
-                            setSelectedRace(heroRaceAfter);
-                            setView('race');
-                          } else {
-                            setActiveTab('calendar');
-                          }
+                          openFromHome({
+                            category: heroNextRace.category,
+                            race: heroRaceAfter,
+                            tab: 'calendar',
+                          });
                         }}
                         className="apex-card p-6 text-left w-full hover:bg-white/5 transition-colors"
                       >
@@ -4035,19 +4125,15 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   : UI_TRANSLATIONS[language].completed;
                               const accent = getCategoryAccent(category.id);
                               return (
-                                <div
+                                <button
+                                  type="button"
                                   key={`${category.id}-${race.id}`}
-                                  onClick={() => {
-                                    if (isRacePageTest) {
-                                      setSelectedCategoryBase(category);
-                                      setSelectedRace(race);
-                                      setView('race');
-                                    } else {
-                                      handleCategorySelect(category);
-                                      setActiveTab('calendar');
-                                    }
-                                  }}
-                                  className="flex flex-col md:grid md:grid-cols-[44px_1fr_1fr_96px] gap-2 md:gap-4 md:items-center px-6 py-4 border-b border-[var(--card-border)] last:border-b-0 cursor-pointer hover:bg-white/5 transition-colors"
+                                  onClick={() => openFromHome({
+                                    category,
+                                    race: isRacePageTest ? race : null,
+                                    tab: 'calendar',
+                                  })}
+                                  className="flex flex-col md:grid md:grid-cols-[44px_1fr_1fr_96px] gap-2 md:gap-4 md:items-center px-6 py-4 border-b border-[var(--card-border)] last:border-b-0 w-full text-left cursor-pointer hover:bg-white/5 transition-colors"
                                 >
                                   <div className="hidden md:block font-apex-mono text-xs text-gray-500">
                                     {String(index + 1).padStart(2, '0')}
@@ -4081,7 +4167,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   <div className="font-apex-mono text-xs text-gray-500 md:text-right">
                                     {race.date.split('-').slice(1).reverse().join('/')}
                                   </div>
-                                </div>
+                                </button>
                               );
                             })}
                         </div>
@@ -4110,7 +4196,22 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           return (
                             <div className="space-y-4">
                               {board.slice(0, 5).map((entry) => (
-                                <div key={`${entry.position}-${entry.name}`} className="flex items-center gap-3">
+                                <button
+                                  type="button"
+                                  key={`${entry.position}-${entry.name}`}
+                                  onClick={() => {
+                                    const driver = findCategoryDriver(leaderCategory, entry.name);
+                                    const team = findCategoryTeam(leaderCategory, entry.name)
+                                      ?? findCategoryTeam(leaderCategory, entry.team);
+                                    openFromHome({
+                                      category: leaderCategory,
+                                      driver,
+                                      team,
+                                      tab: 'standings',
+                                    });
+                                  }}
+                                  className="flex items-center gap-3 w-full text-left rounded-lg px-1 -mx-1 py-1 hover:bg-white/5 transition-colors"
+                                >
                                   <div className="font-apex-mono text-xs text-gray-500 w-4 shrink-0">{entry.position}</div>
                                   <div className="flex-1 min-w-0">
                                     <div className="text-sm font-bold text-[var(--text-main)] truncate">{entry.name}</div>
@@ -4128,7 +4229,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   <div className="text-right shrink-0">
                                     <div className="text-sm font-bold text-[var(--text-main)]">{entry.points}</div>
                                   </div>
-                                </div>
+                                </button>
                               ))}
                             </div>
                           );
