@@ -3903,7 +3903,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               handleCategorySelect(heroNextRace.category);
                               setActiveTab('calendar');
                             }}
-                            className="px-6 py-3 rounded-lg bg-brand-red text-white font-apex-mono text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-opacity"
+                            className="px-6 py-3 rounded-lg bg-brand-red text-white font-apex-mono text-xs font-bold uppercase tracking-widest cursor-pointer hover:opacity-90 transition-opacity"
                           >
                             {UI_TRANSLATIONS[language].viewCalendar}
                           </button>
@@ -3914,7 +3914,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               handleCategorySelect(heroNextRace.category);
                               setActiveTab('teams');
                             }}
-                            className="px-6 py-3 rounded-lg bg-[var(--bg-main)] border border-[var(--card-border)] text-[var(--text-main)] font-apex-mono text-xs font-bold uppercase tracking-widest hover:border-brand-red hover:text-brand-red transition-colors"
+                            className="px-6 py-3 rounded-lg bg-[var(--bg-main)] border border-[var(--card-border)] text-[var(--text-main)] font-apex-mono text-xs font-bold uppercase tracking-widest cursor-pointer hover:border-brand-red hover:text-brand-red transition-colors"
                           >
                             {UI_TRANSLATIONS[language].teams}
                           </button>
@@ -3953,7 +3953,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           tab: 'standings',
                         });
                       }}
-                      className="apex-card p-6 text-left w-full hover:bg-white/5 transition-colors"
+                      className="apex-card p-6 text-left w-full cursor-pointer hover:bg-white/5 transition-colors"
                     >
                       <div className="flex items-center gap-2 mb-4 text-brand-red">
                         <Trophy className="w-4 h-4" />
@@ -3982,7 +3982,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           tab: 'calendar',
                         });
                       }}
-                      className="apex-card p-6 text-left w-full hover:bg-white/5 transition-colors"
+                      className="apex-card p-6 text-left w-full cursor-pointer hover:bg-white/5 transition-colors"
                     >
                       <div className="flex items-center gap-2 mb-4 text-brand-red">
                         <CheckCircle2 className="w-4 h-4" />
@@ -4010,7 +4010,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             tab: 'calendar',
                           });
                         }}
-                        className="apex-card p-6 text-left w-full hover:bg-white/5 transition-colors"
+                        className="apex-card p-6 text-left w-full cursor-pointer hover:bg-white/5 transition-colors"
                       >
                         <div className="flex items-center gap-2 mb-4 text-brand-red">
                           <Calendar className="w-4 h-4" />
@@ -4033,7 +4033,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                           handleCategorySelect(heroNextRace.category);
                           setActiveTab('overview');
                         }}
-                        className="apex-card p-6 text-left w-full hover:bg-white/5 transition-colors"
+                        className="apex-card p-6 text-left w-full cursor-pointer hover:bg-white/5 transition-colors"
                       >
                         <div className="flex items-center gap-2 mb-4 text-brand-red">
                           <Info className="w-4 h-4" />
@@ -4066,7 +4066,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             key={group.name.en}
                             onClick={() => setActiveHomeGroup(group.name.en)}
                             className={cn(
-                              "px-4 py-2 rounded-lg font-apex-mono text-xs font-semibold uppercase tracking-widest whitespace-nowrap transition-all border shrink-0",
+                              "px-4 py-2 rounded-lg font-apex-mono text-xs font-semibold uppercase tracking-widest whitespace-nowrap transition-all border shrink-0 cursor-pointer",
                               isActiveGroup
                                 ? "bg-brand-red text-white border-brand-red"
                                 : "bg-[var(--card-bg)] text-gray-500 border-[var(--card-border)] hover:text-brand-red"
@@ -4210,7 +4210,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                       tab: 'standings',
                                     });
                                   }}
-                                  className="flex items-center gap-3 w-full text-left rounded-lg px-1 -mx-1 py-1 hover:bg-white/5 transition-colors"
+                                  className="flex items-center gap-3 w-full text-left rounded-lg px-1 -mx-1 py-1 cursor-pointer hover:bg-white/5 transition-colors"
                                 >
                                   <div className="font-apex-mono text-xs text-gray-500 w-4 shrink-0">{entry.position}</div>
                                   <div className="flex-1 min-w-0">
@@ -4237,7 +4237,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         {homeLeaderCategory && (
                           <button
                             onClick={() => { handleCategorySelect(homeLeaderCategory); setActiveTab('standings'); }}
-                            className="mt-5 w-full px-4 py-2.5 bg-[var(--bg-main)] border border-[var(--card-border)] rounded-lg font-apex-mono text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-brand-red transition-colors"
+                            className="mt-5 w-full px-4 py-2.5 bg-[var(--bg-main)] border border-[var(--card-border)] rounded-lg font-apex-mono text-[10px] font-black uppercase tracking-widest text-gray-500 cursor-pointer hover:text-brand-red transition-colors"
                           >
                             {UI_TRANSLATIONS[language].standings}
                           </button>
@@ -4282,7 +4282,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 </div>
                                 <button
                                   onClick={(e) => { e.stopPropagation(); toggleFollowCategory(cat.id); }}
-                                  className={cn("p-1 rounded-full transition-colors shrink-0", isFollowed ? "text-brand-red" : "text-gray-600 hover:text-brand-red")}
+                                  className={cn("p-1 rounded-full transition-colors shrink-0 cursor-pointer", isFollowed ? "text-brand-red" : "text-gray-600 hover:text-brand-red")}
                                   title={isFollowed ? UI_TRANSLATIONS[language].followingCategory : UI_TRANSLATIONS[language].followCategory}
                                 >
                                   <Heart className={cn("w-3.5 h-3.5", isFollowed && "fill-brand-red")} />
