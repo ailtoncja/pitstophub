@@ -166,6 +166,8 @@ const UI_TRANSLATIONS = {
     standings: 'Classificação',
     champions: 'Campeões',
     championsLead: 'Galeria dos campeões mundiais de Fórmula 1.',
+    f1Teams: 'Equipes',
+    championWith: 'Campeão',
     poles: 'Poles',
     starts: 'Largadas',
     accessCategory: 'Acessar Categoria',
@@ -296,6 +298,8 @@ const UI_TRANSLATIONS = {
     standings: 'Standings',
     champions: 'Champions',
     championsLead: 'The gallery of Formula 1 World Champions.',
+    f1Teams: 'Teams',
+    championWith: 'Champion',
     poles: 'Poles',
     starts: 'Starts',
     accessCategory: 'Access Category',
@@ -4811,7 +4815,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               {language === 'pt' ? selectedDriverBio.pt : selectedDriverBio.en}
                             </p>
                             <div className="grid grid-cols-2 gap-x-6 gap-y-6">
-                              {selectedDriverTeam?.color && (
+                              {!selectedChampion && selectedDriverTeam?.color && (
                                 <div>
                                   <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
                                     {UI_TRANSLATIONS[language].team}
@@ -4879,6 +4883,60 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     </div>
                   </div>
                 </div>
+
+                {selectedChampion && selectedChampion.teams.length > 0 && (
+                  <div className="apex-card p-8 mb-6">
+                    <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
+                      {UI_TRANSLATIONS[language].f1Teams}
+                    </h3>
+                    <ul className="divide-y divide-white/5">
+                      {selectedChampion.teams.map((stint) => {
+                        const currentTeam = stint.teamId
+                          ? selectedCategory.teams.find((team) => team.id === stint.teamId)
+                          : undefined;
+                        const yearsLabel = stint.championYears?.length
+                          ? formatDriverTitleYears(stint.championYears)
+                          : '';
+                        const seriesLabel = stint.series
+                          ? (language === 'pt' ? stint.series.pt : stint.series.en)
+                          : undefined;
+                        const name = (
+                          <div className="min-w-0 flex-1">
+                            <div className="font-bold text-[var(--text-main)]">{stint.name}</div>
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mt-0.5">
+                              {stint.years}{seriesLabel ? ` • ${seriesLabel}` : ''}
+                            </div>
+                          </div>
+                        );
+                        return (
+                          <li key={`${stint.name}-${stint.years}`} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0">
+                            {currentTeam ? (
+                              <button
+                                type="button"
+                                onClick={() => openTeamPage(currentTeam)}
+                                className="flex items-center gap-4 min-w-0 flex-1 text-left hover:opacity-80 transition-opacity cursor-pointer"
+                              >
+                                <span className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: currentTeam.color }} />
+                                {name}
+                              </button>
+                            ) : (
+                              <>
+                                <span className="w-3 h-3 rounded-sm shrink-0 bg-white/20" />
+                                {name}
+                              </>
+                            )}
+                            {yearsLabel && (
+                              <div className="inline-flex items-center gap-1.5 font-apex-mono text-[10px] uppercase tracking-widest text-[var(--driver-accent)] shrink-0">
+                                <Trophy className="w-3 h-3" />
+                                {UI_TRANSLATIONS[language].championWith} {yearsLabel}
+                              </div>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
 
                 {selectedDriverTitles.length > 0 && (
                   <div className="apex-card p-8 mb-6">
