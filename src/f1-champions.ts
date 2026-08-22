@@ -34,7 +34,7 @@ export const F1_CHAMPIONS: F1Champion[] = [
     number: '5',
     nationality: 'Brasil',
     teamId: 'williams',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/e/ee/Piquet_a_Monza_1983.JPG',
+    image: '/champions/piquet.jpg',
     championYears: [1981, 1983, 1987],
     cardRating: 94,
     careerWins: 23,
