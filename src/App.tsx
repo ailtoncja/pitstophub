@@ -26,7 +26,8 @@ import {
   Zap,
   AlertTriangle,
   Film,
-  Bug
+  Bug,
+  Crown
 } from 'lucide-react';
 import { MOTORSPORT_DATA, Category } from './types';
 import { OpenWheelCarIcon, HypercarIcon, GtCarIcon, RallyCarIcon, StockCarIcon } from './category-icons';
@@ -78,6 +79,8 @@ import { FavoritesPicker, FavoritesOnboardingModal, NotificationsToggle } from '
 import { flagForNationality } from './nationality-flags';
 import { getTeamBio } from './team-bios';
 import { countDriverTitles, formatDriverTitleYears, getDriverTitles } from './driver-titles';
+import { F1_CHAMPIONS, findF1Champion, isF1Champion } from './f1-champions';
+import { F1ChampionCard } from './F1ChampionCard';
 
 const IconMap: Record<string, React.ElementType> = {
   OpenWheelCar: OpenWheelCarIcon,
@@ -161,6 +164,10 @@ const UI_TRANSLATIONS = {
     teams: 'Equipes',
     calendar: 'Calendário',
     standings: 'Classificação',
+    champions: 'Campeões',
+    championsLead: 'Galeria dos campeões mundiais de Fórmula 1.',
+    poles: 'Poles',
+    starts: 'Largadas',
     accessCategory: 'Acessar Categoria',
     viewSummary: 'Ver Resumo',
     liveData: 'Dados ao Vivo',
@@ -287,6 +294,10 @@ const UI_TRANSLATIONS = {
     teams: 'Teams',
     calendar: 'Calendar',
     standings: 'Standings',
+    champions: 'Champions',
+    championsLead: 'The gallery of Formula 1 World Champions.',
+    poles: 'Poles',
+    starts: 'Starts',
     accessCategory: 'Access Category',
     viewSummary: 'View Summary',
     liveData: 'Live Data',
@@ -1325,6 +1336,10 @@ const DRIVER_BIOS: Record<string, { pt: string; en: string }> = {
     pt: 'Sergio Pérez estreou na Fórmula 1 pela Sauber em 2011. Correu pela Red Bull Racing entre 2021 e 2024, ao lado de Max Verstappen, período em que conquistou sua primeira pole no GP da Arábia Saudita de 2022 e terminou como vice-campeão mundial em 2023. Depois de uma temporada de 2024 sem vitórias, deixou a equipe por acordo mútuo. Soma 6 vitórias, 39 pódios e 3 poles na carreira, e estreou pela Cadillac em 2026, equipe estreante na categoria, com a qual luta na parte de trás do grid — melhor resultado até a etapa da Hungria é um 14º lugar.',
     en: 'Sergio Pérez made his Formula 1 debut with Sauber in 2011. He drove for Red Bull Racing between 2021 and 2024, alongside Max Verstappen, a period in which he took his maiden pole position at the 2022 Saudi Arabian Grand Prix and finished championship runner-up in 2023. After a winless 2024 season, he and the team parted ways by mutual agreement. He has 6 career wins, 39 podiums and 3 poles, and joined debutant team Cadillac for 2026, where he has been fighting near the back of the grid — his best result as of the Hungarian Grand Prix is a 14th place.',
   },
+  'f1:senna': {
+    pt: 'Ayrton Senna estreou na Fórmula 1 pela Toleman em 1984 e, no ano seguinte, já na Lotus, venceu seu primeiro GP — em Portugal, na chuva. Na McLaren, conquistou três títulos mundiais (1988, 1990 e 1991) e se tornou o maior vencedor de Mônaco da história, com seis vitórias no principado. Soma 41 vitórias, 80 pódios e 65 poles em 161 largadas. Morreu em 1º de maio de 1994, no GP de San Marino em Ímola, ao volante da Williams, e permanece uma das maiores lendas do esporte.',
+    en: 'Ayrton Senna made his Formula 1 debut with Toleman in 1984 and, the following year at Lotus, won his first Grand Prix — in Portugal, in the rain. At McLaren he won three World Championships (1988, 1990 and 1991) and became the greatest Monaco winner in history, with six victories in the principality. He scored 41 wins, 80 podiums and 65 poles in 161 starts. He died on 1 May 1994 at the San Marino Grand Prix in Imola, driving for Williams, and remains one of the sport\'s greatest legends.',
+  },
   'f1:bottas': {
     pt: 'Valtteri Bottas estreou na Fórmula 1 pela Williams em 2013. Foi companheiro de Lewis Hamilton na Mercedes entre 2017 e 2021, período em que terminou vice-campeão mundial duas vezes (2019 e 2020) e ajudou a equipe a conquistar cinco títulos de construtores seguidos. Depois, correu pela Alfa Romeo e, mais tarde, pela Sauber, entre 2022 e 2024. Soma 10 vitórias, 67 pódios e 20 poles na carreira, e estreou pela Cadillac em 2026 com o número 77 — assim como o companheiro Sérgio Pérez, ainda busca os primeiros pontos da equipe estreante, com melhor resultado um 13º lugar até a etapa da Hungria.',
     en: 'Valtteri Bottas made his Formula 1 debut with Williams in 2013. He was Lewis Hamilton\'s teammate at Mercedes between 2017 and 2021, finishing championship runner-up twice (2019 and 2020) and helping the team win five consecutive Constructors\' Championships. He later drove for Alfa Romeo and then Sauber, from 2022 to 2024. He has 10 career wins, 67 podiums and 20 poles, and joined debutant team Cadillac for 2026 with car number 77 — like teammate Sergio Pérez, he is still chasing the new team\'s first points, with a best finish of 13th as of the Hungarian Grand Prix.',
@@ -2306,10 +2321,12 @@ function getIsIOSInstallable(): boolean {
 // como "reload", entao cai na home normalmente.
 const NAV_STORAGE_KEY = 'pitstophub_nav_state';
 
+type CategoryTab = 'overview' | 'teams' | 'calendar' | 'standings' | 'champions';
+
 type StoredNav = {
   view: 'home' | 'category' | 'race' | 'driver' | 'team' | 'favorites';
   categoryId: string;
-  activeTab: 'overview' | 'teams' | 'calendar' | 'standings';
+  activeTab: CategoryTab;
   raceId: string | null;
   driverId: string | null;
   teamId: string | null;
@@ -2361,9 +2378,12 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     const stored = readStoredNav();
     return (stored && CATEGORY_BY_ID.get(stored.categoryId)) || MOTORSPORT_DATA[0];
   });
-  const [activeTab, setActiveTab] = useState<'overview' | 'teams' | 'calendar' | 'standings'>(
-    () => readStoredNav()?.activeTab ?? 'overview'
-  );
+  const [activeTab, setActiveTab] = useState<CategoryTab>(() => {
+    const stored = readStoredNav();
+    if (!stored) return 'overview';
+    if (stored.activeTab === 'champions' && stored.categoryId !== 'f1') return 'overview';
+    return stored.activeTab;
+  });
   const [showRules, setShowRules] = useState(false);
   const [selectedRace, setSelectedRace] = useState<Race | null>(() => {
     const stored = readStoredNav();
@@ -2375,7 +2395,9 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     const stored = readStoredNav();
     if (!stored?.driverId) return null;
     const category = CATEGORY_BY_ID.get(stored.categoryId);
-    return category?.drivers.find((d) => d.id === stored.driverId) ?? null;
+    const fromGrid = category?.drivers.find((d) => d.id === stored.driverId);
+    if (fromGrid) return fromGrid;
+    return stored.categoryId === 'f1' ? findF1Champion(stored.driverId) ?? null : null;
   });
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(() => {
     const stored = readStoredNav();
@@ -2945,7 +2967,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const categoryAccentInk = getAccentTextColor(categoryAccent);
 
   React.useEffect(() => {
-    if (view !== 'driver' || !selectedDriver || selectedCategory.id !== 'f1') {
+    if (view !== 'driver' || !selectedDriver || selectedCategory.id !== 'f1' || isF1Champion(selectedDriver.id)) {
       setDriverSeasonResults(null);
       setDriverResultsState('idle');
       return;
@@ -2990,7 +3012,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     driver?: Driver | null;
     team?: Team | null;
     race?: Race | null;
-    tab?: 'overview' | 'teams' | 'calendar' | 'standings';
+    tab?: CategoryTab;
   }) => {
     setSelectedCategoryBase(options.category);
     setIsMobileMenuOpen(false);
@@ -3329,6 +3351,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const selectedDriverTitlesCount = useMemo(
     () => countDriverTitles(selectedDriverTitles),
     [selectedDriverTitles]
+  );
+  const selectedChampion = useMemo(
+    () => (selectedDriver && selectedCategory.id === 'f1' ? findF1Champion(selectedDriver.id) : undefined),
+    [selectedCategory.id, selectedDriver]
   );
   const displayedTeam = useMemo(() => {
     if (!selectedTeam) return null;
@@ -4504,10 +4530,14 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
               <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <button
-                  onClick={() => { setView('category'); setActiveTab('standings'); setSelectedDriver(null); }}
+                  onClick={() => {
+                    setView('category');
+                    setActiveTab(selectedChampion ? 'champions' : 'standings');
+                    setSelectedDriver(null);
+                  }}
                   className="inline-flex items-center gap-2 font-apex-mono text-xs font-semibold uppercase tracking-widest text-gray-500 hover:text-[var(--driver-accent)] transition-colors mb-10"
                 >
-                  <ChevronLeft className="w-4 h-4" /> {UI_TRANSLATIONS[language].standings}
+                  <ChevronLeft className="w-4 h-4" /> {selectedChampion ? UI_TRANSLATIONS[language].champions : UI_TRANSLATIONS[language].standings}
                 </button>
 
                 {/* items-start: sem isso, o grid estica os dois cards da linha pra terem a
@@ -4540,7 +4570,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       <img
                         src={selectedDriver.image}
                         alt={selectedDriver.name}
-                        className="absolute inset-0 w-full h-full object-cover object-top opacity-80"
+                        className={cn(
+                          "absolute inset-0 w-full h-full object-cover object-top opacity-80",
+                          selectedChampion?.grayscalePhoto && "grayscale contrast-110"
+                        )}
                         referrerPolicy="no-referrer"
                         loading="lazy"
                         decoding="async"
@@ -4593,7 +4626,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       <img
                         src={selectedDriver.cutout}
                         alt={selectedDriver.name}
-                        className="relative z-10 mx-auto max-h-[300px] w-auto object-contain drop-shadow-2xl"
+                        className={cn(
+                          "relative z-10 mx-auto max-h-[300px] w-auto object-contain drop-shadow-2xl",
+                          selectedChampion?.grayscalePhoto && "grayscale contrast-110"
+                        )}
                         referrerPolicy="no-referrer"
                         loading="eager"
                         decoding="async"
@@ -4601,7 +4637,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     )}
                   </div>
 
-                  {selectedDriverTeammates.length > 0 && (
+                  {!selectedChampion && selectedDriverTeammates.length > 0 && (
                     <div className="apex-card p-5">
                       <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-4">
                         {UI_TRANSLATIONS[language].teammate}
@@ -4654,56 +4690,105 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   <div className="lg:col-span-7 flex flex-col gap-6">
                     <div className={cn(
                       "grid gap-4",
-                      selectedDriverTitles.length > 0 ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5" : "grid-cols-2 sm:grid-cols-4"
+                      selectedChampion || selectedDriverTitles.length > 0
+                        ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"
+                        : "grid-cols-2 sm:grid-cols-4"
                     )}>
-                      <div className="apex-card p-4">
-                        <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
-                          {UI_TRANSLATIONS[language].position}
-                        </div>
-                        <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
-                          {selectedDriverStanding ? (
-                            <>
-                              {formatOrdinal(selectedDriverStanding.position, language).number}
-                              <span className="text-[var(--driver-accent)] text-base align-top">
-                                {formatOrdinal(selectedDriverStanding.position, language).suffix}
-                              </span>
-                            </>
-                          ) : '-'}
-                        </div>
-                      </div>
-                      <div className="apex-card p-4">
-                        <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
-                          {UI_TRANSLATIONS[language].points}
-                        </div>
-                        <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
-                          {selectedDriverStanding?.points ?? '-'}
-                        </div>
-                      </div>
-                      <div className="apex-card p-4">
-                        <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
-                          {UI_TRANSLATIONS[language].wins}
-                        </div>
-                        <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
-                          {selectedDriverWinsCount}
-                        </div>
-                      </div>
-                      <div className="apex-card p-4">
-                        <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
-                          {UI_TRANSLATIONS[language].podiums}
-                        </div>
-                        <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
-                          {selectedDriverPodiumsCount ?? '-'}
-                        </div>
-                      </div>
-                      {selectedDriverTitles.length > 0 && (
-                        <div className="apex-card p-4">
-                          <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
-                            {UI_TRANSLATIONS[language].titles}
+                      {selectedChampion ? (
+                        <>
+                          <div className="apex-card p-4">
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                              {UI_TRANSLATIONS[language].titles}
+                            </div>
+                            <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                              {selectedDriverTitlesCount}
+                            </div>
                           </div>
-                          <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
-                            {selectedDriverTitlesCount}
+                          <div className="apex-card p-4">
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                              {UI_TRANSLATIONS[language].wins}
+                            </div>
+                            <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                              {selectedChampion.careerWins}
+                            </div>
                           </div>
-                        </div>
+                          <div className="apex-card p-4">
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                              {UI_TRANSLATIONS[language].podiums}
+                            </div>
+                            <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                              {selectedChampion.careerPodiums}
+                            </div>
+                          </div>
+                          <div className="apex-card p-4">
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                              {UI_TRANSLATIONS[language].poles}
+                            </div>
+                            <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                              {selectedChampion.careerPoles}
+                            </div>
+                          </div>
+                          <div className="apex-card p-4">
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                              {UI_TRANSLATIONS[language].starts}
+                            </div>
+                            <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                              {selectedChampion.careerStarts}
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="apex-card p-4">
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                              {UI_TRANSLATIONS[language].position}
+                            </div>
+                            <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                              {selectedDriverStanding ? (
+                                <>
+                                  {formatOrdinal(selectedDriverStanding.position, language).number}
+                                  <span className="text-[var(--driver-accent)] text-base align-top">
+                                    {formatOrdinal(selectedDriverStanding.position, language).suffix}
+                                  </span>
+                                </>
+                              ) : '-'}
+                            </div>
+                          </div>
+                          <div className="apex-card p-4">
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                              {UI_TRANSLATIONS[language].points}
+                            </div>
+                            <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                              {selectedDriverStanding?.points ?? '-'}
+                            </div>
+                          </div>
+                          <div className="apex-card p-4">
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                              {UI_TRANSLATIONS[language].wins}
+                            </div>
+                            <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                              {selectedDriverWinsCount}
+                            </div>
+                          </div>
+                          <div className="apex-card p-4">
+                            <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                              {UI_TRANSLATIONS[language].podiums}
+                            </div>
+                            <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                              {selectedDriverPodiumsCount ?? '-'}
+                            </div>
+                          </div>
+                          {selectedDriverTitles.length > 0 && (
+                            <div className="apex-card p-4">
+                              <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                                {UI_TRANSLATIONS[language].titles}
+                              </div>
+                              <div className="font-apex text-3xl font-extrabold text-[var(--text-main)] mt-1">
+                                {selectedDriverTitlesCount}
+                              </div>
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
 
@@ -4733,7 +4818,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                   </button>
                                 </div>
                               )}
-                              {selectedDriverTeam?.car && (
+                              {!selectedChampion && selectedDriverTeam?.car && (
                                 <div>
                                   <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mb-2">
                                     {UI_TRANSLATIONS[language].chassis}
@@ -4743,7 +4828,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               )}
                             </div>
                           </div>
-                          {selectedDriverTeam?.clearart && (
+                          {!selectedChampion && selectedDriverTeam?.clearart && (
                             <div className="bg-black/20 border border-white/5 p-4">
                               <img
                                 src={selectedDriverTeam.clearart}
@@ -4821,6 +4906,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   </div>
                 )}
 
+                {!selectedChampion && (
                 <div className="apex-card p-8">
                   <h3 className="font-apex font-extrabold italic uppercase text-xl text-[var(--text-main)] mb-6">
                     {driverSeasonResults ? UI_TRANSLATIONS[language].recentResults : UI_TRANSLATIONS[language].winsThisSeason}
@@ -4872,6 +4958,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                     </div>
                   )}
                 </div>
+                )}
               </div>
             </section>
           </motion.div>
@@ -5371,15 +5458,18 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                   <div className="flex items-center justify-start md:justify-center gap-4 mb-12 overflow-x-auto pb-4 no-scrollbar">
                     {[
-                      { id: 'overview', label: UI_TRANSLATIONS[language].overview, icon: Info },
-                      { id: 'teams', label: UI_TRANSLATIONS[language].teams, icon: Users },
-                      { id: 'calendar', label: UI_TRANSLATIONS[language].calendar, icon: Calendar },
-                      { id: 'standings', label: UI_TRANSLATIONS[language].standings, icon: Trophy },
+                      { id: 'overview' as const, label: UI_TRANSLATIONS[language].overview, icon: Info },
+                      { id: 'teams' as const, label: UI_TRANSLATIONS[language].teams, icon: Users },
+                      { id: 'calendar' as const, label: UI_TRANSLATIONS[language].calendar, icon: Calendar },
+                      { id: 'standings' as const, label: UI_TRANSLATIONS[language].standings, icon: Trophy },
+                      ...(selectedCategory.id === 'f1'
+                        ? [{ id: 'champions' as const, label: UI_TRANSLATIONS[language].champions, icon: Crown }]
+                        : []),
                     ].map((tab) => (
                       <button
                         key={tab.id}
                         onClick={() => {
-                          setActiveTab(tab.id as any);
+                          setActiveTab(tab.id);
                           setTimeout(() => {
                             contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                           }, 100);
@@ -6025,6 +6115,36 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                             </p>
                           </div>
                         )}
+                      </motion.div>
+                    )}
+                    {activeTab === 'champions' && selectedCategory.id === 'f1' && (
+                      <motion.div
+                        key="champions"
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={SPRING}
+                      >
+                        <div className="mb-8">
+                          <h3 className="font-apex text-2xl font-extrabold italic text-[var(--text-main)]">
+                            {UI_TRANSLATIONS[language].champions}
+                          </h3>
+                          <p className="text-gray-500 mt-2">{UI_TRANSLATIONS[language].championsLead}</p>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 justify-items-center">
+                          {F1_CHAMPIONS.map((champion) => (
+                            <F1ChampionCard
+                              key={champion.id}
+                              champion={champion}
+                              language={language}
+                              onOpen={() => {
+                                setSelectedDriver(champion);
+                                setView('driver');
+                                requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }));
+                              }}
+                            />
+                          ))}
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>

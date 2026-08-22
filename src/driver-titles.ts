@@ -87,6 +87,10 @@ const DRIVER_TITLES: Record<string, DriverTitle[]> = {
     t(2024, 'Fórmula 2', 'Formula 2'),
     t(2023, 'Fórmula 3', 'Formula 3'),
   ],
+  'f1:senna': [
+    t([1988, 1990, 1991], 'Fórmula 1', 'Formula 1'),
+    t(1983, 'Fórmula 3 Britânica', 'British Formula 3'),
+  ],
 
   'wrc:neuville': [t(2024, 'WRC', 'WRC')],
   'wrc:ogier': [t([2013, 2014, 2015, 2016, 2017, 2018, 2020, 2021, 2025], 'WRC', 'WRC')],
