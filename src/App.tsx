@@ -4583,7 +4583,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                         src={selectedDriver.image}
                         alt={selectedDriver.name}
                         className={cn(
-                          "absolute inset-0 w-full h-full object-cover object-top opacity-80",
+                          "absolute inset-0 w-full h-full",
+                          selectedChampion
+                            ? "object-contain p-4"
+                            : "object-cover object-top opacity-80",
                           selectedChampion?.grayscalePhoto && "grayscale contrast-110"
                         )}
                         referrerPolicy="no-referrer"
