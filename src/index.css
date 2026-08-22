@@ -16,13 +16,6 @@ html.champions-mono {
   filter: grayscale(1);
 }
 
-html.champions-mono button:not(.f1-icon-card):not(.champions-current),
-html.champions-mono [role="button"]:not(.champions-current) {
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.7);
-  background-color: transparent;
-}
-
 html.champions-mono .champions-current {
   background: #fff !important;
   color: #111 !important;
