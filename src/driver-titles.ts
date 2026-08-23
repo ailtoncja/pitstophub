@@ -99,6 +99,17 @@ const DRIVER_TITLES: Record<string, DriverTitle[]> = {
     t([1988, 1990, 1991], 'Fórmula 1', 'Formula 1'),
     t(1983, 'Fórmula 3 Britânica', 'British Formula 3'),
   ],
+  'f1:rubens': [
+    t([2014, 2022], 'Stock Car', 'Stock Car'),
+    t(1991, 'Fórmula 3 Britânica', 'British Formula 3'),
+    t(1990, 'Fórmula Opel Euroseries', 'Formula Opel Euroseries'),
+  ],
+  'f1:massa': [
+    t(2001, 'Euro Fórmula 3000', 'Euro Formula 3000'),
+    t(2000, 'Fórmula Renault Europeia', 'Formula Renault Eurocup'),
+    t(2000, 'Fórmula Renault Italiana', 'Italian Formula Renault'),
+    t(1999, 'Fórmula Chevrolet', 'Formula Chevrolet'),
+  ],
 
   'wrc:neuville': [t(2024, 'WRC', 'WRC')],
   'wrc:ogier': [t([2013, 2014, 2015, 2016, 2017, 2018, 2020, 2021, 2025], 'WRC', 'WRC')],
