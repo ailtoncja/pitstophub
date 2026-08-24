@@ -27,6 +27,13 @@ export function formatRaceDateTime(
   return `${dateLabel} · ${time}`;
 }
 
+export function formatRaceDay(race: Pick<Race, 'date'>, language: 'pt' | 'en'): string {
+  return new Date(`${race.date}T00:00:00`).toLocaleDateString(
+    language === 'pt' ? 'pt-BR' : 'en-US',
+    { weekday: 'long', day: 'numeric', month: 'long' },
+  );
+}
+
 export function formatRaceLongDate(race: Pick<Race, 'date' | 'startsAt'>, language: 'pt' | 'en'): string {
   const dateLabel = new Date(`${race.date}T00:00:00`).toLocaleDateString(
     language === 'pt' ? 'pt-BR' : 'en-US',
