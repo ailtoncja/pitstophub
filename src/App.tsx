@@ -77,7 +77,7 @@ import {
 import type { CategoryStandings, Driver, Race, StandingItem, Team } from './types';
 import { FavoritesPicker, FavoritesOnboardingModal, NotificationsToggle } from './Favorites';
 import { ensurePushSubscription } from './push';
-import { formatRaceDateTime, formatRaceLongDate, raceStartDate } from './race-time';
+import { formatRaceDateTime, formatRaceDay, formatRaceLongDate, raceStartDate } from './race-time';
 import { flagForNationality } from './nationality-flags';
 import { getTeamBio } from './team-bios';
 import { countDriverTitles, formatDriverTitleYears, getDriverTitles } from './driver-titles';
@@ -130,6 +130,11 @@ function roundsLeftLabel(count: number, language: 'pt' | 'en'): string {
   if (count <= 0) return UI_TRANSLATIONS[language].seasonWrapped;
   if (language === 'pt') return count === 1 ? 'Falta 1 etapa' : `Faltam ${count} etapas`;
   return count === 1 ? '1 round left' : `${count} rounds left`;
+}
+
+function racesThisDayLabel(count: number, language: 'pt' | 'en'): string {
+  if (language === 'pt') return count === 1 ? '1 corrida neste dia' : `${count} corridas neste dia`;
+  return count === 1 ? '1 race on this day' : `${count} races on this day`;
 }
 
 const NAV_GROUPS = [
@@ -231,6 +236,7 @@ const UI_TRANSLATIONS = {
     championshipLeader: 'Lider do campeonato',
     constructorsLeader: 'Lider entre equipes',
     upNext: 'Próxima Largada',
+    racesOnThisDay: 'Corridas neste dia',
     daysToGo: 'dias para a corrida',
     raceToday: 'É hoje!',
     daysLabel: 'Dias',
@@ -363,6 +369,7 @@ const UI_TRANSLATIONS = {
     championshipLeader: 'Championship leader',
     constructorsLeader: 'Team leader',
     upNext: 'Up Next',
+    racesOnThisDay: 'Races on this day',
     daysToGo: 'days to go',
     raceToday: 'Race day!',
     daysLabel: 'Days',
@@ -3275,18 +3282,29 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
     return () => window.clearInterval(intervalId);
   }, []);
 
+  const allUpcomingRaces = useMemo(() => {
+    return allCategories
+      .flatMap((category) => category.calendar
+        .filter((race) => race.status === 'upcoming')
+        .map((race) => ({ category, race })))
+      .sort((a, b) => raceStartDate(a.race).getTime() - raceStartDate(b.race).getTime());
+  }, [allCategories]);
+
   const heroNextRace = useMemo(() => {
     // Usuario logado com categorias/equipes/pilotos seguidos: mostra a proxima
     // corrida entre o que ele segue, em vez da proxima corrida de qualquer categoria.
     if (currentUser && upcomingFollowedRaces.length > 0) {
       return upcomingFollowedRaces[0];
     }
-    return allCategories
-      .flatMap((category) => category.calendar
-        .filter((race) => race.status === 'upcoming')
-        .map((race) => ({ category, race })))
-      .sort((a, b) => raceStartDate(a.race).getTime() - raceStartDate(b.race).getTime())[0] ?? null;
-  }, [allCategories, currentUser, upcomingFollowedRaces]);
+    return allUpcomingRaces[0] ?? null;
+  }, [allUpcomingRaces, currentUser, upcomingFollowedRaces]);
+
+  const heroDayRaces = useMemo(() => {
+    if (!heroNextRace) return [];
+    return allUpcomingRaces.filter((item) => item.race.date === heroNextRace.race.date);
+  }, [allUpcomingRaces, heroNextRace]);
+
+  const heroHasMultipleRaces = heroDayRaces.length > 1;
 
   const heroCountdownDays = useMemo(() => {
     if (!heroNextRace) return null;
@@ -3958,16 +3976,16 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   transition={SPRING}
                   className={cn(
                     "relative overflow-hidden rounded-2xl border border-[var(--card-border)] bg-[var(--card-bg)] mb-10 sm:mb-16",
-                    heroNextRace && "cursor-pointer hover:border-brand-red/40 transition-colors"
+                    heroNextRace && !heroHasMultipleRaces && "cursor-pointer hover:border-brand-red/40 transition-colors"
                   )}
-                  onClick={heroNextRace ? () => openFromHome({
+                  onClick={heroNextRace && !heroHasMultipleRaces ? () => openFromHome({
                     category: heroNextRace.category,
                     race: heroNextRace.race,
                     tab: 'calendar',
                   }) : undefined}
-                  role={heroNextRace ? 'button' : undefined}
-                  tabIndex={heroNextRace ? 0 : undefined}
-                  onKeyDown={heroNextRace ? (e) => {
+                  role={heroNextRace && !heroHasMultipleRaces ? 'button' : undefined}
+                  tabIndex={heroNextRace && !heroHasMultipleRaces ? 0 : undefined}
+                  onKeyDown={heroNextRace && !heroHasMultipleRaces ? (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
                       openFromHome({
@@ -3983,72 +4001,140 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                       <>
                         <div className="inline-flex items-center gap-2 rounded-lg border border-brand-red text-brand-red px-3 py-1 font-apex-mono text-[11px] font-semibold uppercase tracking-widest mb-6">
                           <span className="w-2 h-2 rounded-full bg-brand-red animate-pulse" />
-                          {UI_TRANSLATIONS[language].upNext}
+                          {heroHasMultipleRaces
+                            ? UI_TRANSLATIONS[language].racesOnThisDay
+                            : UI_TRANSLATIONS[language].upNext}
                         </div>
-                        <h1 className="font-apex text-4xl sm:text-6xl md:text-7xl font-extrabold italic uppercase tracking-tight text-[var(--text-main)] leading-[0.95] mb-3">
-                          {language === 'pt' ? heroNextRace.race.name : (heroNextRace.race.enName || heroNextRace.race.name)}
-                        </h1>
-                        <p className="font-apex text-lg sm:text-2xl italic uppercase text-gray-500 mb-10">
-                          {language === 'pt' ? heroNextRace.race.location : (heroNextRace.race.enLocation || heroNextRace.race.location)}
-                        </p>
-                        <div className="flex flex-wrap items-end gap-8">
-                          <div className="flex gap-3">
-                            {[
-                              { value: heroCountdown?.days ?? 0, label: UI_TRANSLATIONS[language].daysLabel },
-                              { value: heroCountdown?.hours ?? 0, label: UI_TRANSLATIONS[language].hoursLabel },
-                              { value: heroCountdown?.minutes ?? 0, label: UI_TRANSLATIONS[language].minsLabel },
-                            ].map((unit) => (
-                              <div key={unit.label} className="rounded-xl border border-[var(--card-border)] bg-black/20 w-20 text-center py-3">
-                                <span className="block font-apex text-3xl font-extrabold text-[var(--text-main)] mb-1">
-                                  {String(unit.value).padStart(2, '0')}
-                                </span>
-                                <span className="font-apex-mono text-[10px] text-gray-500 uppercase tracking-widest">
-                                  {unit.label}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="w-11 h-11 rounded-lg flex items-center justify-center shrink-0"
-                              style={{ backgroundColor: getCategoryAccent(heroNextRace.category.id) }}
-                            >
-                              {React.createElement(IconMap[heroNextRace.category.icon] ?? Trophy, { className: 'text-white w-5 h-5' })}
+                        {heroHasMultipleRaces ? (
+                          <>
+                            <h1 className="font-apex text-4xl sm:text-6xl md:text-7xl font-extrabold italic uppercase tracking-tight text-[var(--text-main)] leading-[0.95] mb-3">
+                              {formatRaceDay(heroNextRace.race, language)}
+                            </h1>
+                            <p className="font-apex text-lg sm:text-2xl italic uppercase text-gray-500 mb-10">
+                              {racesThisDayLabel(heroDayRaces.length, language)}
+                            </p>
+                            <div className="flex gap-3 mb-8">
+                              {[
+                                { value: heroCountdown?.days ?? 0, label: UI_TRANSLATIONS[language].daysLabel },
+                                { value: heroCountdown?.hours ?? 0, label: UI_TRANSLATIONS[language].hoursLabel },
+                                { value: heroCountdown?.minutes ?? 0, label: UI_TRANSLATIONS[language].minsLabel },
+                              ].map((unit) => (
+                                <div key={unit.label} className="rounded-xl border border-[var(--card-border)] bg-black/20 w-20 text-center py-3">
+                                  <span className="block font-apex text-3xl font-extrabold text-[var(--text-main)] mb-1">
+                                    {String(unit.value).padStart(2, '0')}
+                                  </span>
+                                  <span className="font-apex-mono text-[10px] text-gray-500 uppercase tracking-widest">
+                                    {unit.label}
+                                  </span>
+                                </div>
+                              ))}
                             </div>
-                            <div>
-                              <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
-                                {language === 'pt' ? heroNextRace.category.name : (heroNextRace.category.enFullName || heroNextRace.category.name)}
+                            <div className="flex flex-col gap-3">
+                              {heroDayRaces.map(({ category, race }) => {
+                                const accent = getCategoryAccent(category.id);
+                                const Icon = IconMap[category.icon] ?? Trophy;
+                                return (
+                                  <button
+                                    key={`${category.id}-${race.id}`}
+                                    type="button"
+                                    onClick={() => openFromHome({
+                                      category,
+                                      race,
+                                      tab: 'calendar',
+                                    })}
+                                    className="flex items-center gap-4 w-full text-left rounded-xl border border-[var(--card-border)] bg-black/20 px-4 py-3 hover:border-brand-red/40 transition-colors cursor-pointer"
+                                  >
+                                    <div
+                                      className="w-11 h-11 rounded-lg flex items-center justify-center shrink-0"
+                                      style={{ backgroundColor: accent }}
+                                    >
+                                      <Icon className="w-5 h-5" style={{ color: getAccentTextColor(accent) }} />
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                      <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                                        {language === 'pt' ? category.name : (category.enFullName || category.name)}
+                                      </div>
+                                      <div className="font-apex text-lg sm:text-xl font-extrabold italic uppercase text-[var(--text-main)] truncate">
+                                        {language === 'pt' ? race.name : (race.enName || race.name)}
+                                      </div>
+                                      <div className="font-apex-mono text-xs text-gray-500 uppercase tracking-widest truncate">
+                                        {language === 'pt' ? race.location : (race.enLocation || race.location)} · {formatRaceDateTime(race, language)}
+                                      </div>
+                                    </div>
+                                    <ChevronRight className="w-5 h-5 text-gray-500 shrink-0" />
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <h1 className="font-apex text-4xl sm:text-6xl md:text-7xl font-extrabold italic uppercase tracking-tight text-[var(--text-main)] leading-[0.95] mb-3">
+                              {language === 'pt' ? heroNextRace.race.name : (heroNextRace.race.enName || heroNextRace.race.name)}
+                            </h1>
+                            <p className="font-apex text-lg sm:text-2xl italic uppercase text-gray-500 mb-10">
+                              {language === 'pt' ? heroNextRace.race.location : (heroNextRace.race.enLocation || heroNextRace.race.location)}
+                            </p>
+                            <div className="flex flex-wrap items-end gap-8">
+                              <div className="flex gap-3">
+                                {[
+                                  { value: heroCountdown?.days ?? 0, label: UI_TRANSLATIONS[language].daysLabel },
+                                  { value: heroCountdown?.hours ?? 0, label: UI_TRANSLATIONS[language].hoursLabel },
+                                  { value: heroCountdown?.minutes ?? 0, label: UI_TRANSLATIONS[language].minsLabel },
+                                ].map((unit) => (
+                                  <div key={unit.label} className="rounded-xl border border-[var(--card-border)] bg-black/20 w-20 text-center py-3">
+                                    <span className="block font-apex text-3xl font-extrabold text-[var(--text-main)] mb-1">
+                                      {String(unit.value).padStart(2, '0')}
+                                    </span>
+                                    <span className="font-apex-mono text-[10px] text-gray-500 uppercase tracking-widest">
+                                      {unit.label}
+                                    </span>
+                                  </div>
+                                ))}
                               </div>
-                              <div className="font-apex-mono text-xs font-bold uppercase tracking-widest text-[var(--text-main)]">
-                                {formatRaceDateTime(heroNextRace.race, language)}
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className="w-11 h-11 rounded-lg flex items-center justify-center shrink-0"
+                                  style={{ backgroundColor: getCategoryAccent(heroNextRace.category.id) }}
+                                >
+                                  {React.createElement(IconMap[heroNextRace.category.icon] ?? Trophy, { className: 'text-white w-5 h-5' })}
+                                </div>
+                                <div>
+                                  <div className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500">
+                                    {language === 'pt' ? heroNextRace.category.name : (heroNextRace.category.enFullName || heroNextRace.category.name)}
+                                  </div>
+                                  <div className="font-apex-mono text-xs font-bold uppercase tracking-widest text-[var(--text-main)]">
+                                    {formatRaceDateTime(heroNextRace.race, language)}
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap gap-3 mt-10">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCategorySelect(heroNextRace.category);
-                              setActiveTab('calendar');
-                            }}
-                            className="px-6 py-3 rounded-lg bg-brand-red text-white font-apex-mono text-xs font-bold uppercase tracking-widest cursor-pointer hover:opacity-90 transition-opacity"
-                          >
-                            {UI_TRANSLATIONS[language].viewCalendar}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCategorySelect(heroNextRace.category);
-                              setActiveTab('teams');
-                            }}
-                            className="px-6 py-3 rounded-lg bg-[var(--bg-main)] border border-[var(--card-border)] text-[var(--text-main)] font-apex-mono text-xs font-bold uppercase tracking-widest cursor-pointer hover:border-brand-red hover:text-brand-red transition-colors"
-                          >
-                            {UI_TRANSLATIONS[language].teams}
-                          </button>
-                        </div>
+                            <div className="flex flex-wrap gap-3 mt-10">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCategorySelect(heroNextRace.category);
+                                  setActiveTab('calendar');
+                                }}
+                                className="px-6 py-3 rounded-lg bg-brand-red text-white font-apex-mono text-xs font-bold uppercase tracking-widest cursor-pointer hover:opacity-90 transition-opacity"
+                              >
+                                {UI_TRANSLATIONS[language].viewCalendar}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCategorySelect(heroNextRace.category);
+                                  setActiveTab('teams');
+                                }}
+                                className="px-6 py-3 rounded-lg bg-[var(--bg-main)] border border-[var(--card-border)] text-[var(--text-main)] font-apex-mono text-xs font-bold uppercase tracking-widest cursor-pointer hover:border-brand-red hover:text-brand-red transition-colors"
+                              >
+                                {UI_TRANSLATIONS[language].teams}
+                              </button>
+                            </div>
+                          </>
+                        )}
                       </>
                     ) : (
                       <>
