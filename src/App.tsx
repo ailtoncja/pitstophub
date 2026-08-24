@@ -3301,8 +3301,11 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
   const heroDayRaces = useMemo(() => {
     if (!heroNextRace) return [];
-    return allUpcomingRaces.filter((item) => item.race.date === heroNextRace.race.date);
-  }, [allUpcomingRaces, heroNextRace]);
+    const pool = currentUser && upcomingFollowedRaces.length > 0
+      ? upcomingFollowedRaces
+      : allUpcomingRaces;
+    return pool.filter((item) => item.race.date === heroNextRace.race.date);
+  }, [allUpcomingRaces, currentUser, heroNextRace, upcomingFollowedRaces]);
 
   const heroHasMultipleRaces = heroDayRaces.length > 1;
 
