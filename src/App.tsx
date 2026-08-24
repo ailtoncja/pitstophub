@@ -76,6 +76,8 @@ import {
 } from './endurance-brasil-live';
 import type { CategoryStandings, Driver, Race, StandingItem, Team } from './types';
 import { FavoritesPicker, FavoritesOnboardingModal, NotificationsToggle } from './Favorites';
+import { ensurePushSubscription } from './push';
+import { formatRaceDateTime, formatRaceLongDate, raceStartDate } from './race-time';
 import { flagForNationality } from './nationality-flags';
 import { getTeamBio } from './team-bios';
 import { countDriverTitles, formatDriverTitleYears, getDriverTitles } from './driver-titles';
@@ -2375,6 +2377,29 @@ function readStoredNav(): StoredNav | null {
   }
 }
 
+function readDeepLinkCategoryId(): string | null {
+  if (typeof window === 'undefined') return null;
+  const categoryId = new URLSearchParams(window.location.search).get('c');
+  return categoryId && CATEGORY_BY_ID.has(categoryId) ? categoryId : null;
+}
+
+function consumeDeepLink() {
+  if (typeof window === 'undefined') return;
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has('c')) return;
+  url.searchParams.delete('c');
+  const next = `${url.pathname}${url.search}${url.hash}`;
+  window.history.replaceState(null, '', next);
+}
+
+function browserTimeZone() {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Sao_Paulo';
+  } catch {
+    return 'America/Sao_Paulo';
+  }
+}
+
 type AppProps = {
   currentUser: AuthUser | null;
   onLogout: () => void;
@@ -2393,12 +2418,18 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [view, setView] = useState<'home' | 'category' | 'race' | 'driver' | 'team' | 'favorites'>(() => readStoredNav()?.view ?? 'home');
+  const [view, setView] = useState<'home' | 'category' | 'race' | 'driver' | 'team' | 'favorites'>(() => {
+    if (readDeepLinkCategoryId()) return 'category';
+    return readStoredNav()?.view ?? 'home';
+  });
   const [selectedCategoryBase, setSelectedCategoryBase] = useState<Category>(() => {
+    const deepLink = readDeepLinkCategoryId();
+    if (deepLink) return CATEGORY_BY_ID.get(deepLink) ?? MOTORSPORT_DATA[0];
     const stored = readStoredNav();
     return (stored && CATEGORY_BY_ID.get(stored.categoryId)) || MOTORSPORT_DATA[0];
   });
   const [activeTab, setActiveTab] = useState<CategoryTab>(() => {
+    if (readDeepLinkCategoryId()) return 'calendar';
     const stored = readStoredNav();
     if (!stored) return 'overview';
     if (stored.activeTab === 'champions' && stored.categoryId !== 'f1') return 'overview';
@@ -2538,6 +2569,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
   const [followedDriverIds, setFollowedDriverIds] = useState<string[]>([]);
   const [favoritesOnboarded, setFavoritesOnboarded] = useState(false);
   const [priorityFollowIds, setPriorityFollowIds] = useState<string[]>([]);
+  const [notifyRaceDay, setNotifyRaceDay] = useState(true);
+  const [notifyT60, setNotifyT60] = useState(true);
+  const [notifyStart, setNotifyStart] = useState(true);
+  const [notifyResults, setNotifyResults] = useState(true);
   const [showFavoritesOnboarding, setShowFavoritesOnboarding] = useState(false);
   const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installingApp, setInstallingApp] = useState(false);
@@ -2619,6 +2654,10 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
           setFollowedDriverIds(settings.followedDriverIds);
           setFavoritesOnboarded(settings.favoritesOnboarded);
           setPriorityFollowIds(settings.priorityFollowIds);
+          setNotifyRaceDay(settings.notifyRaceDay);
+          setNotifyT60(settings.notifyT60);
+          setNotifyStart(settings.notifyStart);
+          setNotifyResults(settings.notifyResults);
           const category = CATEGORY_BY_ID.get(settings.favoriteCategoryId);
           if (category) setSelectedCategoryBase(category);
         } else {
@@ -2660,12 +2699,47 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
         followedDriverIds,
         favoritesOnboarded,
         priorityFollowIds,
+        notifyRaceDay,
+        notifyT60,
+        notifyStart,
+        notifyResults,
+        timezone: browserTimeZone(),
       }).catch((error) => {
         console.error('Falha ao salvar configuracoes do usuario.', error);
       });
     }, 250);
     return () => window.clearTimeout(t);
-  }, [currentUser, settingsLoaded, isDarkMode, language, selectedCategoryBase.id, followedCategoryIds, followedTeamIds, followedDriverIds, favoritesOnboarded, priorityFollowIds]);
+  }, [currentUser, settingsLoaded, isDarkMode, language, selectedCategoryBase.id, followedCategoryIds, followedTeamIds, followedDriverIds, favoritesOnboarded, priorityFollowIds, notifyRaceDay, notifyT60, notifyStart, notifyResults]);
+
+  React.useEffect(() => {
+    const openFromLink = (url?: string) => {
+      const categoryId = url
+        ? new URL(url, window.location.origin).searchParams.get('c')
+        : readDeepLinkCategoryId();
+      if (!categoryId || !CATEGORY_BY_ID.has(categoryId)) return;
+      setSelectedCategoryBase(CATEGORY_BY_ID.get(categoryId)!);
+      setActiveTab('calendar');
+      setView('category');
+      consumeDeepLink();
+    };
+
+    openFromLink();
+    const onMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'pitstophub-open') openFromLink(event.data.url);
+    };
+    const onPopState = () => openFromLink();
+    navigator.serviceWorker?.addEventListener('message', onMessage);
+    window.addEventListener('popstate', onPopState);
+    return () => {
+      navigator.serviceWorker?.removeEventListener('message', onMessage);
+      window.removeEventListener('popstate', onPopState);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (!currentUser) return;
+    void ensurePushSubscription(currentUser.id);
+  }, [currentUser?.id]);
 
   React.useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
@@ -3085,7 +3159,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
           .filter(race => race.status === 'upcoming')
           .map(race => ({ category, race }))
       )
-      .sort((a, b) => a.race.date.localeCompare(b.race.date));
+      .sort((a, b) => raceStartDate(a.race).getTime() - raceStartDate(b.race).getTime());
   }, [followedCategoryObjects]);
 
   const toggleFollowCategory = useCallback((categoryId: string) => {
@@ -3211,19 +3285,19 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
       .flatMap((category) => category.calendar
         .filter((race) => race.status === 'upcoming')
         .map((race) => ({ category, race })))
-      .sort((a, b) => a.race.date.localeCompare(b.race.date))[0] ?? null;
+      .sort((a, b) => raceStartDate(a.race).getTime() - raceStartDate(b.race).getTime())[0] ?? null;
   }, [allCategories, currentUser, upcomingFollowedRaces]);
 
   const heroCountdownDays = useMemo(() => {
     if (!heroNextRace) return null;
-    const raceDate = new Date(`${heroNextRace.race.date}T00:00:00`);
+    const raceDate = raceStartDate(heroNextRace.race);
     const diffMs = raceDate.getTime() - now.getTime();
     return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
   }, [heroNextRace, now]);
 
   const heroCountdown = useMemo(() => {
     if (!heroNextRace) return null;
-    const raceDate = new Date(`${heroNextRace.race.date}T00:00:00`);
+    const raceDate = raceStartDate(heroNextRace.race);
     const diffMs = Math.max(0, raceDate.getTime() - now.getTime());
     const totalMinutes = Math.floor(diffMs / (1000 * 60));
     return {
@@ -3235,7 +3309,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
 
   const selectedRaceCountdown = useMemo(() => {
     if (!selectedRace || selectedRace.status !== 'upcoming') return null;
-    const raceDate = new Date(`${selectedRace.date}T00:00:00`);
+    const raceDate = raceStartDate(selectedRace);
     const diffMs = Math.max(0, raceDate.getTime() - now.getTime());
     const totalMinutes = Math.floor(diffMs / (1000 * 60));
     return {
@@ -3946,7 +4020,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 {language === 'pt' ? heroNextRace.category.name : (heroNextRace.category.enFullName || heroNextRace.category.name)}
                               </div>
                               <div className="font-apex-mono text-xs font-bold uppercase tracking-widest text-[var(--text-main)]">
-                                {heroNextRace.race.date.split('-').reverse().join('/')}
+                                {formatRaceDateTime(heroNextRace.race, language)}
                               </div>
                             </div>
                           </div>
@@ -4170,7 +4244,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                 .filter((race) => race.status === 'upcoming')
                                 .map((race) => ({ category: cat, race }));
                             })
-                            .sort((a, b) => a.race.date.localeCompare(b.race.date))
+                            .sort((a, b) => raceStartDate(a.race).getTime() - raceStartDate(b.race).getTime())
                             .slice(0, 6)
                             .map(({ category, race }, index) => {
                               const isRacePageTest = hasCircuitPage(category, race);
@@ -4221,7 +4295,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                                     </span>
                                   </div>
                                   <div className="font-apex-mono text-xs text-gray-500 md:text-right">
-                                    {race.date.split('-').slice(1).reverse().join('/')}
+                                    {formatRaceDateTime(race, language, { monthOnly: true })}
                                   </div>
                                 </button>
                               );
@@ -4399,7 +4473,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                   </span>
                   <span className="flex items-center gap-1.5 text-sm text-gray-400 font-apex-mono">
                     <Calendar className="w-4 h-4" />
-                    {new Date(`${selectedRace.date}T00:00:00`).toLocaleDateString(language === 'pt' ? 'pt-BR' : 'en-US', { day: '2-digit', month: 'long', year: 'numeric' })}
+                    {formatRaceLongDate(selectedRace, language)}
                   </span>
                   <span className="flex items-center gap-1.5 text-sm text-gray-400 font-apex-mono">
                     <MapPin className="w-4 h-4" />
@@ -5409,7 +5483,17 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                 </div>
                 <p className="text-sm text-gray-500 mb-10">{UI_TRANSLATIONS[language].favoritesPageDesc}</p>
 
-                <NotificationsToggle userId={currentUser.id} language={language} />
+                <NotificationsToggle
+                  userId={currentUser.id}
+                  language={language}
+                  prefs={{ notifyRaceDay, notifyT60, notifyStart, notifyResults }}
+                  onPrefChange={(key, value) => {
+                    if (key === 'notifyRaceDay') setNotifyRaceDay(value);
+                    if (key === 'notifyT60') setNotifyT60(value);
+                    if (key === 'notifyStart') setNotifyStart(value);
+                    if (key === 'notifyResults') setNotifyResults(value);
+                  }}
+                />
 
                 <FavoritesPicker
                   categories={allCategories}
@@ -5838,7 +5922,7 @@ export default function App({ currentUser, onLogout, onLoginRequest }: AppProps)
                               <div className="w-full md:col-span-1 flex justify-between md:block items-center">
                                 <span className="md:hidden text-xs font-bold uppercase tracking-widest text-gray-500">{UI_TRANSLATIONS[language].date}</span>
                                 <div className="font-mono text-sm text-[var(--text-main)]">
-                                  {race.date.split('-').slice(1).reverse().join('/')}
+                                  {formatRaceDateTime(race, language, { monthOnly: true })}
                                 </div>
                               </div>
                               <div className="w-full md:col-span-4">

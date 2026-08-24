@@ -95,8 +95,18 @@ async function main() {
     }
     const { error: insertError } = await supabase.from('synced_races').insert(rows);
     if (insertError) {
-      console.error(`[${categoryId}] falha ao gravar corridas:`, insertError.message);
-      continue;
+      if (/starts_at/i.test(insertError.message)) {
+        const withoutStartsAt = rows.map(({ starts_at: _startsAt, ...row }) => row);
+        const { error: legacyError } = await supabase.from('synced_races').insert(withoutStartsAt);
+        if (legacyError) {
+          console.error(`[${categoryId}] falha ao gravar corridas:`, legacyError.message);
+          continue;
+        }
+        console.warn(`[${categoryId}] starts_at ainda nao existe no banco -- rode supabase/notifications_schema.sql`);
+      } else {
+        console.error(`[${categoryId}] falha ao gravar corridas:`, insertError.message);
+        continue;
+      }
     }
     totalRows += rows.length;
   }
@@ -454,6 +464,20 @@ function pickMainEvent(events) {
     .at(-1) ?? events.at(-1);
 }
 
+function parseStartsAt(event) {
+  if (event.strTimestamp) {
+    const parsed = new Date(String(event.strTimestamp).replace(' ', 'T'));
+    if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+  }
+  const time = String(event.strTime ?? '').trim();
+  if (event.dateEvent && time && time !== '00:00:00' && time !== '00:00' && time !== '0:00') {
+    const normalized = time.length === 5 ? `${time}:00` : time;
+    const parsed = new Date(`${event.dateEvent}T${normalized}Z`);
+    if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+  }
+  return null;
+}
+
 function buildRow(categoryId, round, event) {
   const status = getStatus(event);
   return {
@@ -466,6 +490,7 @@ function buildRow(categoryId, round, event) {
     en_location: event.strCity || event.strCountry || null,
     circuit: event.strVenue || null,
     date: event.dateEvent,
+    starts_at: parseStartsAt(event),
     status,
     winner: status === 'completed' ? parseWinner(event.strResult) : null,
     external_id: event.idEvent ?? null,

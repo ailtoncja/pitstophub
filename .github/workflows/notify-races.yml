@@ -2,7 +2,10 @@ name: Send race day notifications
 
 on:
   schedule:
-    - cron: '0 11 * * *' # 11:00 UTC todo dia (~08:00 em Brasilia), depois do sync das 06:17 UTC
+    # A cada 15min: aviso do dia (a partir das 8h no fuso do usuario, ou 2h
+    # antes se a largada for cedo), T-60 e largada. O job e barato -- so
+    # consulta corridas numa janela de 3 dias.
+    - cron: '*/15 * * * *'
   workflow_dispatch: {}
 
 jobs:

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, ChevronUp, X, Heart, Users, Bell, BellOff, BellRing } from 'lucide-react';
 import type { Category } from './types';
 import { cn } from './lib/utils';
-import { getExistingPushSubscription, isPushSupported, subscribeToPush, unsubscribeFromPush } from './push';
+import { getExistingPushSubscription, isIosPwaRequired, isPushSupported, sendTestNotification, subscribeToPush, unsubscribeFromPush } from './push';
 
 type PriorityKind = 'team' | 'driver';
 
@@ -21,7 +21,7 @@ export type PriorityEntry = {
 const TEXT = {
   pt: {
     priorityOrder: 'Ordem de Prioridade',
-    priorityOrderDesc: 'Isso vai definir a prioridade quando as notificações forem personalizadas por piloto/time. Por enquanto, as notificações são por categoria.',
+    priorityOrderDesc: 'Define a ordem dos avisos de resultado: o piloto ou time no topo aparece primeiro na notificação.',
     noFavoritesYet: 'Você ainda não segue nenhum time ou piloto. Escolha abaixo.',
     browseTitle: 'Escolha categorias, times e pilotos',
     followCategory: 'Seguir categoria inteira',
@@ -37,7 +37,7 @@ const TEXT = {
   },
   en: {
     priorityOrder: 'Priority Order',
-    priorityOrderDesc: "This will set the priority once notifications are personalized by driver/team. For now, notifications are by category.",
+    priorityOrderDesc: 'Sets the order of result alerts: the driver or team at the top shows first in the notification.',
     noFavoritesYet: "You don't follow any team or driver yet. Choose below.",
     browseTitle: 'Choose categories, teams and drivers',
     followCategory: 'Follow whole category',
@@ -56,40 +56,70 @@ const TEXT = {
 const NOTIF_TEXT = {
   pt: {
     title: 'Notificações',
-    desc: 'Receba um aviso no dia de corridas das categorias que você segue.',
+    desc: 'Aviso no dia da corrida, 1 hora antes da largada e quando sair o resultado dos seus favoritos.',
     enable: 'Ativar notificações',
     enabled: 'Notificações ativadas',
     disable: 'Desativar',
     checking: 'Verificando...',
-    unsupported: 'Notificações não são suportadas neste navegador.',
+    unsupported: 'Notificações não são suportadas neste navegador. No celular, instale o app na tela inicial.',
     denied: 'Permissão de notificação bloqueada. Ative nas configurações do navegador.',
     error: 'Não foi possível ativar as notificações agora. Tente novamente.',
+    ios: 'No iPhone, adicione o PitStopHub à tela inicial (Compartilhar → Adicionar à Tela de Início) e ative as notificações de dentro do app instalado.',
+    test: 'Enviar teste',
+    testSent: 'Teste enviado — olhe as notificações do celular.',
+    testFail: 'Não deu para enviar o teste. Confira a permissão do navegador.',
+    raceDay: 'Dia da corrida',
+    t60: '1 hora antes',
+    start: 'Largada',
+    results: 'Resultado',
   },
   en: {
     title: 'Notifications',
-    desc: "Get notified on race day for the categories you follow.",
+    desc: 'Race day, one hour before lights out, and results for the drivers and teams you follow.',
     enable: 'Enable notifications',
     enabled: 'Notifications enabled',
     disable: 'Disable',
     checking: 'Checking...',
-    unsupported: 'Notifications are not supported in this browser.',
+    unsupported: 'Notifications are not supported in this browser. On a phone, install the app to the home screen.',
     denied: 'Notification permission blocked. Enable it in your browser settings.',
     error: 'Could not enable notifications right now. Try again.',
+    ios: 'On iPhone, add PitStopHub to the Home Screen (Share → Add to Home Screen) and enable notifications from the installed app.',
+    test: 'Send test',
+    testSent: 'Test sent — check your notification shade.',
+    testFail: 'Could not send the test. Check the browser permission.',
+    raceDay: 'Race day',
+    t60: '1 hour before',
+    start: 'Lights out',
+    results: 'Results',
   },
 } as const;
+
+export type NotifyPrefs = {
+  notifyRaceDay: boolean;
+  notifyT60: boolean;
+  notifyStart: boolean;
+  notifyResults: boolean;
+};
 
 interface NotificationsToggleProps {
   userId: string;
   language: 'pt' | 'en';
+  prefs: NotifyPrefs;
+  onPrefChange: (key: keyof NotifyPrefs, value: boolean) => void;
 }
 
-export function NotificationsToggle({ userId, language }: NotificationsToggleProps) {
+export function NotificationsToggle({ userId, language, prefs, onPrefChange }: NotificationsToggleProps) {
   const t = NOTIF_TEXT[language];
-  const [status, setStatus] = useState<'checking' | 'unsupported' | 'subscribed' | 'not-subscribed' | 'busy'>('checking');
+  const [status, setStatus] = useState<'checking' | 'unsupported' | 'ios' | 'subscribed' | 'not-subscribed' | 'busy'>('checking');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [testMsg, setTestMsg] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
+    if (isIosPwaRequired()) {
+      setStatus('ios');
+      return;
+    }
     if (!isPushSupported()) {
       setStatus('unsupported');
       return;
@@ -104,51 +134,102 @@ export function NotificationsToggle({ userId, language }: NotificationsTogglePro
   const handleEnable = async () => {
     setStatus('busy');
     setErrorMsg(null);
+    setTestMsg(null);
     const result = await subscribeToPush(userId);
     if (result.ok) {
       setStatus('subscribed');
     } else {
-      setStatus('not-subscribed');
+      setStatus(isIosPwaRequired() ? 'ios' : 'not-subscribed');
       setErrorMsg(result.reason === 'denied' ? t.denied : result.reason === 'unsupported' ? t.unsupported : t.error);
     }
   };
 
   const handleDisable = async () => {
     setStatus('busy');
+    setTestMsg(null);
     await unsubscribeFromPush();
     setStatus('not-subscribed');
   };
 
+  const handleTest = async () => {
+    const ok = await sendTestNotification(language);
+    setTestMsg(ok ? t.testSent : t.testFail);
+  };
+
+  const prefRows: Array<{ key: keyof NotifyPrefs; label: string }> = [
+    { key: 'notifyRaceDay', label: t.raceDay },
+    { key: 'notifyT60', label: t.t60 },
+    { key: 'notifyStart', label: t.start },
+    { key: 'notifyResults', label: t.results },
+  ];
+
+  const hint = errorMsg
+    ?? (status === 'ios' ? t.ios : status === 'unsupported' ? t.unsupported : t.desc);
+
   return (
-    <div className="p-5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center gap-4 mb-6">
-      <div className={cn(
-        "w-11 h-11 rounded-lg shrink-0 flex items-center justify-center",
-        status === 'subscribed' ? "bg-brand-red/10 text-brand-red" : "bg-white/5 text-gray-500"
-      )}>
-        {status === 'subscribed' ? <BellRing className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
+    <div className="p-5 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] mb-6">
+      <div className="flex items-center gap-4">
+        <div className={cn(
+          "w-11 h-11 rounded-lg shrink-0 flex items-center justify-center",
+          status === 'subscribed' ? "bg-brand-red/10 text-brand-red" : "bg-white/5 text-gray-500"
+        )}>
+          {status === 'subscribed' ? <BellRing className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-bold text-[var(--text-main)]">{t.title}</div>
+          <div className="text-xs text-gray-500">{hint}</div>
+        </div>
+        {status === 'unsupported' || status === 'ios' ? null : status === 'subscribed' ? (
+          <button
+            type="button"
+            onClick={() => void handleDisable()}
+            className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border border-[var(--card-border)] text-gray-500 hover:text-brand-red transition-colors"
+          >
+            <BellOff className="w-3.5 h-3.5" />
+            {t.disable}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => void handleEnable()}
+            disabled={status === 'checking' || status === 'busy'}
+            className="shrink-0 px-4 py-2 rounded-lg bg-brand-red text-white text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            {status === 'checking' ? t.checking : t.enable}
+          </button>
+        )}
       </div>
-      <div className="min-w-0 flex-1">
-        <div className="text-sm font-bold text-[var(--text-main)]">{t.title}</div>
-        <div className="text-xs text-gray-500">{errorMsg ?? (status === 'unsupported' ? t.unsupported : t.desc)}</div>
-      </div>
-      {status === 'unsupported' ? null : status === 'subscribed' ? (
-        <button
-          type="button"
-          onClick={() => void handleDisable()}
-          className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border border-[var(--card-border)] text-gray-500 hover:text-brand-red transition-colors"
-        >
-          <BellOff className="w-3.5 h-3.5" />
-          {t.disable}
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={() => void handleEnable()}
-          disabled={status === 'checking' || status === 'busy'}
-          className="shrink-0 px-4 py-2 rounded-lg bg-brand-red text-white text-[10px] font-black uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
-        >
-          {status === 'checking' ? t.checking : t.enable}
-        </button>
+
+      {status === 'subscribed' && (
+        <div className="mt-4 pt-4 border-t border-[var(--card-border)] space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            {prefRows.map((row) => (
+              <button
+                key={row.key}
+                type="button"
+                onClick={() => onPrefChange(row.key, !prefs[row.key])}
+                className={cn(
+                  "px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest border text-left transition-colors",
+                  prefs[row.key]
+                    ? "bg-brand-red/10 border-brand-red/30 text-brand-red"
+                    : "bg-white/5 border-white/10 text-gray-500 hover:text-[var(--text-main)]"
+                )}
+              >
+                {row.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => void handleTest()}
+              className="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-brand-red transition-colors"
+            >
+              {t.test}
+            </button>
+            {testMsg && <span className="text-[10px] text-gray-500 text-right">{testMsg}</span>}
+          </div>
+        </div>
       )}
     </div>
   );
