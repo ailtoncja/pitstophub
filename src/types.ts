@@ -27,6 +27,7 @@ export interface Race {
   location: string;
   enLocation?: string;
   date: string;
+  startsAt?: string;
   circuit: string;
   status: 'upcoming' | 'completed' | 'cancelled';
   winner?: string;

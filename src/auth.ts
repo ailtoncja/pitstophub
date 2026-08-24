@@ -17,6 +17,11 @@ export type UserSettings = {
   followedDriverIds: string[];
   favoritesOnboarded: boolean;
   priorityFollowIds: string[];
+  notifyRaceDay: boolean;
+  notifyT60: boolean;
+  notifyStart: boolean;
+  notifyResults: boolean;
+  timezone: string;
 };
 
 type AuthSuccess =
@@ -218,6 +223,11 @@ export async function getUserSettings(userId: string): Promise<UserSettings | nu
         followedDriverIds: parsed.followedDriverIds ?? [],
         favoritesOnboarded: parsed.favoritesOnboarded ?? false,
         priorityFollowIds: parsed.priorityFollowIds ?? [],
+        notifyRaceDay: parsed.notifyRaceDay !== false,
+        notifyT60: parsed.notifyT60 !== false,
+        notifyStart: parsed.notifyStart !== false,
+        notifyResults: parsed.notifyResults !== false,
+        timezone: parsed.timezone || 'America/Sao_Paulo',
       };
     } catch {
       localStorage.removeItem(cacheKey);
@@ -234,11 +244,23 @@ export async function getUserSettings(userId: string): Promise<UserSettings | nu
     const response = await withTimeout(Promise.resolve(
       supabase
         .from('user_settings')
-        .select('theme, language, favorite_category_id, followed_category_ids, followed_team_ids, followed_driver_ids, favorites_onboarded, priority_follow_ids')
+        .select('theme, language, favorite_category_id, followed_category_ids, followed_team_ids, followed_driver_ids, favorites_onboarded, priority_follow_ids, notify_race_day, notify_t60, notify_start, notify_results, timezone')
         .eq('user_id', userId)
         .maybeSingle()
     ));
     let { data, error } = response;
+
+    if (error) {
+      const favorites = await withTimeout(Promise.resolve(
+        supabase
+          .from('user_settings')
+          .select('theme, language, favorite_category_id, followed_category_ids, followed_team_ids, followed_driver_ids, favorites_onboarded, priority_follow_ids')
+          .eq('user_id', userId)
+          .maybeSingle()
+      ));
+      data = favorites.data as typeof data;
+      error = favorites.error;
+    }
 
     if (error) {
       const legacy = await withTimeout(Promise.resolve(
@@ -265,6 +287,11 @@ export async function getUserSettings(userId: string): Promise<UserSettings | nu
       priorityFollowIds: Array.isArray((data as { priority_follow_ids?: string[] }).priority_follow_ids)
         ? (data as { priority_follow_ids: string[] }).priority_follow_ids
         : [],
+      notifyRaceDay: (data as { notify_race_day?: boolean }).notify_race_day !== false,
+      notifyT60: (data as { notify_t60?: boolean }).notify_t60 !== false,
+      notifyStart: (data as { notify_start?: boolean }).notify_start !== false,
+      notifyResults: (data as { notify_results?: boolean }).notify_results !== false,
+      timezone: (data as { timezone?: string }).timezone || 'America/Sao_Paulo',
     };
     localStorage.setItem(cacheKey, JSON.stringify(settings));
     return settings;
@@ -291,18 +318,32 @@ export async function saveUserSettings(userId: string, settings: UserSettings) {
 
   const { error } = await withTimeout(Promise.resolve(
     supabase.from('user_settings').upsert(
-      { ...basePayload, favorites_onboarded: settings.favoritesOnboarded, priority_follow_ids: settings.priorityFollowIds },
+      {
+        ...basePayload,
+        favorites_onboarded: settings.favoritesOnboarded,
+        priority_follow_ids: settings.priorityFollowIds,
+        notify_race_day: settings.notifyRaceDay,
+        notify_t60: settings.notifyT60,
+        notify_start: settings.notifyStart,
+        notify_results: settings.notifyResults,
+        timezone: settings.timezone,
+      },
       { onConflict: 'user_id' }
     )
   ));
 
   if (error) {
-    // Ver comentario em getUserSettings: migracao ainda nao aplicada no banco.
+    const { error: favoritesError } = await withTimeout(Promise.resolve(
+      supabase.from('user_settings').upsert(
+        { ...basePayload, favorites_onboarded: settings.favoritesOnboarded, priority_follow_ids: settings.priorityFollowIds },
+        { onConflict: 'user_id' }
+      )
+    ));
+    if (!favoritesError) return;
     const { error: legacyError } = await withTimeout(Promise.resolve(
       supabase.from('user_settings').upsert(basePayload, { onConflict: 'user_id' })
     ));
     if (legacyError) throw legacyError;
-    return;
   }
 }
 

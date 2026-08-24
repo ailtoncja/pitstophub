@@ -11,6 +11,7 @@ create table if not exists public.synced_races (
   en_location text,
   circuit text,
   date date not null,
+  starts_at timestamptz,
   status text not null check (status in ('upcoming', 'completed', 'cancelled')),
   winner text,
   external_id text, -- idEvent na TheSportsDB, usado pra buscar o resultado completo (ver results_schema.sql)

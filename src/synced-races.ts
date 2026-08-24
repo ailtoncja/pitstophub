@@ -19,6 +19,7 @@ type SyncedRaceRow = {
   en_location: string | null;
   circuit: string | null;
   date: string;
+  starts_at?: string | null;
   status: Race['status'];
   winner: string | null;
 };
@@ -177,16 +178,30 @@ export function mergeCategoryWithSyncedStandings(category: Category, standings: 
 async function loadCalendar(categoryId: string): Promise<Race[] | null> {
   if (!supabase) return null;
 
-  const { data, error } = await supabase
+  const fullSelect = 'race_id, name, en_name, location, en_location, circuit, date, starts_at, status, winner';
+  const query = await supabase
     .from('synced_races')
-    .select('race_id, name, en_name, location, en_location, circuit, date, status, winner')
+    .select(fullSelect)
     .eq('category_id', categoryId)
     .order('round', { ascending: true });
 
-  if (error) throw error;
-  if (!data || data.length === 0) return null;
+  let rows = (query.data ?? null) as SyncedRaceRow[] | null;
+  let error = query.error;
 
-  return (data as SyncedRaceRow[]).map((row) => ({
+  if (error && /starts_at/i.test(error.message)) {
+    const legacy = await supabase
+      .from('synced_races')
+      .select('race_id, name, en_name, location, en_location, circuit, date, status, winner')
+      .eq('category_id', categoryId)
+      .order('round', { ascending: true });
+    rows = (legacy.data ?? null) as SyncedRaceRow[] | null;
+    error = legacy.error;
+  }
+
+  if (error) throw error;
+  if (!rows || rows.length === 0) return null;
+
+  return rows.map((row) => ({
     id: row.race_id,
     name: row.name,
     enName: row.en_name ?? undefined,
@@ -194,6 +209,7 @@ async function loadCalendar(categoryId: string): Promise<Race[] | null> {
     enLocation: row.en_location ?? undefined,
     circuit: row.circuit ?? '',
     date: row.date,
+    startsAt: row.starts_at ?? undefined,
     status: row.status,
     winner: row.winner ?? undefined,
   }));

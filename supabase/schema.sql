@@ -10,6 +10,11 @@ create table if not exists public.user_settings (
   followed_category_ids text[] not null default '{}',
   followed_team_ids text[] not null default '{}',
   followed_driver_ids text[] not null default '{}',
+  notify_race_day boolean not null default true,
+  notify_t60 boolean not null default true,
+  notify_start boolean not null default true,
+  notify_results boolean not null default true,
+  timezone text not null default 'America/Sao_Paulo',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

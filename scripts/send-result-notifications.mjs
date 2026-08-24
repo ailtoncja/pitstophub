@@ -98,6 +98,14 @@ function formatOrdinalList(positions) {
   return `${labels.slice(0, -1).join(', ')} e ${labels.at(-1)}`;
 }
 
+function formatPlaceList(positions, language) {
+  if (language !== 'en') return formatOrdinalList(positions);
+  const labels = positions.map((p) => `P${p}`);
+  if (labels.length <= 1) return labels[0] ?? '';
+  if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
+  return `${labels.slice(0, -1).join(', ')} and ${labels.at(-1)}`;
+}
+
 async function fetchRacesToCheck() {
   const since = new Date(Date.now() - WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
@@ -130,7 +138,7 @@ async function fetchF1RacesToCheck(since) {
   const races = data?.MRData?.RaceTable?.Races ?? [];
   const today = new Date().toISOString().slice(0, 10);
   return races
-    .filter((r) => r.date >= since && r.date < today) // ja deve ter acontecido
+    .filter((r) => r.date >= since && r.date <= today)
     .map((r) => ({
       categoryId: 'f1',
       raceId: `f1-${year}-r${r.round}`,
@@ -226,7 +234,9 @@ async function processRace(race, allSettings, allCategories) {
       .map((k) => k.split('::')[1]);
 
     if (followedDriverIds.length === 0 && followedTeamIds.length === 0) continue;
+    if (settings.notify_results === false) continue;
     if (await alreadyNotified(race.categoryId, race.raceId, settings.user_id)) continue;
+    const language = settings.language === 'en' ? 'en' : 'pt';
 
     // 1a passada: acha a posicao de cada piloto/time seguido, sem se
     // preocupar com ordem ainda. coveredPositions junta as posicoes ja
@@ -244,7 +254,9 @@ async function processRace(race, allSettings, allCategories) {
         : findPositions(resultText, driver.name)[0];
       if (!position) continue;
       coveredPositions.add(Number(position));
-      driverMessages.set(driverId, `${driver.name} terminou em ${formatOrdinal(position)} no ${race.raceName}!`);
+      driverMessages.set(driverId, language === 'en'
+        ? `${driver.name} finished P${position} in the ${race.raceName}.`
+        : `${driver.name} terminou em ${formatOrdinal(position)} no ${race.raceName}!`);
     }
 
     const teamMessages = new Map(); // teamId -> texto
@@ -257,7 +269,9 @@ async function processRace(race, allSettings, allCategories) {
       if (positions.length === 0) continue;
       const sorted = [...new Set(positions.map(Number))].filter((p) => !coveredPositions.has(p)).sort((a, b) => a - b);
       if (sorted.length === 0) continue;
-      teamMessages.set(teamId, `${team.name} terminou com ${sorted.length > 1 ? 'os carros em' : 'o carro em'} ${formatOrdinalList(sorted)} no ${race.raceName}!`);
+      teamMessages.set(teamId, language === 'en'
+        ? `${team.name} finished with ${sorted.length > 1 ? 'cars in' : 'the car in'} ${formatPlaceList(sorted, language)} in the ${race.raceName}.`
+        : `${team.name} terminou com ${sorted.length > 1 ? 'os carros em' : 'o carro em'} ${formatPlaceList(sorted, language)} no ${race.raceName}!`);
     }
 
     if (driverMessages.size === 0 && teamMessages.size === 0) continue;
@@ -289,9 +303,11 @@ async function processRace(race, allSettings, allCategories) {
     }
 
     const sent = await sendPush(settings.user_id, {
-      title: `${categoryName}: resultado`,
+      title: language === 'en' ? `${categoryName}: result` : `${categoryName}: resultado`,
       body: messages.join(' '),
-      url: '/',
+      url: `/?c=${encodeURIComponent(race.categoryId)}`,
+      kind: 'result',
+      tag: `${race.categoryId}-${race.raceId}-result`,
     });
     if (sent) {
       await markNotified(race.categoryId, race.raceId, settings.user_id);
@@ -309,9 +325,17 @@ async function main() {
     return;
   }
 
-  const { data: allSettings, error: settingsError } = await supabase
+  const fullSelect = 'user_id, language, followed_driver_ids, followed_team_ids, priority_follow_ids, notify_results';
+  let { data: allSettings, error: settingsError } = await supabase
     .from('user_settings')
-    .select('user_id, followed_driver_ids, followed_team_ids, priority_follow_ids');
+    .select(fullSelect);
+  if (settingsError) {
+    const legacy = await supabase
+      .from('user_settings')
+      .select('user_id, followed_driver_ids, followed_team_ids, priority_follow_ids');
+    allSettings = legacy.data;
+    settingsError = legacy.error;
+  }
   if (settingsError) throw settingsError;
 
   let totalSent = 0;

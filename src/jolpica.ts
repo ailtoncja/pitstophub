@@ -328,6 +328,7 @@ function buildCalendar(
       location: base?.location ?? race.Circuit.Location.locality,
       enLocation: base?.enLocation ?? race.Circuit.Location.locality,
       date: race.date,
+      startsAt: jolpicaStartsAt(race.date, race.time),
       circuit: base?.circuit ?? race.Circuit.circuitName,
       status,
       winner: winnerMap.get(race.round) ?? (status === 'completed' ? base?.winner : undefined),
@@ -398,6 +399,13 @@ function buildStandings(
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function jolpicaStartsAt(date: string, time?: string): string | undefined {
+  if (!time) return undefined;
+  const iso = /Z|[+-]\d{2}/.test(time) ? `${date}T${time}` : `${date}T${time}Z`;
+  const parsed = new Date(iso);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
+}
 
 function getRaceStatus(race: JolpicaRace, hasResult: boolean): Race['status'] {
   if (hasResult) return 'completed';
