@@ -20,6 +20,21 @@ export interface Team {
   principal?: string;
 }
 
+export type RaceSessionKind =
+  | 'fp1'
+  | 'fp2'
+  | 'fp3'
+  | 'sprint-qualifying'
+  | 'sprint'
+  | 'qualifying'
+  | 'race';
+
+export interface RaceSession {
+  kind: RaceSessionKind;
+  /** Instante ISO (UTC) de inicio da sessao. */
+  startsAt: string;
+}
+
 export interface Race {
   id: string;
   name: string;
@@ -31,6 +46,12 @@ export interface Race {
   circuit: string;
   status: 'upcoming' | 'completed' | 'cancelled';
   winner?: string;
+  // Preenchidos so quando a fonte ao vivo informa (hoje, a Jolpica na F1).
+  round?: number;
+  country?: string;
+  lat?: number;
+  lng?: number;
+  sessions?: RaceSession[];
 }
 
 export interface StandingItem {

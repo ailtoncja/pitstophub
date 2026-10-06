@@ -1,30 +1,174 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
+/* ───────────────────────────────────────────────────────────────────────────
+   Design system "Telemetry Dark Speed" (Stitch → PitStopHub)
+   Tokens identicos aos do DESIGN.md. O site e escuro por definicao.
+   ─────────────────────────────────────────────────────────────────────────── */
 @theme {
+  /* Familias */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Outfit", sans-serif;
+  --font-anybody: "Anybody", ui-sans-serif, system-ui, sans-serif;
+  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono-tel: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Superficies */
+  --color-surface: #111317;
+  --color-surface-dim: #111317;
+  --color-background: #111317;
+  --color-surface-bright: #37393e;
+  --color-surface-container-lowest: #0c0e12;
+  --color-surface-container-low: #1a1c20;
+  --color-surface-container: #1e2024;
+  --color-surface-container-high: #282a2e;
+  --color-surface-container-highest: #333539;
+  --color-surface-variant: #333539;
+  --color-surface-base: #0a0a0b;
+  --color-surface-raised: #12151c;
+  --color-surface-overlay: #181d26;
+  --color-surface-border: #262c3a;
+
+  /* Texto */
+  --color-on-surface: #e2e2e8;
+  --color-on-background: #e2e2e8;
+  --color-on-surface-variant: #e9bcb5;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #9ca3af;
+  --color-text-muted: #64748b;
+  --color-outline: #af8781;
+  --color-outline-variant: #5e3f3a;
+
+  /* Marca e telemetria */
+  --color-racing-red: #e10600;
+  --color-primary: #ffb4a8;
+  --color-on-primary: #680200;
+  --color-primary-container: #e10600;
+  --color-on-primary-container: #fff2f0;
+  --color-inverse-primary: #c00500;
+  --color-secondary: #7bd0ff;
+  --color-secondary-container: #00a6e0;
+  --color-on-secondary-container: #00374d;
+  --color-tertiary: #4ae176;
+  --color-tertiary-container: #008239;
+  --color-on-tertiary-container: #dbffda;
+  --color-telemetry-amber: #f59e0b;
+  --color-telemetry-purple: #a855f7;
+  --color-error: #ffb4ab;
+  --color-error-container: #93000a;
+
+  /* Espacamento nomeado do design */
+  --spacing-gutter: 0.75rem;
+  --spacing-margin: 1rem;
+  --spacing-space-xs: 0.25rem;
+  --spacing-space-sm: 0.5rem;
+  --spacing-space-md: 1rem;
+  --spacing-space-lg: 1.25rem;
+  --spacing-space-xl: 1.75rem;
+
+  /* Raios ("Soft Industrial") */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.75rem;
+
+  /* Legado: ainda usados pela intro 3D, pelo modal de login e pelas cartas de campeao */
+  --font-display: "Anybody", sans-serif;
   --font-apex: "Anybody", sans-serif;
   --font-apex-mono: "JetBrains Mono", ui-monospace, monospace;
-
-  --color-brand-red: #e8232a;
+  --color-brand-red: #e10600;
   --color-brand-dark: #0a0a0b;
-  --color-brand-light: #f8f9fa;
-  --color-apex-accent: #ffb4a8;
 }
 
-html.champions-mono {
-  filter: grayscale(1);
+/* Escala tipografica (nomes identicos aos tokens do DESIGN.md) */
+@utility type-display-hero {
+  font-family: var(--font-anybody);
+  font-size: 36px;
+  line-height: 40px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  font-style: italic;
+}
+@utility type-headline-lg {
+  font-family: var(--font-anybody);
+  font-size: 26px;
+  line-height: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-style: italic;
+}
+@utility type-headline-md {
+  font-family: var(--font-anybody);
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-style: italic;
+}
+@utility type-headline-sm {
+  font-family: var(--font-anybody);
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 700;
+  font-style: italic;
+}
+@utility type-body-lg {
+  font-family: var(--font-inter);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+@utility type-body-md {
+  font-family: var(--font-inter);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+@utility type-body-sm {
+  font-family: var(--font-inter);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+}
+@utility type-telemetry-counter {
+  font-family: var(--font-mono-tel);
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+@utility type-label-badge {
+  font-family: var(--font-mono-tel);
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+@utility type-label-telemetry {
+  font-family: var(--font-mono-tel);
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
 }
 
-html.champions-mono .champions-current {
-  background: #fff !important;
-  color: #111 !important;
-  border-color: #fff !important;
-  box-shadow: none !important;
+/* Elementos de marca */
+@utility glow-red {
+  box-shadow: 0 0 16px rgba(225, 6, 0, 0.22);
+}
+@utility rounded-pill {
+  /* "rounded-full" do design e 0.75rem: capsula compacta, nao circulo */
+  border-radius: 0.75rem;
+}
+@utility hairline {
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 html {
-  transition: filter 0.45s ease;
+  background-color: #111317;
+  color-scheme: dark;
 }
 
 @layer base {
@@ -36,29 +180,19 @@ html {
     text-size-adjust: 100%;
   }
 
-  :root {
-    --bg-main: var(--color-brand-light);
-    --text-main: #1a1a1a;
-    --card-bg: rgba(255, 255, 255, 0.7);
-    --card-border: rgba(0, 0, 0, 0.1);
-    --header-bg: rgba(248, 249, 250, 0.8);
-    --sidebar-bg: #f1f2f4;
-  }
-
-  .dark {
-    --bg-main: var(--color-brand-dark);
-    --text-main: #f2f2f3;
-    --card-bg: #151517;
-    --card-border: #232326;
-    --header-bg: rgba(16, 16, 18, 0.86);
-    --sidebar-bg: #101012;
-  }
-
   body {
-    background-color: var(--bg-main);
-    color: var(--text-main);
+    margin: 0;
+    background-color: #111317;
+    color: #e2e2e8;
+    font-family: var(--font-inter);
     overflow-x: hidden;
-    @apply font-sans antialiased transition-colors duration-300;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::selection {
+    background: #e10600;
+    color: #fff;
   }
 
   img, video {
@@ -66,53 +200,21 @@ html {
     height: auto;
     -webkit-touch-callout: none;
     -webkit-user-drag: none;
-    user-select: none;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-extrabold tracking-tight;
+
+  button, [role="button"], a {
+    -webkit-tap-highlight-color: transparent;
   }
-}
 
-.glass-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--card-border);
-  @apply rounded-2xl shadow-sm;
-}
+  :focus-visible {
+    outline: 2px solid #ffb4a8;
+    outline-offset: 2px;
+  }
 
-/* Cartao usado em praticamente toda a UI (estilo dashboard TranGo: cantos arredondados). */
-.apex-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 0.875rem;
-}
-
-/* Manchas radiais decorativas atras do conteudo, estilo dashboard TranGo. Fixed
-   (nao absolute) de proposito: presas aos cantos da viewport, nao aos cantos do
-   documento -- a sidebar forca o wrapper raiz a ter pelo menos 1 viewport de
-   altura mesmo quando o conteudo real e mais curto, entao um blob "absolute"
-   podia flutuar sozinho nesse sobra abaixo do rodape de verdade. */
-.tg-glow {
-  position: fixed;
-  border-radius: 9999px;
-  pointer-events: none;
-  filter: blur(2px);
-}
-
-.tg-glow-red {
-  background: radial-gradient(circle, rgba(214, 72, 20, 0.38) 0%, rgba(214, 72, 20, 0.08) 45%, rgba(0, 0, 0, 0) 70%);
-}
-
-.tg-glow-crimson {
-  background: radial-gradient(circle, rgba(232, 35, 42, 0.18) 0%, rgba(180, 50, 20, 0.08) 45%, rgba(0, 0, 0, 0) 72%);
-}
-
-button, [role="button"] {
-  -webkit-tap-highlight-color: transparent;
-}
-
-.nav-item-active {
-  @apply text-brand-red after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-0.5 after:bg-brand-red;
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .animate-pulse, .animate-ping { animation: none; }
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -132,35 +234,33 @@ button, [role="button"] {
   padding-top: env(safe-area-inset-top, 0px);
 }
 
-@media (max-width: 768px) {
-  .glass-card {
-    border-radius: 1rem;
-    backdrop-filter: blur(6px);
-  }
+/* Rolagem fina (desktop) fora das tiras horizontais */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #262c3a transparent;
 }
 
-.hero-bg-lines {
-  background-image: repeating-linear-gradient(
-    135deg,
-    var(--text-main) 0px,
-    var(--text-main) 1px,
-    transparent 1px,
-    transparent 28px
-  );
-  opacity: 0.04;
-  animation: hero-drift 40s linear infinite;
+/* Textura de fibra de carbono sutil (herois e cards em destaque) */
+.carbon-mesh {
+  background-image:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.025) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.025) 75%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.025) 25%, transparent 25%, transparent 75%, rgba(255, 255, 255, 0.025) 75%);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
 }
 
-@keyframes hero-drift {
-  0% { background-position: 0 0; }
-  100% { background-position: 120px 120px; }
+/* Animacao de entrada das paginas */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
+.page-in {
+  animation: page-in 0.22s ease-out both;
+}
 @media (prefers-reduced-motion: reduce) {
-  .hero-bg-lines {
-    animation: none;
-  }
+  .page-in { animation: none; }
 }
+
 
 /* Animacao de abertura (carro 3D + wordmark), tocada uma vez por sessao antes do app. */
 .pitstop-intro {
@@ -342,4 +442,5 @@ button, [role="button"] {
   height: auto;
   pointer-events: none;
 }
+
 
