@@ -117,7 +117,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
     [user],
   );
 
-  const inputClass = 'w-full rounded-xl border border-surface-border bg-surface-container-lowest px-4 py-3 type-body-md text-text-primary placeholder:text-text-muted outline-none focus:border-racing-red/70 focus:ring-2 focus:ring-racing-red/20 transition';
+  const inputClass = 'w-full rounded-lg border border-hairline bg-asphaltest px-4 py-3 type-body-md text-text-primary placeholder:text-text-muted outline-none focus:border-racing-red/70 focus:ring-2 focus:ring-racing-red/20 transition';
   const labelClass = 'block type-label-telemetry uppercase tracking-widest text-text-muted mb-2';
 
   return (
@@ -137,9 +137,9 @@ export default function AuthGate({ children }: { children: ReactNode }) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 24, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 380, damping: 34 }}
-              className="relative w-full max-w-md rounded-2xl bg-surface-raised border border-surface-border p-6 sm:p-8 shadow-[0_24px_60px_rgba(0,0,0,0.6)]"
+              className="relative w-full max-w-md rounded-lg bg-asphalt border border-hairline p-6 sm:p-8 shadow-[0_24px_60px_rgba(0,0,0,0.6)]"
             >
-              <button type="button" onClick={closeAuth} aria-label={t('common.close')} className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-xl text-text-muted hover:text-text-primary hover:bg-surface-overlay transition-colors">
+              <button type="button" onClick={closeAuth} aria-label={t('common.close')} className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-overlay transition-colors">
                 <X className="w-5 h-5" />
               </button>
 
@@ -149,7 +149,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
                 <p className="type-body-sm text-text-muted mt-1">{mode === 'login' ? t('auth.titleLogin') : t('auth.titleRegister')}</p>
               </div>
 
-              <div className="grid grid-cols-2 bg-surface-container-lowest rounded-xl p-1 mb-6" role="tablist">
+              <div className="grid grid-cols-2 bg-asphaltest rounded-lg p-1 mb-6" role="tablist">
                 {(['login', 'register'] as const).map((value) => (
                   <button
                     key={value}
@@ -195,7 +195,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
                 {notice && <p className="type-body-sm text-tertiary" role="status">{notice}</p>}
                 {error && <p className="type-body-sm text-error" role="alert">{error}</p>}
 
-                <button type="submit" disabled={busy} className="w-full rounded-xl bg-racing-red text-white type-label-badge uppercase tracking-widest px-4 py-3.5 glow-red hover:opacity-90 active:scale-[0.99] transition disabled:opacity-50">
+                <button type="submit" disabled={busy} className="w-full rounded-lg bg-racing-red text-white type-label-badge uppercase tracking-widest px-4 py-3.5 glow-red hover:opacity-90 active:scale-[0.99] transition disabled:opacity-50">
                   {busy ? t('auth.busy') : mode === 'login' ? t('auth.submitLogin') : t('auth.submitRegister')}
                 </button>
               </form>

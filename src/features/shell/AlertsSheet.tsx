@@ -30,18 +30,18 @@ export function AlertsSheet({ open, onClose, onOpenProfile }: { open: boolean; o
         <section>
           <h3 className="type-headline-sm uppercase text-text-primary mb-2">{t('alerts.next')}</h3>
           {!user ? (
-            <div className="rounded-xl border border-dashed border-surface-border p-5 text-center">
+            <div className="rounded-lg border border-dashed border-hairline p-5 text-center">
               <p className="type-body-sm text-text-muted">{t('alerts.needLogin')}</p>
               <button type="button" onClick={() => { onClose(); requestLogin(); }} className="mt-3 px-4 py-2 rounded-lg bg-racing-red text-white type-label-badge uppercase tracking-wider active:scale-95 transition-transform">{t('profile.login')}</button>
             </div>
           ) : upcoming.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-surface-border p-5 text-center">
+            <div className="rounded-lg border border-dashed border-hairline p-5 text-center">
               <BellRing className="w-6 h-6 text-text-muted mx-auto mb-2" />
               <p className="type-body-sm text-text-muted">{t('alerts.empty')}</p>
               <button type="button" onClick={() => { onClose(); onOpenProfile(); }} className="mt-3 px-4 py-2 rounded-lg bg-surface-container-high text-text-primary type-label-badge uppercase tracking-wider active:scale-95 transition-transform">{t('alerts.choose')}</button>
             </div>
           ) : (
-            <ul className="divide-y divide-surface-container-high rounded-xl bg-surface-container-low overflow-hidden">
+            <ul className="divide-y divide-surface-container-high rounded-lg bg-asphalt overflow-hidden">
               {upcoming.map(({ category, race }) => (
                 <li key={`${category.id}-${race.id}`}>
                   <Link to={paths.race(category.id, race.id)} onClick={onClose} className="flex items-center gap-3 px-3.5 py-3 hover:bg-surface-container transition-colors">

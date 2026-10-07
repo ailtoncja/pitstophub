@@ -81,7 +81,7 @@ export function BioCard({ text, className }: { text: string; className?: string 
             <>
               <span className="block w-10 h-[3px] bg-primary-container" aria-hidden />
               {bio.paragraphs.map((paragraph) => (
-                <p key={paragraph} className="font-inter text-[16px] leading-[26px] text-tertiary">{paragraph}</p>
+                <p key={paragraph} className="font-inter text-[16px] leading-[26px] text-silver">{paragraph}</p>
               ))}
             </>
           )}

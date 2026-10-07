@@ -66,13 +66,13 @@ export function Sheet({
             exit={{ y: 40, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 380, damping: 34 }}
             className={cn(
-              'relative w-full md:max-w-lg max-h-[88dvh] overflow-y-auto rounded-t-2xl md:rounded-2xl bg-surface-raised border border-surface-border shadow-[0_-8px_40px_rgba(0,0,0,0.6)] outline-none pb-safe',
+              'relative w-full md:max-w-lg max-h-[88dvh] overflow-y-auto rounded-t-lg md:rounded-lg bg-surface border border-hairline shadow-[0_-8px_40px_rgba(0,0,0,0.6)] outline-none pb-safe',
               className,
             )}
           >
-            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 px-margin py-3 bg-surface-raised/95 backdrop-blur border-b border-surface-border">
-              <h2 className="type-headline-md uppercase text-text-primary truncate">{title}</h2>
-              <button type="button" onClick={onClose} aria-label={closeLabel} className="w-9 h-9 -mr-2 flex items-center justify-center rounded-xl text-text-secondary hover:text-text-primary hover:bg-surface-overlay active:scale-95 transition-all">
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 px-margin py-3 bg-surface/95 backdrop-blur border-b-2 border-outline-variant">
+              <h2 className="type-headline-md uppercase text-on-surface truncate border-l-4 border-primary pl-3">{title}</h2>
+              <button type="button" onClick={onClose} aria-label={closeLabel} className="w-9 h-9 -mr-2 flex items-center justify-center rounded-sm text-primary hover:text-white active:scale-95 transition-all">
                 <X className="w-5 h-5" />
               </button>
             </div>

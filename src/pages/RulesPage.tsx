@@ -130,10 +130,10 @@ export default function RulesPage() {
                   </div>
                   <span className="block w-10 h-[3px] bg-primary-container" aria-hidden />
                   {text.lead && (
-                    <p className={cn('font-inter text-[16px] leading-[25px]', short ? 'font-semibold text-on-surface' : 'text-tertiary')}>{text.lead}</p>
+                    <p className={cn('font-inter text-[16px] leading-[25px]', short ? 'font-semibold text-on-surface' : 'text-silver')}>{text.lead}</p>
                   )}
                   {text.paragraphs.map((paragraph) => (
-                    <p key={paragraph} className="font-inter text-[16px] leading-[25px] text-tertiary">{paragraph}</p>
+                    <p key={paragraph} className="font-inter text-[16px] leading-[25px] text-silver">{paragraph}</p>
                   ))}
                 </section>
               );

@@ -25,7 +25,7 @@ export function TeamCard({ category, team, drivers }: { category: Category; team
           <div className="min-w-0">
             <h3 className="type-headline-md uppercase text-white line-clamp-2">{team.name}</h3>
             {(team.car || team.class) && (
-              <p className="type-label-badge uppercase text-tertiary-container mt-1 truncate">{[team.car, team.class].filter(Boolean).join(' • ')}</p>
+              <p className="type-label-badge uppercase text-silver-dim mt-1 truncate">{[team.car, team.class].filter(Boolean).join(' • ')}</p>
             )}
           </div>
           <span

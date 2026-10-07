@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, BellRing, Check, Plus, Search, SearchX, X } from 'lucide-react';
+import { Heart, Search, SearchX, X } from 'lucide-react';
 import { paths } from '../app/paths';
 import { EmptyState, LiveDot, PillStrip } from '../components/ui';
 import { useToast } from '../components/Toast';
-import { useShell } from '../app/shell-context';
-import { CATEGORY_GROUPS, categorySummary, type GroupId } from '../lib/categories-meta';
+import { CATEGORY_GROUPS, accentOf, type GroupId } from '../lib/categories-meta';
 import { iconOfCategory } from '../lib/category-icons';
 import { normalize } from '../lib/entities';
 import { useT } from '../lib/i18n';
@@ -27,7 +26,6 @@ function isActiveToday(category: Category, now: number): boolean {
 export default function CategoriesPage() {
   const { t, lang } = useT();
   const toast = useToast();
-  const shell = useShell();
   const { categories } = useLiveData();
   const settings = useSettings();
   const [query, setQuery] = useState('');
@@ -61,25 +59,25 @@ export default function CategoriesPage() {
 
   return (
     <div className="flex flex-col gap-space-md px-margin pb-space-xl page-in">
-      <div className="pt-4 pb-2 flex flex-col gap-1">
-        <div className="flex items-center justify-between text-text-muted">
-          <span className="type-label-telemetry uppercase tracking-wider">{t('cats.global')}</span>
-          <span className="type-label-telemetry">{t('cats.count', { n: categories.length })}</span>
+      <div className="pt-6 flex flex-col gap-2">
+        <div className="flex items-center justify-between text-on-surface-variant">
+          <span className="type-label-badge uppercase tracking-widest">{t('cats.global')}</span>
+          <span className="type-label-badge">{t('cats.count', { n: categories.length })}</span>
         </div>
-        <h1 className="type-headline-lg uppercase text-text-primary tracking-tight">{t('cats.explore')}</h1>
-        <p className="type-body-sm text-text-muted mt-0.5">{t('cats.lead')}</p>
+        <h1 className="type-headline-lg text-[34px] leading-9 uppercase text-on-surface">{t('cats.explore')}</h1>
+        <p className="type-body-md text-primary">{t('cats.lead')}</p>
 
         <label className="relative mt-3 block">
-          <Search className="w-[18px] h-[18px] text-text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-[18px] h-[18px] text-on-surface-variant absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t('cats.filter')}
             aria-label={t('cats.filter')}
-            className="w-full bg-surface-container-low pl-9 pr-8 py-2 rounded-lg type-body-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:bg-surface-raised transition-all"
+            className="w-full bg-surface-container-lowest border border-outline-variant pl-10 pr-9 py-3 rounded-lg type-label-badge uppercase tracking-wider text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary transition-colors"
           />
           {query && (
-            <button type="button" onClick={() => setQuery('')} aria-label={t('common.clear')} className="absolute inset-y-0 right-0 pr-3 flex items-center text-text-muted hover:text-text-primary">
+            <button type="button" onClick={() => setQuery('')} aria-label={t('common.clear')} className="absolute inset-y-0 right-0 pr-3 flex items-center text-on-surface-variant hover:text-white">
               <X className="w-4 h-4" />
             </button>
           )}
@@ -94,57 +92,50 @@ export default function CategoriesPage() {
           title={t('cats.none')}
           hint={t('cats.noneHint')}
           action={
-            <button type="button" onClick={() => { setQuery(''); setGroup('all'); }} className="px-4 py-1.5 rounded-lg bg-surface-raised text-text-primary type-label-badge uppercase tracking-wider hover:bg-surface-container transition-all">
+            <button type="button" onClick={() => { setQuery(''); setGroup('all'); }} className="px-4 py-2 rounded-sm bg-surface-container-high border border-hairline text-on-surface type-label-badge uppercase tracking-wider hover:bg-surface-container-highest transition-all">
               {t('cats.seeAll')}
             </button>
           }
         />
       ) : (
-        <div className="grid grid-cols-1 gap-space-md lg:grid-cols-2 lg:items-start">
+        <div className="space-y-space-lg">
           {sections.map(({ group: g, items }) => (
-            <section key={g.id} className="flex flex-col gap-1">
-              <div className="flex items-center justify-between pb-1 pt-2">
-                <span className="type-label-badge uppercase text-text-muted tracking-wider">{g.label[lang]}</span>
-                <span className="type-label-telemetry text-text-muted">{t('cats.count', { n: items.length })}</span>
+            <section key={g.id} className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="type-label-badge uppercase text-on-surface tracking-widest">{g.label[lang]}</span>
+                <span className="type-label-badge text-on-surface-variant">{t('cats.count', { n: items.length })}</span>
               </div>
-              <div className="flex flex-col bg-surface-container-low rounded-xl overflow-hidden shadow-sm divide-y divide-surface-container-high/50">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 items-start">
                 {items.map((category) => {
                   const Icon = iconOfCategory(category.id);
                   const following = settings.isFollowingCategory(category.id);
+                  const accent = accentOf(category.id);
                   return (
-                    <div key={category.id} className="flex items-center justify-between gap-2 p-space-md hover:bg-surface-raised transition-colors">
-                      <Link to={paths.category(category.id)} className="flex items-center gap-space-sm min-w-0 flex-1">
-                        <Icon className={cn('w-5 h-5 shrink-0', following ? 'text-text-secondary' : 'text-text-muted')} />
-                        <div className="flex flex-col min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="type-body-md font-semibold text-text-primary truncate">{lang === 'en' ? category.enFullName ?? category.fullName : category.fullName}</span>
+                    <div key={category.id} className="flex items-stretch gap-3 rounded-lg bg-asphalt border border-hairline p-4 hover:bg-asphalt-alt transition-colors">
+                      <Link to={paths.category(category.id)} className="flex items-start gap-3.5 min-w-0 flex-1">
+                        <span className="w-14 h-14 rounded-sm flex items-center justify-center shrink-0 border" style={{ backgroundColor: `${accent}29`, borderColor: `${accent}73` }}>
+                          <Icon className="w-[30px] h-[30px]" style={{ color: accent }} />
+                        </span>
+                        <span className="flex flex-col min-w-0 gap-1">
+                          <span className="flex items-center gap-2">
+                            <span className="type-headline-md text-[18px] leading-[22px] uppercase text-white line-clamp-2">{lang === 'en' ? category.enFullName ?? category.fullName : category.fullName}</span>
                             {isActiveToday(category, now) && <LiveDot />}
-                          </div>
-                          <span className="type-label-telemetry text-text-muted truncate">{categorySummary(category, lang)}</span>
-                        </div>
+                          </span>
+                          <span className="type-body-sm text-on-surface-variant line-clamp-2">{lang === 'en' ? category.enDescription ?? category.description : category.description}</span>
+                          <span className="type-label-badge uppercase" style={{ color: accent }}>
+                            {[category.teams.length > 0 ? t('summary.teams', { n: category.teams.length }) : null, category.calendar.length > 0 ? t('summary.rounds', { n: category.calendar.filter((r) => r.status !== 'cancelled').length }) : null].filter(Boolean).join(' • ') || category.name}
+                          </span>
+                        </span>
                       </Link>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => follow(category)}
-                          aria-pressed={following}
-                          className={cn(
-                            'px-2.5 py-1 rounded type-label-badge uppercase flex items-center gap-1 active:scale-95 transition-all',
-                            following ? 'bg-surface-overlay text-racing-red' : 'bg-surface-container text-text-secondary hover:text-text-primary',
-                          )}
-                        >
-                          {following ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
-                          {following ? t('common.following') : t('common.follow')}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={shell.openAlerts}
-                          aria-label={t('app.notifications')}
-                          className={cn('p-1.5 transition-colors', following ? 'text-racing-red' : 'text-text-muted hover:text-text-primary')}
-                        >
-                          {following ? <BellRing className="w-[18px] h-[18px]" /> : <Bell className="w-[18px] h-[18px]" />}
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => follow(category)}
+                        aria-pressed={following}
+                        aria-label={following ? t('common.following') : t('common.follow')}
+                        className={cn('w-10 h-10 shrink-0 self-center rounded-sm flex items-center justify-center border active:scale-95 transition-all', following ? 'bg-primary-container/20 border-primary-container/60 text-primary' : 'bg-surface-container-high border-hairline text-on-surface-variant hover:text-white')}
+                      >
+                        <Heart className={cn('w-5 h-5', following && 'fill-current')} />
+                      </button>
                     </div>
                   );
                 })}

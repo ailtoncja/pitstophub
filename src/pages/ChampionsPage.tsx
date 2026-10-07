@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trophy } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { paths } from '../app/paths';
-import { Segmented, SectionTitle } from '../components/ui';
+import { Segmented } from '../components/ui';
 import { F1ChampionCard } from '../F1ChampionCard';
 import { F1_CHAMPIONS } from '../f1-champions';
 import { useScrollTopOn } from '../lib/hooks';
@@ -30,38 +30,32 @@ export default function ChampionsPage() {
   return (
     <div className="flex flex-col w-full px-margin pb-10 gap-space-md page-in">
       <div className="pt-space-sm flex items-center">
-        <button type="button" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(paths.categories))} aria-label={t('common.back')} className="w-10 h-10 -ml-2 rounded-xl flex items-center justify-center text-text-secondary hover:text-text-primary active:scale-90 transition-transform">
+        <button type="button" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(paths.categories))} aria-label={t('common.back')} className="w-10 h-10 -ml-2 rounded-sm flex items-center justify-center text-primary hover:text-white active:scale-90 transition-transform">
           <ArrowLeft className="w-5 h-5" />
         </button>
       </div>
 
-      <header>
-        <div className="flex items-center gap-2 mb-1">
-          <Trophy className="w-[18px] h-[18px] text-racing-red" />
-          <span className="type-label-telemetry uppercase tracking-widest text-text-muted">{t('champs.kicker')}</span>
-        </div>
-        <h1 className="type-display-hero uppercase italic font-black tracking-tighter text-text-primary leading-[0.95]">
-          {t('champs.title1')} <span className="text-racing-red">{t('champs.title2')}</span>
+      <header className="space-y-2">
+        <span className="type-label-badge uppercase tracking-widest text-on-surface-variant">{t('champs.kicker')}</span>
+        <h1 className="type-headline-lg text-[34px] leading-9 uppercase text-on-surface">
+          {t('champs.title1')} {t('champs.title2')}
         </h1>
-        <p className="type-body-md text-text-secondary mt-2 max-w-xl">{t('champs.lead')}</p>
-        <p className="type-label-telemetry uppercase text-text-muted mt-3 tracking-wider">
+        <p className="type-body-md text-primary max-w-xl">{t('champs.lead')}</p>
+        <p className="type-label-badge uppercase text-on-surface-variant tracking-wider">
           {t('champs.count', { drivers: F1_CHAMPIONS.length, titles: totalTitles })}
         </p>
       </header>
 
-      <div>
-        <SectionTitle bar>{t('champs.gallery')}</SectionTitle>
-        <Segmented
-          className="mt-2"
-          value={order}
-          onChange={setOrder}
-          options={[
-            { value: 'titles', label: t('champs.byTitles') },
-            { value: 'recent', label: t('champs.byRecent') },
-            { value: 'wins', label: t('champs.byWins') },
-          ]}
-        />
-      </div>
+      <Segmented
+        className="w-fit"
+        value={order}
+        onChange={setOrder}
+        options={[
+          { value: 'titles', label: t('champs.byTitles') },
+          { value: 'recent', label: t('champs.byRecent') },
+          { value: 'wins', label: t('champs.byWins') },
+        ]}
+      />
 
       <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 justify-items-center">
         {champions.map((champion) => (

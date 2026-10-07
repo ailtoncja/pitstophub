@@ -31,6 +31,8 @@
   --color-carbon: #000000;
   --color-asphalt: #15151e;
   --color-asphalt-alt: #1a1a24;
+  --color-silver: #c6c6c6; /* Tertiary do app: texto de apoio cinza (o 'tertiary' do site e verde) */
+  --color-silver-dim: #707070;
   --color-hairline: rgba(255, 255, 255, 0.1);
   --color-hairline-soft: rgba(255, 255, 255, 0.05);
 

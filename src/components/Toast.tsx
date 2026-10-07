@@ -38,7 +38,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 12 }}
               transition={{ duration: 0.2 }}
-              className="pointer-events-auto flex items-center gap-2.5 bg-surface-raised border border-surface-border rounded-xl pl-3 pr-2 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.5)] max-w-sm"
+              className="pointer-events-auto flex items-center gap-2.5 bg-asphalt border border-hairline rounded-lg pl-3 pr-2 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.5)] max-w-sm"
             >
               <Icon className="w-4 h-4 text-racing-red shrink-0" aria-hidden />
               <span className="type-label-telemetry uppercase tracking-wider text-text-primary">{toast.message}</span>
