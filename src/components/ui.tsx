@@ -1,4 +1,4 @@
-import { useId, type ComponentType, type ReactNode } from 'react';
+import { useId, type ComponentType, type CSSProperties, type ReactNode } from 'react';
 import { cn } from '../lib/utils';
 import { countdownTo, pad2 } from '../lib/format';
 import { useNow } from '../lib/useNow';
@@ -10,26 +10,22 @@ export function LiveDot({ className, color = 'bg-racing-red' }: { className?: st
   return <span className={cn('inline-block w-1.5 h-1.5 rounded-full animate-pulse', color, className)} aria-hidden />;
 }
 
-/** Faixa de titulo de secao: "DESTAQUES ........ Temporada 2026". */
+/** Titulo de secao do app: barra salmao de 4px a esquerda, titulo italico em caixa alta e a acao a direita. */
 export function SectionTitle({
   children,
   right,
-  bar = false,
   className,
 }: {
   children: ReactNode;
   right?: ReactNode;
-  /** Barra vermelha vertical antes do titulo (paginas de perfil). */
+  /** Mantido por compatibilidade: a barra agora e sempre exibida. */
   bar?: boolean;
   className?: string;
 }) {
   return (
-    <div className={cn('flex items-center justify-between gap-3 pb-1', className)}>
-      <div className="flex items-center gap-1.5 min-w-0">
-        {bar && <span className="w-1 h-3.5 rounded-full bg-racing-red shrink-0" aria-hidden />}
-        <h2 className="type-headline-sm uppercase text-text-primary tracking-wide truncate">{children}</h2>
-      </div>
-      {right != null && <div className="type-label-telemetry uppercase text-text-muted shrink-0">{right}</div>}
+    <div className={cn('flex items-center justify-between gap-3', className)}>
+      <h2 className="type-headline-md uppercase text-on-surface border-l-4 border-primary pl-3 min-w-0">{children}</h2>
+      {right != null && <div className="type-label-badge uppercase text-primary shrink-0 tracking-wider">{right}</div>}
     </div>
   );
 }
@@ -44,14 +40,14 @@ export function Telemetry({ children, className }: { children: ReactNode; classN
 /** Grupo de linhas com divisores finos (lista "Destaques", "Corridas futuras"...). */
 export function ListGroup({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn('divide-y divide-surface-container-high rounded-xl bg-surface-container-low overflow-hidden', className)}>
+    <div className={cn('divide-y divide-hairline-soft rounded-lg bg-asphalt border border-hairline overflow-hidden', className)}>
       {children}
     </div>
   );
 }
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn('rounded-xl bg-surface-raised', className)}>{children}</div>;
+  return <div className={cn('rounded-lg bg-asphalt border border-hairline', className)}>{children}</div>;
 }
 
 export function StatTile({
@@ -68,10 +64,10 @@ export function StatTile({
   className?: string;
 }) {
   return (
-    <div className={cn('flex flex-col min-w-0', className)}>
-      <span className="type-label-telemetry uppercase text-text-muted tracking-wider">{label}</span>
-      <span className={cn('type-headline-lg font-black leading-none mt-1', accent ? 'text-racing-red' : 'text-text-primary')}>{value}</span>
-      {sub != null && <span className="type-label-telemetry text-text-muted mt-1 leading-snug line-clamp-2 break-words">{sub}</span>}
+    <div className={cn('flex flex-col min-w-0 rounded-lg bg-asphalt border p-3.5', accent ? 'border-primary/40' : 'border-hairline', className)}>
+      <span className="type-label-telemetry uppercase text-on-surface-variant tracking-wider truncate">{label}</span>
+      <span className={cn('type-telemetry-counter text-[24px] leading-[26px] mt-1.5', accent ? 'text-primary' : 'text-white')}>{value}</span>
+      {sub != null && <span className="type-label-telemetry text-on-surface-variant mt-1 leading-snug line-clamp-2 break-words">{sub}</span>}
     </div>
   );
 }
@@ -87,9 +83,9 @@ export function ProgressBar({ value, className, barClassName = 'bg-racing-red' }
 
 // ─── Pilulas e abas ───────────────────────────────────────────────────────────
 
-export type PillOption<T extends string> = { value: T; label: ReactNode; dot?: string };
+export type PillOption<T extends string> = { value: T; label: ReactNode; dot?: string; icon?: ComponentType<{ className?: string; style?: CSSProperties }>; accent?: string };
 
-/** Tira horizontal de pilulas (filtros de categoria / grupo). */
+/** Tira horizontal de chips de categoria/grupo. Selecionado: salmao, canto cortado e sombra vermelha dura (como no app). */
 export function PillStrip<T extends string>({
   options,
   value,
@@ -104,30 +100,34 @@ export function PillStrip<T extends string>({
   tone?: 'red' | 'quiet';
 }) {
   return (
-    <div className={cn('flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-margin px-margin whitespace-nowrap', className)} role="tablist">
+    <div className={cn('flex items-center gap-3 overflow-x-auto no-scrollbar py-1.5 pr-2 -mx-margin px-margin whitespace-nowrap', className)} role="tablist">
       {options.map((option) => {
         const active = option.value === value;
-        return (
+        const Icon = option.icon;
+        const chip = (
           <button
-            key={option.value}
             type="button"
             role="tab"
             aria-selected={active}
             onClick={() => onChange(option.value)}
             className={cn(
-              'shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-pill type-label-badge uppercase tracking-wider transition-all active:scale-95',
-              tone === 'red'
-                ? active
-                  ? 'bg-racing-red text-white shadow-[0_0_12px_rgba(225,6,0,0.4)]'
-                  : 'bg-surface-container-high text-text-secondary hover:text-white'
-                : active
-                  ? 'bg-surface-raised text-text-primary'
-                  : 'text-text-muted hover:text-text-primary',
+              'shrink-0 inline-flex items-center gap-2 px-4 py-2 type-headline-sm uppercase transition-colors active:scale-95',
+              active
+                ? 'cut-corner [--cut:12px] bg-primary text-on-primary'
+                : tone === 'red'
+                  ? 'rounded-sm bg-surface-container-highest text-on-surface border border-hairline hover:bg-surface-bright'
+                  : 'rounded-sm text-on-surface-variant hover:text-white',
             )}
           >
-            {option.dot && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: option.dot }} aria-hidden />}
+            {Icon && <Icon className="w-5 h-5" style={{ color: active ? undefined : option.accent }} />}
+            {option.dot && !Icon && <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: option.dot }} aria-hidden />}
             {option.label}
           </button>
+        );
+        return active ? (
+          <span key={option.value} className="shrink-0 inline-flex" style={{ filter: 'drop-shadow(3px 3px 0 #e10600)' }}>{chip}</span>
+        ) : (
+          <span key={option.value} className="shrink-0 inline-flex">{chip}</span>
         );
       })}
     </div>
@@ -147,7 +147,7 @@ export function Segmented<T extends string>({
   className?: string;
 }) {
   return (
-    <div className={cn('bg-surface-container-lowest p-1 rounded-xl flex items-center gap-1 shadow-inner overflow-x-auto no-scrollbar', className)} role="tablist">
+    <div className={cn('bg-surface-container-high p-1 rounded-lg border border-hairline flex items-center gap-1 overflow-x-auto no-scrollbar', className)} role="tablist">
       {options.map((option) => {
         const active = option.value === value;
         return (
@@ -158,8 +158,8 @@ export function Segmented<T extends string>({
             aria-selected={active}
             onClick={() => onChange(option.value)}
             className={cn(
-              'flex-1 min-w-fit px-3 py-2 text-center rounded-lg type-headline-sm uppercase tracking-wider transition-all whitespace-nowrap',
-              active ? 'bg-surface-overlay text-white' : 'text-text-muted hover:text-white',
+              'flex-1 min-w-fit px-3 py-2 text-center rounded-md type-label-badge uppercase tracking-wider transition-all whitespace-nowrap',
+              active ? 'bg-racing-red text-white' : 'text-on-surface-variant hover:text-white',
             )}
           >
             {option.label}
@@ -219,10 +219,35 @@ export function CountdownTiles({ target, labels }: { target: number; labels: { d
   );
 }
 
+/** Painel de vidro do hero: barra salmao na lateral e "06 : 07 : 50" com dois-pontos piscando. */
+export function CountdownPanel({ target, labels }: { target: number; labels: { d: string; h: string; m: string } }) {
+  const now = useNow(1000);
+  const c = countdownTo(target, now);
+  const unit = (value: number, label: string) => (
+    <div className="flex flex-col items-center">
+      <span className="type-telemetry-counter text-white leading-none">{pad2(value)}</span>
+      <span className="type-label-telemetry uppercase text-tertiary mt-1.5">{label}</span>
+    </div>
+  );
+  const colon = <span className="type-telemetry-counter text-primary animate-pulse self-start" aria-hidden>:</span>;
+  return (
+    <div className="inline-flex rounded-sm bg-black/55 backdrop-blur-sm border border-hairline overflow-hidden" role="timer" aria-label={`${c.days} d ${c.hours} h ${c.minutes} m`}>
+      <span className="w-1 bg-primary" aria-hidden />
+      <div className="flex items-center gap-4 px-4 py-3.5">
+        {unit(c.days, labels.d)}
+        {colon}
+        {unit(c.hours, labels.h)}
+        {colon}
+        {unit(c.minutes, labels.m)}
+      </div>
+    </div>
+  );
+}
+
 // ─── Estados ──────────────────────────────────────────────────────────────────
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn('animate-pulse rounded-xl bg-surface-container-low', className)} aria-hidden />;
+  return <div className={cn('animate-pulse rounded-lg bg-asphalt border border-hairline-soft', className)} aria-hidden />;
 }
 
 export function EmptyState({
@@ -237,7 +262,7 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 text-center bg-surface-container-low rounded-xl">
+    <div className="flex flex-col items-center justify-center py-12 px-4 text-center bg-asphalt border border-hairline rounded-lg">
       {Icon && <Icon className="w-9 h-9 text-text-muted mb-2" />}
       <h3 className="type-headline-sm uppercase text-text-primary">{title}</h3>
       {hint && <p className="type-body-sm text-text-secondary mt-1 max-w-xs">{hint}</p>}

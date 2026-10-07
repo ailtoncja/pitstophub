@@ -27,6 +27,13 @@
   --color-surface-overlay: #181d26;
   --color-surface-border: #262c3a;
 
+  /* Velocity Control (mesmos niveis do app Android): fundo carbono, cartoes asfalto */
+  --color-carbon: #000000;
+  --color-asphalt: #15151e;
+  --color-asphalt-alt: #1a1a24;
+  --color-hairline: rgba(255, 255, 255, 0.1);
+  --color-hairline-soft: rgba(255, 255, 255, 0.05);
+
   /* Texto */
   --color-on-surface: #e2e2e8;
   --color-on-background: #e2e2e8;
@@ -162,12 +169,25 @@
   /* "rounded-full" do design e 0.75rem: capsula compacta, nao circulo */
   border-radius: 0.75rem;
 }
+/* Canto superior direito cortado a 45 graus (--cut define o tamanho). */
+@utility cut-corner {
+  --cut: 16px;
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%);
+}
+/* Paralelogramo inclinado a 15 graus ("NEXT RACE"). */
+@utility skew-shape {
+  clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+}
+/* Fibra de carbono: linhas diagonais finas. */
+@utility carbon-lines {
+  background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 10px);
+}
 @utility hairline {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 html {
-  background-color: #111317;
+  background-color: #000000;
   color-scheme: dark;
 }
 
@@ -182,7 +202,7 @@ html {
 
   body {
     margin: 0;
-    background-color: #111317;
+    background-color: #000000;
     color: #e2e2e8;
     font-family: var(--font-inter);
     overflow-x: hidden;

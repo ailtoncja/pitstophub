@@ -15,6 +15,8 @@ const DriverPage = lazy(() => import('../pages/DriverPage'));
 const TeamPage = lazy(() => import('../pages/TeamPage'));
 const RacePage = lazy(() => import('../pages/RacePage'));
 const ChampionsPage = lazy(() => import('../pages/ChampionsPage'));
+const GridPage = lazy(() => import('../pages/GridPage'));
+const RulesPage = lazy(() => import('../pages/RulesPage'));
 
 const CATEGORY_IDS = new Set(MOTORSPORT_DATA.map((category) => category.id));
 
@@ -73,6 +75,8 @@ export default function AppRouter() {
           <Route path="equipe/:categoryId/:teamId" element={<TeamPage />} />
           <Route path="circuito/:categoryId/:raceId" element={<RacePage />} />
           <Route path="campeoes" element={<ChampionsPage />} />
+          <Route path="grid" element={<GridPage />} />
+          <Route path="como-funciona/:categoryId" element={<RulesPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

@@ -8,6 +8,8 @@ export const paths = {
   standings: '/classificacao',
   categories: '/categorias',
   champions: '/campeoes',
+  grid: '/grid',
+  rules: (categoryId: string, section = 0) => `/como-funciona/${enc(categoryId)}${section > 0 ? `?s=${section}` : ''}`,
   category: (categoryId: string) => `/categorias/${enc(categoryId)}`,
   driver: (categoryId: string, driverId: string) => `/piloto/${enc(categoryId)}/${enc(driverId)}`,
   team: (categoryId: string, teamId: string) => `/equipe/${enc(categoryId)}/${enc(teamId)}`,
