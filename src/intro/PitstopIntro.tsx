@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import type * as THREE from 'three';
 
 const WORDMARK = 'PITSTOPHUB';
 const HUB_START = 7;

@@ -22,8 +22,8 @@ export default defineConfig(() => ({
         scope: '/',
         display: 'standalone',
         orientation: 'portrait-primary',
-        background_color: '#0a0a0b',
-        theme_color: '#0a0a0b',
+        background_color: '#000000',
+        theme_color: '#121414',
         categories: ['sports', 'news', 'productivity'],
         icons: [
           {
@@ -47,9 +47,21 @@ export default defineConfig(() => ({
         ],
         shortcuts: [
           {
+            name: 'Calendário',
+            short_name: 'Calendário',
+            url: '/calendario',
+            icons: [{ src: 'icons/icon-192.png', sizes: '192x192' }],
+          },
+          {
+            name: 'Classificação',
+            short_name: 'Classificação',
+            url: '/classificacao',
+            icons: [{ src: 'icons/icon-192.png', sizes: '192x192' }],
+          },
+          {
             name: 'Explorar categorias',
-            short_name: 'Explorar',
-            url: '/',
+            short_name: 'Categorias',
+            url: '/categorias',
             icons: [{ src: 'icons/icon-192.png', sizes: '192x192' }],
           },
         ],
