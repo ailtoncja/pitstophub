@@ -101,7 +101,7 @@ export function PillStrip<T extends string>({
 }) {
   if (tone === 'quiet') {
     return (
-      <div className={cn('flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-margin px-margin whitespace-nowrap', className)} role="tablist">
+      <div className={cn('flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-margin px-margin whitespace-nowrap md:flex-wrap md:overflow-visible md:mx-0 md:px-0', className)} role="tablist">
         {options.map((option) => {
           const active = option.value === value;
           return (
@@ -124,7 +124,7 @@ export function PillStrip<T extends string>({
     );
   }
   return (
-    <div className={cn('flex items-center gap-3 overflow-x-auto no-scrollbar py-1.5 pr-2 -mx-margin px-margin whitespace-nowrap', className)} role="tablist">
+    <div className={cn('flex items-center gap-3 overflow-x-auto no-scrollbar py-1.5 pr-2 -mx-margin px-margin whitespace-nowrap md:flex-wrap md:gap-y-4 md:overflow-visible md:mx-0 md:px-0 md:pr-1', className)} role="tablist">
       {options.map((option) => {
         const active = option.value === value;
         const Icon = option.icon;
