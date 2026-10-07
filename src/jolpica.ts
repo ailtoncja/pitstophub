@@ -1,4 +1,4 @@
-import type { Category, CategoryStandings, Driver, Race, StandingItem, Team } from './types';
+import type { Category, CategoryStandings, Driver, Race, RaceSession, RaceSessionKind, StandingItem, Team } from './types';
 
 const API_BASE = 'https://api.jolpi.ca/ergast/f1';
 const TIMEOUT_MS = 10000;
@@ -37,6 +37,8 @@ type StandingsTableWrapper = {
   StandingsTable: { season?: string; round?: string; StandingsLists: JolpicaStandingsList[] };
 };
 
+type JolpicaSessionSlot = { date: string; time?: string };
+
 type JolpicaRace = {
   season?: string;
   round: string;
@@ -44,10 +46,17 @@ type JolpicaRace = {
   Circuit: {
     circuitId: string;
     circuitName: string;
-    Location: { locality: string; country: string };
+    Location: { locality: string; country: string; lat?: string; long?: string };
   };
   date: string;
   time?: string;
+  FirstPractice?: JolpicaSessionSlot;
+  SecondPractice?: JolpicaSessionSlot;
+  ThirdPractice?: JolpicaSessionSlot;
+  Qualifying?: JolpicaSessionSlot;
+  Sprint?: JolpicaSessionSlot;
+  SprintQualifying?: JolpicaSessionSlot;
+  SprintShootout?: JolpicaSessionSlot;
   Results?: JolpicaResult[];
 };
 
@@ -122,6 +131,8 @@ export type DriverResultRow = {
   finishPosition: number | null;
   points: number;
   status: string;
+  /** Posicao da volta mais rapida da prova (1 = a mais rapida); null se a fonte nao informou. */
+  fastestLapRank: number | null;
 };
 
 type JolpicaDriverRaceResult = {
@@ -129,7 +140,40 @@ type JolpicaDriverRaceResult = {
   points: string;
   grid: string;
   status: string;
+  FastestLap?: { rank?: string };
 };
+
+/** Uma linha do resultado completo de uma corrida. */
+export type RaceResultRow = {
+  position: string;
+  driverName: string;
+  driverCode: string;
+  driverNumber: string;
+  teamName: string;
+  grid: number | null;
+  laps: number | null;
+  /** Tempo total (lider) ou diferenca para o lider; vazio quando abandonou. */
+  time: string;
+  status: string;
+  points: number;
+  fastestLapRank: number | null;
+  fastestLapTime: string | null;
+};
+
+type JolpicaFullResult = {
+  position: string;
+  positionText?: string;
+  points: string;
+  grid?: string;
+  laps?: string;
+  status?: string;
+  Time?: { time?: string };
+  FastestLap?: { rank?: string; Time?: { time?: string } };
+  Driver: { code?: string; permanentNumber?: string; givenName: string; familyName: string };
+  Constructor: { constructorId: string; name: string };
+};
+
+export type TeamRoundPoints = { round: number; raceName: string; points: number };
 
 type JolpicaDriverRace = {
   round: string;
@@ -277,10 +321,99 @@ export async function fetchDriverSeasonResults(
         finishPosition: result ? Number(result.position) : null,
         points: result ? Number(result.points) : 0,
         status: result?.status ?? '',
+        fastestLapRank: result?.FastestLap?.rank ? Number(result.FastestLap.rank) : null,
       };
     });
   });
 }
+
+const raceResultsCache = new Map<string, CacheEntry<RaceResultRow[] | null>>();
+const standingsAtRoundCache = new Map<string, CacheEntry<CategoryStandings | null>>();
+const teamPointsCache = new Map<string, CacheEntry<TeamRoundPoints[] | null>>();
+
+/** Resultado completo (classificacao final) de uma rodada da F1. */
+export async function fetchRaceResults(year: string, round: number, force = false): Promise<RaceResultRow[] | null> {
+  return getCached(raceResultsCache, `${year}:${round}`, DETAIL_TTL_MS, force, async () => {
+    const data = await fetchJson<MRData<RaceTableWrapper>>(`/${year}/${round}/results.json?limit=100`);
+    const rows = data.MRData.RaceTable.Races?.[0]?.Results as unknown as JolpicaFullResult[] | undefined;
+    if (!rows?.length) return null;
+    return rows.map((row) => ({
+      position: row.positionText && /^\d+$/.test(row.positionText) ? row.positionText : row.position,
+      driverName: `${row.Driver.givenName} ${row.Driver.familyName}`,
+      driverCode: row.Driver.code ?? row.Driver.familyName.slice(0, 3).toUpperCase(),
+      driverNumber: row.Driver.permanentNumber ?? '',
+      teamName: row.Constructor.name,
+      grid: row.grid ? Number(row.grid) : null,
+      laps: row.laps ? Number(row.laps) : null,
+      time: row.Time?.time ?? '',
+      status: row.status ?? '',
+      points: Number(row.points) || 0,
+      fastestLapRank: row.FastestLap?.rank ? Number(row.FastestLap.rank) : null,
+      fastestLapTime: row.FastestLap?.Time?.time ?? null,
+    }));
+  });
+}
+
+/** Classificacao do campeonato logo apos uma rodada (para mostrar quem subiu/caiu desde a anterior). */
+export async function fetchStandingsAfterRound(
+  category: Category,
+  year: string,
+  round: number,
+  force = false,
+): Promise<CategoryStandings | null> {
+  if (category.id !== 'f1' || round < 1) return null;
+  return getCached(standingsAtRoundCache, `${year}:${round}`, DETAIL_TTL_MS, force, async () => {
+    const [drivers, constructors] = await Promise.all([
+      fetchJson<MRData<StandingsTableWrapper>>(`/${year}/${round}/driverStandings.json`)
+        .then((d) => d.MRData.StandingsTable.StandingsLists[0]?.DriverStandings ?? [])
+        .catch((): JolpicaDriverStanding[] => []),
+      fetchJson<MRData<StandingsTableWrapper>>(`/${year}/${round}/constructorStandings.json`)
+        .then((d) => d.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings ?? [])
+        .catch((): JolpicaConstructorStanding[] => []),
+    ]);
+    return buildStandings(category, drivers, constructors);
+  });
+}
+
+// Reverso de CONSTRUCTOR_ID_TO_TEAM: a Jolpica ja usou mais de um id para a mesma equipe (Sauber/Audi, RB).
+function constructorIdCandidates(teamId: string): string[] {
+  return Object.entries(CONSTRUCTOR_ID_TO_TEAM)
+    .filter(([, ours]) => ours === teamId)
+    .map(([jolpicaId]) => jolpicaId);
+}
+
+/** Pontos que a equipe fez em cada rodada (corrida + sprint), na ordem do calendario. */
+export async function fetchTeamSeasonPoints(year: string, teamId: string, force = false): Promise<TeamRoundPoints[] | null> {
+  return getCached(teamPointsCache, `${year}:${teamId}`, DETAIL_TTL_MS, force, async () => {
+    for (const constructorId of constructorIdCandidates(teamId)) {
+      const [race, sprint] = await Promise.all([
+        fetchJson<MRData<RaceTableWrapper>>(`/${year}/constructors/${constructorId}/results.json?limit=100`).catch(() => null),
+        fetchJson<MRData<{ RaceTable: { Races?: JolpicaSprintRace[] } }>>(`/${year}/constructors/${constructorId}/sprint.json?limit=100`).catch(() => null),
+      ]);
+      const races = race?.MRData.RaceTable.Races ?? [];
+      if (races.length === 0) continue;
+
+      const byRound = new Map<number, TeamRoundPoints>();
+      for (const r of races) {
+        const results = (r.Results as unknown as { points: string }[] | undefined) ?? [];
+        byRound.set(Number(r.round), {
+          round: Number(r.round),
+          raceName: r.raceName,
+          points: results.reduce((sum, row) => sum + (Number(row.points) || 0), 0),
+        });
+      }
+      for (const s of sprint?.MRData.RaceTable.Races ?? []) {
+        const entry = byRound.get(Number(s.round));
+        const extra = (s.SprintResults ?? []).reduce((sum, row) => sum + (Number(row.points) || 0), 0);
+        if (entry) entry.points += extra;
+      }
+      return [...byRound.values()].sort((a, b) => a.round - b.round);
+    }
+    return null;
+  });
+}
+
+type JolpicaSprintRace = { round: string; SprintResults?: { points: string }[] };
 
 // ─── Fetchers ─────────────────────────────────────────────────────────────────
 
@@ -321,6 +454,8 @@ function buildCalendar(
   return races.map((race) => {
     const base = matchBaseRace(category.calendar, race);
     const status = getRaceStatus(race, winnerMap.has(race.round));
+    const lat = Number(race.Circuit.Location.lat);
+    const lng = Number(race.Circuit.Location.long);
     return {
       id: base?.id ?? slugify(race.raceName),
       name: base?.name ?? formatPt(race.raceName),
@@ -332,8 +467,31 @@ function buildCalendar(
       circuit: base?.circuit ?? race.Circuit.circuitName,
       status,
       winner: winnerMap.get(race.round) ?? (status === 'completed' ? base?.winner : undefined),
+      round: Number.parseInt(race.round, 10) || undefined,
+      country: race.Circuit.Location.country,
+      lat: Number.isFinite(lat) && race.Circuit.Location.lat ? lat : undefined,
+      lng: Number.isFinite(lng) && race.Circuit.Location.long ? lng : undefined,
+      sessions: buildSessions(race),
     };
   });
+}
+
+function buildSessions(race: JolpicaRace): RaceSession[] {
+  const slot = (kind: RaceSessionKind, session: JolpicaSessionSlot | undefined): RaceSession | null => {
+    const startsAt = session ? jolpicaStartsAt(session.date, session.time) : undefined;
+    return startsAt ? { kind, startsAt } : null;
+  };
+  return [
+    slot('fp1', race.FirstPractice),
+    slot('fp2', race.SecondPractice),
+    slot('fp3', race.ThirdPractice),
+    slot('sprint-qualifying', race.SprintQualifying ?? race.SprintShootout),
+    slot('sprint', race.Sprint),
+    slot('qualifying', race.Qualifying),
+    slot('race', { date: race.date, time: race.time }),
+  ]
+    .filter((s): s is RaceSession => s !== null)
+    .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
 }
 
 function buildDrivers(category: Category, standings: JolpicaDriverStanding[]): Driver[] {

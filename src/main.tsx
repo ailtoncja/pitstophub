@@ -1,9 +1,14 @@
-import {StrictMode} from 'react';
-import {createRoot} from 'react-dom/client';
-import AuthGate from './AuthGate.tsx';
-import IntroGate from './IntroGate.tsx';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import AppRouter from './app/AppRouter';
+import AuthGate from './AuthGate';
+import { ToastProvider } from './components/Toast';
+import { TributesProvider } from './features/tributes/Tributes';
+import IntroGate from './IntroGate';
 import './index.css';
 import { registerServiceWorker } from './pwa';
+import { LiveDataProvider } from './state/live-data';
+import { SettingsProvider } from './state/settings';
 
 registerServiceWorker();
 
@@ -20,7 +25,17 @@ document.addEventListener('contextmenu', (event) => {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <IntroGate>
-      <AuthGate />
+      <AuthGate>
+        <SettingsProvider>
+          <LiveDataProvider>
+            <ToastProvider>
+              <TributesProvider>
+                <AppRouter />
+              </TributesProvider>
+            </ToastProvider>
+          </LiveDataProvider>
+        </SettingsProvider>
+      </AuthGate>
     </IntroGate>
   </StrictMode>,
 );
