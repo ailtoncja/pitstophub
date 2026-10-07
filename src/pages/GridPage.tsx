@@ -71,7 +71,7 @@ export default function GridPage() {
       ) : (
         <>
           <Segmented
-            className="self-start"
+            className="w-fit"
             options={[
               { value: 'drivers' as const, label: t('grid.drivers', { n: drivers.length }) },
               { value: 'teams' as const, label: t('grid.teams', { n: teams.length }) },
