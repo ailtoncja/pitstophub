@@ -1,13 +1,14 @@
 import { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Bookmark, BookmarkCheck, Gauge, Timer, TriangleAlert, Trophy } from 'lucide-react';
+import { BioCard } from '../components/pit';
 import { paths } from '../app/paths';
 import { teamColor } from '../components/cards';
 import { useToast } from '../components/Toast';
 import { Avatar } from '../components/Avatar';
 import { EmptyState, ListGroup, LiveDot, SectionTitle, Skeleton, StatTile } from '../components/ui';
 import { getDriverBio } from '../driver-bios';
-import { countDriverTitles, formatDriverTitleYears, getDriverTitles } from '../driver-titles';
+import { countDriverTitles, formatDriverTitleYears, getDriverTitles, type DriverTitle } from '../driver-titles';
 import { useTributes } from '../features/tributes/Tributes';
 import { findF1Champion } from '../f1-champions';
 import { flagForNationality } from '../nationality-flags';
@@ -108,32 +109,10 @@ export default function DriverPage() {
 
       <div className="lg:grid lg:grid-cols-12 lg:gap-space-lg">
         <div className="lg:col-span-5">
-          <section className="px-margin pt-space-xs pb-space-md">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="type-label-telemetry uppercase tracking-wider text-text-muted">{category.name}</span>
-              {team && (<><span className="text-text-muted text-[10px]">•</span><Link to={paths.team(category.id, team.id)} className="type-label-telemetry uppercase tracking-wider text-text-secondary hover:text-white">{team.name}</Link></>)}
-              {driver.nationality && (<><span className="text-text-muted text-[10px]">•</span><span className="type-label-telemetry uppercase px-1.5 py-0.5 rounded bg-surface-container-high text-text-secondary">{flagForNationality(driver.nationality)} {driver.nationality}</span></>)}
-            </div>
-            <div className="flex items-baseline justify-between gap-2">
-              <div className="flex flex-col min-w-0">
-                <h1 className="type-display-hero uppercase tracking-tighter text-text-primary leading-none">
-                  {first && <>{first} </>}<span className="text-racing-red">{last}</span>
-                </h1>
-                {team && <p className="type-label-telemetry text-text-muted mt-1 uppercase tracking-widest">{[team.car, team.name].filter(Boolean).join(' • ')}</p>}
-              </div>
-              {driver.number && !championOnly && (
-                <div className="flex flex-col items-end shrink-0 pl-2">
-                  <span className="type-telemetry-counter font-black text-racing-red leading-none select-none tracking-tighter">#{driver.number.padStart(2, '0')}</span>
-                  <span className="type-label-telemetry uppercase text-text-muted mt-1 tracking-wider">{t('drv.holder')}</span>
-                </div>
-              )}
-            </div>
-          </section>
-
           <div className="px-margin mb-space-md">
             <div
-              className="relative w-full h-52 lg:h-80 rounded-xl overflow-hidden bg-surface-container-lowest select-none"
-              style={{ backgroundImage: `radial-gradient(ellipse at 70% 100%, ${color}33, transparent 65%)` }}
+              className="relative h-[400px] lg:h-[470px] rounded-lg overflow-hidden border border-hairline select-none"
+              style={{ background: `linear-gradient(135deg, ${color}80 0%, #15151e 55%, #000 100%)` }}
               onClick={isHamilton ? tributes.onHamiltonTap : undefined}
               onMouseDown={isHamilton ? tributes.onHamiltonHoldStart : undefined}
               onMouseUp={isHamilton ? tributes.onHamiltonHoldEnd : undefined}
@@ -142,21 +121,47 @@ export default function DriverPage() {
               onTouchEnd={isHamilton ? tributes.onHamiltonHoldEnd : undefined}
               onTouchCancel={isHamilton ? tributes.onHamiltonHoldEnd : undefined}
             >
+              <div className="absolute inset-0 carbon-lines pointer-events-none" aria-hidden />
+              {driver.number && driver.number !== '--' && !championOnly && (
+                <span className="absolute top-2 right-3 type-display-hero text-[120px] leading-[120px] text-white/[0.07] pointer-events-none" aria-hidden>{driver.number}</span>
+              )}
               {photo ? (
                 <img
                   src={photo}
                   alt={driver.name}
                   referrerPolicy="no-referrer"
-                  className={cn('w-full h-full opacity-90 mix-blend-luminosity hover:mix-blend-normal transition-all duration-500', driver.cutout ? 'object-contain object-bottom' : 'object-cover object-top')}
+                  className={cn(
+                    'absolute top-0 inset-x-0 w-full opacity-95',
+                    championOnly ? 'h-[72%] object-contain p-2' : driver.cutout ? 'h-[78%] object-contain object-bottom' : 'h-[78%] object-cover object-top',
+                  )}
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center"><Avatar name={driver.name} size={96} /></div>
+                <div className="absolute top-0 inset-x-0 h-[70%] flex items-center justify-center"><Avatar name={driver.name} size={96} /></div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/30 to-transparent pointer-events-none" />
-              <div className="absolute inset-0 bg-gradient-to-r from-surface via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-3 left-3 flex items-center gap-2">
-                {team?.car && <span className="type-label-badge bg-surface-container-lowest/90 backdrop-blur-md px-2 py-1 rounded text-text-primary uppercase tracking-wider">{team.car}</span>}
-                {driver.nationality && <span className="type-label-telemetry text-text-muted">{driver.nationality}</span>}
+              <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.85) 85%, #000 100%)' }} aria-hidden />
+              <span className="absolute left-0 inset-y-0 w-1" style={{ backgroundColor: championOnly ? '#e10600' : color }} aria-hidden />
+
+              <div className="absolute bottom-0 inset-x-0 pl-[22px] pr-5 pb-5 space-y-1.5 pointer-events-none">
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  {championOnly ? (
+                    <span className="type-label-badge uppercase tracking-wider text-primary">{t('drv.champion')}</span>
+                  ) : (
+                    team && (
+                      <Link to={paths.team(category.id, team.id)} className="pointer-events-auto flex items-center gap-2 type-label-badge uppercase tracking-wider text-on-surface hover:text-white">
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
+                        {team.name}
+                      </Link>
+                    )
+                  )}
+                  {driver.nationality && (
+                    <span className="type-label-telemetry uppercase text-on-surface-variant">{flagForNationality(driver.nationality)} {driver.nationality}</span>
+                  )}
+                </div>
+                {first && <p className="type-headline-md text-[20px] uppercase text-white leading-6">{first}</p>}
+                <div className="flex items-end gap-2">
+                  <h1 className="type-display-hero text-[44px] leading-[46px] uppercase text-primary-container min-w-0 break-words">{last}</h1>
+                  {driver.number && !championOnly && <span className="type-telemetry-counter text-[22px] text-on-surface-variant pb-0.5">#{driver.number}</span>}
+                </div>
               </div>
             </div>
           </div>
@@ -166,24 +171,17 @@ export default function DriverPage() {
           {/* NUMEROS */}
           <section className="px-margin mb-space-lg">
             {championOnly && champion ? (
-              <div className="grid grid-cols-4 gap-2 bg-surface-container-low rounded-xl p-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <StatTile label={t('drv.titles')} value={champion.championYears.length} accent sub={champion.championYears.join(', ')} />
                 <StatTile label={t('drv.wins')} value={champion.careerWins} sub={t('drv.career')} />
                 <StatTile label={t('drv.podiums')} value={champion.careerPodiums} sub={t('drv.career')} />
                 <StatTile label={t('drv.poles')} value={champion.careerPoles} sub={t('drv.career')} />
               </div>
             ) : (
-              <div className="grid grid-cols-4 gap-2 bg-surface-container-low rounded-xl p-3">
-                <div className="flex flex-col min-w-0">
-                  <span className="type-label-telemetry uppercase text-text-muted tracking-wider">{t('drv.position')}</span>
-                  <div className="flex items-baseline gap-0.5 mt-1">
-                    <span className="type-headline-lg font-black text-text-primary leading-none">{standing ? standing.item.position : '—'}</span>
-                    {standing && <span className="type-label-badge text-racing-red">{ordinal(standing.item.position, lang).replace(/\d+/, '')}</span>}
-                  </div>
-                  <span className="type-label-telemetry text-text-muted mt-1 truncate">{standing?.classLabel ?? t('drv.world')}</span>
-                </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <StatTile label={t('drv.position')} value={standing ? `P${standing.item.position}` : '—'} accent={standing?.item.position === 1} sub={standing?.classLabel ?? t('drv.world')} />
                 <StatTile label={t('drv.points')} value={standing ? formatPoints(standing.item.points) : '—'} sub={standing ? `${Math.round(share)}% ${t('drv.ofLeader')}` : undefined} />
-                <StatTile label={t('drv.wins')} value={wins} accent sub={winsList.slice(0, 3).map(shortGp).join(', ') || undefined} />
+                <StatTile label={t('drv.wins')} value={wins} accent={wins > 0} sub={winsList.slice(0, 2).map(shortGp).join(', ') || undefined} />
                 <StatTile label={t('drv.podiums')} value={stats ? stats.podiums : '—'} sub={stats ? t('drv.rate', { n: Math.round(stats.podiumRate * 100) }) : undefined} />
               </div>
             )}
@@ -193,7 +191,7 @@ export default function DriverPage() {
           {duel && mate && (duel.grid.total > 0 || duel.race.total > 0) && (
             <section className="px-margin mb-space-lg">
               <SectionTitle bar right={t('drv.vs', { name: shortName(mate.name) })}>{t('drv.duel')}</SectionTitle>
-              <div className="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-4 mt-2">
+              <div className="bg-asphalt border border-hairline rounded-lg p-space-md flex flex-col gap-4 mt-2">
                 <DuelBar title={t('drv.duelGrid')} mineName={driver.name} mateName={mate.name} mine={duel.grid.mine} theirs={duel.grid.theirs} total={duel.grid.total} />
                 <DuelBar title={t('drv.duelRace')} mineName={driver.name} mateName={mate.name} mine={duel.race.mine} theirs={duel.race.theirs} total={duel.race.total} />
               </div>
@@ -273,26 +271,17 @@ export default function DriverPage() {
 
           {/* BIOGRAFIA E TITULOS */}
           {(bio || titles.length > 0) && (
-            <section className="px-margin mb-space-lg">
-              <SectionTitle bar right={titles.length > 0 ? t('drv.titleCount', { n: countDriverTitles(titles) }) : undefined}>{t('drv.bio')}</SectionTitle>
-              {titles.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {titles.map((title) => (
-                    <span key={`${title.pt}-${title.years.join()}`} className="px-2.5 py-1.5 rounded-lg bg-surface-container-low border border-surface-border type-label-telemetry uppercase text-text-secondary">
-                      <span className="text-racing-red font-bold mr-1.5">{formatDriverTitleYears(title.years) || '—'}</span>
-                      {lang === 'en' ? title.en : title.pt}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {bio && <p className="type-body-md text-text-secondary mt-3 max-w-2xl">{lang === 'en' ? bio.en : bio.pt}</p>}
+            <section className="px-margin mb-space-lg space-y-4">
+              <SectionTitle>{t('drv.bio')}</SectionTitle>
+              {titles.length > 0 && <TitlesBlock titles={titles} lang={lang} />}
+              {bio && <BioCard text={lang === 'en' ? bio.en : bio.pt} />}
             </section>
           )}
 
           {/* EQUIPE */}
           {team && !championOnly && (
             <section className="px-margin mb-space-md">
-              <Link to={paths.team(category.id, team.id)} className="flex items-center gap-3 rounded-xl bg-surface-raised border border-surface-border p-space-md hover:bg-surface-overlay transition-colors">
+              <Link to={paths.team(category.id, team.id)} className="flex items-center gap-3 rounded-lg bg-asphalt border border-hairline p-space-md hover:bg-asphalt-alt transition-colors">
                 <Avatar src={team.badge} name={team.name} size={44} square fit="contain" />
                 <div className="min-w-0 flex-1">
                   <p className="type-label-telemetry uppercase text-text-muted">{t('drv.team')}</p>
@@ -303,6 +292,28 @@ export default function DriverPage() {
             </section>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+/** Placar de titulos: contador em destaque ao lado da lista de campeonatos com os anos (como no app). */
+function TitlesBlock({ titles, lang }: { titles: DriverTitle[]; lang: 'pt' | 'en' }) {
+  const { t } = useT();
+  return (
+    <div className="flex gap-3 items-stretch">
+      <div className="w-[104px] shrink-0 rounded-sm bg-primary-container flex flex-col items-center justify-center py-3 text-white">
+        <Trophy className="w-[26px] h-[26px]" />
+        <span className="type-display-hero text-[44px] leading-[48px]">{countDriverTitles(titles)}</span>
+        <span className="type-label-telemetry uppercase text-white/85">{t('drv.titles')}</span>
+      </div>
+      <div className="flex-1 min-w-0 rounded-lg bg-asphalt border border-hairline divide-y divide-hairline-soft overflow-hidden">
+        {titles.map((title) => (
+          <div key={`${title.pt}-${title.years.join()}`} className="px-3.5 py-2.5">
+            <p className="font-inter text-[16px] font-semibold text-on-surface">{lang === 'en' ? title.en : title.pt}</p>
+            {formatDriverTitleYears(title.years) && <p className="type-label-badge text-primary">{formatDriverTitleYears(title.years)}</p>}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -321,7 +332,7 @@ function Cell({ label, value, strong = false, tone }: { label: string; value: st
 
 function Tile({ icon, tag, value, label, red = false }: { icon: React.ReactNode; tag: string; value: string | number; label: string; red?: boolean }) {
   return (
-    <div className="bg-surface-container-low rounded-xl p-3 flex flex-col justify-between min-h-[96px]">
+    <div className="bg-asphalt border border-hairline rounded-lg p-3 flex flex-col justify-between min-h-[96px]">
       <div className="flex items-center justify-between text-text-muted">
         {icon}
         <span className="type-label-telemetry uppercase">{tag}</span>
