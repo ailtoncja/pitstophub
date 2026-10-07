@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, CalendarPlus, Cloud, CloudFog, CloudLightning, CloudRain, CloudSnow, Droplets, MapPin, Share2, Sun, Timer, Wind } from 'lucide-react';
 import { paths } from '../app/paths';
+import { HeroBackdrop, SkewBadge } from '../components/pit';
 import { useToast } from '../components/Toast';
-import { CountdownInline, EmptyState, ListGroup, Skeleton } from '../components/ui';
+import { CountdownPanel, EmptyState, ListGroup, Skeleton } from '../components/ui';
 import { getRaceCircuitInfo } from '../circuit-info';
 import { findCategoryDriver, raceKey } from '../lib/entities';
 import { useRaceResults } from '../lib/f1-hooks';
@@ -91,39 +92,49 @@ export default function RacePage() {
 
   return (
     <div className="flex flex-col w-full pb-10 page-in">
-      <div className="px-margin pt-space-sm pb-space-xs flex items-center justify-between">
-        <button type="button" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(paths.calendarOf(category.id)))} className="flex items-center gap-1.5 -ml-1 px-1 h-10 rounded-xl text-text-secondary hover:text-text-primary active:scale-95 transition-all">
+      <div className="px-margin pt-space-sm pb-space-xs">
+        <button type="button" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(paths.calendarOf(category.id)))} className="flex items-center gap-1.5 -ml-1 px-1 h-10 rounded-sm text-primary hover:text-white active:scale-95 transition-all">
           <ArrowLeft className="w-5 h-5" />
-          <span className="type-label-telemetry uppercase tracking-wider">{t('cir.calendar', { year: race.date.slice(0, 4) })}</span>
+          <span className="type-label-badge uppercase tracking-wider">{t('cir.calendar', { year: race.date.slice(0, 4) })}</span>
         </button>
-        <div className="flex items-center gap-2">
-          <button type="button" onClick={saveToCalendar} aria-label={t('cir.saveCalendar')} className="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-text-secondary hover:text-text-primary active:scale-90 transition-all">
-            <CalendarPlus className="w-[18px] h-[18px]" />
-          </button>
-          <button type="button" onClick={share} aria-label={t('cir.share')} className="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-text-secondary hover:text-text-primary active:scale-90 transition-all">
-            <Share2 className="w-[18px] h-[18px]" />
-          </button>
-        </div>
       </div>
 
-      {/* CABECALHO */}
-      <section className="px-margin pt-space-xs pb-space-md">
-        <div className="flex items-center gap-2 flex-wrap mb-2">
-          <span className="type-label-telemetry uppercase px-2 py-1 rounded bg-racing-red/15 text-racing-red tracking-wider">
+      {/* HERO */}
+      <section className="px-margin pb-space-md space-y-3">
+        <div className="relative h-[330px] sm:h-[380px] rounded-lg overflow-hidden border border-hairline">
+          <HeroBackdrop race={race} categoryName={category.name} />
+          <div className="absolute inset-x-0 bottom-0 p-5 space-y-2.5">
+            <SkewBadge>{upcoming ? t('cir.upcomingBadge') : t('cal.final')}</SkewBadge>
+            <h1 className="type-headline-lg text-[28px] leading-[34px] uppercase text-white line-clamp-3">{raceTitle(race, lang)}</h1>
+            <p className="flex items-start gap-2 type-label-badge text-on-surface-variant">
+              <MapPin className="w-4 h-4 shrink-0 mt-px" />
+              <span>{[race.circuit, racePlace(race, lang)].filter(Boolean).join(' • ')}</span>
+            </p>
+            {upcoming && timed && start.getTime() > Date.now() && (
+              <CountdownPanel target={start.getTime()} labels={{ d: t('unit.days'), h: t('unit.hours'), m: t('unit.minutes') }} />
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="type-label-badge uppercase px-2 py-1 rounded-sm bg-primary-container/15 text-primary tracking-wider">
             {t('cir.stage', { n: round })}{info ? ` • ${t('cir.laps', { n: info.laps })}` : ''}
           </span>
-          <span className="type-label-telemetry uppercase px-2 py-1 rounded bg-surface-container-high text-text-secondary tracking-wider">{category.name}</span>
-          {info && <span className="type-label-telemetry uppercase text-text-muted tracking-wider">{info.direction === 'clockwise' ? t('cir.clockwise') : t('cir.counterclockwise')}</span>}
+          <span className="type-label-badge uppercase px-2 py-1 rounded-sm bg-surface-container-high text-on-surface-variant tracking-wider">{category.name}</span>
+          {info && <span className="type-label-telemetry uppercase text-on-surface-variant tracking-wider">{info.direction === 'clockwise' ? t('cir.clockwise') : t('cir.counterclockwise')}</span>}
+          <span className="type-label-telemetry uppercase text-on-surface-variant tracking-wider">
+            {weekdayShort(start, lang)} {dayMonth(start, lang)}{timed ? ` • ${timeOf(start, lang)} ${timeZoneLabel(start)}` : ''}
+          </span>
         </div>
-        <h1 className="type-display-hero uppercase italic font-black tracking-tighter text-text-primary leading-[0.95]">{race.circuit}</h1>
-        <p className="flex items-center gap-1.5 type-body-md text-text-secondary mt-2">
-          <MapPin className="w-4 h-4 text-racing-red shrink-0" />
-          <span>{racePlace(race, lang)} • {raceTitle(race, lang)}</span>
-        </p>
-        <p className="type-label-telemetry uppercase text-text-muted mt-2 tracking-wider">
-          {weekdayShort(start, lang)} {dayMonth(start, lang)}{timed ? ` • ${timeOf(start, lang)} ${timeZoneLabel(start)}` : ''}
-        </p>
-        {upcoming && timed && start.getTime() > Date.now() && <CountdownInline target={start.getTime()} className="mt-1" />}
+
+        <div className="grid grid-cols-2 gap-3">
+          <button type="button" onClick={saveToCalendar} className="h-12 flex items-center justify-center gap-2 rounded-sm bg-surface-container-high border border-hairline text-on-surface type-label-badge uppercase tracking-wider hover:bg-surface-container-highest active:scale-[0.98] transition-all">
+            <CalendarPlus className="w-5 h-5 text-primary" /> {t('cir.saveCalendarShort')}
+          </button>
+          <button type="button" onClick={share} className="h-12 flex items-center justify-center gap-2 rounded-sm bg-surface-container-high border border-hairline text-on-surface type-label-badge uppercase tracking-wider hover:bg-surface-container-highest active:scale-[0.98] transition-all">
+            <Share2 className="w-5 h-5 text-primary" /> {t('cir.share')}
+          </button>
+        </div>
       </section>
 
       <div className="lg:grid lg:grid-cols-12 lg:gap-space-lg">
@@ -140,7 +151,7 @@ export default function RacePage() {
             <section className="px-margin">
               <BarTitle>{t('cir.layout')}</BarTitle>
               {info.trackImage && (
-                <div className="relative mt-2 rounded-xl bg-surface-container-lowest overflow-hidden aspect-[16/10] flex items-center justify-center">
+                <div className="relative mt-2 rounded-lg bg-asphalt border border-hairlineest overflow-hidden aspect-[16/10] flex items-center justify-center">
                   <img src={info.trackImage} alt={race.circuit} className="w-full h-full object-contain p-3" loading="lazy" />
                   {info.drsZones.length > 0 && (
                     <span className="absolute bottom-3 right-3 flex items-center gap-1.5 type-label-telemetry uppercase bg-surface-container-high/90 backdrop-blur px-2 py-1 rounded text-text-secondary">
@@ -154,7 +165,7 @@ export default function RacePage() {
                 <Spec label={t('cir.corners')} value={String(info.corners)} />
                 <Spec label={t('cir.distance')} value={info.raceDistanceKm.toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} unit="km" />
               </div>
-              <div className="flex items-center justify-between gap-3 mt-3 rounded-xl bg-surface-container-low p-3">
+              <div className="flex items-center justify-between gap-3 mt-3 rounded-lg bg-asphalt border border-hairline p-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <Timer className="w-6 h-6 text-text-muted shrink-0" />
                   <div className="min-w-0">
@@ -193,7 +204,7 @@ export default function RacePage() {
                 </>
               )}
               {info.drsZones.length > 0 && (
-                <div className="rounded-xl bg-surface-container-low p-3">
+                <div className="rounded-lg bg-asphalt border border-hairline p-3">
                   <p className="type-label-telemetry uppercase text-text-muted tracking-wider mb-1.5">{t('cir.drs')}</p>
                   <ul className="space-y-1">
                     {info.drsZones.map((zone, i) => (
@@ -202,7 +213,7 @@ export default function RacePage() {
                   </ul>
                 </div>
               )}
-              <div className="rounded-xl bg-surface-container-low p-3">
+              <div className="rounded-lg bg-asphalt border border-hairline p-3">
                 <p className="type-label-telemetry uppercase text-text-muted tracking-wider mb-1.5">{t('cir.tyres')}</p>
                 <p className="type-body-sm text-text-secondary">{lang === 'en' ? info.tyreStrategyNote.en : info.tyreStrategyNote.pt}</p>
               </div>
@@ -276,7 +287,7 @@ export default function RacePage() {
                 </>
               )}
               {results.status !== 'loading' && !results.data && (
-                <div className="mt-2 rounded-xl bg-surface-container-low p-4">
+                <div className="mt-2 rounded-lg bg-asphalt border border-hairline p-4">
                   <p className="type-label-telemetry uppercase text-text-muted tracking-wider">{t('cir.winner')}</p>
                   <p className="type-headline-sm uppercase text-text-primary mt-1">{race.winner ?? t('cir.noResult')}</p>
                 </div>
@@ -286,7 +297,7 @@ export default function RacePage() {
 
           {upcoming && (
             <section className="px-margin">
-              <button type="button" onClick={saveToCalendar} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-racing-red text-white type-label-badge uppercase tracking-wider glow-red active:scale-[0.98] transition-transform">
+              <button type="button" onClick={saveToCalendar} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-racing-red text-white type-label-badge uppercase tracking-wider glow-red active:scale-[0.98] transition-transform">
                 <CalendarPlus className="w-[18px] h-[18px]" />{t('cir.saveCalendar')}
               </button>
             </section>
@@ -320,7 +331,7 @@ function Spec({ label, value, unit }: { label: string; value: string; unit?: str
 
 function Highlight({ label, name, sub }: { label: string; name?: string; sub?: string }) {
   return (
-    <div className="rounded-xl bg-surface-container-low p-3 min-w-0">
+    <div className="rounded-lg bg-asphalt border border-hairline p-3 min-w-0">
       <p className="type-label-telemetry uppercase text-text-muted tracking-wider">{label}</p>
       <p className="type-body-md font-bold text-text-primary truncate mt-1">{name ?? '—'}</p>
       {sub && <p className="type-label-telemetry text-text-muted truncate">{sub}</p>}
@@ -334,7 +345,7 @@ function WeatherTiles({ weather }: { weather: RaceWeather }) {
   const rainTone = weather.rainChance >= 60 ? 'text-racing-red' : weather.rainChance >= 30 ? 'text-secondary' : 'text-tertiary';
   return (
     <div className="grid grid-cols-3 gap-2">
-      <div className="rounded-xl bg-surface-container-low p-3">
+      <div className="rounded-lg bg-asphalt border border-hairline p-3">
         <div className="flex items-center justify-between text-text-muted">
           <span className="type-label-telemetry uppercase tracking-wider">{t('cir.temp')}</span>
           <Icon className="w-4 h-4" />
@@ -342,7 +353,7 @@ function WeatherTiles({ weather }: { weather: RaceWeather }) {
         <p className="mt-1.5 leading-none"><span className="type-headline-lg font-black text-text-primary">{Math.round(weather.temperatureMax)}</span><span className="type-body-sm text-text-muted">°C</span></p>
         <p className="type-label-telemetry uppercase text-text-muted mt-1">{t(`cir.cond.${weather.condition}`)}</p>
       </div>
-      <div className="rounded-xl bg-surface-container-low p-3">
+      <div className="rounded-lg bg-asphalt border border-hairline p-3">
         <div className="flex items-center justify-between text-text-muted">
           <span className="type-label-telemetry uppercase tracking-wider">{t('cir.rain')}</span>
           <Droplets className="w-4 h-4" />
@@ -350,7 +361,7 @@ function WeatherTiles({ weather }: { weather: RaceWeather }) {
         <p className="mt-1.5 leading-none"><span className="type-headline-lg font-black text-text-primary">{Math.round(weather.rainChance)}</span><span className="type-body-sm text-text-muted">%</span></p>
         <p className={cn('type-label-telemetry uppercase mt-1', rainTone)}>{weather.rainChance >= 60 ? t('cir.rainHigh') : weather.rainChance >= 30 ? t('cir.rainMid') : t('cir.rainLow')}</p>
       </div>
-      <div className="rounded-xl bg-surface-container-low p-3">
+      <div className="rounded-lg bg-asphalt border border-hairline p-3">
         <div className="flex items-center justify-between text-text-muted">
           <span className="type-label-telemetry uppercase tracking-wider">{t('cir.wind')}</span>
           <Wind className="w-4 h-4" />
