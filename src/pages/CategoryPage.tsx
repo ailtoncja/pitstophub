@@ -1,18 +1,20 @@
 import { useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Bell, BellRing, CalendarDays, ChevronDown, Crown, ListOrdered, Check, Plus } from 'lucide-react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, CalendarDays, Crown, Heart, ListOrdered } from 'lucide-react';
 import { paths } from '../app/paths';
-import { useShell } from '../app/shell-context';
 import { DriverRow, TeamCard } from '../components/cards';
+import { BioCard, CutButton, HowItWorksCard } from '../components/pit';
 import { useToast } from '../components/Toast';
 import { EmptyState, ListGroup, PillStrip, SectionTitle, StatTile } from '../components/ui';
-import { completedRounds, groupOf, totalRounds } from '../lib/categories-meta';
+import { accentOf, completedRounds, groupOf, totalRounds } from '../lib/categories-meta';
+import { iconOfCategory } from '../lib/category-icons';
 import { driversOfTeam } from '../lib/entities';
 import { raceTitle, raceWhen } from '../lib/format';
 import { useT } from '../lib/i18n';
 import { nextRace, roundNumber } from '../lib/season';
 import { cn } from '../lib/utils';
 import { useCategory } from '../state/live-data';
+import { useSelectedCategory } from '../state/selected-category';
 import { useSettings } from '../state/settings';
 import { useScrollTopOn } from '../lib/hooks';
 
@@ -23,12 +25,12 @@ export default function CategoryPage() {
   useScrollTopOn(categoryId ?? '');
   const { t, lang } = useT();
   const toast = useToast();
-  const shell = useShell();
+  const navigate = useNavigate();
+  const { select } = useSelectedCategory();
   const settings = useSettings();
   const category = useCategory(categoryId);
   const [classFilter, setClassFilter] = useState('all');
   const [showAllDrivers, setShowAllDrivers] = useState(false);
-  const [openRule, setOpenRule] = useState<number | null>(null);
 
   const classes = useMemo(() => Array.from(new Set((category?.teams ?? []).map((team) => team.class).filter((c): c is string => Boolean(c)))), [category]);
 
@@ -55,69 +57,91 @@ export default function CategoryPage() {
     }
   };
 
+  const accent = accentOf(category.id);
+  const Icon = iconOfCategory(category.id);
+  const open = (to: string) => {
+    select(category.id);
+    navigate(to);
+  };
+
   return (
     <div className="flex flex-col w-full px-margin pb-10 gap-space-lg page-in">
-      <div className="flex items-center justify-between pt-space-sm">
-        <Link to={paths.categories} className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary py-1">
+      <div className="pt-space-sm">
+        <Link to={paths.categories} className="inline-flex items-center gap-2 text-primary hover:text-white py-1">
           <ArrowLeft className="w-[18px] h-[18px]" />
-          <span className="type-label-telemetry uppercase tracking-wider">{t('nav.categories')}</span>
+          <span className="type-label-badge uppercase tracking-wider">{t('nav.categories')}</span>
         </Link>
-        <div className="flex items-center gap-2">
-          <button type="button" onClick={shell.openAlerts} aria-label={t('app.notifications')} className={cn('w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center active:scale-95 transition-all', following ? 'text-racing-red' : 'text-text-secondary')}>
-            {following ? <BellRing className="w-[18px] h-[18px]" /> : <Bell className="w-[18px] h-[18px]" />}
-          </button>
-          <button type="button" onClick={toggleFollow} aria-pressed={following} className={cn('px-3 h-9 rounded-xl type-label-badge uppercase flex items-center gap-1.5 active:scale-95 transition-all', following ? 'bg-surface-overlay text-racing-red' : 'bg-racing-red text-white')}>
-            {following ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
-            {following ? t('common.following') : t('common.follow')}
-          </button>
-        </div>
       </div>
 
-      <header className="flex flex-col gap-1">
-        <span className="type-label-telemetry uppercase tracking-widest text-racing-red font-semibold">{group?.label[lang] ?? t('nav.categories')}</span>
-        <h1 className="type-display-hero uppercase text-text-primary">{category.name}</h1>
-        <p className="type-body-lg text-text-secondary">{lang === 'en' ? category.enFullName ?? category.fullName : category.fullName}</p>
-        {short && <p className="type-body-md text-text-muted mt-1 max-w-2xl">{short}</p>}
+      {/* HERO */}
+      <header className="relative overflow-hidden rounded-lg border border-hairline" style={{ background: `linear-gradient(135deg, ${accent}73 0%, #15151e 55%, #000 100%)` }}>
+        <div className="absolute inset-0 carbon-lines" aria-hidden />
+        <div className="relative p-5 space-y-2.5">
+          <div className="flex items-start gap-3">
+            <div className="flex-1 min-w-0 space-y-1.5">
+              <p className="type-label-badge uppercase tracking-widest" style={{ color: accent }}>{group?.label[lang] ?? t('nav.categories')}</p>
+              <h1 className="type-headline-lg text-[34px] leading-9 uppercase text-white">{category.name}</h1>
+              <p className="type-body-md text-on-surface-variant">{lang === 'en' ? category.enFullName ?? category.fullName : category.fullName}</p>
+            </div>
+            <span className="w-14 h-14 rounded-sm flex items-center justify-center shrink-0 border" style={{ backgroundColor: `${accent}33`, borderColor: `${accent}80` }}>
+              <Icon className="w-[30px] h-[30px]" style={{ color: accent }} />
+            </span>
+          </div>
+          {short && <p className="type-body-sm text-on-surface max-w-2xl">{short}</p>}
+          <div className="flex items-center gap-3 pt-1">
+            <button
+              type="button"
+              onClick={toggleFollow}
+              aria-pressed={following}
+              aria-label={following ? t('common.following') : t('common.follow')}
+              className={cn('w-10 h-10 rounded-sm flex items-center justify-center border active:scale-95 transition-all', following ? 'bg-primary-container/20 border-primary-container/60 text-primary' : 'bg-surface-container-high border-hairline text-on-surface-variant hover:text-white')}
+            >
+              <Heart className={cn('w-5 h-5', following && 'fill-current')} />
+            </button>
+            <span className="type-label-badge uppercase text-on-surface-variant">{following ? t('hub.following') : t('hub.followHint')}</span>
+          </div>
+        </div>
       </header>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-gutter">
-        <div className="rounded-xl bg-surface-container-low p-3"><StatTile label={t('cat.teams')} value={category.teams.length || '—'} /></div>
-        <div className="rounded-xl bg-surface-container-low p-3"><StatTile label={t('cat.drivers')} value={category.drivers.length || '—'} /></div>
-        <div className="rounded-xl bg-surface-container-low p-3"><StatTile label={t('cat.rounds')} value={totalRounds(category) || '—'} /></div>
-        <div className="rounded-xl bg-surface-container-low p-3"><StatTile label={t('cat.completed')} value={completedRounds(category)} accent /></div>
+      {rules.length > 0 && <HowItWorksCard to={paths.rules(category.id)} title={t('rules.entryTitle')} subtitle={t('rules.entrySubtitle', { name: category.name })} />}
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <StatTile label={t('cat.teams')} value={category.teams.length || '—'} />
+        <StatTile label={t('cat.drivers')} value={category.drivers.length || '—'} />
+        <StatTile label={t('cat.rounds')} value={totalRounds(category) || '—'} />
+        <StatTile label={t('cat.completed')} value={completedRounds(category)} accent />
       </div>
 
-      <div className="grid grid-cols-2 gap-space-sm">
-        <Link to={paths.calendarOf(category.id)} className="h-11 flex items-center justify-center gap-2 rounded-lg bg-surface-container text-text-primary type-label-badge uppercase tracking-wider hover:bg-surface-variant transition-all">
-          <CalendarDays className="w-4 h-4" /> {t('nav.calendar')}
-        </Link>
-        <Link to={paths.standingsOf(category.id)} className="h-11 flex items-center justify-center gap-2 rounded-lg bg-surface-container text-text-primary type-label-badge uppercase tracking-wider hover:bg-surface-variant transition-all">
-          <ListOrdered className="w-4 h-4" /> {t('nav.standings')}
-        </Link>
+      <div className="grid grid-cols-2 gap-3">
+        <button type="button" onClick={() => open(paths.calendar)} className="h-12 flex items-center justify-center gap-2 rounded-sm bg-surface-container-high border border-hairline text-on-surface type-label-badge uppercase tracking-wider hover:bg-surface-container-highest transition-colors">
+          <CalendarDays className="w-5 h-5 text-primary" /> {t('nav.calendar')}
+        </button>
+        <button type="button" onClick={() => open(paths.standings)} className="h-12 flex items-center justify-center gap-2 rounded-sm bg-surface-container-high border border-hairline text-on-surface type-label-badge uppercase tracking-wider hover:bg-surface-container-highest transition-colors">
+          <ListOrdered className="w-5 h-5 text-primary" /> {t('nav.standings')}
+        </button>
         {category.id === 'f1' && (
-          <Link to={paths.champions} className="col-span-2 h-11 flex items-center justify-center gap-2 rounded-lg bg-racing-red text-white type-headline-sm uppercase tracking-wide active:scale-[0.98] transition-all">
+          <CutButton to={paths.champions} className="col-span-2 w-full">
             <Crown className="w-4 h-4" /> {t('cat.champions')}
-          </Link>
+          </CutButton>
         )}
       </div>
 
       {next && (
-        <section>
-          <SectionTitle bar>{t('home.nextStart')}</SectionTitle>
-          <Link to={paths.race(category.id, next.id)} className="mt-2 block rounded-xl bg-surface-overlay border border-racing-red/60 glow-red p-space-md hover:bg-surface-raised transition-colors">
-            <p className="type-label-telemetry uppercase text-racing-red font-semibold">{t('home.round', { n: roundNumber(category.calendar, next) })}</p>
-            <h3 className="type-headline-md uppercase text-text-primary mt-1">{raceTitle(next, lang)}</h3>
-            <p className="type-body-sm text-text-muted mt-0.5">{[next.circuit, raceWhen(next, lang)].filter(Boolean).join(' • ')}</p>
+        <section className="space-y-3">
+          <SectionTitle>{t('home.nextRace')}</SectionTitle>
+          <Link to={paths.race(category.id, next.id)} className="block rounded-lg bg-asphalt border border-primary/40 p-4 hover:bg-asphalt-alt transition-colors">
+            <p className="type-label-badge uppercase text-primary">{t('home.round', { n: roundNumber(category.calendar, next) })}</p>
+            <h3 className="type-headline-md uppercase text-white mt-1 line-clamp-2">{raceTitle(next, lang)}</h3>
+            <p className="type-label-badge text-on-surface-variant mt-1">{[next.circuit, raceWhen(next, lang)].filter(Boolean).join(' • ')}</p>
           </Link>
         </section>
       )}
 
       <div className="lg:grid lg:grid-cols-12 lg:gap-space-lg space-y-space-lg lg:space-y-0">
-        <section className="lg:col-span-7">
-          <SectionTitle bar right={t('cat.count', { n: teams.length })}>{t('cat.teams')}</SectionTitle>
+        <section className="lg:col-span-7 space-y-3">
+          <SectionTitle right={t('cat.count', { n: teams.length })}>{t('cat.teams')}</SectionTitle>
           {classes.length > 1 && (
             <PillStrip
-              className="mt-1"
               tone="quiet"
               options={[{ value: 'all', label: t('home.all') }, ...classes.map((c) => ({ value: c, label: c }))]}
               value={classFilter}
@@ -125,9 +149,9 @@ export default function CategoryPage() {
             />
           )}
           {teams.length === 0 ? (
-            <p className="type-body-sm text-text-muted py-4">{t('cat.noTeams')}</p>
+            <p className="type-body-sm text-on-surface-variant py-4">{t('cat.noTeams')}</p>
           ) : (
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 mt-2">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 items-start">
               {teams.map((team) => (
                 <TeamCard key={team.id} category={category} team={team} drivers={driversOfTeam(category, team)} />
               ))}
@@ -135,20 +159,20 @@ export default function CategoryPage() {
           )}
         </section>
 
-        <section className="lg:col-span-5">
-          <SectionTitle bar right={t('cat.count', { n: category.drivers.length })}>{t('cat.drivers')}</SectionTitle>
+        <section className="lg:col-span-5 space-y-3">
+          <SectionTitle right={t('cat.count', { n: category.drivers.length })}>{t('cat.drivers')}</SectionTitle>
           {category.drivers.length === 0 ? (
-            <p className="type-body-sm text-text-muted py-4">{t('cat.noDrivers')}</p>
+            <p className="type-body-sm text-on-surface-variant py-4">{t('cat.noDrivers')}</p>
           ) : (
             <>
-              <ListGroup className="mt-2">
+              <ListGroup>
                 {drivers.map((driver) => (
                   <DriverRow key={driver.id} category={category} driver={driver} team={category.teams.find((team) => team.id === driver.teamId)} />
                 ))}
               </ListGroup>
               {category.drivers.length > DRIVERS_PREVIEW && (
-                <button type="button" onClick={() => setShowAllDrivers((v) => !v)} className="w-full mt-2 py-2.5 rounded-lg text-text-muted hover:text-text-primary type-label-badge uppercase tracking-wider transition-all">
-                  {showAllDrivers ? t('common.showLess') : t('st.showAll', { n: category.drivers.length })}
+                <button type="button" onClick={() => setShowAllDrivers((v) => !v)} className="w-full py-3 rounded-sm border border-outline-variant text-on-surface-variant hover:text-white type-label-badge uppercase tracking-wider transition-colors">
+                  {showAllDrivers ? t('common.showLess') : t('hub.showAllDrivers', { n: category.drivers.length })}
                 </button>
               )}
             </>
@@ -156,26 +180,10 @@ export default function CategoryPage() {
         </section>
       </div>
 
-      {(description || rules.length > 0) && (
-        <section className="space-y-space-sm">
-          <SectionTitle bar>{t('cat.about')}</SectionTitle>
-          {description && <p className="type-body-md text-text-secondary max-w-3xl">{description}</p>}
-          {rules.length > 0 && (
-            <div className="rounded-xl bg-surface-container-low divide-y divide-surface-container-high overflow-hidden max-w-3xl">
-              {rules.map((rule, index) => {
-                const open = openRule === index;
-                return (
-                  <div key={rule.title}>
-                    <button type="button" onClick={() => setOpenRule(open ? null : index)} aria-expanded={open} className="w-full flex items-center justify-between gap-3 px-space-md py-3.5 text-left">
-                      <span className="type-headline-sm uppercase text-text-primary">{lang === 'en' ? rule.enTitle ?? rule.title : rule.title}</span>
-                      <ChevronDown className={cn('w-4 h-4 text-text-muted transition-transform shrink-0', open && 'rotate-180')} />
-                    </button>
-                    {open && <p className="px-space-md pb-4 type-body-md text-text-secondary">{lang === 'en' ? rule.enBody ?? rule.body : rule.body}</p>}
-                  </div>
-                );
-              })}
-            </div>
-          )}
+      {description && (
+        <section className="space-y-3 max-w-3xl">
+          <SectionTitle>{t('cat.about')}</SectionTitle>
+          <BioCard text={description} />
         </section>
       )}
     </div>
