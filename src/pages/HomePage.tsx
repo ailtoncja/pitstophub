@@ -111,7 +111,7 @@ export default function HomePage() {
                     <div className="inline-flex rounded-sm bg-black/55 backdrop-blur-sm border border-hairline overflow-hidden max-w-full">
                       <span className="w-1 bg-primary shrink-0" aria-hidden />
                       <div className="px-4 py-3 min-w-0">
-                        <p className="type-label-badge uppercase text-tertiary">{t('home.winner')}</p>
+                        <p className="type-label-badge uppercase text-silver">{t('home.winner')}</p>
                         <p className="type-telemetry-counter text-[20px] text-white leading-6 truncate">{race.winner}</p>
                       </div>
                     </div>

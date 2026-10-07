@@ -66,7 +66,7 @@ export function SearchSheet({ open, onClose }: { open: boolean; onClose: () => v
 
   return (
     <Sheet open={open} onClose={onClose} title={t('search.title')} closeLabel={t('common.close')}>
-      <label className="flex items-center gap-2 rounded-xl bg-surface-container-lowest border border-surface-border px-3.5 focus-within:border-racing-red/60 transition-colors">
+      <label className="flex items-center gap-2 rounded-lg bg-asphaltest border border-hairline px-3.5 focus-within:border-racing-red/60 transition-colors">
         <Search className="w-[18px] h-[18px] text-text-muted shrink-0" />
         <input
           ref={inputRef}
@@ -86,7 +86,7 @@ export function SearchSheet({ open, onClose }: { open: boolean; onClose: () => v
         ) : hits.length === 0 ? (
           <p className="type-body-sm text-text-muted text-center py-6">{t('search.empty', { q: query.trim() })}</p>
         ) : (
-          <ul className="divide-y divide-surface-container-high rounded-xl bg-surface-container-low overflow-hidden">
+          <ul className="divide-y divide-surface-container-high rounded-lg bg-asphalt overflow-hidden">
             {hits.map((hit) => {
               const Icon = ICONS[hit.kind];
               return (

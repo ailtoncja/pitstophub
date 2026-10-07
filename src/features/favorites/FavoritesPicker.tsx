@@ -53,11 +53,11 @@ export function FavoritesPicker() {
         </div>
         <p className="type-body-sm text-text-muted mb-3">{t('fav.priorityDesc')}</p>
         {entries.length === 0 ? (
-          <div className="p-5 rounded-xl border border-dashed border-surface-border type-body-sm text-text-muted text-center">{t('fav.none')}</div>
+          <div className="p-5 rounded-lg border border-dashed border-hairline type-body-sm text-text-muted text-center">{t('fav.none')}</div>
         ) : (
           <ol className="space-y-2">
             {entries.map((entry, index) => (
-              <li key={entry.key} className="flex items-center gap-3 p-2.5 rounded-xl bg-surface-container-low">
+              <li key={entry.key} className="flex items-center gap-3 p-2.5 rounded-lg bg-asphalt">
                 <span className="w-6 h-6 shrink-0 rounded-full bg-surface-container-high flex items-center justify-center type-label-telemetry font-bold text-text-muted">{index + 1}</span>
                 <Avatar src={entry.image} name={entry.name} size={36} square={entry.kind === 'team'} fit={entry.kind === 'team' ? 'contain' : 'cover'} />
                 <div className="min-w-0 flex-1">
@@ -87,7 +87,7 @@ export function FavoritesPicker() {
               category.teams.filter((x) => settings.isFollowingTeam(category.id, x.id)).length +
               category.drivers.filter((x) => settings.isFollowingDriver(category.id, x.id)).length;
             return (
-              <div key={category.id} className="rounded-xl bg-surface-container-low overflow-hidden">
+              <div key={category.id} className="rounded-lg bg-asphalt overflow-hidden">
                 <div className="flex items-center gap-3 px-3.5 py-3">
                   <button type="button" onClick={() => setOpenId(open ? null : category.id)} aria-expanded={open} className="flex items-center gap-3 min-w-0 flex-1 text-left">
                     <span className="w-[3px] h-6 rounded-full shrink-0" style={{ backgroundColor: accentOf(category.id) }} aria-hidden />
@@ -110,7 +110,7 @@ export function FavoritesPicker() {
                   </button>
                 </div>
                 {open && (
-                  <div className="px-3.5 pb-4 pt-3 space-y-4 border-t border-surface-border">
+                  <div className="px-3.5 pb-4 pt-3 space-y-4 border-t border-hairline">
                     {category.teams.length > 0 && (
                       <div>
                         <p className="type-label-telemetry uppercase tracking-wider text-text-muted mb-2">{t('fav.teams')}</p>

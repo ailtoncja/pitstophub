@@ -99,6 +99,30 @@ export function PillStrip<T extends string>({
   className?: string;
   tone?: 'red' | 'quiet';
 }) {
+  if (tone === 'quiet') {
+    return (
+      <div className={cn('flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-margin px-margin whitespace-nowrap', className)} role="tablist">
+        {options.map((option) => {
+          const active = option.value === value;
+          return (
+            <button
+              key={option.value}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => onChange(option.value)}
+              className={cn(
+                'shrink-0 px-3.5 py-2 rounded-sm type-label-badge uppercase tracking-wider border transition-colors active:scale-95',
+                active ? 'bg-primary-container text-on-primary-container border-primary-container' : 'bg-surface-container-high text-on-surface-variant border-hairline hover:text-white',
+              )}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
   return (
     <div className={cn('flex items-center gap-3 overflow-x-auto no-scrollbar py-1.5 pr-2 -mx-margin px-margin whitespace-nowrap', className)} role="tablist">
       {options.map((option) => {
@@ -112,11 +136,7 @@ export function PillStrip<T extends string>({
             onClick={() => onChange(option.value)}
             className={cn(
               'shrink-0 inline-flex items-center gap-2 px-4 py-2 type-headline-sm uppercase transition-colors active:scale-95',
-              active
-                ? 'cut-corner [--cut:12px] bg-primary text-on-primary'
-                : tone === 'red'
-                  ? 'rounded-sm bg-surface-container-highest text-on-surface border border-hairline hover:bg-surface-bright'
-                  : 'rounded-sm text-on-surface-variant hover:text-white',
+              active ? 'cut-corner [--cut:12px] bg-primary text-on-primary' : 'rounded-sm bg-surface-container-highest text-on-surface border border-hairline hover:bg-surface-bright',
             )}
           >
             {Icon && <Icon className="w-5 h-5" style={{ color: active ? undefined : option.accent }} />}
@@ -124,10 +144,10 @@ export function PillStrip<T extends string>({
             {option.label}
           </button>
         );
-        return active ? (
-          <span key={option.value} className="shrink-0 inline-flex" style={{ filter: 'drop-shadow(3px 3px 0 #e10600)' }}>{chip}</span>
-        ) : (
-          <span key={option.value} className="shrink-0 inline-flex">{chip}</span>
+        return (
+          <span key={option.value} className="shrink-0 inline-flex" style={active ? { filter: 'drop-shadow(3px 3px 0 #e10600)' } : undefined}>
+            {chip}
+          </span>
         );
       })}
     </div>
@@ -226,7 +246,7 @@ export function CountdownPanel({ target, labels }: { target: number; labels: { d
   const unit = (value: number, label: string) => (
     <div className="flex flex-col items-center">
       <span className="type-telemetry-counter text-white leading-none">{pad2(value)}</span>
-      <span className="type-label-telemetry uppercase text-tertiary mt-1.5">{label}</span>
+      <span className="type-label-telemetry uppercase text-silver mt-1.5">{label}</span>
     </div>
   );
   const colon = <span className="type-telemetry-counter text-primary animate-pulse self-start" aria-hidden>:</span>;

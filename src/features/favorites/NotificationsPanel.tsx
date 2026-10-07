@@ -74,7 +74,7 @@ export function NotificationsPanel() {
   const subscribed = status === 'subscribed';
 
   return (
-    <div className="rounded-xl bg-surface-container-low p-space-md">
+    <div className="rounded-lg bg-asphalt p-space-md">
       <div className="flex items-center gap-3">
         <div className={cn('w-11 h-11 rounded-lg shrink-0 flex items-center justify-center', subscribed ? 'bg-racing-red/15 text-racing-red' : 'bg-surface-container-high text-text-muted')}>
           {subscribed ? <BellRing className="w-5 h-5" /> : <Bell className="w-5 h-5" />}
@@ -84,7 +84,7 @@ export function NotificationsPanel() {
           <p className="type-body-sm text-text-muted">{hint}</p>
         </div>
         {status === 'unsupported' || status === 'ios' ? null : subscribed ? (
-          <button type="button" onClick={() => void disable()} className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg border border-surface-border text-text-secondary hover:text-racing-red type-label-telemetry uppercase tracking-wider transition-colors">
+          <button type="button" onClick={() => void disable()} className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg border border-hairline text-text-secondary hover:text-racing-red type-label-telemetry uppercase tracking-wider transition-colors">
             <BellOff className="w-3.5 h-3.5" />{t('notif.disable')}
           </button>
         ) : (
@@ -95,7 +95,7 @@ export function NotificationsPanel() {
       </div>
 
       {subscribed && (
-        <div className="mt-4 pt-4 border-t border-surface-border space-y-3">
+        <div className="mt-4 pt-4 border-t border-hairline space-y-3">
           <div className="grid grid-cols-2 gap-2">
             {PREF_ROWS.map((row) => (
               <button
