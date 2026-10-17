@@ -146,7 +146,7 @@ function ReelCard({ item, index, active, next, setRef, onNext }: { item: ReelIte
   return (
     <article ref={setRef} data-index={index} className="reel-item relative shrink-0" aria-label={`${category.name}: ${title}`}>
       <div className="absolute inset-0 overflow-hidden">
-        <ReelBackdrop race={race} categoryId={category.id} eager={index < 2} label={category.name} />
+        <ReelBackdrop race={race} categoryId={category.id} eager={index < 2} art="car" />
       </div>
 
       {/* Legenda ancorada embaixo, a esquerda */}

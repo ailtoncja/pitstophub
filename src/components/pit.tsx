@@ -9,17 +9,26 @@ import { MOTORSPORT_DATA, type Race } from '../types';
 
 // Peças do "Reel": campo de cor da categoria, mídia sangrando até a borda e etiquetas de estado.
 
+// Desenho do carro de cada serie (arte branca com transparencia em public/cars, tingida pelo tom da categoria).
 const CAR_ART: Record<string, string> = {
-  OpenWheelCar: '/icons/categories/car-openwheel.png',
-  Hypercar: '/icons/categories/car-hypercar.png',
-  GtCar: '/icons/categories/car-gt3.png',
-  RallyCar: '/icons/categories/car-rally.png',
-  StockCar: '/icons/categories/car-stockcar.png',
+  f1: '/cars/indy.webp',
+  f2: '/cars/indy.webp',
+  f3: '/cars/indy.webp',
+  'f1-academy': '/cars/indy.webp',
+  indy: '/cars/indy.webp',
+  nascar: '/cars/nascar.webp',
+  wrc: '/cars/wrc.webp',
+  dtm: '/cars/dtm.webp',
+  wec: '/cars/gt3-hyper.webp',
+  imsa: '/cars/gt3-hyper.webp',
+  'gtwc-europe': '/cars/gt3.webp',
+  'gtwc-america': '/cars/gt3.webp',
+  'gtwc-asia': '/cars/gt3.webp',
+  'endurance-brasil': '/cars/gt3.webp',
 };
 
 export function carArtOf(categoryId: string): string | undefined {
-  const icon = MOTORSPORT_DATA.find((category) => category.id === categoryId)?.icon;
-  return icon ? CAR_ART[icon] : undefined;
+  return CAR_ART[categoryId] ?? (MOTORSPORT_DATA.some((category) => category.id === categoryId) ? '/cars/gt3.webp' : undefined);
 }
 
 /** Etiqueta de estado da largada: ao vivo (ponto vermelho), a confirmar, temporada encerrada. Sem caixa colorida. */
@@ -33,8 +42,8 @@ export function StatusTag({ live = false, children, className }: { live?: boolea
 }
 
 /**
- * Campo do reel: o tom da categoria tinge só o fundo; a mídia é o mapa do circuito quando existe e, senão,
- * a silhueta do carro da categoria. Um véu preto embaixo carrega o texto.
+ * Campo do reel: o tom da categoria tinge o fundo e o desenho do carro da serie. Com `art="track"` (paginas de corrida
+ * e calendario) usa o mapa do circuito quando existe. Um veu preto embaixo carrega o texto.
  */
 export function ReelBackdrop({
   race,
@@ -42,69 +51,49 @@ export function ReelBackdrop({
   hue: hueOverride,
   bare = false,
   eager = false,
-  label,
+  art = 'track',
   className,
 }: {
   race?: Race | null;
   categoryId: string;
   /** Tom do campo quando nao e o da categoria (ex.: cor da equipe na pagina do piloto). */
   hue?: string;
-  /** Sem mapa nem silhueta: so o campo e o veu (paginas que trazem a propria foto). */
+  /** Sem mapa nem carro: so o campo e o veu (paginas que trazem a propria foto). */
   bare?: boolean;
-  /** Carrega o mapa ja (os dois primeiros itens do reel: o seguinte precisa estar pronto quando aparece embaixo). */
+  /** Carrega a arte ja (os dois primeiros itens do reel: o seguinte precisa estar pronto quando aparece embaixo). */
   eager?: boolean;
-  /** Sem mapa da pista: o nome da serie em tamanho grande, atras do carro (so no reel). */
-  label?: string;
+  /** "car" sempre mostra o carro da serie (Inicio); "track" prefere o mapa do circuito. */
+  art?: 'car' | 'track';
   className?: string;
 }) {
   const hue = hueOverride ?? accentOf(categoryId);
-  const track = useMemo(() => (race && !bare ? getRaceCircuitInfo(race)?.trackImage : undefined), [race, bare]);
+  const track = useMemo(() => (race && !bare && art === 'track' ? getRaceCircuitInfo(race)?.trackImage : undefined), [race, bare, art]);
   const car = bare ? undefined : carArtOf(categoryId);
   return (
-    <div className={cn('absolute inset-0 overflow-hidden bg-black', className)} style={{ containerType: 'inline-size' }} aria-hidden>
+    <div className={cn('absolute inset-0 overflow-hidden bg-black', className)} aria-hidden>
       <div className="absolute inset-0" style={{ background: `radial-gradient(120% 80% at 75% 8%, color-mix(in oklab, ${hue} 46%, #000) 0%, color-mix(in oklab, ${hue} 18%, #000) 46%, #000 82%)` }} />
       {track ? (
         <img src={track} alt="" className="absolute top-[7%] inset-x-0 mx-auto h-[50%] w-[92%] object-contain" loading={eager ? 'eager' : 'lazy'} />
-      ) : car && label ? (
+      ) : car ? (
         <>
-          <span
-            className="absolute top-[12%] left-5 right-5 font-extrabold leading-[0.9] tracking-[-0.05em] whitespace-nowrap select-none"
-            style={{ fontSize: `min(8.5rem, ${(86 / (label.length * 0.68)).toFixed(1)}cqw)`, color: 'transparent', WebkitTextStroke: `1.5px color-mix(in oklab, ${hue} 60%, #fff)`, opacity: 0.45 }}
-          >
-            {label}
-          </span>
+          {/* pre-carrega a arte (mask-image nao tem loading="eager") */}
+          {eager && <link rel="preload" as="image" href={car} />}
           <div
-            className="absolute top-[24%] right-5 w-[58%] max-w-[17rem] aspect-[2/1]"
+            className="absolute top-[5%] inset-x-0 mx-auto w-[96%] max-w-[46rem] aspect-[1672/941]"
             style={{
-              backgroundColor: `color-mix(in oklab, ${hue} 65%, #fff)`,
-              opacity: 0.55,
+              backgroundColor: `color-mix(in oklab, ${hue} 30%, #fff)`,
+              opacity: 0.8,
               WebkitMaskImage: `url(${car})`,
               maskImage: `url(${car})`,
               WebkitMaskSize: 'contain',
               maskSize: 'contain',
               WebkitMaskRepeat: 'no-repeat',
               maskRepeat: 'no-repeat',
-              WebkitMaskPosition: 'right center',
-              maskPosition: 'right center',
+              WebkitMaskPosition: 'center',
+              maskPosition: 'center',
             }}
           />
         </>
-      ) : car ? (
-        <div
-          className="absolute top-[12%] right-[-6%] w-[96%] aspect-[2.2/1]"
-          style={{
-            backgroundColor: `color-mix(in oklab, ${hue} 70%, #fff)`,
-            opacity: 0.34,
-            WebkitMaskImage: `url(${car})`,
-            maskImage: `url(${car})`,
-            WebkitMaskSize: 'contain',
-            maskSize: 'contain',
-            WebkitMaskRepeat: 'no-repeat',
-            maskRepeat: 'no-repeat',
-            WebkitMaskPosition: 'right center',
-            maskPosition: 'right center',
-          }}
-        />
       ) : null}
       <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #000 0%, rgba(0,0,0,0.88) 26%, rgba(0,0,0,0.35) 52%, transparent 70%)' }} />
     </div>
