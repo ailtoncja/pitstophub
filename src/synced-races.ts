@@ -64,7 +64,7 @@ export async function fetchSyncedCalendar(categoryId: string, force = false): Pr
 export function mergeCategoryWithSyncedCalendar(category: Category, calendar: Race[] | null): Category {
   if (!calendar || calendar.length === 0) return category;
   const synced = calendar.map((race) =>
-    normalizeRaceWinner(preferOfficialWinner(category, race), category)
+    normalizeRaceWinner(preferOfficialWinner(category, nameFromCatalog(category, race)), category)
   );
   return {
     ...category,
@@ -73,6 +73,21 @@ export function mergeCategoryWithSyncedCalendar(category: Category, calendar: Ra
       fillMissingOfficialRaces(category, synced)
     ).map((race) => normalizeRaceWinner(race, category)),
   };
+}
+
+// A TheSportsDB agrupa os eventos de um fim de semana e, quando nao escolhe um nome, a rotina diaria grava
+// "Rodada 7". Esse nome nao diz nada na tela (e vira o titulo grande da Inicio): usa o nome do catalogo para a
+// mesma data e, sem ele, o local da etapa.
+const GENERIC_ROUND_NAME = /^(rodada|round)\s*\d+$/i;
+
+export function nameFromCatalog(category: Category, race: Race): Race {
+  if (!GENERIC_ROUND_NAME.test(race.name.trim())) return race;
+  const base = category.calendar.find((item) => item.date === race.date && !GENERIC_ROUND_NAME.test(item.name.trim()));
+  if (base) {
+    return { ...race, name: base.name, enName: base.enName ?? base.name, location: race.location || base.location, enLocation: race.enLocation ?? base.enLocation, circuit: race.circuit || base.circuit };
+  }
+  const place = race.location || race.circuit;
+  return place ? { ...race, name: place, enName: race.enLocation || place } : race;
 }
 
 // WEC/IMSA: a TheSportsDB devolve "equipe #carro" (e as vezes o carro errado,
