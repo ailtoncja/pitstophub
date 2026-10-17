@@ -117,8 +117,8 @@ export default function AuthGate({ children }: { children: ReactNode }) {
     [user],
   );
 
-  const inputClass = 'w-full rounded-lg border border-hairline bg-asphaltest px-4 py-3 type-body-md text-text-primary placeholder:text-text-muted outline-none focus:border-racing-red/70 focus:ring-2 focus:ring-racing-red/20 transition';
-  const labelClass = 'block type-label-telemetry uppercase tracking-widest text-text-muted mb-2';
+  const inputClass = 'w-full rounded-xl border border-hairline bg-asphalt px-4 py-3 type-body-md text-text-primary placeholder:text-text-muted outline-none focus:border-white focus:ring-2 focus:ring-white/20 transition';
+  const labelClass = 'block type-label-telemetry text-text-muted mb-2';
 
   return (
     <AuthContext.Provider value={context}>
@@ -127,7 +127,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
       <AnimatePresence>
         {authOpen && (
           <motion.div className="fixed inset-0 z-[250] flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}>
-            <button type="button" className="absolute inset-0 bg-black/70 backdrop-blur-sm cursor-default" onClick={closeAuth} aria-label={t('common.close')} />
+            <button type="button" className="absolute inset-0 bg-black/75 cursor-default" onClick={closeAuth} aria-label={t('common.close')} />
 
             <motion.div
               role="dialog"
@@ -145,11 +145,11 @@ export default function AuthGate({ children }: { children: ReactNode }) {
 
               <div className="mb-6 text-center">
                 <img src="/icons/icon-192.png" alt="" className="w-14 h-14 object-contain mx-auto mb-2" />
-                <h1 id="auth-title" className="type-headline-lg italic font-black uppercase tracking-tight text-text-primary">PitStopHub</h1>
+                <h1 id="auth-title" className="type-headline-lg text-text-primary">PitStopHub</h1>
                 <p className="type-body-sm text-text-muted mt-1">{mode === 'login' ? t('auth.titleLogin') : t('auth.titleRegister')}</p>
               </div>
 
-              <div className="grid grid-cols-2 bg-asphaltest rounded-lg p-1 mb-6" role="tablist">
+              <div className="grid grid-cols-2 bg-asphalt rounded-lg p-1 mb-6" role="tablist">
                 {(['login', 'register'] as const).map((value) => (
                   <button
                     key={value}
@@ -157,7 +157,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
                     role="tab"
                     aria-selected={mode === value}
                     onClick={() => switchMode(value)}
-                    className={cn('px-3 py-2 rounded-lg type-label-badge uppercase tracking-wider transition-colors', mode === value ? 'bg-racing-red text-white' : 'text-text-secondary hover:text-white')}
+                    className={cn('px-3 py-2 rounded-lg type-label-badge transition-colors', mode === value ? 'bg-white text-black' : 'text-text-secondary hover:text-white')}
                   >
                     {value === 'login' ? t('auth.tabLogin') : t('auth.tabRegister')}
                   </button>
@@ -195,7 +195,7 @@ export default function AuthGate({ children }: { children: ReactNode }) {
                 {notice && <p className="type-body-sm text-tertiary" role="status">{notice}</p>}
                 {error && <p className="type-body-sm text-error" role="alert">{error}</p>}
 
-                <button type="submit" disabled={busy} className="w-full rounded-lg bg-racing-red text-white type-label-badge uppercase tracking-widest px-4 py-3.5 glow-red hover:opacity-90 active:scale-[0.99] transition disabled:opacity-50">
+                <button type="submit" disabled={busy} className="w-full h-12 rounded-full bg-white text-black type-label-badge text-[0.9375rem] px-4 hover:bg-white/85 active:scale-[0.99] transition disabled:opacity-50">
                   {busy ? t('auth.busy') : mode === 'login' ? t('auth.submitLogin') : t('auth.submitRegister')}
                 </button>
               </form>

@@ -23,7 +23,7 @@ export default defineConfig(() => ({
         display: 'standalone',
         orientation: 'portrait-primary',
         background_color: '#000000',
-        theme_color: '#121414',
+        theme_color: '#000000',
         categories: ['sports', 'news', 'productivity'],
         icons: [
           {
@@ -46,6 +46,12 @@ export default defineConfig(() => ({
           },
         ],
         shortcuts: [
+          {
+            name: 'Agenda',
+            short_name: 'Agenda',
+            url: '/agenda',
+            icons: [{ src: 'icons/icon-192.png', sizes: '192x192' }],
+          },
           {
             name: 'Calendário',
             short_name: 'Calendário',

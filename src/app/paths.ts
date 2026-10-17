@@ -4,6 +4,7 @@ const enc = encodeURIComponent;
 
 export const paths = {
   home: '/',
+  agenda: '/agenda',
   calendar: '/calendario',
   standings: '/classificacao',
   categories: '/categorias',
@@ -16,4 +17,5 @@ export const paths = {
   race: (categoryId: string, raceId: string) => `/circuito/${enc(categoryId)}/${enc(raceId)}`,
   calendarOf: (categoryId: string) => `/calendario?c=${enc(categoryId)}`,
   standingsOf: (categoryId: string) => `/classificacao?c=${enc(categoryId)}`,
+  gridOf: (categoryId: string) => `/grid?c=${enc(categoryId)}`,
 } as const;

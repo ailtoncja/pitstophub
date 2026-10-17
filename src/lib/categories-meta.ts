@@ -28,9 +28,10 @@ export function groupOf(categoryId: string): CategoryGroup | undefined {
   return CATEGORY_GROUPS.find((group) => group.ids.includes(categoryId));
 }
 
-// Cor de cada serie (usada em marcadores pequenos; o vermelho de marca segue como destaque principal).
+// Tom de cada serie: tinge so o campo do reel e dos cartoes. O vermelho de marca (#e10600) fica reservado para
+// largada, ao vivo e "seguindo", por isso nenhuma serie usa ele como tom.
 export const CATEGORY_ACCENTS: Record<string, string> = {
-  f1: '#e10600',
+  f1: '#9aa5b8',
   f2: '#0093cc',
   f3: '#ff8700',
   'f1-academy': '#e91e8c',
@@ -46,7 +47,34 @@ export const CATEGORY_ACCENTS: Record<string, string> = {
   'endurance-brasil': '#009b3a',
 };
 
-export const accentOf = (categoryId: string) => CATEGORY_ACCENTS[categoryId] ?? '#e10600';
+export const accentOf = (categoryId: string) => CATEGORY_ACCENTS[categoryId] ?? '#9aa5b8';
+
+/**
+ * De onde vem o dado de cada categoria, em tres graus que a interface mostra pela forma do filete:
+ * live = calendario e classificacao ao vivo (Jolpica, api-motorsports; atualizam em minutos);
+ * daily = calendario e classificacao sincronizados todo dia (TheSportsDB via Supabase);
+ * catalog = calendario diario, mas a classificacao vem do catalogo estatico e pode estar desatualizada.
+ */
+export type DataState = 'live' | 'daily' | 'catalog';
+
+export const DATA_STATE: Record<string, DataState> = {
+  f1: 'live',
+  'gtwc-europe': 'live',
+  'gtwc-america': 'live',
+  'gtwc-asia': 'live',
+  'endurance-brasil': 'live',
+  f2: 'daily',
+  f3: 'daily',
+  dtm: 'daily',
+  wrc: 'daily',
+  wec: 'catalog',
+  imsa: 'catalog',
+  indy: 'catalog',
+  nascar: 'catalog',
+  'f1-academy': 'catalog',
+};
+
+export const dataStateOf = (categoryId: string): DataState => DATA_STATE[categoryId] ?? 'catalog';
 
 /** Nome da corrida que o campeonato chama de "rodada" (F1: GP; NASCAR/IndyCar: etapa). */
 export function totalRounds(category: Category): number {

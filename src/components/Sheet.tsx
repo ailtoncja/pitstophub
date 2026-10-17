@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 /**
- * Folha inferior no celular, modal centralizado no desktop. Fecha com Esc, toque no fundo ou no X,
+ * Folha inferior no celular, painel centralizado no computador. Fecha com Esc, toque no fundo ou no X,
  * trava a rolagem da pagina e devolve o foco ao botao que a abriu.
  */
 export function Sheet({
@@ -55,7 +55,7 @@ export function Sheet({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
         >
-          <button type="button" aria-label={closeLabel} onClick={onClose} className="absolute inset-0 bg-black/70 backdrop-blur-sm cursor-default" />
+          <button type="button" aria-label={closeLabel} onClick={onClose} className="absolute inset-0 bg-black/75 cursor-default" />
           <motion.div
             ref={panelRef}
             role="dialog"
@@ -66,17 +66,17 @@ export function Sheet({
             exit={{ y: 40, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 380, damping: 34 }}
             className={cn(
-              'relative w-full md:max-w-lg max-h-[88dvh] overflow-y-auto rounded-t-lg md:rounded-lg bg-surface border border-hairline shadow-[0_-8px_40px_rgba(0,0,0,0.6)] outline-none pb-safe',
+              'relative w-full md:max-w-lg max-h-[88dvh] overflow-y-auto rounded-t-3xl md:rounded-3xl bg-asphalt border border-hairline outline-none pb-safe',
               className,
             )}
           >
-            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 px-margin py-3 bg-surface/95 backdrop-blur border-b-2 border-outline-variant">
-              <h2 className="type-headline-md uppercase text-on-surface truncate border-l-4 border-primary pl-3">{title}</h2>
-              <button type="button" onClick={onClose} aria-label={closeLabel} className="w-9 h-9 -mr-2 flex items-center justify-center rounded-sm text-primary hover:text-white active:scale-95 transition-all">
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 px-margin h-16 bg-asphalt border-b border-hairline">
+              <h2 className="type-headline-md text-white truncate">{title}</h2>
+              <button type="button" onClick={onClose} aria-label={closeLabel} className="w-11 h-11 -mr-3 flex items-center justify-center rounded-full text-silver hover:text-white hover:bg-white/10 active:scale-95 transition-all">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="px-margin py-4">{children}</div>
+            <div className="px-margin py-5">{children}</div>
           </motion.div>
         </motion.div>
       )}

@@ -1,18 +1,19 @@
 import { useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, CalendarPlus, Cloud, CloudFog, CloudLightning, CloudRain, CloudSnow, Droplets, MapPin, Share2, Sun, Timer, Wind } from 'lucide-react';
+import { ArrowLeft, CalendarPlus, Cloud, CloudFog, CloudLightning, CloudRain, CloudSnow, MapPin, Share2, Sun, Timer } from 'lucide-react';
 import { paths } from '../app/paths';
-import { HeroBackdrop, SkewBadge } from '../components/pit';
+import { RaceSpotlight } from '../components/RaceSpotlight';
 import { useToast } from '../components/Toast';
-import { CountdownPanel, EmptyState, ListGroup, Skeleton } from '../components/ui';
+import { Button, EmptyState, FactList, ListGroup, SectionTitle, Skeleton } from '../components/ui';
 import { getRaceCircuitInfo } from '../circuit-info';
 import { findCategoryDriver, raceKey } from '../lib/entities';
 import { useRaceResults } from '../lib/f1-hooks';
-import { dayMonth, hasStartTime, racePlace, raceTitle, timeOf, timeZoneLabel, weekdayShort } from '../lib/format';
+import { hasStartTime, raceTitle, timeOf, timeZoneLabel, weekdayShort } from '../lib/format';
 import { useAsync, useScrollTopOn } from '../lib/hooks';
 import { useT } from '../lib/i18n';
 import { buildIcs, downloadIcs } from '../lib/ics';
 import { raceHighlights, roundNumber } from '../lib/season';
+import { useNow } from '../lib/useNow';
 import { cn } from '../lib/utils';
 import { fetchRaceWeather, weatherWindowOpen, type RaceWeather } from '../lib/weather';
 import { raceStartDate } from '../race-time';
@@ -45,6 +46,7 @@ export default function RacePage() {
   const { t, lang } = useT();
   const navigate = useNavigate();
   const toast = useToast();
+  const now = useNow(30_000);
   const category = useCategory(categoryId);
   const race = category?.calendar.find((r) => raceKey(r) === raceId);
 
@@ -58,8 +60,8 @@ export default function RacePage() {
 
   if (!category || !race) {
     return (
-      <div className="px-margin pt-6">
-        <EmptyState title={t('cir.notFound')} action={<Link to={categoryId ? paths.calendarOf(categoryId) : paths.calendar} className="px-4 py-1.5 rounded-lg bg-surface-raised text-text-primary type-label-badge uppercase tracking-wider">{t('common.back')}</Link>} />
+      <div className="px-margin lg:px-0 pt-6">
+        <EmptyState title={t('cir.notFound')} action={<Button to={categoryId ? paths.calendarOf(categoryId) : paths.agenda}>{t('common.back')}</Button>} />
       </div>
     );
   }
@@ -69,6 +71,7 @@ export default function RacePage() {
   const round = race.round ?? roundNumber(category.calendar, race);
   const sessions = race.sessions ?? [];
   const upcoming = race.status === 'upcoming';
+  const numberFormat = lang === 'pt' ? 'pt-BR' : 'en-US';
 
   const saveToCalendar = () => {
     downloadIcs(`pitstophub-${category.id}-${race.id}.ics`, buildIcs([{ category, race }], lang));
@@ -91,155 +94,119 @@ export default function RacePage() {
   };
 
   return (
-    <div className="flex flex-col w-full pb-10 page-in">
-      <div className="px-margin pt-space-sm pb-space-xs">
-        <button type="button" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(paths.calendarOf(category.id)))} className="flex items-center gap-1.5 -ml-1 px-1 h-10 rounded-sm text-primary hover:text-white active:scale-95 transition-all">
-          <ArrowLeft className="w-5 h-5" />
-          <span className="type-label-badge uppercase tracking-wider">{t('cir.calendar', { year: race.date.slice(0, 4) })}</span>
-        </button>
-      </div>
+    <div className="px-margin lg:px-0 pb-12 pt-3 lg:pt-8 page-in">
+      <button
+        type="button"
+        onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(paths.calendarOf(category.id)))}
+        className="inline-flex items-center gap-2 h-11 -ml-2 px-2 rounded-full text-silver hover:text-white transition-colors"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        <span className="type-label-badge text-[0.875rem]">{category.name} · {t('cir.calendar', { year: race.date.slice(0, 4) })}</span>
+      </button>
 
-      {/* HERO */}
-      <section className="px-margin pb-space-md space-y-3">
-        <div className="relative h-[330px] sm:h-[380px] rounded-lg overflow-hidden border border-hairline">
-          <HeroBackdrop race={race} categoryName={category.name} />
-          <div className="absolute inset-x-0 bottom-0 p-5 space-y-2.5">
-            <SkewBadge>{upcoming ? t('cir.upcomingBadge') : t('cal.final')}</SkewBadge>
-            <h1 className="type-headline-lg text-[28px] leading-[34px] uppercase text-white line-clamp-3">{raceTitle(race, lang)}</h1>
-            <p className="flex items-start gap-2 type-label-badge text-on-surface-variant">
-              <MapPin className="w-4 h-4 shrink-0 mt-px" />
-              <span>{[race.circuit, racePlace(race, lang)].filter(Boolean).join(' • ')}</span>
-            </p>
-            {upcoming && timed && start.getTime() > Date.now() && (
-              <CountdownPanel target={start.getTime()} labels={{ d: t('unit.days'), h: t('unit.hours'), m: t('unit.minutes') }} />
+      <h1 className="sr-only">{raceTitle(race, lang)}</h1>
+      <div className="mt-2 space-y-4">
+        <RaceSpotlight race={race} categoryId={category.id} now={now} />
+
+        <div className="flex items-center gap-x-4 gap-y-2 flex-wrap justify-between">
+          <p className="type-body-md text-silver">
+            {[t('cir.stage', { n: round }), info ? t('cir.laps', { n: info.laps }) : null, info ? (info.direction === 'clockwise' ? t('cir.clockwise') : t('cir.counterclockwise')) : null].filter(Boolean).join(' · ')}
+          </p>
+          <div className="flex items-center gap-2">
+            {upcoming && (
+              <Button variant="primary" onClick={saveToCalendar}>
+                <CalendarPlus className="w-[18px] h-[18px]" /> {t('cir.saveCalendarShort')}
+              </Button>
             )}
+            <Button variant="secondary" onClick={() => void share()}>
+              <Share2 className="w-[18px] h-[18px]" /> {t('cir.share')}
+            </Button>
           </div>
         </div>
+      </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="type-label-badge uppercase px-2 py-1 rounded-sm bg-primary-container/15 text-primary tracking-wider">
-            {t('cir.stage', { n: round })}{info ? ` • ${t('cir.laps', { n: info.laps })}` : ''}
-          </span>
-          <span className="type-label-badge uppercase px-2 py-1 rounded-sm bg-surface-container-high text-on-surface-variant tracking-wider">{category.name}</span>
-          {info && <span className="type-label-telemetry uppercase text-on-surface-variant tracking-wider">{info.direction === 'clockwise' ? t('cir.clockwise') : t('cir.counterclockwise')}</span>}
-          <span className="type-label-telemetry uppercase text-on-surface-variant tracking-wider">
-            {weekdayShort(start, lang)} {dayMonth(start, lang)}{timed ? ` • ${timeOf(start, lang)} ${timeZoneLabel(start)}` : ''}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <button type="button" onClick={saveToCalendar} className="h-12 flex items-center justify-center gap-2 rounded-sm bg-surface-container-high border border-hairline text-on-surface type-label-badge uppercase tracking-wider hover:bg-surface-container-highest active:scale-[0.98] transition-all">
-            <CalendarPlus className="w-5 h-5 text-primary" /> {t('cir.saveCalendarShort')}
-          </button>
-          <button type="button" onClick={share} className="h-12 flex items-center justify-center gap-2 rounded-sm bg-surface-container-high border border-hairline text-on-surface type-label-badge uppercase tracking-wider hover:bg-surface-container-highest active:scale-[0.98] transition-all">
-            <Share2 className="w-5 h-5 text-primary" /> {t('cir.share')}
-          </button>
-        </div>
-      </section>
-
-      <div className="lg:grid lg:grid-cols-12 lg:gap-space-lg">
-        <div className="lg:col-span-7 space-y-space-lg">
-          {/* PREVISAO */}
+      <div className="mt-10 lg:grid lg:grid-cols-12 lg:gap-10 space-y-10 lg:space-y-0">
+        <div className="lg:col-span-7 space-y-10 min-w-0">
           {(weather.data || weather.status === 'loading') && (
-            <section className="px-margin">
-              {weather.data ? <WeatherTiles weather={weather.data} /> : <Skeleton className="h-20" />}
+            <section className="space-y-3">
+              <SectionTitle>{t('cir.forecast')}</SectionTitle>
+              {weather.data ? <WeatherList weather={weather.data} /> : <Skeleton className="h-28" />}
             </section>
           )}
 
-          {/* TRACADO */}
           {info && (
-            <section className="px-margin">
-              <BarTitle>{t('cir.layout')}</BarTitle>
+            <section className="space-y-3">
+              <SectionTitle>{t('cir.layout')}</SectionTitle>
               {info.trackImage && (
-                <div className="relative mt-2 rounded-lg bg-asphalt border border-hairlineest overflow-hidden aspect-[16/10] flex items-center justify-center">
-                  <img src={info.trackImage} alt={race.circuit} className="w-full h-full object-contain p-3" loading="lazy" />
-                  {info.drsZones.length > 0 && (
-                    <span className="absolute bottom-3 right-3 flex items-center gap-1.5 type-label-telemetry uppercase bg-surface-container-high/90 backdrop-blur px-2 py-1 rounded text-text-secondary">
-                      <span className="w-1.5 h-1.5 rounded-full bg-racing-red" aria-hidden />{t('cir.drsZones', { n: info.drsZones.length })}
-                    </span>
-                  )}
+                <div className="relative rounded-2xl bg-asphalt border border-hairline overflow-hidden aspect-[16/10] flex items-center justify-center">
+                  <img src={info.trackImage} alt={race.circuit} className="w-full h-full object-contain p-4" loading="lazy" />
                 </div>
               )}
-              <div className="grid grid-cols-3 gap-3 mt-3">
-                <Spec label={t('cir.length')} value={info.lengthKm.toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US', { minimumFractionDigits: 3 })} unit="km" />
-                <Spec label={t('cir.corners')} value={String(info.corners)} />
-                <Spec label={t('cir.distance')} value={info.raceDistanceKm.toLocaleString(lang === 'pt' ? 'pt-BR' : 'en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} unit="km" />
-              </div>
-              <div className="flex items-center justify-between gap-3 mt-3 rounded-lg bg-asphalt border border-hairline p-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <Timer className="w-6 h-6 text-text-muted shrink-0" />
-                  <div className="min-w-0">
-                    <p className="type-label-telemetry uppercase text-text-muted tracking-wider">{t('cir.record')}</p>
-                    {info.lapRecord ? (
-                      <p className="type-body-md font-semibold text-text-primary truncate">
-                        <span className="font-black">{info.lapRecord.time}</span> • {info.lapRecord.driver} ({info.lapRecord.year})
-                      </p>
-                    ) : (
-                      <p className="type-body-md text-text-secondary">{t('cir.noRecord')}</p>
-                    )}
-                  </div>
-                </div>
-                <span className="type-label-telemetry uppercase text-racing-red shrink-0">{t('cir.since', { year: info.firstGrandPrix })}</span>
-              </div>
+              <FactList
+                items={[
+                  { label: t('cir.length'), value: `${info.lengthKm.toLocaleString(numberFormat, { minimumFractionDigits: 3 })} km` },
+                  { label: t('cir.corners'), value: String(info.corners) },
+                  { label: t('cir.distance'), value: `${info.raceDistanceKm.toLocaleString(numberFormat, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} km` },
+                  {
+                    label: t('cir.record'),
+                    value: info.lapRecord ? `${info.lapRecord.time} · ${info.lapRecord.driver} (${info.lapRecord.year})` : t('cir.noRecord'),
+                  },
+                  { label: t('cir.firstGp'), value: String(info.firstGrandPrix) },
+                ]}
+              />
             </section>
           )}
 
-          {/* FRENAGEM, DRS E PNEUS */}
           {info && (
-            <section className="px-margin space-y-3">
+            <section className="space-y-4">
               {info.brakingZones.length > 0 && (
                 <>
-                  <BarTitle>{t('cir.braking')}</BarTitle>
+                  <SectionTitle>{t('cir.braking')}</SectionTitle>
                   <ListGroup>
                     {info.brakingZones.map((zone) => (
-                      <div key={`${zone.turn}-${zone.name}`} className="p-3">
-                        <div className="flex items-baseline gap-2">
-                          <span className="type-label-badge text-racing-red font-bold">{zone.turn}</span>
-                          <span className="type-body-md font-bold text-text-primary">{zone.name}</span>
-                        </div>
-                        <p className="type-body-sm text-text-secondary mt-1">{lang === 'en' ? zone.en : zone.pt}</p>
+                      <div key={`${zone.turn}-${zone.name}`} className="p-4">
+                        <p className="type-body-md font-bold text-white">
+                          <span className="text-silver tabular mr-2">{zone.turn}</span>
+                          {zone.name}
+                        </p>
+                        <p className="type-body-sm text-silver mt-1 max-w-[68ch]">{lang === 'en' ? zone.en : zone.pt}</p>
                       </div>
                     ))}
                   </ListGroup>
                 </>
               )}
               {info.drsZones.length > 0 && (
-                <div className="rounded-lg bg-asphalt border border-hairline p-3">
-                  <p className="type-label-telemetry uppercase text-text-muted tracking-wider mb-1.5">{t('cir.drs')}</p>
+                <div className="space-y-2">
+                  <h3 className="type-headline-sm text-white">{t('cir.drs')}</h3>
                   <ul className="space-y-1">
                     {info.drsZones.map((zone, i) => (
-                      <li key={i} className="type-body-sm text-text-secondary flex gap-2"><span className="text-racing-red">▸</span>{lang === 'en' ? zone.en : zone.pt}</li>
+                      <li key={i} className="type-body-md text-silver">{lang === 'en' ? zone.en : zone.pt}</li>
                     ))}
                   </ul>
                 </div>
               )}
-              <div className="rounded-lg bg-asphalt border border-hairline p-3">
-                <p className="type-label-telemetry uppercase text-text-muted tracking-wider mb-1.5">{t('cir.tyres')}</p>
-                <p className="type-body-sm text-text-secondary">{lang === 'en' ? info.tyreStrategyNote.en : info.tyreStrategyNote.pt}</p>
+              <div className="space-y-2">
+                <h3 className="type-headline-sm text-white">{t('cir.tyres')}</h3>
+                <p className="type-body-md text-silver max-w-[68ch]">{lang === 'en' ? info.tyreStrategyNote.en : info.tyreStrategyNote.pt}</p>
               </div>
             </section>
           )}
 
-          {!info && (
-            <section className="px-margin">
-              <EmptyState icon={MapPin} title={t('cir.noInfo')} hint={t('cir.noInfoHint')} />
-            </section>
-          )}
+          {!info && <EmptyState icon={MapPin} title={t('cir.noInfo')} hint={t('cir.noInfoHint')} />}
         </div>
 
-        <div className="lg:col-span-5 space-y-space-lg mt-space-lg lg:mt-0">
-          {/* CRONOGRAMA */}
-          <section className="px-margin">
-            <div className="flex items-end justify-between gap-2">
-              <BarTitle>{t('cir.schedule')}</BarTitle>
-              <span className="type-label-telemetry uppercase text-text-muted text-right shrink-0">{t('cir.localTime', { tz: timeZoneLabel(start) })}</span>
+        <div className="lg:col-span-5 space-y-10 min-w-0">
+          <section className="space-y-3">
+            <div className="flex items-baseline justify-between gap-2">
+              <SectionTitle>{t('cir.schedule')}</SectionTitle>
+              <span className="type-body-sm text-silver text-right shrink-0">{t('cir.localTime', { tz: timeZoneLabel(start) })}</span>
             </div>
             {sessions.length > 0 ? (
-              <ListGroup className="mt-2">
+              <ListGroup>
                 {sessions.map((session) => <SessionRow key={session.kind} session={session} lang={lang} label={t(SESSION_LABEL[session.kind])} />)}
               </ListGroup>
             ) : (
-              <ListGroup className="mt-2">
+              <ListGroup>
                 <SessionRow
                   session={{ kind: 'race', startsAt: timed ? (race.startsAt as string) : `${race.date}T12:00:00` }}
                   lang={lang}
@@ -250,126 +217,74 @@ export default function RacePage() {
             )}
           </section>
 
-          {/* RESULTADO */}
           {race.status === 'completed' && (
-            <section className="px-margin">
-              <BarTitle>{t('cir.result')}</BarTitle>
-              {results.status === 'loading' && <Skeleton className="h-48 mt-2" />}
+            <section className="space-y-3">
+              <SectionTitle>{t('cir.result')}</SectionTitle>
+              {results.status === 'loading' && <Skeleton className="h-48" />}
               {results.data && highlights && (
                 <>
-                  <div className="grid grid-cols-2 gap-3 mt-2">
-                    <Highlight label={t('cir.pole')} name={highlights.pole?.driverName} sub={highlights.pole?.teamName} />
-                    <Highlight label={t('cir.fastest')} name={highlights.fastestLap?.driverName} sub={highlights.fastestLap?.fastestLapTime ?? undefined} />
-                  </div>
-                  <ListGroup className="mt-3">
+                  <FactList
+                    items={[
+                      { label: t('cir.pole'), value: [highlights.pole?.driverName, highlights.pole?.teamName].filter(Boolean).join(' · ') || '—' },
+                      { label: t('cir.fastest'), value: [highlights.fastestLap?.driverName, highlights.fastestLap?.fastestLapTime].filter(Boolean).join(' · ') || '—' },
+                    ]}
+                  />
+                  <ListGroup>
                     {results.data.slice(0, 10).map((row) => {
                       const driver = findCategoryDriver(category, row.driverName);
                       const body = (
                         <>
-                          <span className={cn('w-7 text-center type-body-md font-black', row.position === '1' ? 'text-racing-red' : 'text-text-secondary')}>{row.position}</span>
+                          <span className={cn('w-7 type-headline-sm tabular', row.position === '1' ? 'text-white' : 'text-silver')}>{row.position}</span>
                           <div className="min-w-0 flex-1">
-                            <p className="type-body-md font-bold text-text-primary truncate">{row.driverName}</p>
-                            <p className="type-label-telemetry uppercase text-text-muted truncate">{row.teamName}</p>
+                            <p className="type-body-md font-semibold text-white truncate">{row.driverName}</p>
+                            <p className="type-body-sm text-silver truncate">{row.teamName}</p>
                           </div>
                           <div className="text-right shrink-0">
-                            <p className="type-label-badge text-text-secondary">{row.time || row.status}</p>
-                            {row.points > 0 && <p className="type-label-telemetry text-racing-red">+{row.points}</p>}
+                            <p className="type-label-badge text-silver tabular">{row.time || row.status}</p>
+                            {row.points > 0 && <p className="type-label-telemetry text-tertiary tabular">+{row.points}</p>}
                           </div>
                         </>
                       );
                       return driver ? (
-                        <Link key={row.position + row.driverCode} to={paths.driver(category.id, driver.id)} className="flex items-center gap-3 px-3 py-2.5 hover:bg-surface-container/40 transition-colors">{body}</Link>
+                        <Link key={row.position + row.driverCode} to={paths.driver(category.id, driver.id)} className="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors">{body}</Link>
                       ) : (
-                        <div key={row.position + row.driverCode} className="flex items-center gap-3 px-3 py-2.5">{body}</div>
+                        <div key={row.position + row.driverCode} className="flex items-center gap-3 px-4 py-3">{body}</div>
                       );
                     })}
                   </ListGroup>
                 </>
               )}
               {results.status !== 'loading' && !results.data && (
-                <div className="mt-2 rounded-lg bg-asphalt border border-hairline p-4">
-                  <p className="type-label-telemetry uppercase text-text-muted tracking-wider">{t('cir.winner')}</p>
-                  <p className="type-headline-sm uppercase text-text-primary mt-1">{race.winner ?? t('cir.noResult')}</p>
-                </div>
+                <FactList items={[{ label: t('cir.winner'), value: race.winner ?? t('cir.noResult') }]} />
               )}
             </section>
           )}
-
-          {upcoming && (
-            <section className="px-margin">
-              <button type="button" onClick={saveToCalendar} className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg bg-racing-red text-white type-label-badge uppercase tracking-wider glow-red active:scale-[0.98] transition-transform">
-                <CalendarPlus className="w-[18px] h-[18px]" />{t('cir.saveCalendar')}
-              </button>
-            </section>
-          )}
         </div>
       </div>
     </div>
   );
 }
 
-function BarTitle({ children }: { children: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="w-1 h-5 rounded-full bg-racing-red" aria-hidden />
-      <h2 className="type-headline-md italic uppercase font-black text-text-primary tracking-tight">{children}</h2>
-    </div>
-  );
-}
-
-function Spec({ label, value, unit }: { label: string; value: string; unit?: string }) {
-  return (
-    <div className="min-w-0">
-      <p className="type-label-telemetry uppercase text-text-muted tracking-wider">{label}</p>
-      <p className="mt-1 leading-none">
-        <span className="type-headline-md font-black text-text-primary">{value}</span>
-        {unit && <span className="type-body-sm text-text-muted ml-1">{unit}</span>}
-      </p>
-    </div>
-  );
-}
-
-function Highlight({ label, name, sub }: { label: string; name?: string; sub?: string }) {
-  return (
-    <div className="rounded-lg bg-asphalt border border-hairline p-3 min-w-0">
-      <p className="type-label-telemetry uppercase text-text-muted tracking-wider">{label}</p>
-      <p className="type-body-md font-bold text-text-primary truncate mt-1">{name ?? '—'}</p>
-      {sub && <p className="type-label-telemetry text-text-muted truncate">{sub}</p>}
-    </div>
-  );
-}
-
-function WeatherTiles({ weather }: { weather: RaceWeather }) {
+function WeatherList({ weather }: { weather: RaceWeather }) {
   const { t } = useT();
   const Icon = WEATHER_ICON[weather.condition];
-  const rainTone = weather.rainChance >= 60 ? 'text-racing-red' : weather.rainChance >= 30 ? 'text-secondary' : 'text-tertiary';
+  const rainLabel = weather.rainChance >= 60 ? t('cir.rainHigh') : weather.rainChance >= 30 ? t('cir.rainMid') : t('cir.rainLow');
   return (
-    <div className="grid grid-cols-3 gap-2">
-      <div className="rounded-lg bg-asphalt border border-hairline p-3">
-        <div className="flex items-center justify-between text-text-muted">
-          <span className="type-label-telemetry uppercase tracking-wider">{t('cir.temp')}</span>
-          <Icon className="w-4 h-4" />
-        </div>
-        <p className="mt-1.5 leading-none"><span className="type-headline-lg font-black text-text-primary">{Math.round(weather.temperatureMax)}</span><span className="type-body-sm text-text-muted">°C</span></p>
-        <p className="type-label-telemetry uppercase text-text-muted mt-1">{t(`cir.cond.${weather.condition}`)}</p>
-      </div>
-      <div className="rounded-lg bg-asphalt border border-hairline p-3">
-        <div className="flex items-center justify-between text-text-muted">
-          <span className="type-label-telemetry uppercase tracking-wider">{t('cir.rain')}</span>
-          <Droplets className="w-4 h-4" />
-        </div>
-        <p className="mt-1.5 leading-none"><span className="type-headline-lg font-black text-text-primary">{Math.round(weather.rainChance)}</span><span className="type-body-sm text-text-muted">%</span></p>
-        <p className={cn('type-label-telemetry uppercase mt-1', rainTone)}>{weather.rainChance >= 60 ? t('cir.rainHigh') : weather.rainChance >= 30 ? t('cir.rainMid') : t('cir.rainLow')}</p>
-      </div>
-      <div className="rounded-lg bg-asphalt border border-hairline p-3">
-        <div className="flex items-center justify-between text-text-muted">
-          <span className="type-label-telemetry uppercase tracking-wider">{t('cir.wind')}</span>
-          <Wind className="w-4 h-4" />
-        </div>
-        <p className="mt-1.5 leading-none"><span className="type-headline-lg font-black text-text-primary">{Math.round(weather.windKmh)}</span><span className="type-body-sm text-text-muted">km/h</span></p>
-        <p className="type-label-telemetry uppercase text-text-muted mt-1">{Math.round(weather.temperatureMin)}°C {t('cir.min')}</p>
-      </div>
-    </div>
+    <FactList
+      items={[
+        {
+          label: t('cir.temp'),
+          value: (
+            <span className="inline-flex items-center gap-2">
+              <Icon className="w-4 h-4 text-silver" aria-hidden />
+              {Math.round(weather.temperatureMax)} °C <span className="text-silver font-medium">· {t(`cir.cond.${weather.condition}`)}</span>
+            </span>
+          ),
+        },
+        { label: t('cir.rain'), value: <>{Math.round(weather.rainChance)}% <span className="text-silver font-medium">· {rainLabel}</span></> },
+        { label: t('cir.wind'), value: <>{Math.round(weather.windKmh)} km/h <span className="text-silver font-medium">· {Math.round(weather.temperatureMin)} °C {t('cir.min')}</span></> },
+      ]}
+    />
   );
 }
 
@@ -378,16 +293,16 @@ function SessionRow({ session, lang, label, dateOnly = false }: { session: RaceS
   const isRace = session.kind === 'race';
   const past = date.getTime() < Date.now();
   return (
-    <div className={cn('flex items-center gap-3 p-3', past && 'opacity-60')}>
-      <div className={cn('w-11 shrink-0 rounded-lg py-1.5 text-center', isRace ? 'bg-racing-red text-white' : 'bg-surface-container-high text-text-primary')}>
-        <p className="type-label-telemetry uppercase leading-none opacity-80">{weekdayShort(date, lang)}</p>
-        <p className="type-headline-sm font-black leading-tight">{String(date.getDate()).padStart(2, '0')}</p>
+    <div className={cn('flex items-center gap-4 px-4 py-3', past && 'opacity-60')}>
+      <div className="w-12 shrink-0 text-center leading-none">
+        <p className="type-label-telemetry text-silver">{weekdayShort(date, lang)}</p>
+        <p className={cn('type-headline-md tabular mt-1', isRace ? 'text-white' : 'text-silver')}>{String(date.getDate()).padStart(2, '0')}</p>
       </div>
       <div className="min-w-0 flex-1">
-        <p className={cn('type-body-md font-bold truncate', isRace ? 'text-text-primary' : 'text-text-secondary')}>{label}</p>
-        {!dateOnly && <p className="type-label-telemetry text-text-muted">{timeOf(date, lang)}</p>}
+        <p className={cn('type-body-md truncate', isRace ? 'font-bold text-white' : 'font-semibold text-silver')}>{label}</p>
       </div>
-      {isRace && <span className="w-2 h-2 rounded-full bg-racing-red animate-pulse shrink-0" aria-hidden />}
+      {!dateOnly && <p className={cn('type-headline-sm tabular shrink-0', isRace ? 'text-white' : 'text-silver')}>{timeOf(date, lang)}</p>}
+      {isRace && !past && <Timer className="w-4 h-4 text-racing-red shrink-0" aria-hidden />}
     </div>
   );
 }

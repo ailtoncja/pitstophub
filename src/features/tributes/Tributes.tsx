@@ -154,11 +154,11 @@ export function TributesProvider({ children }: { children: ReactNode }) {
               <div className="w-14 h-14 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: def.color }}>
                 {def.icon === 'heart' ? <Heart className={`w-6 h-6 ${def.iconInk}`} fill="currentColor" /> : <Bug className={`w-6 h-6 ${def.iconInk}`} />}
               </div>
-              <div className="font-apex-mono text-xs uppercase tracking-[0.3em] mb-3" style={{ color: def.color }}>
+              <div className="type-label-badge text-[0.8125rem] mb-3" style={{ color: def.color }}>
                 {def.label}
               </div>
-              <p className="font-apex text-2xl sm:text-3xl font-extrabold italic text-white leading-snug">{def.text}</p>
-              <p className="font-apex-mono text-[10px] uppercase tracking-widest text-gray-500 mt-6">(toque 2x pra fechar)</p>
+              <p className="text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-white leading-snug text-balance">{def.text}</p>
+              <p className="type-label-telemetry text-silver-dim mt-6">(toque 2x pra fechar)</p>
             </motion.div>
           </motion.div>
         )}

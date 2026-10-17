@@ -38,10 +38,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 12 }}
               transition={{ duration: 0.2 }}
-              className="pointer-events-auto flex items-center gap-2.5 bg-asphalt border border-hairline rounded-lg pl-3 pr-2 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.5)] max-w-sm"
+              className="pointer-events-auto flex items-center gap-2.5 bg-white text-black rounded-full pl-4 pr-2 py-2 shadow-[0_8px_30px_rgba(0,0,0,0.5)] max-w-sm"
             >
-              <Icon className="w-4 h-4 text-racing-red shrink-0" aria-hidden />
-              <span className="type-label-telemetry uppercase tracking-wider text-text-primary">{toast.message}</span>
+              <Icon className="w-4 h-4 text-black shrink-0" aria-hidden />
+              <span className="type-label-badge text-[0.8125rem] text-black">{toast.message}</span>
               {toast.actionLabel && toast.onAction && (
                 <button
                   type="button"
@@ -49,7 +49,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                     toast.onAction?.();
                     setToast(null);
                   }}
-                  className="ml-1 px-2.5 py-1.5 rounded-lg bg-racing-red text-white type-label-badge uppercase tracking-wider active:scale-95"
+                  className="ml-1 px-3 h-8 rounded-full bg-black text-white type-label-badge active:scale-95"
                 >
                   {toast.actionLabel}
                 </button>

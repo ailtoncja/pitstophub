@@ -28,22 +28,22 @@ export default function ChampionsPage() {
   const totalTitles = F1_CHAMPIONS.reduce((sum, c) => sum + c.championYears.length, 0);
 
   return (
-    <div className="flex flex-col w-full px-margin pb-10 gap-space-md page-in">
-      <div className="pt-space-sm flex items-center">
-        <button type="button" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(paths.categories))} aria-label={t('common.back')} className="w-10 h-10 -ml-2 rounded-sm flex items-center justify-center text-primary hover:text-white active:scale-90 transition-transform">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-      </div>
+    <div className="px-margin lg:px-0 pb-12 pt-3 lg:pt-8 space-y-6 page-in">
+      <button
+        type="button"
+        onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(paths.category('f1')))}
+        className="inline-flex items-center gap-2 h-11 -ml-2 px-2 rounded-full text-silver hover:text-white transition-colors"
+      >
+        <ArrowLeft className="w-5 h-5" />
+        <span className="type-label-badge text-[0.875rem]">{t('common.back')}</span>
+      </button>
 
       <header className="space-y-2">
-        <span className="type-label-badge uppercase tracking-widest text-on-surface-variant">{t('champs.kicker')}</span>
-        <h1 className="type-headline-lg text-[34px] leading-9 uppercase text-on-surface">
+        <h1 className="type-headline-lg lg:text-[2.25rem] text-white">
           {t('champs.title1')} {t('champs.title2')}
         </h1>
-        <p className="type-body-md text-primary max-w-xl">{t('champs.lead')}</p>
-        <p className="type-label-badge uppercase text-on-surface-variant tracking-wider">
-          {t('champs.count', { drivers: F1_CHAMPIONS.length, titles: totalTitles })}
-        </p>
+        <p className="type-body-lg text-silver max-w-[60ch]">{t('champs.lead')}</p>
+        <p className="type-body-sm text-silver-dim">{t('champs.count', { drivers: F1_CHAMPIONS.length, titles: totalTitles })}</p>
       </header>
 
       <Segmented
@@ -57,12 +57,12 @@ export default function ChampionsPage() {
         ]}
       />
 
-      <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 justify-items-center">
+      <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-8 justify-items-center">
         {champions.map((champion) => (
-          <li key={champion.id} className="w-full flex flex-col items-center gap-2">
+          <li key={champion.id} className="w-full flex flex-col items-center gap-2.5">
             <F1ChampionCard champion={champion} language={lang} onOpen={() => navigate(paths.driver('f1', champion.id))} />
-            <Link to={paths.driver('f1', champion.id)} className="type-label-telemetry uppercase text-text-muted tracking-wider text-center hover:text-text-primary transition-colors">
-              {champion.name}{champion.championYears.length > 0 ? ` • ${champion.championYears.length}x` : ''}
+            <Link to={paths.driver('f1', champion.id)} className="type-body-sm text-silver text-center hover:text-white transition-colors">
+              {champion.name}{champion.championYears.length > 0 ? ` · ${champion.championYears.length}x` : ''}
             </Link>
           </li>
         ))}

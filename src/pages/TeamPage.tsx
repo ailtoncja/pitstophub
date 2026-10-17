@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Star } from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
+import { Star } from 'lucide-react';
 import { paths } from '../app/paths';
 import { Avatar } from '../components/Avatar';
-import { BioCard } from '../components/pit';
+import { BioCard, ReelBackdrop } from '../components/pit';
 import { Sparkline } from '../components/Sparkline';
 import { useToast } from '../components/Toast';
-import { EmptyState, SectionTitle, Skeleton, StatTile } from '../components/ui';
+import { BackBar, Button, EmptyState, FactList, SectionTitle, Skeleton } from '../components/ui';
 import { useTributes } from '../features/tributes/Tributes';
 import { driversOfTeam, findCategoryDriver, findCategoryTeam } from '../lib/entities';
 import { useTeamPoints } from '../lib/f1-hooks';
@@ -31,7 +31,6 @@ export default function TeamPage() {
   const { categoryId, teamId } = useParams();
   useScrollTopOn(`${categoryId}/${teamId}`);
   const { t, lang } = useT();
-  const navigate = useNavigate();
   const toast = useToast();
   const tributes = useTributes();
   const settings = useSettings();
@@ -43,8 +42,8 @@ export default function TeamPage() {
 
   if (!category || !team) {
     return (
-      <div className="px-margin pt-6">
-        <EmptyState title={t('team.notFound')} action={<Link to={categoryId ? paths.category(categoryId) : paths.categories} className="px-4 py-1.5 rounded-lg bg-surface-raised text-text-primary type-label-badge uppercase tracking-wider">{t('common.back')}</Link>} />
+      <div className="px-margin lg:px-0 pt-6">
+        <EmptyState title={t('team.notFound')} action={<Button to={categoryId ? paths.category(categoryId) : paths.categories}>{t('common.back')}</Button>} />
       </div>
     );
   }
@@ -78,123 +77,113 @@ export default function TeamPage() {
     (lang === 'en' ? race.enName ?? race.name : race.name).replace(/\s*(Grand Prix|GP)\s*$/i, '').replace(/^GP (de|da|do|dos|das) /i, '');
 
   return (
-    <div className="flex flex-col w-full pb-10 page-in">
-      <div className="px-margin pt-space-sm pb-space-xs flex items-center justify-between">
-        <button type="button" onClick={() => (window.history.length > 1 ? navigate(-1) : navigate(paths.category(category.id)))} aria-label={t('common.back')} className="w-10 h-10 -ml-2 rounded-sm flex items-center justify-center text-primary hover:text-white active:scale-90 transition-transform">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <span className="type-label-badge uppercase tracking-wider text-on-surface-variant">{category.name} {year}</span>
-        <button type="button" onClick={toggleFollow} aria-pressed={following} aria-label={t('team.follow')} className={cn('w-10 h-10 -mr-2 rounded-sm flex items-center justify-center active:scale-90 transition-all', following ? 'text-primary-container' : 'text-on-surface-variant hover:text-primary')}>
-          <Star className={cn('w-5 h-5', following && 'fill-current')} />
-        </button>
-      </div>
+    <div className="px-margin lg:px-0 pb-12 page-in">
+      <BackBar
+        fallback={paths.category(category.id)}
+        label={`${category.name} ${year}`}
+        right={
+          <Button variant={following ? 'primary' : 'secondary'} onClick={toggleFollow} aria-pressed={following} className={cn(following && 'bg-racing-red text-white hover:bg-racing-red/90')}>
+            <Star className={cn('w-[18px] h-[18px]', following && 'fill-current')} />
+            {following ? t('common.following') : t('team.follow')}
+          </Button>
+        }
+      />
 
-      <div className="lg:grid lg:grid-cols-12 lg:gap-space-lg">
-        <div className="lg:col-span-5 space-y-space-lg">
-          {/* HERO: carro da equipe, brasao e nome (monocromatico, como no app) */}
-          <section className="px-margin">
-            <div className="relative h-60 rounded-lg overflow-hidden border border-hairline" style={{ background: 'linear-gradient(135deg, #2e2e33 0%, #15151e 55%, #000 100%)' }}>
-              <div className="absolute inset-0 carbon-lines" aria-hidden />
-              {art && <img src={art} alt="" className="absolute top-3 inset-x-6 mx-auto h-[170px] max-w-[calc(100%-3rem)] object-contain" />}
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 45%, rgba(0,0,0,0.9) 100%)' }} aria-hidden />
-              <div className="absolute bottom-0 inset-x-0 p-5 flex items-center gap-3">
-                <span
-                  onClick={isFerrariWec ? tributes.onFerrariWecTap : undefined}
-                  className={cn('shrink-0 rounded-full', isFerrariWec && 'cursor-pointer select-none')}
-                >
-                  <Avatar src={team.badge ?? team.logo} name={team.name} size={44} fit="contain" className="bg-surface-container-highest border border-hairline" />
-                </span>
-                <div className="min-w-0">
-                  <h1 className="type-headline-md text-[22px] leading-[26px] uppercase text-white line-clamp-2">{team.name}</h1>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    {team.car && <span className="type-label-badge uppercase text-on-surface-variant">{team.car}</span>}
-                    {team.class && <span className="type-label-telemetry uppercase bg-surface-container-highest text-on-surface-variant rounded-sm px-2 py-0.5">{team.class}</span>}
-                  </div>
-                  {team.principal && <p className="type-label-telemetry uppercase text-on-surface-variant mt-0.5 truncate">{team.principal}</p>}
-                </div>
+      <div className="mt-2 lg:grid lg:grid-cols-12 lg:gap-10">
+        <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-8 lg:self-start">
+          {/* Carro da equipe, brasao e nome: campo neutro, a cor da equipe nao tinge a pagina */}
+          <div className="relative h-[19rem] rounded-3xl overflow-hidden border border-hairline">
+            <ReelBackdrop categoryId={category.id} hue="#6f6f78" bare />
+            {art && <img src={art} alt="" className="absolute top-4 inset-x-6 mx-auto h-[11.5rem] max-w-[calc(100%-3rem)] object-contain" />}
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, #000 0%, rgba(0,0,0,0.85) 30%, transparent 62%)' }} aria-hidden />
+            <div className="absolute bottom-0 inset-x-0 p-5 flex items-center gap-3">
+              <span onClick={isFerrariWec ? tributes.onFerrariWecTap : undefined} className={cn('shrink-0 rounded-full', isFerrariWec && 'cursor-pointer select-none')}>
+                <Avatar src={team.badge ?? team.logo} name={team.name} size={48} fit="contain" className="bg-surface-container-highest border border-hairline" />
+              </span>
+              <div className="min-w-0">
+                <h1 className="type-headline-md text-[1.5rem] text-white line-clamp-2">{team.name}</h1>
+                <p className="type-body-sm text-silver truncate">{[team.car, team.class, team.principal].filter(Boolean).join(' · ')}</p>
               </div>
             </div>
-          </section>
+          </div>
 
-          {/* NUMEROS */}
-          <section className="px-margin grid grid-cols-2 gap-3">
-            <StatTile label={t('team.pos')} value={standing ? `P${standing.item.position}` : '—'} accent={standing?.item.position === 1} />
-            <StatTile label={t('team.pointsAccrued')} value={standing ? formatPoints(standing.item.points) : formatPoints(teamPoints)} />
-            <StatTile label={t('team.wins')} value={wins.length} accent={wins.length > 0} sub={wins.length === 0 ? t('team.noWins') : wins.slice(0, 2).map(shortGp).join(', ')} />
-            <StatTile label={t('team.gapLabel')} value={gap != null && standing?.next ? signed(gap) : '—'} sub={standing?.next ? t('team.vs', { name: standing.next.name }) : undefined} />
-          </section>
+          <FactList
+            items={[
+              { label: t('team.pos'), value: standing ? `P${standing.item.position}` : '—' },
+              { label: t('team.pointsAccrued'), value: standing ? formatPoints(standing.item.points) : formatPoints(teamPoints) },
+              { label: t('team.wins'), value: wins.length === 0 ? t('team.noWins') : `${wins.length} · ${wins.slice(0, 2).map(shortGp).join(', ')}` },
+              { label: t('team.gapLabel'), value: gap != null && standing?.next ? `${signed(gap)} · ${t('team.vs', { name: standing.next.name })}` : '—' },
+            ]}
+          />
         </div>
 
-        <div className="lg:col-span-7 space-y-space-lg mt-space-lg lg:mt-0">
-          {/* DUPLA DE PILOTOS */}
+        <div className="lg:col-span-7 mt-10 lg:mt-0 space-y-10 min-w-0">
           {driverRows.length > 0 && (
-            <section className="px-margin">
+            <section className="space-y-3">
               <SectionTitle right={t('team.currentSeason')}>{t('team.duo')}</SectionTitle>
-              <div className="space-y-3 mt-3">
+              <ul className="space-y-3">
                 {driverRows.map(({ driver, item, wins: driverWins }) => {
                   const share = driverTotal > 0 ? percent(item?.points ?? 0, driverTotal) : 0;
                   return (
-                    <Link key={driver.id} to={paths.driver(category.id, driver.id)} className="block rounded-lg bg-asphalt border border-hairline overflow-hidden hover:bg-asphalt-alt transition-colors">
-                      <div className="flex items-center gap-3 pr-2">
-                        <span className="w-1 self-stretch bg-outline-variant" aria-hidden />
-                        <div className="flex-1 min-w-0 py-3">
-                          {driver.number && <p className="type-telemetry-counter text-[26px] leading-[28px] text-white">{driver.number}</p>}
-                          <p className="type-headline-md text-[18px] leading-[22px] uppercase text-white line-clamp-2">{driver.name}</p>
-                          <p className="type-label-telemetry uppercase text-on-surface-variant mt-0.5 truncate">
-                            {item ? t('team.driverLine', { pos: item.position, wins: driverWins }) : t('team.noStanding')}
-                          </p>
+                    <li key={driver.id}>
+                      <Link to={paths.driver(category.id, driver.id)} className="block rounded-2xl bg-asphalt border border-hairline overflow-hidden hover:border-white/40 transition-colors">
+                        <div className="flex items-center gap-4 pl-5 pr-2">
+                          <div className="flex-1 min-w-0 py-4">
+                            <p className="type-headline-md text-white line-clamp-2">
+                              {driver.number && <span className="text-silver tabular mr-2">{driver.number}</span>}
+                              {driver.name}
+                            </p>
+                            <p className="type-body-sm text-silver mt-0.5 truncate">
+                              {item ? t('team.driverLine', { pos: item.position, wins: driverWins }) : t('team.noStanding')}
+                            </p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="type-headline-sm text-white tabular">{item ? formatPoints(item.points) : '—'}</p>
+                            {item && driverTotal > 0 && <p className="type-label-telemetry text-silver">{t('team.share', { n: share.toFixed(1) })}</p>}
+                          </div>
+                          <Avatar src={driver.cutout ?? driver.image} name={driver.name} size={80} className="bg-transparent rounded-none shrink-0" />
                         </div>
-                        <div className="text-right shrink-0">
-                          <p className="type-telemetry-counter text-[18px] text-white">{item ? formatPoints(item.points) : '—'}</p>
-                          {item && driverTotal > 0 && <p className="type-label-telemetry uppercase text-on-surface-variant">{t('team.share', { n: share.toFixed(1) })}</p>}
+                        <div className="w-full h-1 bg-white/10">
+                          <div className="h-full bg-white transition-[width] duration-700" style={{ width: `${share}%` }} />
                         </div>
-                        <Avatar src={driver.cutout ?? driver.image} name={driver.name} size={80} className="bg-transparent rounded-none shrink-0" />
-                      </div>
-                      <div className="w-full h-1 bg-surface-container-highest">
-                        <div className="h-full bg-on-surface-variant transition-[width] duration-700" style={{ width: `${share}%` }} />
-                      </div>
-                    </Link>
+                      </Link>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
             </section>
           )}
 
-          {/* EVOLUCAO */}
-          {points.status === 'loading' && <div className="px-margin"><Skeleton className="h-44" /></div>}
+          {points.status === 'loading' && <Skeleton className="h-44" />}
           {evolution.length > 1 && firstLabel && lastLabel && (
-            <section className="px-margin">
-              <SectionTitle right={perStage != null ? `Δ ${formatPoints(Math.round(perStage * 10) / 10)} ${t('team.ptsPerStage')}` : undefined}>{t('team.evolution')}</SectionTitle>
-              <div className="rounded-lg bg-asphalt border border-hairline p-space-md mt-3">
-                <div className="flex justify-between type-label-telemetry uppercase mb-2 gap-2">
-                  <span className="text-on-surface-variant">R{pad2(firstLabel.round)} · {formatPoints(firstLabel.total)} PTS</span>
-                  <span className="text-white font-bold">R{pad2(lastLabel.round)} · {formatPoints(lastLabel.total)} PTS</span>
+            <section className="space-y-3">
+              <SectionTitle right={perStage != null ? `${formatPoints(Math.round(perStage * 10) / 10)} ${t('team.ptsPerStage')}` : undefined}>{t('team.evolution')}</SectionTitle>
+              <div className="rounded-2xl bg-asphalt border border-hairline p-4">
+                <div className="flex justify-between type-label-telemetry mb-2 gap-2 tabular">
+                  <span className="text-silver">R{pad2(firstLabel.round)} · {formatPoints(firstLabel.total)} {t('st.pts').toLowerCase()}</span>
+                  <span className="text-white font-bold">R{pad2(lastLabel.round)} · {formatPoints(lastLabel.total)} {t('st.pts').toLowerCase()}</span>
                 </div>
                 <Sparkline values={evolution.map((e) => e.total)} className="w-full h-24" />
-                <div className="flex justify-between type-label-telemetry uppercase text-on-surface-variant mt-2">
+                <div className="flex justify-between type-label-telemetry text-silver mt-2 tabular">
                   {pickTicks(evolution).map((tick, i, all) => (
-                    <span key={tick.round} className={cn(i === all.length - 1 && 'text-primary font-bold')}>R{pad2(tick.round)}</span>
+                    <span key={tick.round} className={cn(i === all.length - 1 && 'text-white font-bold')}>R{pad2(tick.round)}</span>
                   ))}
                 </div>
               </div>
             </section>
           )}
 
-          {/* SOBRE */}
           {bio && (
-            <section className="px-margin space-y-3">
+            <section className="space-y-4">
               <SectionTitle>{t('team.about')}</SectionTitle>
               <BioCard text={lang === 'en' ? bio.en : bio.pt} />
             </section>
           )}
 
-          {/* CLASSIFICACAO COMPLETA */}
-          <section className="px-margin">
-            <Link to={paths.standingsOf(category.id)} className="flex items-center justify-between rounded-lg bg-asphalt border border-hairline p-space-md hover:bg-asphalt-alt transition-colors">
-              <span className="type-label-badge uppercase tracking-wider text-on-surface-variant">{t('team.fullStandings', { name: category.name })}</span>
-              <span className="type-label-badge text-primary uppercase">{t('common.open')} →</span>
-            </Link>
-          </section>
+          <Link to={paths.standingsOf(category.id)} className="flex items-center justify-between gap-3 rounded-2xl bg-asphalt border border-hairline p-4 hover:border-white/40 transition-colors">
+            <span className="type-body-md text-white">{t('team.fullStandings', { name: category.name })}</span>
+            <span className="type-label-badge text-white">{t('common.open')} →</span>
+          </Link>
         </div>
       </div>
     </div>

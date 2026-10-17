@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-17T00:00:00Z",
+  "title": "Design System: PitStopHub",
+  "extensions": {
+    "colorMeta": {
+      "carbon": { "role": "neutral", "displayName": "Carbon", "canonical": "#000000", "tonalRamp": ["#000000", "#060607", "#0e0e10", "#121214", "#17171a", "#1e1e22", "#26262b", "#2a2a2e"] },
+      "asphalt": { "role": "neutral", "displayName": "Asphalt", "canonical": "#0e0e10", "tonalRamp": ["#000000", "#060607", "#0e0e10", "#121214", "#17171a", "#1e1e22", "#26262b", "#2a2a2e"] },
+      "white": { "role": "primary", "displayName": "Interface White", "canonical": "#ffffff", "tonalRamp": ["#3a3a40", "#6f6f78", "#8f8f98", "#b9b9c0", "#d8d8dc", "#f4f4f6", "#fafafa", "#ffffff"] },
+      "silver": { "role": "neutral", "displayName": "Silver", "canonical": "#b9b9c0", "tonalRamp": ["#3a3a40", "#6f6f78", "#8f8f98", "#a4a4ac", "#b9b9c0", "#d0d0d5", "#e4e4e7", "#f4f4f6"] },
+      "racing-red": { "role": "secondary", "displayName": "Racing Red (reserved)", "canonical": "#e10600", "tonalRamp": ["#3a0200", "#6b0300", "#930400", "#c00500", "#e10600", "#ff3b30", "#ff5a4f", "#ff9a92"] },
+      "signal": { "role": "secondary", "displayName": "Signal Red (text)", "canonical": "#ff5a4f", "tonalRamp": ["#930400", "#c00500", "#e10600", "#ff3b30", "#ff5a4f", "#ff7d74", "#ff9a92", "#ffc4bf"] },
+      "positive-green": { "role": "tertiary", "displayName": "Positive Green", "canonical": "#4ae176", "tonalRamp": ["#003d1a", "#005f28", "#008239", "#1fb757", "#4ae176", "#7aeb9a", "#aaf3be", "#dbffda"] },
+      "field-steel": { "role": "neutral", "displayName": "F1 Field Steel", "canonical": "#9aa5b8", "tonalRamp": ["#262b34", "#3a4150", "#4f5869", "#677184", "#808b9f", "#9aa5b8", "#b8c0cd", "#d6dbe3"] }
+    },
+    "typographyMeta": {
+      "reel-title": { "displayName": "Reel title", "purpose": "Race name on each reel item; 2rem / 2.5rem sm / 3.5rem lg." },
+      "display-hero": { "displayName": "Display hero", "purpose": "Page-level hero." },
+      "headline-lg": { "displayName": "Headline large", "purpose": "Category page title." },
+      "headline-md": { "displayName": "Headline medium", "purpose": "Section and sheet titles." },
+      "headline-sm": { "displayName": "Headline small", "purpose": "Row titles and fact values." },
+      "body-lg": { "displayName": "Body large", "purpose": "Editorial reading text, max 68ch." },
+      "body-md": { "displayName": "Body medium", "purpose": "Lists and inputs." },
+      "body-sm": { "displayName": "Body small", "purpose": "Secondary lines." },
+      "counter": { "displayName": "Counter", "purpose": "Countdown numerals, tabular." },
+      "label-badge": { "displayName": "Label badge", "purpose": "Pills, tabs, buttons; 12px floor." },
+      "label-telemetry": { "displayName": "Label telemetry", "purpose": "Legends, dates, glyph labels." }
+    },
+    "shadows": [
+      { "name": "toast", "value": "0 8px 30px rgba(0,0,0,0.5)", "purpose": "Diffuse lift for the white toast pill." },
+      { "name": "champion-card", "value": "0 16px 36px rgba(0,0,0,0.35)", "purpose": "Soft lift on champion art cards (hover 0 22px 44px rgba(0,0,0,0.45))." }
+    ],
+    "motion": [
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Page entry, 220ms, opacity and 6px rise." },
+      { "name": "transition-ui", "value": "200ms", "purpose": "Colour and transform on controls; press scale 0.97 / 0.9." },
+      { "name": "sheet-spring", "value": "spring stiffness 380, damping 34", "purpose": "Sheet entry from 40px below." },
+      { "name": "toast-rise", "value": "200ms, 12px", "purpose": "Toast enter and exit." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "White pill, 44px, main action.",
+      "html": "<button class=\"ds-btn\">Seguir</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 20px; border-radius: 999px; background: #fff; color: #000; border: 0; font-family: Archivo, sans-serif; font-size: 0.875rem; font-weight: 650; letter-spacing: 0.01em; transition: background-color 200ms, transform 200ms; } .ds-btn:hover { background: rgba(255,255,255,0.85); } .ds-btn:active { transform: scale(0.97); } .ds-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Outlined pill.",
+      "html": "<button class=\"ds-btn-secondary\">Agenda</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 20px; border-radius: 999px; background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.3); font-family: Archivo, sans-serif; font-size: 0.875rem; font-weight: 650; transition: background-color 200ms, border-color 200ms; } .ds-btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.6); } .ds-btn-secondary:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Glyph Button",
+      "kind": "button",
+      "refersTo": "glyph-button",
+      "description": "44px round glyph with label, used in the reel action rail.",
+      "html": "<button class=\"ds-glyph\"><span class=\"ds-glyph-c\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9\"/><path d=\"M10.3 21a1.9 1.9 0 0 0 3.4 0\"/></svg></span><span class=\"ds-glyph-l\">Seguir</span></button>",
+      "css": ".ds-glyph { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: 0; color: #fff; font-family: Archivo, sans-serif; } .ds-glyph-c { width: 44px; height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.45); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); transition: background-color 200ms, transform 200ms; } .ds-glyph:hover .ds-glyph-c { background: rgba(255,255,255,0.2); } .ds-glyph:active .ds-glyph-c { transform: scale(0.9); } .ds-glyph:focus-visible { outline: 2px solid #fff; outline-offset: 3px; } .ds-glyph-l { font-size: 0.75rem; font-weight: 500; text-shadow: 0 1px 6px rgba(0,0,0,.8); }"
+    },
+    {
+      "name": "Pill Strip",
+      "kind": "chip",
+      "refersTo": "pill-strip-item",
+      "description": "Filter chips; selected is white.",
+      "html": "<div class=\"ds-pills\"><button class=\"ds-pill ds-pill-on\">Todas</button><button class=\"ds-pill\">Ao vivo</button></div>",
+      "css": ".ds-pills { display: flex; gap: 8px; } .ds-pill { height: 36px; padding: 0 16px; border-radius: 999px; background: transparent; color: #b9b9c0; border: 1px solid rgba(255,255,255,0.2); font-family: Archivo, sans-serif; font-size: 0.8125rem; font-weight: 650; transition: color 200ms, border-color 200ms; } .ds-pill:hover { color: #fff; border-color: rgba(255,255,255,0.5); } .ds-pill-on { background: #fff; color: #000; border-color: #fff; } .ds-pill:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }"
+    },
+    {
+      "name": "State Legend",
+      "kind": "custom",
+      "refersTo": "state-mark",
+      "description": "Solid = live, dashed = daily, half = catalog.",
+      "html": "<ul class=\"ds-legend\"><li><span class=\"ds-mark\"></span>Ao vivo</li><li><span class=\"ds-mark ds-mark-daily\"></span>Diario</li><li><span class=\"ds-mark ds-mark-cat\"></span>Catalogo</li></ul>",
+      "css": ".ds-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-family: Archivo, sans-serif; font-size: 0.75rem; font-weight: 500; color: #b9b9c0; } .ds-legend li { display: flex; align-items: center; gap: 10px; } .ds-mark { display: inline-block; width: 1.125rem; height: 0; border-top: 3px solid #fff; } .ds-mark-daily { border-top-style: dashed; } .ds-mark-cat { width: 0.5625rem; }"
+    },
+    {
+      "name": "Category Rail Row",
+      "kind": "nav",
+      "refersTo": "rail-row",
+      "description": "44px category link with state mark and next date; active inverts to white.",
+      "html": "<a class=\"ds-row ds-row-on\" href=\"#\"><span class=\"ds-rm\"></span><span>Formula 1</span><span class=\"ds-date\">24 out</span></a><a class=\"ds-row\" href=\"#\"><span class=\"ds-rm\"></span><span>WEC</span><span class=\"ds-date\">02 nov</span></a>",
+      "css": ".ds-row { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 12px; border-radius: 0.75rem; color: #b9b9c0; text-decoration: none; font-family: Archivo, sans-serif; font-size: 0.9375rem; transition: background-color 200ms, color 200ms; } .ds-row:hover { color: #fff; background: rgba(255,255,255,0.1); } .ds-row-on, .ds-row-on:hover { background: #fff; color: #000; font-weight: 700; } .ds-rm { width: 1.125rem; border-top: 3px solid currentColor; } .ds-date { margin-left: auto; font-size: 0.75rem; font-variant-numeric: tabular-nums; opacity: 0.7; } .ds-row:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Fact List",
+      "kind": "card",
+      "refersTo": "list-group",
+      "description": "Label and value rows in an asphalt panel.",
+      "html": "<dl class=\"ds-facts\"><div><dt>Etapas</dt><dd>24</dd></div><div><dt>Proxima largada</dt><dd>24 out</dd></div></dl>",
+      "css": ".ds-facts { margin: 0; background: #0e0e10; border: 1px solid rgba(255,255,255,0.12); border-radius: 1.5rem; overflow: hidden; font-family: Archivo, sans-serif; } .ds-facts div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 12px 16px; } .ds-facts div + div { border-top: 1px solid rgba(255,255,255,0.07); } .ds-facts dt { font-size: 0.8125rem; color: #b9b9c0; } .ds-facts dd { margin: 0; font-size: 1rem; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Reel Item",
+      "kind": "custom",
+      "refersTo": "reel-title",
+      "description": "Signature: tinted field, title bottom left, glyph rail right.",
+      "html": "<article class=\"ds-reel\"><div class=\"ds-reel-field\"></div><div class=\"ds-reel-cap\"><h2>Grande Premio do Brasil</h2><p>dom, 9 nov · 14:00</p><span class=\"ds-live\"><i></i>Ao vivo</span></div></article>",
+      "css": ".ds-reel { position: relative; width: 320px; height: 420px; overflow: hidden; background: #000; font-family: Archivo, sans-serif; color: #fff; } .ds-reel-field { position: absolute; inset: 0; background: radial-gradient(120% 80% at 75% 8%, color-mix(in oklab, #9aa5b8 46%, #000) 0%, color-mix(in oklab, #9aa5b8 18%, #000) 46%, #000 82%), linear-gradient(to top, #000 0%, rgba(0,0,0,0.88) 26%, transparent 70%); } .ds-reel-cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 84px 24px 20px; } .ds-reel-cap h2 { margin: 0 0 10px; font-size: 2rem; line-height: 0.98; font-weight: 800; letter-spacing: -0.035em; } .ds-reel-cap p { margin: 0 0 10px; font-size: 1.125rem; font-weight: 700; font-variant-numeric: tabular-nums; } .ds-live { display: inline-flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 650; } .ds-live i { width: 8px; height: 8px; border-radius: 999px; background: #e10600; }"
+    },
+    {
+      "name": "Toast",
+      "kind": "custom",
+      "refersTo": "toast",
+      "description": "White pill confirmation.",
+      "html": "<div class=\"ds-toast\">Alertas ativados</div>",
+      "css": ".ds-toast { display: inline-flex; align-items: center; padding: 8px 16px; border-radius: 999px; background: #fff; color: #000; font-family: Archivo, sans-serif; font-size: 0.8125rem; font-weight: 650; box-shadow: 0 8px 30px rgba(0,0,0,0.5); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Reel",
+    "overview": "PitStopHub is a vertical media feed for motorsport. A black stage holds one race at a time: the category tints only the backdrop, the race title sits at the bottom left in heavy Archivo, and a rail of four round glyphs sits at the right. White is the only interface colour; red is reserved for next start, live and following; data freshness is carried by form (solid, dashed, half), not colour.",
+    "keyCharacteristics": [
+      "Pure black ground, neutral panels with no blue or wine cast.",
+      "White as the interface colour; red reserved.",
+      "One family (Archivo), heavy weights for titles, minimum text size 12px.",
+      "Round controls (pills and 44px glyphs), large-radius panels.",
+      "Depth by tonal layering and hairlines; no decorative shadows.",
+      "Category colour lives in the media field only."
+    ],
+    "rules": [
+      { "name": "The Reserved Red Rule", "body": "Red means next start, live, or following. If a red element is none of those, it is wrong.", "section": "colors" },
+      { "name": "The Field Only Rule", "body": "Category hues colour the backdrop and nothing else: no text, buttons, borders or chart series.", "section": "colors" },
+      { "name": "The Positive Only Rule", "body": "Green appears only for a positive delta.", "section": "colors" },
+      { "name": "The One Family Rule", "body": "Archivo only. No second display face.", "section": "typography" },
+      { "name": "The Sentence Case Rule", "body": "Labels and headings are sentence case. Tracking on labels stays at 0.01em.", "section": "typography" },
+      { "name": "The Tabular Rule", "body": "Any number that lines up uses tabular numerals.", "section": "typography" },
+      { "name": "The Tonal Depth Rule", "body": "Panels separate from the stage by step and hairline, not by shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use white for every interactive emphasis and reserve #e10600 for next start, live and following.",
+      "Do use signal (#ff5a4f) if red must be text.",
+      "Do show data freshness with the state mark shape (solid, dashed, half), with its text name beside it.",
+      "Do keep controls at least 44px and text at least 12px (0.75rem).",
+      "Do use tabular numerals for aligned numbers and sentence case for labels.",
+      "Do tint only the media field with the category hue; keep F1 steel (#9aa5b8).",
+      "Do keep motion between 150 and 250ms with exponential ease-out, and honour reduced motion."
+    ],
+    "donts": [
+      "Don't put an eyebrow or kicker above a heading.",
+      "Don't use a coloured border-left stripe on rows or cards.",
+      "Don't use hard offset shadows.",
+      "Don't use red as a series, category or chart tone, or any hue as a text colour.",
+      "Don't use uppercase tracked labels.",
+      "Don't add a second type family or text under 12px.",
+      "Don't colour interface chrome with category or team hues; team colours are thin data marks only."
+    ]
+  }
+}
