@@ -420,6 +420,7 @@ const entries: Record<string, readonly [pt: string, en: string]> = {
   'cal.toCome': ['A disputar', 'Still to race'],
   'cal.played': ['Já disputadas', 'Already raced'],
   'reel.agenda': ['Agenda', 'Calendar'],
+  'reel.noTrack': ['Obs.: desenho desta pista ainda não disponível', 'Note: this track map is not available yet'],
 };
 
 export const dictionary = {
