@@ -1,12 +1,13 @@
 import { lazy, useEffect } from 'react';
-import { BrowserRouter, Link, Navigate, Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
-import { EmptyState } from '../components/ui';
+import { BrowserRouter, Navigate, Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
+import { Button, EmptyState } from '../components/ui';
 import { useT } from '../lib/i18n';
 import { MOTORSPORT_DATA } from '../types';
 import AppShell from './AppShell';
 import { paths } from './paths';
 
 const HomePage = lazy(() => import('../pages/HomePage'));
+const AgendaPage = lazy(() => import('../pages/AgendaPage'));
 const CalendarPage = lazy(() => import('../pages/CalendarPage'));
 const StandingsPage = lazy(() => import('../pages/StandingsPage'));
 const CategoriesPage = lazy(() => import('../pages/CategoriesPage'));
@@ -54,7 +55,7 @@ function NotFound() {
       <EmptyState
         title={t('app.notFound')}
         hint={t('app.notFoundHint')}
-        action={<Link to={paths.home} className="px-4 py-1.5 rounded-lg bg-surface-raised text-text-primary type-label-badge uppercase tracking-wider">{t('nav.home')}</Link>}
+        action={<Button to={paths.home}>{t('nav.home')}</Button>}
       />
     </div>
   );
@@ -67,6 +68,7 @@ export default function AppRouter() {
       <Routes>
         <Route element={<AppShell />}>
           <Route index element={<HomeEntry />} />
+          <Route path="agenda" element={<AgendaPage />} />
           <Route path="calendario" element={<CalendarPage />} />
           <Route path="classificacao" element={<StandingsPage />} />
           <Route path="categorias" element={<CategoriesPage />} />

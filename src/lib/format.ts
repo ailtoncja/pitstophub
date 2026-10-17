@@ -57,6 +57,14 @@ export function longDate(date: Date, lang: Lang): string {
   return new Intl.DateTimeFormat(localeOf(lang), { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
 }
 
+/** "Domingo, 25 out" (dia da semana por extenso, dia e mes curto; em ingles "Sunday, 25 Oct"). */
+export function weekdayDayMonth(date: Date, lang: Lang): string {
+  const weekday = new Intl.DateTimeFormat(localeOf(lang), { weekday: 'long' }).format(date);
+  const month = new Intl.DateTimeFormat(localeOf(lang), { month: 'short' }).format(date).replace('.', '');
+  const text = `${weekday}, ${date.getDate()} ${month}`;
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 /** "04 Out, 03:00" (so a data quando a fonte nao informa horario). */
 export function raceWhen(race: Race, lang: Lang): string {
   const date = raceStartDate(race);

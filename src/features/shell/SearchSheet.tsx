@@ -66,7 +66,7 @@ export function SearchSheet({ open, onClose }: { open: boolean; onClose: () => v
 
   return (
     <Sheet open={open} onClose={onClose} title={t('search.title')} closeLabel={t('common.close')}>
-      <label className="flex items-center gap-2 rounded-lg bg-asphaltest border border-hairline px-3.5 focus-within:border-racing-red/60 transition-colors">
+      <label className="flex items-center gap-2 rounded-full bg-asphalt border border-white/25 px-4 focus-within:border-white transition-colors">
         <Search className="w-[18px] h-[18px] text-text-muted shrink-0" />
         <input
           ref={inputRef}
@@ -95,9 +95,9 @@ export function SearchSheet({ open, onClose }: { open: boolean; onClose: () => v
                     <span className="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-text-muted shrink-0"><Icon className="w-4 h-4" /></span>
                     <span className="min-w-0 flex-1">
                       <span className="block type-body-md font-bold text-text-primary truncate">{hit.title}</span>
-                      <span className="block type-label-telemetry uppercase text-text-muted truncate">{hit.sub}</span>
+                      <span className="block type-label-telemetry text-text-muted truncate">{hit.sub}</span>
                     </span>
-                    <span className="type-label-telemetry uppercase text-text-muted shrink-0">{t(`search.kind.${hit.kind}`)}</span>
+                    <span className="type-label-telemetry text-text-muted shrink-0">{t(`search.kind.${hit.kind}`)}</span>
                   </button>
                 </li>
               );

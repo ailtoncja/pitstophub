@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type * as THREE from 'three';
 
-const WORDMARK = 'PITSTOPHUB';
+const WORDMARK = 'PitStopHub';
 const HUB_START = 7;
 const LINE_COUNT = 14;
 // Segundos ate a intro se fechar sozinha (a marca ja terminou de entrar por volta de 3.2s;
@@ -102,8 +102,8 @@ export default function PitstopIntro({ onDone }: PitstopIntroProps) {
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
       const scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x08090b);
-      scene.fog = new THREE.Fog(0x08090b, 12, 30);
+      scene.background = new THREE.Color(0x000000);
+      scene.fog = new THREE.Fog(0x000000, 12, 30);
       const camera = new THREE.PerspectiveCamera(BASE_FOV_DEG, 1, 0.1, 100);
 
       scene.add(new THREE.HemisphereLight(0x556070, 0x090a0c, 0.55));

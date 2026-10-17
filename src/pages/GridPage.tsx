@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Users } from 'lucide-react';
 import { DriverCard, TeamCard } from '../components/cards';
+import { CategoryHeader } from '../components/CategoryHeader';
 import { EmptyState, Segmented, Skeleton } from '../components/ui';
 import { findCategoryDriver, findCategoryTeam, teamOfDriver } from '../lib/entities';
 import { useT } from '../lib/i18n';
@@ -50,50 +51,51 @@ export default function GridPage() {
   const season = category?.calendar[0]?.date.slice(0, 4);
 
   if (!category) {
-    return <div className="px-margin pt-6 space-y-3"><Skeleton className="h-10 w-1/2" /><Skeleton className="h-28" /><Skeleton className="h-28" /></div>;
+    return <div className="px-margin lg:px-0 pt-6 space-y-3"><Skeleton className="h-10 w-1/2" /><Skeleton className="h-28" /><Skeleton className="h-28" /></div>;
   }
 
   const empty = drivers.length === 0 && teams.length === 0;
 
   return (
-    <div className="flex flex-col w-full px-margin pt-6 pb-8 gap-space-lg page-in">
-      <header className="border-l-4 border-primary-container pl-4 space-y-1.5">
-        <h1 className="type-headline-lg text-[34px] leading-9 uppercase text-on-surface">{t('grid.title')}</h1>
-        <p className="type-label-badge uppercase tracking-widest text-on-surface-variant">{[category.name, season].filter(Boolean).join(' • ')}</p>
-      </header>
+    <div className="px-margin lg:px-0 pb-10 page-in">
+      <CategoryHeader category={category} current="grid" />
 
-      {empty ? (
-        !ready ? (
-          <div className="space-y-3"><Skeleton className="h-28" /><Skeleton className="h-28" /></div>
-        ) : (
-          <EmptyState icon={Users} title={t('grid.title')} hint={t('grid.empty')} />
-        )
-      ) : (
-        <>
-          <Segmented
-            className="w-fit"
-            options={[
-              { value: 'drivers' as const, label: t('grid.drivers', { n: drivers.length }) },
-              { value: 'teams' as const, label: t('grid.teams', { n: teams.length }) },
-            ]}
-            value={view}
-            onChange={setView}
-          />
-          {view === 'drivers' ? (
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {drivers.map(({ driver, standing }) => (
-                <DriverCard key={driver.id} category={category} driver={driver} team={teamOfDriver(category, driver)} standing={standing} />
-              ))}
-            </div>
+      <div className="mt-6 space-y-5">
+        <h2 className="type-headline-md text-white">{[t('grid.title'), season].filter(Boolean).join(' · ')}</h2>
+
+        {empty ? (
+          !ready ? (
+            <div className="space-y-3"><Skeleton className="h-28" /><Skeleton className="h-28" /></div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 items-start">
-              {teams.map((team) => (
-                <TeamCard key={team.id} category={category} team={team} drivers={category.drivers.filter((driver) => driver.teamId === team.id)} />
-              ))}
-            </div>
-          )}
-        </>
-      )}
+            <EmptyState icon={Users} title={t('grid.title')} hint={t('grid.empty')} />
+          )
+        ) : (
+          <>
+            <Segmented
+              className="w-fit"
+              options={[
+                { value: 'drivers' as const, label: t('grid.drivers', { n: drivers.length }) },
+                { value: 'teams' as const, label: t('grid.teams', { n: teams.length }) },
+              ]}
+              value={view}
+              onChange={setView}
+            />
+            {view === 'drivers' ? (
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {drivers.map(({ driver, standing }) => (
+                  <DriverCard key={driver.id} category={category} driver={driver} team={teamOfDriver(category, driver)} standing={standing} />
+                ))}
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 items-start">
+                {teams.map((team) => (
+                  <TeamCard key={team.id} category={category} team={team} drivers={category.drivers.filter((driver) => driver.teamId === team.id)} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -28,17 +28,17 @@ export function AlertsSheet({ open, onClose, onOpenProfile }: { open: boolean; o
         <NotificationsPanel />
 
         <section>
-          <h3 className="type-headline-sm uppercase text-text-primary mb-2">{t('alerts.next')}</h3>
+          <h3 className="type-headline-sm text-text-primary mb-2">{t('alerts.next')}</h3>
           {!user ? (
             <div className="rounded-lg border border-dashed border-hairline p-5 text-center">
               <p className="type-body-sm text-text-muted">{t('alerts.needLogin')}</p>
-              <button type="button" onClick={() => { onClose(); requestLogin(); }} className="mt-3 px-4 py-2 rounded-lg bg-racing-red text-white type-label-badge uppercase tracking-wider active:scale-95 transition-transform">{t('profile.login')}</button>
+              <button type="button" onClick={() => { onClose(); requestLogin(); }} className="mt-3 px-4 h-9 rounded-full bg-white text-black type-label-badge active:scale-95 transition-transform">{t('profile.login')}</button>
             </div>
           ) : upcoming.length === 0 ? (
             <div className="rounded-lg border border-dashed border-hairline p-5 text-center">
               <BellRing className="w-6 h-6 text-text-muted mx-auto mb-2" />
               <p className="type-body-sm text-text-muted">{t('alerts.empty')}</p>
-              <button type="button" onClick={() => { onClose(); onOpenProfile(); }} className="mt-3 px-4 py-2 rounded-lg bg-surface-container-high text-text-primary type-label-badge uppercase tracking-wider active:scale-95 transition-transform">{t('alerts.choose')}</button>
+              <button type="button" onClick={() => { onClose(); onOpenProfile(); }} className="mt-3 px-4 h-9 rounded-full bg-surface-container-high text-text-primary type-label-badge active:scale-95 transition-transform">{t('alerts.choose')}</button>
             </div>
           ) : (
             <ul className="divide-y divide-surface-container-high rounded-lg bg-asphalt overflow-hidden">
@@ -48,7 +48,7 @@ export function AlertsSheet({ open, onClose, onOpenProfile }: { open: boolean; o
                     <span className="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-text-muted shrink-0"><CalendarDays className="w-4 h-4" /></span>
                     <span className="min-w-0 flex-1">
                       <span className="block type-body-md font-bold text-text-primary truncate">{raceTitle(race, lang)}</span>
-                      <span className="block type-label-telemetry uppercase text-text-muted truncate">{category.name} • {raceWhen(race, lang)}</span>
+                      <span className="block type-label-telemetry text-text-muted truncate">{category.name} • {raceWhen(race, lang)}</span>
                     </span>
                   </Link>
                 </li>
