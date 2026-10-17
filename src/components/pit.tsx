@@ -11,10 +11,10 @@ import { MOTORSPORT_DATA, type Race } from '../types';
 
 // Desenho do carro de cada serie (arte branca com transparencia em public/cars, tingida pelo tom da categoria).
 const CAR_ART: Record<string, string> = {
-  f1: '/cars/indy.webp',
-  f2: '/cars/indy.webp',
-  f3: '/cars/indy.webp',
-  'f1-academy': '/cars/indy.webp',
+  f1: '/cars/f1.webp',
+  f2: '/cars/f1.webp',
+  f3: '/cars/f1.webp',
+  'f1-academy': '/cars/f1.webp',
   indy: '/cars/indy.webp',
   nascar: '/cars/nascar.webp',
   wrc: '/cars/wrc.webp',
