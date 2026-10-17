@@ -37,7 +37,7 @@ export function SearchSheet({ open, onClose }: { open: boolean; onClose: () => v
     };
     for (const category of categories) {
       if (normalize(`${category.name} ${category.fullName}`).includes(q)) {
-        push({ key: `c-${category.id}`, kind: 'category', to: paths.category(category.id), title: category.name, sub: category.fullName });
+        push({ key: `c-${category.id}`, kind: 'category', to: paths.categoryEntry(category), title: category.name, sub: category.fullName });
       }
       for (const driver of category.drivers) {
         if (normalize(`${driver.name} ${driver.number}`).includes(q)) {

@@ -24,11 +24,11 @@ export function CategoryHeader({ category, current }: { category: Category; curr
   const hasRules = (category.rulesFormat?.length ?? 0) > 0;
 
   const tabs: { key: CategorySection; to: string; label: string }[] = [
+    ...(hasRules ? [{ key: 'rules' as const, to: paths.rules(category.id), label: t('cat.tabRules') }] : []),
     { key: 'overview', to: paths.category(category.id), label: t('cat.tabOverview') },
     { key: 'calendar', to: paths.calendarOf(category.id), label: t('nav.calendar') },
     { key: 'standings', to: paths.standingsOf(category.id), label: t('nav.standings') },
     { key: 'grid', to: paths.gridOf(category.id), label: t('nav.grid') },
-    ...(hasRules ? [{ key: 'rules' as const, to: paths.rules(category.id), label: t('cat.tabRules') }] : []),
   ];
 
   const toggleFollow = () => {

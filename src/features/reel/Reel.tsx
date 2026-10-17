@@ -146,7 +146,7 @@ function ReelCard({ item, index, active, next, setRef, onNext }: { item: ReelIte
   return (
     <article ref={setRef} data-index={index} className="reel-item relative shrink-0" aria-label={`${category.name}: ${title}`}>
       <div className="absolute inset-0 overflow-hidden">
-        <ReelBackdrop race={race} categoryId={category.id} eager={index < 2} />
+        <ReelBackdrop race={race} categoryId={category.id} eager={index < 2} label={category.name} />
       </div>
 
       {/* Legenda ancorada embaixo, a esquerda */}
@@ -185,7 +185,7 @@ function ReelCard({ item, index, active, next, setRef, onNext }: { item: ReelIte
           </p>
         )}
 
-        <Link to={paths.category(category.id)} onClick={() => select(category.id)} tabIndex={tab} className="inline-flex items-center gap-2.5 type-label-badge text-[0.875rem] text-white hover:underline underline-offset-4 decoration-white/50">
+        <Link to={paths.categoryEntry(category)} onClick={() => select(category.id)} tabIndex={tab} className="inline-flex items-center gap-2.5 type-label-badge text-[0.875rem] text-white hover:underline underline-offset-4 decoration-white/50">
           <StateMark state={dataStateOf(category.id)} className="text-white" />
           <span>{category.name}</span>
           {item.round != null && item.rounds > 0 && <span className="text-silver font-medium">{t('home.roundOf', { n: item.round, total: item.rounds })}</span>}
