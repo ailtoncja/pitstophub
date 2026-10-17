@@ -42,6 +42,7 @@ export function ReelBackdrop({
   hue: hueOverride,
   bare = false,
   eager = false,
+  label,
   className,
 }: {
   race?: Race | null;
@@ -52,16 +53,42 @@ export function ReelBackdrop({
   bare?: boolean;
   /** Carrega o mapa ja (os dois primeiros itens do reel: o seguinte precisa estar pronto quando aparece embaixo). */
   eager?: boolean;
+  /** Sem mapa da pista: o nome da serie em tamanho grande, atras do carro (so no reel). */
+  label?: string;
   className?: string;
 }) {
   const hue = hueOverride ?? accentOf(categoryId);
   const track = useMemo(() => (race && !bare ? getRaceCircuitInfo(race)?.trackImage : undefined), [race, bare]);
   const car = bare ? undefined : carArtOf(categoryId);
   return (
-    <div className={cn('absolute inset-0 overflow-hidden bg-black', className)} aria-hidden>
+    <div className={cn('absolute inset-0 overflow-hidden bg-black', className)} style={{ containerType: 'inline-size' }} aria-hidden>
       <div className="absolute inset-0" style={{ background: `radial-gradient(120% 80% at 75% 8%, color-mix(in oklab, ${hue} 46%, #000) 0%, color-mix(in oklab, ${hue} 18%, #000) 46%, #000 82%)` }} />
       {track ? (
         <img src={track} alt="" className="absolute top-[7%] inset-x-0 mx-auto h-[50%] w-[92%] object-contain" loading={eager ? 'eager' : 'lazy'} />
+      ) : car && label ? (
+        <>
+          <span
+            className="absolute top-[12%] left-5 right-5 font-extrabold leading-[0.9] tracking-[-0.05em] whitespace-nowrap select-none"
+            style={{ fontSize: `min(8.5rem, ${(86 / (label.length * 0.68)).toFixed(1)}cqw)`, color: 'transparent', WebkitTextStroke: `1.5px color-mix(in oklab, ${hue} 60%, #fff)`, opacity: 0.45 }}
+          >
+            {label}
+          </span>
+          <div
+            className="absolute top-[24%] right-5 w-[58%] max-w-[17rem] aspect-[2/1]"
+            style={{
+              backgroundColor: `color-mix(in oklab, ${hue} 65%, #fff)`,
+              opacity: 0.55,
+              WebkitMaskImage: `url(${car})`,
+              maskImage: `url(${car})`,
+              WebkitMaskSize: 'contain',
+              maskSize: 'contain',
+              WebkitMaskRepeat: 'no-repeat',
+              maskRepeat: 'no-repeat',
+              WebkitMaskPosition: 'right center',
+              maskPosition: 'right center',
+            }}
+          />
+        </>
       ) : car ? (
         <div
           className="absolute top-[12%] right-[-6%] w-[96%] aspect-[2.2/1]"

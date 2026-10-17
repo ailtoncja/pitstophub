@@ -12,6 +12,9 @@ export const paths = {
   grid: '/grid',
   rules: (categoryId: string, section = 0) => `/como-funciona/${enc(categoryId)}${section > 0 ? `?s=${section}` : ''}`,
   category: (categoryId: string) => `/categorias/${enc(categoryId)}`,
+  /** Entrada de uma categoria: abre direto em "Como funciona" quando a categoria tem regras. */
+  categoryEntry: (category: { id: string; rulesFormat?: unknown[] }) =>
+    (category.rulesFormat?.length ?? 0) > 0 ? `/como-funciona/${enc(category.id)}` : `/categorias/${enc(category.id)}`,
   driver: (categoryId: string, driverId: string) => `/piloto/${enc(categoryId)}/${enc(driverId)}`,
   team: (categoryId: string, teamId: string) => `/equipe/${enc(categoryId)}/${enc(teamId)}`,
   race: (categoryId: string, raceId: string) => `/circuito/${enc(categoryId)}/${enc(raceId)}`,

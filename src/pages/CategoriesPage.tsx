@@ -97,7 +97,7 @@ export default function CategoriesPage() {
                   return (
                     <li key={category.id} className="relative h-[11.5rem] rounded-2xl overflow-hidden border border-hairline hover:border-white/40 transition-colors">
                       <ReelBackdrop categoryId={category.id} />
-                      <Link to={paths.category(category.id)} onClick={() => select(category.id)} className="absolute inset-0 flex flex-col justify-end p-5 gap-1" aria-label={category.fullName}>
+                      <Link to={paths.categoryEntry(category)} onClick={() => select(category.id)} className="absolute inset-0 flex flex-col justify-end p-5 gap-1" aria-label={category.fullName}>
                         <span className="type-headline-md text-white line-clamp-2 pr-14">{lang === 'en' ? category.enFullName ?? category.fullName : category.fullName}</span>
                         <span className="type-body-sm text-silver line-clamp-1 tabular">
                           {next ? `${dayMonth(raceStartDate(next), lang)} · ${raceTitle(next, lang)}` : t('cats.noNext')}

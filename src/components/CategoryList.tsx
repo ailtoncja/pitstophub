@@ -42,7 +42,7 @@ export function CategoryList({ activeId, onNavigate, legend = true, className }:
                 return (
                   <li key={category.id}>
                     <Link
-                      to={paths.category(category.id)}
+                      to={paths.categoryEntry(category)}
                       onClick={() => {
                         select(category.id);
                         onNavigate?.();
