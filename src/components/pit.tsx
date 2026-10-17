@@ -52,6 +52,7 @@ export function ReelBackdrop({
   bare = false,
   eager = false,
   art = 'track',
+  compact = false,
   className,
 }: {
   race?: Race | null;
@@ -64,6 +65,8 @@ export function ReelBackdrop({
   eager?: boolean;
   /** "car" sempre mostra o carro da serie (Inicio); "track" prefere o mapa do circuito. */
   art?: 'car' | 'track';
+  /** Cartoes pequenos: carro menor, no canto, para caber inteiro. */
+  compact?: boolean;
   className?: string;
 }) {
   const hue = hueOverride ?? accentOf(categoryId);
@@ -79,7 +82,7 @@ export function ReelBackdrop({
           {/* pre-carrega a arte (mask-image nao tem loading="eager") */}
           {eager && <link rel="preload" as="image" href={car} />}
           <div
-            className="absolute top-[5%] inset-x-0 mx-auto w-[96%] max-w-[46rem] aspect-[1672/941]"
+            className={cn('absolute aspect-[1672/941]', compact ? 'top-[6%] right-[15%] w-[52%]' : 'top-[5%] inset-x-0 mx-auto w-[96%] max-w-[46rem]')}
             style={{
               backgroundColor: `color-mix(in oklab, ${hue} 30%, #fff)`,
               opacity: 0.8,

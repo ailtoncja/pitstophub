@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowUpRight, Bell, BellRing, CalendarPlus, ChevronDown, MapPin, Share2 } from 'lucide-react';
 import { paths } from '../../app/paths';
+import { getRaceCircuitInfo } from '../../circuit-info';
 import { ReelBackdrop, StatusTag } from '../../components/pit';
 import { useToast } from '../../components/Toast';
 import { Countdown, GlyphButton, StateMark } from '../../components/ui';
@@ -108,6 +109,7 @@ function ReelCard({ item, index, active, next, setRef, onNext }: { item: ReelIte
   const settings = useSettings();
   const { select } = useSelectedCategory();
   const { category, race, phase } = item;
+  const hasTrack = Boolean(getRaceCircuitInfo(race)?.trackImage);
   // So o item atual entra na ordem de tabulacao (sao quatro glifos por item); os outros continuam lidos por leitores de tela.
   const tab = active ? 0 : -1;
 
@@ -146,7 +148,10 @@ function ReelCard({ item, index, active, next, setRef, onNext }: { item: ReelIte
   return (
     <article ref={setRef} data-index={index} className="reel-item relative shrink-0" aria-label={`${category.name}: ${title}`}>
       <div className="absolute inset-0 overflow-hidden">
-        <ReelBackdrop race={race} categoryId={category.id} eager={index < 2} art="car" />
+        <ReelBackdrop race={race} categoryId={category.id} eager={index < 2} />
+        {!hasTrack && (
+          <p className="absolute top-4 left-5 lg:left-9 type-label-telemetry text-silver bg-black/50 backdrop-blur-sm rounded-full px-3 py-1.5">{t('reel.noTrack')}</p>
+        )}
       </div>
 
       {/* Legenda ancorada embaixo, a esquerda */}
