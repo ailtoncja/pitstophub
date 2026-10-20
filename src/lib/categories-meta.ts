@@ -52,7 +52,7 @@ export const accentOf = (categoryId: string) => CATEGORY_ACCENTS[categoryId] ?? 
 /**
  * De onde vem o dado de cada categoria, em tres graus que a interface mostra pela forma do filete:
  * live = calendario e classificacao ao vivo (Jolpica, api-motorsports; atualizam em minutos);
- * daily = calendario e classificacao sincronizados todo dia (TheSportsDB via Supabase);
+ * daily = calendario e classificacao sincronizados das fontes oficiais pelo motor do Supabase (pitstophub-data);
  * catalog = calendario diario, mas a classificacao vem do catalogo estatico e pode estar desatualizada.
  */
 export type DataState = 'live' | 'daily' | 'catalog';
@@ -67,11 +67,11 @@ export const DATA_STATE: Record<string, DataState> = {
   f3: 'daily',
   dtm: 'daily',
   wrc: 'daily',
-  wec: 'catalog',
-  imsa: 'catalog',
-  indy: 'catalog',
-  nascar: 'catalog',
-  'f1-academy': 'catalog',
+  wec: 'daily',
+  imsa: 'daily',
+  indy: 'daily',
+  nascar: 'daily',
+  'f1-academy': 'daily',
 };
 
 export const dataStateOf = (categoryId: string): DataState => DATA_STATE[categoryId] ?? 'catalog';
