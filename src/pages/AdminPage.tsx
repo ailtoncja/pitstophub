@@ -1,12 +1,14 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, EmptyState, SectionTitle } from '../components/ui';
+import { useAuth } from '../state/auth-context';
+import { supabase } from '../supabase';
 
 // Painel de correcao do motor de sincronizacao (Edge Function "admin" no Supabase).
-// Nao aparece no menu: acesso por /admin com a senha ADMIN_TOKEN, guardada so
-// nesta aba (sessionStorage). A chave service_role nunca chega ao navegador.
+// Nao aparece no menu. So abre para a conta do dono do site: a funcao confere a
+// sessao de login e o ID do usuario (segredo ADMIN_USER_IDS no Supabase). A tela
+// aqui e so conveniencia; quem barra de verdade e o servidor.
 
 const API = `${import.meta.env.VITE_SUPABASE_URL ?? ''}/functions/v1/admin`;
-const TOKEN_KEY = 'pitstophub.admin.token';
 
 type Mode = 'off' | 'dry_run' | 'live';
 
@@ -49,18 +51,27 @@ interface ChangeRow {
 
 const MODE_LABEL: Record<Mode, string> = { off: 'Desligada', dry_run: 'Teste (nao grava)', live: 'Ativa' };
 
-async function call<T>(token: string, path: string, body?: unknown): Promise<T> {
+class AdminError extends Error {
+  constructor(message: string, public status: number) {
+    super(message);
+  }
+}
+
+async function call<T>(path: string, body?: unknown): Promise<T> {
+  const { data: auth } = (await supabase?.auth.getSession()) ?? { data: { session: null } };
+  const accessToken = auth.session?.access_token;
+  if (!accessToken) throw new AdminError('Entre na sua conta para abrir o painel.', 401);
   const res = await fetch(`${API}${path}`, {
     method: body === undefined ? 'GET' : 'POST',
     headers: {
-      'x-admin-token': token,
+      authorization: `Bearer ${accessToken}`,
       apikey: import.meta.env.VITE_SUPABASE_ANON_KEY ?? '',
       ...(body === undefined ? {} : { 'content-type': 'application/json' }),
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error((data as { error?: string }).error ?? `HTTP ${res.status}`);
+  if (!res.ok) throw new AdminError((data as { error?: string }).error ?? `HTTP ${res.status}`, res.status);
   return data as T;
 }
 
@@ -80,52 +91,40 @@ function health(s: CategoryStatus): { label: string; className: string } {
 }
 
 export default function AdminPage() {
-  const [token, setToken] = useState(() => sessionStorage.getItem(TOKEN_KEY) ?? '');
-  const [draft, setDraft] = useState('');
+  const { user, requestLogin } = useAuth();
   const [statuses, setStatuses] = useState<CategoryStatus[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [denied, setDenied] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [open, setOpen] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (!token) return;
+    if (!user) return;
     try {
       setError(null);
-      setStatuses(await call<CategoryStatus[]>(token, '/status'));
+      setStatuses(await call<CategoryStatus[]>('/status'));
     } catch (e) {
-      setError((e as Error).message);
-      if ((e as Error).message.includes('autorizado')) {
-        sessionStorage.removeItem(TOKEN_KEY);
-        setToken('');
-      }
+      if (e instanceof AdminError && e.status === 403) setDenied(true);
+      else setError((e as Error).message);
     }
-  }, [token]);
+  }, [user]);
 
   useEffect(() => {
     void load();
   }, [load]);
 
-  if (!token) {
-    const submit = (e: FormEvent) => {
-      e.preventDefault();
-      sessionStorage.setItem(TOKEN_KEY, draft);
-      setToken(draft);
-    };
+  if (!user) {
     return (
-      <div className="px-margin pt-6 max-w-md">
-        <SectionTitle>Painel de dados</SectionTitle>
-        <form onSubmit={submit} className="mt-4 flex flex-col gap-3">
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder="Senha do painel"
-            className="rounded-xl bg-white/5 px-4 py-3 outline-none ring-1 ring-white/10 focus:ring-white/30"
-          />
-          <Button type="submit" disabled={draft.length < 16}>Entrar</Button>
-          {error && <p className="text-sm text-red-300">{error}</p>}
-        </form>
+      <div className="px-margin pt-6">
+        <EmptyState title="Area restrita" hint="Entre na sua conta para continuar." action={<Button onClick={requestLogin}>Entrar</Button>} />
+      </div>
+    );
+  }
+
+  if (denied) {
+    return (
+      <div className="px-margin pt-6">
+        <EmptyState title="Area restrita" hint="Esta pagina e so para a administracao do site." />
       </div>
     );
   }
@@ -133,7 +132,7 @@ export default function AdminPage() {
   const run = async (category: string, path: string, body: unknown, label: string) => {
     setBusy(`${category}:${label}`);
     try {
-      await call(token, path, body);
+      await call(path, body);
       await load();
     } catch (e) {
       setError(`${category}: ${(e as Error).message}`);
@@ -170,7 +169,7 @@ export default function AdminPage() {
                   </div>
                   <span className={`rounded-full px-3 py-1 text-xs font-semibold ${h.className}`}>{h.label}</span>
                 </button>
-                {expanded && <CategoryDetail token={token} status={s} busy={busy} onAction={run} />}
+                {expanded && <CategoryDetail status={s} busy={busy} onAction={run} />}
               </div>
             );
           })}
@@ -181,12 +180,10 @@ export default function AdminPage() {
 }
 
 function CategoryDetail({
-  token,
   status: s,
   busy,
   onAction,
 }: {
-  token: string;
   status: CategoryStatus;
   busy: string | null;
   onAction: (category: string, path: string, body: unknown, label: string) => Promise<void>;
@@ -198,12 +195,12 @@ function CategoryDetail({
 
   const refresh = useCallback(async () => {
     const [r, c] = await Promise.all([
-      call<RaceRow[]>(token, `/races?category=${s.category}`),
-      call<ChangeRow[]>(token, `/changes?category=${s.category}`),
+      call<RaceRow[]>(`/races?category=${s.category}`),
+      call<ChangeRow[]>(`/changes?category=${s.category}`),
     ]);
     setRaces(r);
     setChanges(c);
-  }, [token, s.category]);
+  }, [s.category]);
 
   useEffect(() => {
     void refresh().catch((e) => setMessage((e as Error).message));
