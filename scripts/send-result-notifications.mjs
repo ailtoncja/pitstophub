@@ -21,6 +21,7 @@
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
+import { isAllowedPushEndpoint } from './lib/push-guard.mjs';
 import { MOTORSPORT_DATA } from '../src/types.ts';
 
 const MOTORSPORT_DATA_BY_ID = new Map(MOTORSPORT_DATA.map((c) => [c.id, c]));
@@ -178,7 +179,8 @@ async function markNotified(categoryId, raceId, userId) {
   const { error } = await supabase
     .from('notified_race_results')
     .insert({ category_id: categoryId, race_id: raceId, user_id: userId });
-  if (error) console.error(`Falha ao marcar ${categoryId}/${raceId}/${userId} como notificada.`, error);
+  // Sem id de usuario no log (os logs do job ficam visiveis no CI).
+  if (error) console.error(`Falha ao marcar ${categoryId}/${raceId} como notificada.`, error.code ?? error.message);
 }
 
 async function sendPush(userId, payload) {
@@ -190,6 +192,11 @@ async function sendPush(userId, payload) {
 
   let sentAny = false;
   for (const sub of subs ?? []) {
+    // Endpoint vem do navegador do usuario: so envia para servicos de push conhecidos.
+    if (!isAllowedPushEndpoint(sub.endpoint)) {
+      console.warn('Inscricao de push ignorada: endpoint fora dos servicos permitidos.');
+      continue;
+    }
     try {
       await webpush.sendNotification(
         { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
@@ -201,7 +208,7 @@ async function sendPush(userId, payload) {
       if (statusCode === 404 || statusCode === 410) {
         await supabase.from('push_subscriptions').delete().eq('id', sub.id);
       } else {
-        console.error(`Falha ao enviar push (usuario ${userId}).`, statusCode ?? error);
+        console.error('Falha ao enviar push.', statusCode ?? error?.message ?? 'erro desconhecido');
       }
     }
   }
@@ -226,92 +233,98 @@ async function processRace(race, allSettings, allCategories) {
   let sentCount = 0;
 
   for (const settings of allSettings) {
-    const followedDriverIds = (settings.followed_driver_ids ?? [])
-      .filter((k) => k.startsWith(`${race.categoryId}::`))
-      .map((k) => k.split('::')[1]);
-    const followedTeamIds = (settings.followed_team_ids ?? [])
-      .filter((k) => k.startsWith(`${race.categoryId}::`))
-      .map((k) => k.split('::')[1]);
+    // Uma linha ruim (array malformado, erro de rede) nao pode parar o job
+    // para todo mundo: registra sem identificar o usuario e segue.
+    try {
+      const followedDriverIds = (settings.followed_driver_ids ?? [])
+        .filter((k) => k.startsWith(`${race.categoryId}::`))
+        .map((k) => k.split('::')[1]);
+      const followedTeamIds = (settings.followed_team_ids ?? [])
+        .filter((k) => k.startsWith(`${race.categoryId}::`))
+        .map((k) => k.split('::')[1]);
 
-    if (followedDriverIds.length === 0 && followedTeamIds.length === 0) continue;
-    if (settings.notify_results === false) continue;
-    if (await alreadyNotified(race.categoryId, race.raceId, settings.user_id)) continue;
-    const language = settings.language === 'en' ? 'en' : 'pt';
+      if (followedDriverIds.length === 0 && followedTeamIds.length === 0) continue;
+      if (settings.notify_results === false) continue;
+      if (await alreadyNotified(race.categoryId, race.raceId, settings.user_id)) continue;
+      const language = settings.language === 'en' ? 'en' : 'pt';
 
-    // 1a passada: acha a posicao de cada piloto/time seguido, sem se
-    // preocupar com ordem ainda. coveredPositions junta as posicoes ja
-    // cobertas por um piloto seguido individualmente -- se a pessoa segue o
-    // Leclerc e a Ferrari, a linha da Ferrari nao repete a posicao dele, so
-    // entra com o(s) outro(s) carro(s) (se houver).
-    const driverMessages = new Map(); // driverId -> texto
-    const coveredPositions = new Set();
+      // 1a passada: acha a posicao de cada piloto/time seguido, sem se
+      // preocupar com ordem ainda. coveredPositions junta as posicoes ja
+      // cobertas por um piloto seguido individualmente -- se a pessoa segue o
+      // Leclerc e a Ferrari, a linha da Ferrari nao repete a posicao dele, so
+      // entra com o(s) outro(s) carro(s) (se houver).
+      const driverMessages = new Map(); // driverId -> texto
+      const coveredPositions = new Set();
 
-    for (const driverId of followedDriverIds) {
-      const driver = category.drivers.find((d) => d.id === driverId);
-      if (!driver) continue;
-      const position = f1Results
-        ? f1Results.find((r) => r.Driver.driverId === driverId)?.position
-        : findPositions(resultText, driver.name)[0];
-      if (!position) continue;
-      coveredPositions.add(Number(position));
-      driverMessages.set(driverId, language === 'en'
-        ? `${driver.name} finished P${position} in the ${race.raceName}.`
-        : `${driver.name} terminou em ${formatOrdinal(position)} no ${race.raceName}!`);
-    }
-
-    const teamMessages = new Map(); // teamId -> texto
-    for (const teamId of followedTeamIds) {
-      const team = category.teams.find((t) => t.id === teamId);
-      if (!team) continue;
-      const positions = f1Results
-        ? f1Results.filter((r) => r.Constructor && category.drivers.some((d) => d.id === r.Driver.driverId && d.teamId === teamId)).map((r) => r.position)
-        : findPositions(resultText, team.name);
-      if (positions.length === 0) continue;
-      const sorted = [...new Set(positions.map(Number))].filter((p) => !coveredPositions.has(p)).sort((a, b) => a - b);
-      if (sorted.length === 0) continue;
-      teamMessages.set(teamId, language === 'en'
-        ? `${team.name} finished with ${sorted.length > 1 ? 'cars in' : 'the car in'} ${formatPlaceList(sorted, language)} in the ${race.raceName}.`
-        : `${team.name} terminou com ${sorted.length > 1 ? 'os carros em' : 'o carro em'} ${formatPlaceList(sorted, language)} no ${race.raceName}!`);
-    }
-
-    if (driverMessages.size === 0 && teamMessages.size === 0) continue;
-
-    // 2a passada: monta a ordem final seguindo priority_follow_ids (quem
-    // esta mais no topo da lista de prioridade aparece primeiro na
-    // notificacao). Quem tem mensagem mas nao esta na lista de prioridade
-    // (ex.: settings desatualizado) entra no fim, na ordem em que foi
-    // encontrado -- nunca fica de fora.
-    const messages = [];
-    const usedDriverIds = new Set();
-    const usedTeamIds = new Set();
-    for (const key of settings.priority_follow_ids ?? []) {
-      const [kind, categoryId, id] = key.split('::');
-      if (categoryId !== race.categoryId) continue;
-      if (kind === 'driver' && driverMessages.has(id)) {
-        messages.push(driverMessages.get(id));
-        usedDriverIds.add(id);
-      } else if (kind === 'team' && teamMessages.has(id)) {
-        messages.push(teamMessages.get(id));
-        usedTeamIds.add(id);
+      for (const driverId of followedDriverIds) {
+        const driver = category.drivers.find((d) => d.id === driverId);
+        if (!driver) continue;
+        const position = f1Results
+          ? f1Results.find((r) => r.Driver.driverId === driverId)?.position
+          : findPositions(resultText, driver.name)[0];
+        if (!position) continue;
+        coveredPositions.add(Number(position));
+        driverMessages.set(driverId, language === 'en'
+          ? `${driver.name} finished P${position} in the ${race.raceName}.`
+          : `${driver.name} terminou em ${formatOrdinal(position)} no ${race.raceName}!`);
       }
-    }
-    for (const [driverId, text] of driverMessages) {
-      if (!usedDriverIds.has(driverId)) messages.push(text);
-    }
-    for (const [teamId, text] of teamMessages) {
-      if (!usedTeamIds.has(teamId)) messages.push(text);
-    }
 
-    const sent = await sendPush(settings.user_id, {
-      title: language === 'en' ? `${categoryName}: result` : `${categoryName}: resultado`,
-      body: messages.join(' '),
-      url: `/?c=${encodeURIComponent(race.categoryId)}`,
-      kind: 'result',
-      tag: `${race.categoryId}-${race.raceId}-result`,
-    });
-    if (sent) {
-      await markNotified(race.categoryId, race.raceId, settings.user_id);
-      sentCount++;
+      const teamMessages = new Map(); // teamId -> texto
+      for (const teamId of followedTeamIds) {
+        const team = category.teams.find((t) => t.id === teamId);
+        if (!team) continue;
+        const positions = f1Results
+          ? f1Results.filter((r) => r.Constructor && category.drivers.some((d) => d.id === r.Driver.driverId && d.teamId === teamId)).map((r) => r.position)
+          : findPositions(resultText, team.name);
+        if (positions.length === 0) continue;
+        const sorted = [...new Set(positions.map(Number))].filter((p) => !coveredPositions.has(p)).sort((a, b) => a - b);
+        if (sorted.length === 0) continue;
+        teamMessages.set(teamId, language === 'en'
+          ? `${team.name} finished with ${sorted.length > 1 ? 'cars in' : 'the car in'} ${formatPlaceList(sorted, language)} in the ${race.raceName}.`
+          : `${team.name} terminou com ${sorted.length > 1 ? 'os carros em' : 'o carro em'} ${formatPlaceList(sorted, language)} no ${race.raceName}!`);
+      }
+
+      if (driverMessages.size === 0 && teamMessages.size === 0) continue;
+
+      // 2a passada: monta a ordem final seguindo priority_follow_ids (quem
+      // esta mais no topo da lista de prioridade aparece primeiro na
+      // notificacao). Quem tem mensagem mas nao esta na lista de prioridade
+      // (ex.: settings desatualizado) entra no fim, na ordem em que foi
+      // encontrado -- nunca fica de fora.
+      const messages = [];
+      const usedDriverIds = new Set();
+      const usedTeamIds = new Set();
+      for (const key of settings.priority_follow_ids ?? []) {
+        const [kind, categoryId, id] = key.split('::');
+        if (categoryId !== race.categoryId) continue;
+        if (kind === 'driver' && driverMessages.has(id)) {
+          messages.push(driverMessages.get(id));
+          usedDriverIds.add(id);
+        } else if (kind === 'team' && teamMessages.has(id)) {
+          messages.push(teamMessages.get(id));
+          usedTeamIds.add(id);
+        }
+      }
+      for (const [driverId, text] of driverMessages) {
+        if (!usedDriverIds.has(driverId)) messages.push(text);
+      }
+      for (const [teamId, text] of teamMessages) {
+        if (!usedTeamIds.has(teamId)) messages.push(text);
+      }
+
+      const sent = await sendPush(settings.user_id, {
+        title: language === 'en' ? `${categoryName}: result` : `${categoryName}: resultado`,
+        body: messages.join(' '),
+        url: `/?c=${encodeURIComponent(race.categoryId)}`,
+        kind: 'result',
+        tag: `${race.categoryId}-${race.raceId}-result`,
+      });
+      if (sent) {
+        await markNotified(race.categoryId, race.raceId, settings.user_id);
+        sentCount++;
+      }
+    } catch (userError) {
+      console.error(`Falha ao processar um usuario em ${race.categoryId}/${race.raceId}.`, userError?.message ?? userError);
     }
   }
 

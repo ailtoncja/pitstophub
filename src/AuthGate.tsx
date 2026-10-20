@@ -4,11 +4,14 @@ import { X } from 'lucide-react';
 import { type AuthUser, getStoredUser, loginUser, logoutUser, mapAuthUser, MIN_PASSWORD_LENGTH, registerUser } from './auth';
 import { translate } from './lib/i18n';
 import { cn } from './lib/utils';
+import { unsubscribeFromPush } from './push';
 import { AuthContext, type AuthContextValue } from './state/auth-context';
 import { readStoredLanguage } from './state/settings';
 import { supabase } from './supabase';
 
 type AuthMode = 'login' | 'register';
+
+const PUSH_UNSUBSCRIBE_TIMEOUT_MS = 5000;
 
 /**
  * Dono da sessao: expoe usuario / login / logout via AuthContext e desenha o modal de entrar/cadastrar.
@@ -105,12 +108,26 @@ export default function AuthGate({ children }: { children: ReactNode }) {
       },
       logout: () => {
         void (async () => {
-          await logoutUser();
-          setUser(null);
-          setMode('login');
-          setEmail('');
-          setPassword('');
-          setError('');
+          const userId = user?.id;
+          try {
+            // Melhor esforco: tira a inscricao de push deste aparelho enquanto
+            // ainda ha sessao (a linha no banco e apagada com o token do usuario).
+            // Com teto de tempo para nunca travar o logout.
+            await Promise.race([
+              unsubscribeFromPush().catch(() => undefined),
+              new Promise<void>((resolve) => window.setTimeout(resolve, PUSH_UNSUBSCRIBE_TIMEOUT_MS)),
+            ]);
+            await logoutUser(userId);
+          } catch (logoutError) {
+            console.error('Falha ao sair da conta.', logoutError);
+          } finally {
+            // A tela sempre volta ao estado deslogado, mesmo sem rede.
+            setUser(null);
+            setMode('login');
+            setEmail('');
+            setPassword('');
+            setError('');
+          }
         })();
       },
     }),

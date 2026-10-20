@@ -10,6 +10,7 @@
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
+import { DEFAULT_TZ, isAllowedPushEndpoint, safeTimeZone } from './lib/push-guard.mjs';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -36,7 +37,6 @@ const SYNCED_CATEGORY_NAMES = {
   wrc: 'WRC',
 };
 
-const DEFAULT_TZ = 'America/Sao_Paulo';
 const KINDS = ['race-day', 't-60', 't-0'];
 
 function addDays(isoDate, days) {
@@ -244,7 +244,10 @@ async function alreadyNotified(categoryId, raceId, userId, kind) {
     .maybeSingle();
   if (error) {
     if (/notified_race_alerts/i.test(error.message)) {
-      throw new Error('Tabela notified_race_alerts ausente. Rode supabase/notifications_schema.sql');
+      // Problema de schema, nao de um usuario: derruba o job (ver main()).
+      const fatal = new Error('Tabela notified_race_alerts ausente. Rode supabase/notifications_schema.sql');
+      fatal.fatal = true;
+      throw fatal;
     }
     throw error;
   }
@@ -255,7 +258,8 @@ async function markNotified(categoryId, raceId, userId, kind) {
   const { error } = await supabase
     .from('notified_race_alerts')
     .insert({ category_id: categoryId, race_id: raceId, user_id: userId, kind });
-  if (error) console.error(`Falha ao marcar ${categoryId}/${raceId}/${userId}/${kind}.`, error);
+  // Sem id de usuario no log (os logs do job ficam visiveis no CI).
+  if (error) console.error(`Falha ao marcar ${categoryId}/${raceId}/${kind} como notificada.`, error.code ?? error.message);
 }
 
 async function sendToUser(userId, payload) {
@@ -268,6 +272,11 @@ async function sendToUser(userId, payload) {
 
   let sentAny = false;
   for (const sub of subs) {
+    // Endpoint vem do navegador do usuario: so envia para servicos de push conhecidos.
+    if (!isAllowedPushEndpoint(sub.endpoint)) {
+      console.warn('Inscricao de push ignorada: endpoint fora dos servicos permitidos.');
+      continue;
+    }
     try {
       await webpush.sendNotification(
         { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
@@ -279,7 +288,7 @@ async function sendToUser(userId, payload) {
       if (statusCode === 404 || statusCode === 410) {
         await supabase.from('push_subscriptions').delete().eq('id', sub.id);
       } else {
-        console.error(`Falha ao enviar push (usuario ${userId}).`, statusCode ?? sendError);
+        console.error('Falha ao enviar push.', statusCode ?? sendError?.message ?? 'erro desconhecido');
       }
     }
   }
@@ -297,28 +306,41 @@ async function main() {
   const allSettings = await loadSettings();
   let totalSent = 0;
 
+  let totalFailed = 0;
+
   for (const race of races) {
+    let raceSent = 0;
     for (const settings of allSettings) {
-      if (!followsCategory(settings, race.categoryId)) continue;
-      const language = settings.language === 'en' ? 'en' : 'pt';
-      const timeZone = settings.timezone || DEFAULT_TZ;
+      // Uma linha ruim (fuso invalido, array malformado, erro de rede) nao
+      // pode parar o job para todo mundo: registra sem identificar o usuario
+      // e segue para o proximo.
+      try {
+        if (!followsCategory(settings, race.categoryId)) continue;
+        const language = settings.language === 'en' ? 'en' : 'pt';
+        const timeZone = safeTimeZone(settings.timezone || DEFAULT_TZ);
 
-      for (const kind of KINDS) {
-        if (!wantsKind(settings, kind)) continue;
-        if (!shouldSend(kind, now, race, timeZone)) continue;
-        if (await alreadyNotified(race.categoryId, race.raceId, settings.user_id, kind)) continue;
+        for (const kind of KINDS) {
+          if (!wantsKind(settings, kind)) continue;
+          if (!shouldSend(kind, now, race, timeZone)) continue;
+          if (await alreadyNotified(race.categoryId, race.raceId, settings.user_id, kind)) continue;
 
-        const sent = await sendToUser(settings.user_id, buildPayload(race, kind, language, timeZone));
-        if (sent) {
-          await markNotified(race.categoryId, race.raceId, settings.user_id, kind);
-          totalSent += 1;
-          console.log(`${race.categoryId}/${race.raceId} ${kind} -> ${settings.user_id}`);
+          const sent = await sendToUser(settings.user_id, buildPayload(race, kind, language, timeZone));
+          if (sent) {
+            await markNotified(race.categoryId, race.raceId, settings.user_id, kind);
+            totalSent += 1;
+            raceSent += 1;
+          }
         }
+      } catch (userError) {
+        if (userError?.fatal) throw userError;
+        totalFailed += 1;
+        console.error(`Falha ao processar um usuario em ${race.categoryId}/${race.raceId}.`, userError?.message ?? userError);
       }
     }
+    if (raceSent > 0) console.log(`${race.categoryId}/${race.raceId}: ${raceSent} notificacao(oes) enviada(s).`);
   }
 
-  console.log(`Concluido: ${totalSent} notificacao(oes) de corrida enviada(s).`);
+  console.log(`Concluido: ${totalSent} notificacao(oes) de corrida enviada(s), ${totalFailed} falha(s).`);
 }
 
 main().catch((error) => {
