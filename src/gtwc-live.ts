@@ -1,4 +1,4 @@
-import type { Category, CategoryStandings, Driver, Race, StandingItem, Team } from './types';
+import type { Category, CategoryStandings, Driver, Race, StandingItem, StandingsClassGroup, Team } from './types';
 import { lookupTeamAssets } from './team-bios';
 
 // GT World Challenge (Europe/America/Asia) nao usa TheSportsDB nem o pipeline
@@ -160,13 +160,9 @@ function normalizePersonName(value: string): string {
     .toLowerCase();
 }
 
-// So expoe uma classificacao quando ela tem uma unica classe "geral" -- ex.:
-// America so tem classificacao de times dividida em Pro/Pro-Am/Am (sem
-// classificacao de pilotos), e misturar 3 classes numa lista so de posicoes
-// reintroduziria o mesmo tipo de erro (misturar classificacoes que nao devem
-// se misturar) que tirou o GT World Challenge do pitstophub da primeira vez.
-// Nesse caso a aba Classificacao cai no fallback "nao disponivel" ja
-// existente, em vez de mostrar um ranking enganoso.
+// Uma classe so vira a lista unica de sempre. Mais de uma classe (ex.: America
+// so tem classificacao de equipes dividida em Pro/Pro-Am/Am) vira uma aba por
+// classe -- nunca uma lista misturando posicoes de classes diferentes.
 export async function fetchGtwcStandings(categoryId: string, force = false): Promise<CategoryStandings | null> {
   const seriesId = GTWC_SERIES_BY_CATEGORY[categoryId];
   if (!seriesId) return null;
@@ -174,14 +170,26 @@ export async function fetchGtwcStandings(categoryId: string, force = false): Pro
     const data = await fetchJson<ApiSeriesStandings>(`/series/${seriesId}/standings`);
     const drivers = toSingleClassEntries(data.drivers);
     const teams = toSingleClassEntries(data.teams);
-    if (!drivers && !teams) return null;
-    return { drivers: drivers ?? undefined, teams: teams ?? undefined };
+    const driverClasses = drivers ? undefined : toClassGroups(data.drivers);
+    const teamClasses = teams ? undefined : toClassGroups(data.teams);
+    if (!drivers && !teams && !driverClasses && !teamClasses) return null;
+    return { drivers: drivers ?? undefined, teams: teams ?? undefined, driverClasses, teamClasses };
   });
+}
+
+function toEntries(cls: ApiStandingsClass): StandingItem[] {
+  return cls.entries.map((e) => ({ position: e.position, name: toDriverName(e.name), points: e.points }));
 }
 
 function toSingleClassEntries(classes: ApiStandingsClass[] | null): StandingItem[] | null {
   if (!classes || classes.length !== 1) return null;
-  return classes[0].entries.map((e) => ({ position: e.position, name: toDriverName(e.name), points: e.points }));
+  return toEntries(classes[0]);
+}
+
+function toClassGroups(classes: ApiStandingsClass[] | null): StandingsClassGroup[] | undefined {
+  if (!classes || classes.length < 2) return undefined;
+  const groups = classes.filter((c) => c.entries.length > 0).map((c) => ({ classLabel: c.classLabel, entries: toEntries(c) }));
+  return groups.length ? groups : undefined;
 }
 
 export function mergeCategoryWithGtwcStandings(category: Category, standings: CategoryStandings | null): Category {

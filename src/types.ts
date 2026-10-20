@@ -74,6 +74,8 @@ export interface CategoryStandings {
   // Classificacao por classe (ex.: Endurance Brasil P1/GT3/GT4). Nao misturar
   // numa unica lista de posicoes -- o mesmo criterio do GTWC America.
   driverClasses?: StandingsClassGroup[];
+  // Classificacao de equipes dividida em classes (ex.: GTWC America Pro/Pro-Am/Am).
+  teamClasses?: StandingsClassGroup[];
 }
 
 export interface RuleSection {

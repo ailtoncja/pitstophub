@@ -249,3 +249,38 @@ async function loadStandings(categoryId: string): Promise<StandingItem[] | null>
     team: row.team ?? undefined,
   }));
 }
+
+// Frescor do dado sincronizado (view public.sync_freshness, mantida pelo motor
+// do pitstophub-data): ate qual etapa a classificacao vai e quando mudou.
+export type SyncFreshness = {
+  season: number | null;
+  asOfRound: number | null;
+  lastSuccessAt: string | null;
+  degraded: boolean;
+};
+
+const freshnessCache = new Map<string, CacheEntry<SyncFreshness | null>>();
+
+export async function fetchSyncFreshness(categoryId: string): Promise<SyncFreshness | null> {
+  if (!supabase || !isCategorySynced(categoryId)) return null;
+  const now = Date.now();
+  const hit = freshnessCache.get(categoryId);
+  if (hit && hit.expiresAt > now) return hit.value;
+  const value = (async () => {
+    const { data, error } = await supabase!
+      .from('sync_freshness')
+      .select('season, as_of_round, last_success_at, degraded')
+      .eq('category_id', categoryId)
+      .maybeSingle();
+    // View ainda nao criada (motor novo nao instalado): so nao mostra nada.
+    if (error || !data) return null;
+    return {
+      season: data.season ?? null,
+      asOfRound: data.as_of_round ?? null,
+      lastSuccessAt: data.last_success_at ?? null,
+      degraded: Boolean(data.degraded),
+    };
+  })().catch(() => null);
+  freshnessCache.set(categoryId, { expiresAt: now + CACHE_TTL_MS, value });
+  return value;
+}
