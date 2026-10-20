@@ -17,6 +17,7 @@ import { flagForNationality } from '../nationality-flags';
 import { useCategory, useLiveData } from '../state/live-data';
 import { useSelectedCategory } from '../state/selected-category';
 import type { Category, StandingItem } from '../types';
+import { fetchSyncFreshness, type SyncFreshness } from '../synced-races';
 
 type TabKey = string;
 type Tab = { key: TabKey; label: string; items: StandingItem[]; kind: 'driver' | 'team' };
@@ -30,6 +31,11 @@ function buildTabs(category: Category, t: (key: string) => string): Tab[] {
   if (s.teams?.length) tabs.push({ key: 'teams', label: t('st.teams'), items: s.teams, kind: 'team' });
   for (const group of s.driverClasses ?? []) {
     if (group.entries.length) tabs.push({ key: `class:${group.classLabel}`, label: group.classLabel, items: group.entries, kind: 'driver' });
+  }
+  for (const group of s.teamClasses ?? []) {
+    if (group.entries.length) {
+      tabs.push({ key: `team-class:${group.classLabel}`, label: `${t('st.teams')} · ${group.classLabel}`, items: group.entries, kind: 'team' });
+    }
   }
   return tabs;
 }
@@ -99,6 +105,7 @@ export default function StandingsPage() {
           <p className="type-body-sm text-silver flex flex-wrap items-center gap-x-3 gap-y-1 max-w-[68ch]">
             <CategoryDataState categoryId={category.id} />
             {dataStateOf(category.id) === 'catalog' && <span>{t('state.catalogNote')}</span>}
+            <SyncFreshnessNote categoryId={category.id} />
           </p>
         )}
 
@@ -245,4 +252,27 @@ function Delta({ delta }: { delta: number | null }) {
   if (delta > 0) return <ArrowUp className="w-3.5 h-3.5 text-tertiary" aria-label={`+${delta}`} />;
   if (delta < 0) return <ArrowDown className="w-3.5 h-3.5 text-error" aria-label={`${delta}`} />;
   return <Minus className="w-3.5 h-3.5 text-silver" aria-hidden />;
+}
+
+function SyncFreshnessNote({ categoryId }: { categoryId: string }) {
+  const { t, lang } = useT();
+  const [freshness, setFreshness] = useState<SyncFreshness | null>(null);
+  useEffect(() => {
+    let alive = true;
+    setFreshness(null);
+    void fetchSyncFreshness(categoryId).then((f) => alive && setFreshness(f));
+    return () => {
+      alive = false;
+    };
+  }, [categoryId]);
+  if (!freshness) return null;
+  const parts: string[] = [];
+  if (freshness.asOfRound) parts.push(t('sync.asOf', { round: freshness.asOfRound }));
+  if (freshness.lastSuccessAt) {
+    const ago = new Intl.RelativeTimeFormat(lang === 'en' ? 'en' : 'pt-BR', { numeric: 'auto' });
+    const hours = Math.round((new Date(freshness.lastSuccessAt).getTime() - Date.now()) / 3600000);
+    parts.push(t('sync.updated', { ago: Math.abs(hours) < 48 ? ago.format(hours, 'hour') : ago.format(Math.round(hours / 24), 'day') }));
+  }
+  if (freshness.degraded) parts.push(t('sync.degraded'));
+  return parts.length ? <span>{parts.join(' · ')}</span> : null;
 }
