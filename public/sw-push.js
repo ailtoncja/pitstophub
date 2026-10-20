@@ -26,19 +26,34 @@ self.addEventListener('push', (event) => {
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
+// So abre caminhos do proprio site: a URL vem do payload do push, entao e
+// reconstruida contra a origem do service worker e qualquer coisa de outra
+// origem (ou que nao der pra interpretar) cai na home.
+function safeTargetUrl(raw) {
+  try {
+    const url = new URL(typeof raw === 'string' && raw ? raw : '/', self.location.origin);
+    if (url.origin !== self.location.origin) return '/';
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return '/';
+  }
+}
+
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = (event.notification.data && event.notification.data.url) || '/';
+  const url = safeTargetUrl(event.notification.data && event.notification.data.url);
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Com o app aberto: so avisa a pagina (o roteador navega sem recarregar)
+      // e traz a janela pra frente. Sem janela aberta: abre uma nova.
       for (const client of clientList) {
         if ('focus' in client) {
           client.postMessage({ type: 'pitstophub-open', url });
-          const navigate = typeof client.navigate === 'function' ? client.navigate(url) : Promise.resolve();
-          return navigate.then(() => client.focus());
+          return client.focus();
         }
       }
       if (self.clients.openWindow) return self.clients.openWindow(url);
+      return undefined;
     })
   );
 });

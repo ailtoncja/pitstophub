@@ -27,9 +27,23 @@ function ymd(date: Date): string {
   return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}`;
 }
 
-/** RFC 5545: escapa virgula, ponto e virgula, barra e quebras de linha. */
+/**
+ * RFC 5545: escapa virgula, ponto e virgula, barra e quebras de linha.
+ * Aceita \r\n, \n e \r sozinho -- um \r solto deixaria o texto quebrar a linha
+ * e injetar propriedades novas no evento.
+ */
 export function escapeIcs(text: string): string {
-  return text.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+  return text.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r\n|\r|\n/g, '\\n');
+}
+
+/**
+ * UID do evento: so letras, numeros e hifen, mais um sufixo de dominio fixo.
+ * Ids comuns (ex.: f1-singapore-2026-10-11) saem iguais aos de antes, entao
+ * reimportar o arquivo atualiza o evento em vez de duplicar.
+ */
+export function icsUid(...parts: string[]): string {
+  const local = parts.join('-').replace(/[^A-Za-z0-9-]/g, '-');
+  return `${local || 'evento'}@pitstophub`;
 }
 
 /** Linhas com mais de 75 octetos precisam ser dobradas (RFC 5545 §3.1). */
@@ -59,7 +73,7 @@ export function buildIcs(entries: IcsEntry[], language: 'pt' | 'en', now = new D
     const place = [race.circuit, language === 'en' ? race.enLocation ?? race.location : race.location].filter(Boolean).join(', ');
     lines.push(
       'BEGIN:VEVENT',
-      `UID:${category.id}-${race.id}-${race.date}@pitstophub`,
+      `UID:${icsUid(category.id, race.id, race.date)}`,
       `DTSTAMP:${utc(now)}`,
       timed ? `DTSTART:${utc(start)}` : `DTSTART;VALUE=DATE:${ymd(start)}`,
       timed ? `DTEND:${utc(end)}` : `DTEND;VALUE=DATE:${ymd(new Date(start.getTime() + 86400_000))}`,

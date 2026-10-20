@@ -46,8 +46,18 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs = SUPABASE_REQUEST_
   }
 }
 
-function mapAuthErrorMessage(message: string, mode: 'login' | 'register') {
-  const normalized = message.toLowerCase();
+export const REGISTER_FAILED_MESSAGE = 'Nao foi possivel criar a conta. Se ja tiver cadastro, entre ou recupere a senha.';
+export const LOGIN_FAILED_MESSAGE = 'Email ou senha invalidos.';
+const RATE_LIMIT_MESSAGE = 'Muitas tentativas de envio de email em pouco tempo. Aguarde alguns minutos antes de tentar novamente.';
+
+/**
+ * Traduz o erro do Supabase para uma mensagem segura de mostrar na tela.
+ * Nunca repassa o texto cru do servidor e nao diz se o email ja tem conta
+ * (evita enumeracao de contas): fora limite de tentativas e regra de senha,
+ * tudo cai numa mensagem neutra.
+ */
+export function mapAuthErrorMessage(message: string | undefined, mode: 'login' | 'register') {
+  const normalized = (message ?? '').toLowerCase();
 
   if (
     normalized.includes('email rate limit exceeded') ||
@@ -55,22 +65,27 @@ function mapAuthErrorMessage(message: string, mode: 'login' | 'register') {
     normalized.includes('security purposes') ||
     normalized.includes('too many requests')
   ) {
-    return 'Muitas tentativas de envio de email em pouco tempo. Aguarde alguns minutos antes de tentar novamente.';
+    return RATE_LIMIT_MESSAGE;
   }
 
-  if (mode === 'register' && normalized.includes('user already registered')) {
-    return 'Este email ja esta cadastrado. Tente entrar na conta em vez de criar outra.';
+  if (mode === 'register') {
+    // Regra de senha nao revela nada sobre a conta, entao vale mostrar.
+    if (normalized.includes('password should be at least')) {
+      return `A senha deve ter no minimo ${MIN_PASSWORD_LENGTH} caracteres.`;
+    }
+    if (normalized.includes('password') && normalized.includes('weak')) {
+      return 'Escolha uma senha mais forte para proteger sua conta.';
+    }
+    return REGISTER_FAILED_MESSAGE;
   }
 
-  if (normalized.includes('password should be at least')) {
-    return `A senha deve ter no minimo ${MIN_PASSWORD_LENGTH} caracteres.`;
+  // O Supabase so responde "email not confirmed" depois de conferir a senha,
+  // entao nao serve para descobrir contas -- e ajuda quem acabou de se cadastrar.
+  if (normalized.includes('email not confirmed')) {
+    return 'Confirme seu email antes de entrar. O link esta na sua caixa de entrada.';
   }
 
-  if (normalized.includes('password') && normalized.includes('weak')) {
-    return 'Escolha uma senha mais forte para proteger sua conta.';
-  }
-
-  return message;
+  return LOGIN_FAILED_MESSAGE;
 }
 
 export function getStoredUser(): AuthUser | null {
@@ -154,20 +169,27 @@ export async function registerUser(input: {
     return { ok: false, message: `Senha deve ter no minimo ${MIN_PASSWORD_LENGTH} caracteres.` };
   }
 
-  const { data, error } = await withTimeout(supabase.auth.signUp({
-    email,
-    password,
-    options: { data: { display_name: name } },
-  }));
+  let result: Awaited<ReturnType<typeof supabase.auth.signUp>>;
+  try {
+    result = await withTimeout(supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { display_name: name } },
+    }));
+  } catch (requestError) {
+    console.error('Falha ao criar conta.', requestError);
+    return { ok: false, message: REGISTER_FAILED_MESSAGE };
+  }
+  const { data, error } = result;
 
   if (error) return { ok: false, message: mapAuthErrorMessage(error.message, 'register') };
-  if (!data.user) return { ok: false, message: 'Nao foi possivel criar a conta.' };
+  if (!data.user) return { ok: false, message: REGISTER_FAILED_MESSAGE };
 
   if (!data.session) {
     return {
       ok: true,
       status: 'pending_verification',
-      message: 'Conta criada. Verifique seu email para confirmar o cadastro antes de entrar.',
+      message: 'Verifique seu email para confirmar o cadastro antes de entrar. Se ja tiver conta, entre ou recupere a senha.',
     };
   }
 
@@ -186,25 +208,58 @@ export async function loginUser(input: {
     };
   }
 
-  const { data, error } = await withTimeout(supabase.auth.signInWithPassword({
-    email: input.email.trim().toLowerCase(),
-    password: input.password,
-  }));
+  let result: Awaited<ReturnType<typeof supabase.auth.signInWithPassword>>;
+  try {
+    result = await withTimeout(supabase.auth.signInWithPassword({
+      email: input.email.trim().toLowerCase(),
+      password: input.password,
+    }));
+  } catch (requestError) {
+    console.error('Falha ao entrar.', requestError);
+    return { ok: false, message: 'Nao foi possivel entrar agora. Verifique a conexao e tente novamente.' };
+  }
+  const { data, error } = result;
 
   if (error || !data.user) {
-    if (error) {
-      return { ok: false, message: mapAuthErrorMessage(error.message, 'login') };
-    }
-    return { ok: false, message: 'Email ou senha invalidos.' };
+    return { ok: false, message: mapAuthErrorMessage(error?.message, 'login') };
   }
 
   void ensureUserSettingsRow(data.user.id);
   return { ok: true, status: 'authenticated', user: mapAuthUser(data.user) };
 }
 
-export async function logoutUser() {
-  if (!supabase) return;
-  await withTimeout(supabase.auth.signOut());
+/** Apaga o que fica salvo no aparelho para a sessao: token do Supabase e cache de configuracoes. */
+function clearLocalAuthData(userId?: string) {
+  try {
+    localStorage.removeItem(SUPABASE_STORAGE_KEY);
+    if (userId) localStorage.removeItem(`${SETTINGS_CACHE_PREFIX}${userId}`);
+  } catch {
+    // localStorage indisponivel (modo privado etc.): nada a limpar
+  }
+}
+
+/**
+ * Sai da conta sempre, mesmo sem rede: tenta o signOut global (revoga o
+ * refresh token no servidor); se falhar ou passar do tempo, encerra so a
+ * sessao local. No fim, apaga o token e o cache do aparelho de qualquer jeito.
+ */
+export async function logoutUser(userId?: string) {
+  try {
+    if (!supabase) return;
+    try {
+      const { error } = await withTimeout(supabase.auth.signOut());
+      if (error) throw error;
+    } catch (globalError) {
+      console.warn('Falha ao encerrar a sessao no servidor; encerrando so neste aparelho.', globalError);
+      try {
+        await withTimeout(supabase.auth.signOut({ scope: 'local' }));
+      } catch (localError) {
+        console.warn('Falha ao encerrar a sessao local.', localError);
+      }
+    }
+  } finally {
+    clearLocalAuthData(userId);
+  }
 }
 
 export async function getUserSettings(userId: string): Promise<UserSettings | null> {
