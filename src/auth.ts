@@ -46,7 +46,7 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs = SUPABASE_REQUEST_
   }
 }
 
-export const REGISTER_FAILED_MESSAGE = 'Nao foi possivel criar a conta. Se ja tiver cadastro, entre ou recupere a senha.';
+export const REGISTER_FAILED_MESSAGE = 'Nao foi possivel criar a conta. Se ja tiver cadastro, entre na sua conta.';
 export const LOGIN_FAILED_MESSAGE = 'Email ou senha invalidos.';
 const RATE_LIMIT_MESSAGE = 'Muitas tentativas de envio de email em pouco tempo. Aguarde alguns minutos antes de tentar novamente.';
 
@@ -189,7 +189,7 @@ export async function registerUser(input: {
     return {
       ok: true,
       status: 'pending_verification',
-      message: 'Verifique seu email para confirmar o cadastro antes de entrar. Se ja tiver conta, entre ou recupere a senha.',
+      message: 'Verifique seu email para confirmar o cadastro antes de entrar. Se ja tiver conta, entre com ela.',
     };
   }
 
