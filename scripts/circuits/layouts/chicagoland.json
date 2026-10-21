@@ -9,7 +9,7 @@
  },
  "official": {
   "length_m": 2414,
-  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications; NOT confirmed for this track because the PDF returned 403 -- nominal figure) 1.5 mi",
+  "length_source": "https://www.chicagolandspeedway.com/?p=104 (Track Facts: \"Chicagoland Speedway in Joliet is a $130 million, 1.5-Mile D-shaped tri-oval Speedway\"; checked 2026-10-21)",
   "map_url": "https://www.chicagolandspeedway.com/wp-content/uploads/sites/1031/2026/07/01/CLS-26-Facility-Map-Final-with-Info-booths.pdf",
   "map_page": "https://www.chicagolandspeedway.com/maps/",
   "map_publisher": "Chicagoland Speedway",
@@ -22,7 +22,7 @@
   ]
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": 0.8
  },
  "extract": {
   "mode": "mask",
@@ -41,8 +41,8 @@
   "nascar / chicagoland / 2026-07-05"
  ],
  "layout_source": "https://www.chicagolandspeedway.com/maps/",
- "status": "skipped",
- "notes": "OSM way 33119599 is 2468 m vs 1.5 mi (+2.24%): fails the 2% length rule. Shape 0.54% vs the 2026 facility map.",
+ "status": "published",
+ "notes": "Published in PR #12 under the 3% length rule approved by the owner (was skipped in PR #9 only because the OSM lap was just over 2%). OSM lap 2468 m vs official 2414 m (+2.24%). PR #9 note: OSM way 33119599 is 2468 m vs 1.5 mi (+2.24%): fails the 2% length rule. Shape 0.54% vs the 2026 facility map.",
  "verify": {
   "symmetric": true,
   "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."

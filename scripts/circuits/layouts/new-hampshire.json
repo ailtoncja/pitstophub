@@ -9,7 +9,7 @@
  },
  "official": {
   "length_m": 1703,
-  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications; NOT confirmed for this track because the PDF returned 403 -- nominal figure) 1.058 mi",
+  "length_source": "https://www.nhms.com/track-facts/ (\"1.058-Mile Oval\"; checked 2026-10-21)",
   "map_url": "https://www.nhms.com/documents/nascar-cup-series-seating-chart.pdf",
   "map_page": "https://www.nhms.com/fans/maps/",
   "map_publisher": "New Hampshire Motor Speedway",
@@ -26,7 +26,7 @@
   ]
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": -71.1
  },
  "extract": {
   "mode": "mask",
@@ -36,8 +36,8 @@
   "nascar / newhampshire / 2026-08-23"
  ],
  "layout_source": "https://www.nhms.com/fans/maps/",
- "status": "skipped",
- "notes": "Oval ways (road course excluded) total 1668 m vs 1.058 mi (-2.09%): just outside the 2% rule. Shape 0.99% vs the (stylised) seating chart.",
+ "status": "published",
+ "notes": "Published in PR #12 under the 3% length rule approved by the owner (was skipped in PR #9 only because the OSM lap was just over 2%). OSM lap 1668 m vs official 1703 m (-2.09%). PR #9 note: Oval ways (road course excluded) total 1668 m vs 1.058 mi (-2.09%): just outside the 2% rule. Shape 0.99% vs the (stylised) seating chart.",
  "verify": {
   "symmetric": true,
   "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."
