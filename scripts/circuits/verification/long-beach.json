@@ -1,9 +1,9 @@
 {
  "key": "long-beach",
- "official_map": null,
- "official_map_page": null,
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/LongBeach.png",
+ "official_map_page": "https://www.indycar.com/Schedule/2026/Long-Beach",
  "official_length_m": 3167,
- "official_length_source": null,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/Long-Beach (1.968-mile)",
  "alt_lengths": [],
  "osm_length_m": 3258.9,
  "length_error_pct": 2.9,
@@ -23,7 +23,7 @@
   "shape": false,
   "not_mirrored": true,
   "not_distorted": true,
-  "length": false
+  "length": true
  },
  "pass": false
 }

@@ -1,9 +1,9 @@
 {
  "key": "bowman-gray",
- "official_map": null,
+ "official_map": "https://www.nascarclash.com/wp-content/uploads/sites/1029/2026/01/21/FINAL-Track-Map-CookOut-Clash-2026-.pdf",
  "official_map_page": null,
  "official_length_m": 402,
- "official_length_source": null,
+ "official_length_source": "0.25 mi (nominal)",
  "alt_lengths": [],
  "osm_length_m": 403.3,
  "length_error_pct": 0.31,

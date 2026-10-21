@@ -3,7 +3,7 @@
  "official_map": "https://www.chicagolandspeedway.com/wp-content/uploads/sites/1031/2026/07/01/CLS-26-Facility-Map-Final-with-Info-booths.pdf",
  "official_map_page": "https://www.chicagolandspeedway.com/maps/",
  "official_length_m": 2414,
- "official_length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications; NOT confirmed for this track because the PDF returned 403 -- nominal figure) 1.5 mi",
+ "official_length_source": "https://www.chicagolandspeedway.com/?p=104 (Track Facts: \"Chicagoland Speedway in Joliet is a $130 million, 1.5-Mile D-shaped tri-oval Speedway\"; checked 2026-10-21)",
  "alt_lengths": [],
  "osm_length_m": 2468.2,
  "length_error_pct": 2.24,
@@ -17,13 +17,21 @@
   "mode": "mask",
   "n": 11490
  },
+ "png_chamfer_pct": 0.56,
+ "png_mirror_pct": 0.57,
+ "png_aniso": 1.013,
+ "png_rot_deg": 0.1,
  "mirror_ratio": 1.02,
  "symmetric_shape": true,
  "checks": {
   "shape": true,
   "not_mirrored": true,
   "not_distorted": true,
-  "length": false
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
  },
- "pass": false
+ "pass": true
 }

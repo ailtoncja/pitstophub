@@ -1,4 +1,33 @@
 {
+ "atlanta": {
+  "own_pct": 0.61,
+  "best_other": "texas",
+  "best_other_pct": 0.85,
+  "margin": 1.39,
+  "own_is_best": true,
+  "top5": [
+   [
+    "atlanta",
+    0.61
+   ],
+   [
+    "texas",
+    0.85
+   ],
+   [
+    "iowa",
+    1.22
+   ],
+   [
+    "richmond",
+    2.01
+   ],
+   [
+    "phoenix",
+    2.46
+   ]
+  ]
+ },
  "barber": {
   "own_pct": 1.13,
   "best_other": "f1:usa",
@@ -54,6 +83,64 @@
    [
     "indianapolis-road",
     11.54
+   ]
+  ]
+ },
+ "charlotte-oval": {
+  "own_pct": 0.58,
+  "best_other": "nashville-superspeedway",
+  "best_other_pct": 1.15,
+  "margin": 1.98,
+  "own_is_best": true,
+  "top5": [
+   [
+    "charlotte-oval",
+    0.58
+   ],
+   [
+    "nashville-superspeedway",
+    1.15
+   ],
+   [
+    "michigan",
+    1.35
+   ],
+   [
+    "richmond",
+    1.64
+   ],
+   [
+    "talladega",
+    2.39
+   ]
+  ]
+ },
+ "chicagoland": {
+  "own_pct": 0.6,
+  "best_other": "kansas",
+  "best_other_pct": 1.36,
+  "margin": 2.27,
+  "own_is_best": true,
+  "top5": [
+   [
+    "chicagoland",
+    0.6
+   ],
+   [
+    "kansas",
+    1.36
+   ],
+   [
+    "las-vegas-motor-speedway",
+    1.41
+   ],
+   [
+    "iowa",
+    3.44
+   ],
+   [
+    "texas",
+    3.59
    ]
   ]
  },
@@ -434,6 +521,35 @@
    ]
   ]
  },
+ "markham": {
+  "own_pct": 1.02,
+  "best_other": "watkins-glen",
+  "best_other_pct": 10.02,
+  "margin": 9.82,
+  "own_is_best": true,
+  "top5": [
+   [
+    "markham",
+    1.02
+   ],
+   [
+    "watkins-glen",
+    10.02
+   ],
+   [
+    "sonoma-gtwc",
+    10.32
+   ],
+   [
+    "vir",
+    10.62
+   ],
+   [
+    "portimao",
+    10.72
+   ]
+  ]
+ },
  "michigan": {
   "own_pct": 0.59,
   "best_other": "charlotte-oval",
@@ -576,6 +692,35 @@
    [
     "richmond",
     1.78
+   ]
+  ]
+ },
+ "new-hampshire": {
+  "own_pct": 0.6,
+  "best_other": "milwaukee",
+  "best_other_pct": 4.32,
+  "margin": 7.2,
+  "own_is_best": true,
+  "top5": [
+   [
+    "new-hampshire",
+    0.6
+   ],
+   [
+    "milwaukee",
+    4.32
+   ],
+   [
+    "bowman-gray",
+    4.52
+   ],
+   [
+    "darlington",
+    4.75
+   ],
+   [
+    "homestead",
+    4.82
    ]
   ]
  },
@@ -840,6 +985,35 @@
    ]
   ]
  },
+ "sebring": {
+  "own_pct": 1.11,
+  "best_other": "road-america",
+  "best_other_pct": 10.37,
+  "margin": 9.34,
+  "own_is_best": true,
+  "top5": [
+   [
+    "sebring",
+    1.11
+   ],
+   [
+    "road-america",
+    10.37
+   ],
+   [
+    "brasilia",
+    10.8
+   ],
+   [
+    "cuiaba",
+    11.26
+   ],
+   [
+    "f1:qatar",
+    11.88
+   ]
+  ]
+ },
  "st-petersburg": {
   "own_pct": 0.79,
   "best_other": "velocitta",
@@ -953,6 +1127,35 @@
    [
     "detroit",
     8.54
+   ]
+  ]
+ },
+ "washington-dc": {
+  "own_pct": 0.65,
+  "best_other": "pocono",
+  "best_other_pct": 9.84,
+  "margin": 15.14,
+  "own_is_best": true,
+  "top5": [
+   [
+    "washington-dc",
+    0.65
+   ],
+   [
+    "pocono",
+    9.84
+   ],
+   [
+    "f1:hungary",
+    10.53
+   ],
+   [
+    "hockenheim",
+    10.91
+   ],
+   [
+    "road-atlanta",
+    11.44
    ]
   ]
  },
