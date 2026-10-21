@@ -1,0 +1,25 @@
+{
+ "key": "sonoma-gtwc",
+ "name": "Sonoma Raceway",
+ "layout": "Long course with the Carousel (2.52 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 38.1611,
+  "lon": -122.4547,
+  "radius_m": 1800
+ },
+ "venue_key": "sonoma",
+ "official": {
+  "length_m": 4056
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

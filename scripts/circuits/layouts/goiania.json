@@ -1,14 +1,18 @@
 {
  "key": "goiania",
  "name": "Autódromo Internacional Ayrton Senna (Goiânia)",
- "layout": "",
+ "layout": "Circuito reformado (traçado MotoGP 2026)",
  "venue": {
   "lat": -16.7186,
   "lon": -49.1924,
   "radius_m": 1500
  },
  "official": {
-  "length_m": 3835
+  "length_m": 3835,
+  "length_source": "https://www.motogp.com/en/calendar/2026/event/brazil/11588b5a-f76c-4c8e-ae06-acba82ff1303",
+  "map_url": "https://photos.motogp.com/events-admin/5/0/50941f7f-e112-4404-8dcf-5fb2c47e9617/info/bra2-info.svg",
+  "map_page": "https://www.motogp.com/en/calendar/2026/event/brazil/11588b5a-f76c-4c8e-ae06-acba82ff1303",
+  "map_publisher": "MotoGP (Dorna), rendered from SVG to PNG"
  },
  "select": {
   "mode": "cycle"
@@ -16,5 +20,15 @@
  "render": {
   "rotate_deg": 0
  },
- "status": "draft"
+ "status": "draft",
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   160,
+   160,
+   160
+  ],
+  "tol": 30,
+  "close": 3
+ }
 }

@@ -1,14 +1,20 @@
 {
  "key": "velopark",
- "name": "Autódromo Internacional Velopark",
- "layout": "",
+ "name": "Autódromo FuelTech Velopark",
+ "layout": "Traçado principal",
  "venue": {
   "lat": -29.8239,
   "lon": -51.3201,
   "radius_m": 1200
  },
  "official": {
-  "length_m": 2278
+  "length_m": 2278,
+  "length_source": "https://autodromofueltech.com.br/ (ícone \"2.278 km traçado principal\"); CBA https://www.cba.org.br/circuitos",
+  "corners": 11,
+  "corners_source": "https://autodromofueltech.com.br/ (ícone \"11 curvas\")",
+  "map_url": "https://autodromofueltech.com.br/wp-content/uploads/2026/09/Mapa-Autodromo-FuelTech-Velopark-web.webp",
+  "map_page": "https://autodromofueltech.com.br/mapa-autodromo/",
+  "map_publisher": "Autódromo FuelTech Velopark"
  },
  "select": {
   "mode": "cycle"
@@ -16,5 +22,23 @@
  "render": {
   "rotate_deg": 0
  },
- "status": "draft"
+ "status": "draft",
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   60,
+   82,
+   98
+  ],
+  "tol": 16,
+  "crop": [
+   0.02,
+   0.32,
+   0.73,
+   0.78
+  ],
+  "close": 3,
+  "keep": "all",
+  "min_size": 2500
+ }
 }

@@ -8,7 +8,11 @@
   "radius_m": 900
  },
  "official": {
-  "length_m": 1609
+  "length_m": 1609,
+  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications; NOT confirmed for this track because the PDF returned 403 -- nominal figure) 1.0 mi (\"The Monster Mile\")",
+  "map_url": "https://www.dovermotorspeedway.com/documents/dms_seating-chart_31126.pdf",
+  "map_page": "https://www.dovermotorspeedway.com/fans/seating-chart/",
+  "map_publisher": "Dover Motor Speedway"
  },
  "select": {
   "mode": "cycle"
@@ -28,5 +32,15 @@
   "close": 8,
   "keep": "largest",
   "min_size": 2000
+ },
+ "used_by": [
+  "nascar / allstar / 2026-05-17 (NASCAR All-Star Race, non-points)"
+ ],
+ "layout_source": "https://www.dovermotorspeedway.com/",
+ "status": "skipped",
+ "notes": "OSM way 350676133 is 1662 m vs the official 1 mile (+3.27%): fails the 2% length rule (OSM traces a line well outside the official measuring line). Shape matches the official seating chart (0.91%).",
+ "verify": {
+  "symmetric": true,
+  "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."
  }
 }

@@ -1,0 +1,37 @@
+{
+ "key": "watkins-glen-nascar",
+ "official_map": null,
+ "official_map_page": null,
+ "official_length_m": 3943,
+ "official_length_source": null,
+ "alt_lengths": [],
+ "osm_length_m": 3935.3,
+ "length_error_pct": -0.19,
+ "osm_chamfer_pct": 1.12,
+ "osm_chamfer_m": 6.1,
+ "osm_p95_m": 14.0,
+ "osm_mirror_pct": 11.18,
+ "osm_aniso": 1.03,
+ "osm_rot_deg": -3.4,
+ "extract": {
+  "mode": "mask",
+  "n": 61057
+ },
+ "png_chamfer_pct": 1.14,
+ "png_mirror_pct": 11.26,
+ "png_aniso": 1.029,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 9.98,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

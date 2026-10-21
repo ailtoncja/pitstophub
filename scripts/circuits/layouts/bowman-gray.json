@@ -14,7 +14,11 @@
  "select": {
   "mode": "cycle"
  },
- "extract": {},
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "keep": "largest"
+ },
  "render": {
   "rotate_deg": 0
  },

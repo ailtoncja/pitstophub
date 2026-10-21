@@ -18,7 +18,10 @@
   "map_publisher": "INDYCAR"
  },
  "select": {
-  "mode": "cycle"
+  "mode": "cycle",
+  "exclude_ways": [
+   444205376
+  ]
  },
  "extract": {
   "mode": "mask",

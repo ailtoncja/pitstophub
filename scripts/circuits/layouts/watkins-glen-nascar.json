@@ -16,10 +16,36 @@
   "mode": "cycle"
  },
  "extract": {
-  "mode": "mask"
+  "mode": "mask",
+  "min_lum": 0.6,
+  "max_lum": 0.92,
+  "max_sat": 0.12,
+  "crop": [
+   0.04,
+   0.11,
+   0.6,
+   0.92
+  ],
+  "close": 7,
+  "open": 4,
+  "erase": [
+   [
+    0.1357,
+    0.585,
+    0.3371,
+    0.9272
+   ],
+   [
+    0.3371,
+    0.7119,
+    0.3571,
+    0.7572
+   ]
+  ],
+  "keep": "largest"
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": -3.3
  },
  "status": "draft"
 }

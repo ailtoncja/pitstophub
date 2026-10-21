@@ -1,0 +1,37 @@
+{
+ "key": "st-petersburg",
+ "official_map": null,
+ "official_map_page": null,
+ "official_length_m": 2897,
+ "official_length_source": null,
+ "alt_lengths": [],
+ "osm_length_m": 2902.7,
+ "length_error_pct": 0.2,
+ "osm_chamfer_pct": 1.47,
+ "osm_chamfer_m": 4.8,
+ "osm_p95_m": 16.1,
+ "osm_mirror_pct": 6.4,
+ "osm_aniso": 1.025,
+ "osm_rot_deg": 89.2,
+ "extract": {
+  "mode": "mask",
+  "n": 24472
+ },
+ "png_chamfer_pct": 1.52,
+ "png_mirror_pct": 6.46,
+ "png_aniso": 1.025,
+ "png_rot_deg": -0.1,
+ "mirror_ratio": 4.35,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

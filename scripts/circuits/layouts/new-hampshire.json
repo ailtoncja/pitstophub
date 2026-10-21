@@ -2,8 +2,44 @@
  "key": "new-hampshire",
  "name": "New Hampshire Motor Speedway",
  "layout": "Oval",
- "venue": {"lat": 43.3626, "lon": -71.4605, "radius_m": 1000},
- "official": {"length_m": 1703},
- "select": {"mode": "cycle"},
- "render": {"rotate_deg": 0}
+ "venue": {
+  "lat": 43.3626,
+  "lon": -71.4605,
+  "radius_m": 1000
+ },
+ "official": {
+  "length_m": 1703,
+  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications; NOT confirmed for this track because the PDF returned 403 -- nominal figure) 1.058 mi",
+  "map_url": "https://www.nhms.com/documents/nascar-cup-series-seating-chart.pdf",
+  "map_page": "https://www.nhms.com/fans/maps/",
+  "map_publisher": "New Hampshire Motor Speedway",
+  "map_file_note": "cleaned copy of the official map (work/circuits2-scratch/B2/outer_ring.py): only the track band, as the outer edge of the filled band (inner edge for Richmond); the original is at map_url"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   60096117,
+   766389942,
+   766389943,
+   766389944,
+   766389945
+  ]
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5
+ },
+ "used_by": [
+  "nascar / newhampshire / 2026-08-23"
+ ],
+ "layout_source": "https://www.nhms.com/fans/maps/",
+ "status": "skipped",
+ "notes": "Oval ways (road course excluded) total 1668 m vs 1.058 mi (-2.09%): just outside the 2% rule. Shape 0.99% vs the (stylised) seating chart.",
+ "verify": {
+  "symmetric": true,
+  "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."
+ }
 }

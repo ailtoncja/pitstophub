@@ -2,10 +2,36 @@
  "key": "nurburgring-sprint",
  "name": "Nürburgring",
  "layout": "Sprint",
- "venue": {"lat": 50.3330, "lon": 6.9450, "radius_m": 1800},
+ "venue": {
+  "lat": 50.333,
+  "lon": 6.945,
+  "radius_m": 1800
+ },
  "venue_key": "nurburgring",
- "official": {"length_m": 3629},
- "select": {"mode": "cycle"},
- "render": {"rotate_deg": 0},
- "status": "draft"
+ "official": {
+  "length_m": 3629
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft",
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   175,
+   175,
+   175
+  ],
+  "tol": 45,
+  "crop": [
+   0.33,
+   0.05,
+   1,
+   0.95
+  ],
+  "close": 2
+ }
 }

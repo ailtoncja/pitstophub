@@ -1,0 +1,37 @@
+{
+ "key": "nashville-superspeedway",
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/NashvilleSuperSpeedway.png",
+ "official_map_page": "https://www.indycar.com/Schedule/2026/Nashville",
+ "official_length_m": 2140,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/Nashville (Track Length 1.33 Miles)",
+ "alt_lengths": [],
+ "osm_length_m": 2116.3,
+ "length_error_pct": -1.11,
+ "osm_chamfer_pct": 1.26,
+ "osm_chamfer_m": 4.1,
+ "osm_p95_m": 6.9,
+ "osm_mirror_pct": 1.26,
+ "osm_aniso": 1.039,
+ "osm_rot_deg": 99.6,
+ "extract": {
+  "mode": "mask",
+  "n": 63182
+ },
+ "png_chamfer_pct": 1.22,
+ "png_mirror_pct": 1.21,
+ "png_aniso": 1.037,
+ "png_rot_deg": 99.5,
+ "mirror_ratio": 1.0,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": false,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": false,
+  "png_not_distorted": true,
+  "png_orientation": false
+ },
+ "pass": false
+}

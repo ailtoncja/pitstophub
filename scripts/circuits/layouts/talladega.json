@@ -14,9 +14,16 @@
  "select": {
   "mode": "cycle"
  },
- "extract": {},
- "render": {
-  "rotate_deg": 0
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5
  },
- "status": "draft"
+ "render": {
+  "rotate_deg": 90.2
+ },
+ "status": "draft",
+ "verify": {
+  "symmetric": true,
+  "notes": "Tri-oval mirror-symmetric about the axis through the start/finish apex: mirrored fit 1.07% vs 1.05%, the mirror check cannot discriminate."
+ }
 }

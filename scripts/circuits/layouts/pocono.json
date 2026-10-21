@@ -8,7 +8,12 @@
   "radius_m": 1500
  },
  "official": {
-  "length_m": 4023
+  "length_m": 4023,
+  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications Rev B, Jayski-hosted copy; figure read from a search excerpt, the PDF itself returned 403) 2.50 mi",
+  "map_url": "https://ik.imagekit.io/poconoraceway/wp-content/uploads/2019/09/Camping-Map-Update-2025.png",
+  "map_page": "https://www.poconoraceway.com/3d-seat-map.html",
+  "map_publisher": "Pocono Raceway",
+  "map_file_note": "cleaned copy of the official map (work/circuits2-scratch/B2/outer_ring.py): only the track band, as the outer edge of the filled band (inner edge for Richmond); the original is at map_url"
  },
  "select": {
   "mode": "cycle",
@@ -22,5 +27,15 @@
  "extract": {
   "mode": "mask",
   "max_lum": 0.5
+ },
+ "used_by": [
+  "nascar / pocono / 2026-06-14"
+ ],
+ "layout_source": "https://www.poconoraceway.com/",
+ "status": "published",
+ "notes": "OSM way 109767460 (the triangle; infield road course excluded).",
+ "verify": {
+  "symmetric": true,
+  "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."
  }
 }

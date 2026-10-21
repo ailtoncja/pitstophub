@@ -12,7 +12,10 @@
   "length_m": 2414
  },
  "select": {
-  "mode": "cycle"
+  "mode": "cycle",
+  "only_ways": [
+   27545411
+  ]
  },
  "extract": {},
  "render": {

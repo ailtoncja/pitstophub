@@ -8,13 +8,17 @@
   "radius_m": 1500
  },
  "official": {
-  "length_m": 3000
+  "length_m": 4004
  },
  "select": {
-  "mode": "cycle"
+  "mode": "cycle",
+  "only_ways": [
+   1523801531
+  ]
  },
  "render": {
   "rotate_deg": 0
  },
- "status": "draft"
+ "status": "draft",
+ "notes": "OSM maps this circuit as leisure=track (not highway=raceway); the cache extract osm/chapeco.json was saved by hand with an Overpass query for leisure=track|highway=raceway in the venue box."
 }

@@ -1,12 +1,17 @@
 {
  "key": "lausitzring",
- "official_map": null,
- "official_map_page": null,
+ "official_map": "https://res.cloudinary.com/dmwcbhehi/image/upload/v1779878619/05_Lausitzring_Track_Map_ENG_t3m2bh.webp",
+ "official_map_page": "https://racing.porsche.com/events/pccd-05-lausitzring-2026",
  "official_length_m": 3478,
- "official_length_source": null,
- "alt_lengths": [],
+ "official_length_source": "https://racing.porsche.com/events/pccd-05-lausitzring-2026 (Porsche Carrera Cup Deutschland 2026 track map, DTM support race: Length 3,478 m)",
+ "alt_lengths": [
+  {
+   "length_m": 3442,
+   "source": "https://dekra-lausitzring.de/wp-content/uploads/2026/10/Site-Presentation-of-the-DEKRA-Lausitzring.pdf (p. 8, Grand Prix Circuit: 3,442 m or 4,500 m configurable)"
+  }
+ ],
  "osm_length_m": 3383.3,
- "length_error_pct": -2.72,
+ "length_error_pct": -1.71,
  "osm_chamfer_pct": 0.87,
  "osm_chamfer_m": 3.2,
  "osm_p95_m": 9.5,
@@ -17,13 +22,21 @@
   "mode": "mask",
   "n": 27417
  },
+ "png_chamfer_pct": 0.91,
+ "png_mirror_pct": 9.58,
+ "png_aniso": 1.006,
+ "png_rot_deg": -0.1,
  "mirror_ratio": 10.86,
  "symmetric_shape": false,
  "checks": {
   "shape": true,
   "not_mirrored": true,
   "not_distorted": true,
-  "length": false
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
  },
- "pass": false
+ "pass": true
 }

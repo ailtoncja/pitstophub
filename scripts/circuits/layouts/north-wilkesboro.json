@@ -2,8 +2,52 @@
  "key": "north-wilkesboro",
  "name": "North Wilkesboro Speedway",
  "layout": "Oval",
- "venue": {"lat": 36.1418, "lon": -81.0703, "radius_m": 700},
- "official": {"length_m": 1006},
- "select": {"mode": "cycle"},
- "render": {"rotate_deg": 0}
+ "venue": {
+  "lat": 36.1418,
+  "lon": -81.0703,
+  "radius_m": 700
+ },
+ "official": {
+  "length_m": 1006,
+  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications; NOT confirmed for this track because the PDF returned 403 -- nominal figure) 0.625 mi",
+  "map_url": "https://www.northwilkesborospeedway.com/documents/nws-map-seating.pdf",
+  "map_page": "https://www.northwilkesborospeedway.com/events/maps/",
+  "map_publisher": "North Wilkesboro Speedway"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   18928710
+  ]
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   128,
+   128,
+   128
+  ],
+  "tol": 20,
+  "crop": [
+   0.05,
+   0.2,
+   0.92,
+   0.85
+  ],
+  "close": 6,
+  "min_size": 2000
+ },
+ "used_by": [
+  "nascar / northwilkesboro / 2026-07-19"
+ ],
+ "layout_source": "https://www.northwilkesborospeedway.com/events/maps/",
+ "status": "skipped",
+ "notes": "OSM way 18928710 is 845 m vs 0.625 mi (-16%): OSM geometry far too short (likely an inner/apron line). Shape matches (0.70%) but length fails.",
+ "verify": {
+  "symmetric": true,
+  "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."
+ }
 }

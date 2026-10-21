@@ -8,7 +8,12 @@
   "radius_m": 1200
  },
  "official": {
-  "length_m": 2414
+  "length_m": 2414,
+  "length_source": "https://www.charlottemotorspeedway.com/fans/track-facts/ (1.5 miles or 7,920 feet)",
+  "map_url": "https://www.charlottemotorspeedway.com/documents/cms-nascar-seating-map.pdf",
+  "map_page": "https://www.charlottemotorspeedway.com/events/facility-maps/",
+  "map_publisher": "Charlotte Motor Speedway",
+  "map_file_note": "cleaned copy of the official map (work/circuits2-scratch/B2/outer_ring.py): only the track band, as the outer edge of the filled band (inner edge for Richmond); the original is at map_url"
  },
  "select": {
   "mode": "cycle",
@@ -26,5 +31,15 @@
  "extract": {
   "mode": "mask",
   "max_lum": 0.5
+ },
+ "used_by": [
+  "nascar / charlotte600 / 2026-05-24 (Coca-Cola 600; synced r13-charlotte)"
+ ],
+ "layout_source": "https://www.charlottemotorspeedway.com/fans/track-facts/",
+ "status": "skipped",
+ "notes": "Oval-only ways (Roval chicanes excluded) total 2365 m vs 2414 m (-2.03%): just outside the 2% rule. Shape 0.71%. The Oct 11 NASCAR race uses the Roval, not this layout.",
+ "verify": {
+  "symmetric": true,
+  "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."
  }
 }

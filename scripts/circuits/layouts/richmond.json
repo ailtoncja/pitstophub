@@ -8,10 +8,18 @@
   "radius_m": 800
  },
  "official": {
-  "length_m": 1207
+  "length_m": 1207,
+  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications Rev B, Jayski-hosted copy; figure read from a search excerpt, the PDF itself returned 403) 0.75 mi",
+  "map_url": "https://www.richmondraceway.com/wp-content/uploads/sites/1028/2026/06/10/RR-26-1752331-SUM-26-Parking-Map-Update-v2-1.pdf",
+  "map_page": "https://www.richmondraceway.com/maps/",
+  "map_publisher": "Richmond Raceway",
+  "map_file_note": "cleaned copy of the official map (work/circuits2-scratch/B2/outer_ring.py): only the track band, as the outer edge of the filled band (inner edge for Richmond); the original is at map_url"
  },
  "select": {
-  "mode": "cycle"
+  "mode": "cycle",
+  "only_ways": [
+   452377300
+  ]
  },
  "render": {
   "rotate_deg": 0
@@ -19,5 +27,15 @@
  "extract": {
   "mode": "mask",
   "max_lum": 0.5
+ },
+ "used_by": [
+  "nascar / richmond / 2026-08-15"
+ ],
+ "layout_source": "https://www.richmondraceway.com/maps/",
+ "status": "skipped",
+ "notes": "OSM way 452377300 is 1178 m (-2.37%), and the only top-down official map (parking map) merges stands and pit road with the band; inner-edge extraction scores 5.77% / aniso 1.20. Not verified.",
+ "verify": {
+  "symmetric": true,
+  "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."
  }
 }

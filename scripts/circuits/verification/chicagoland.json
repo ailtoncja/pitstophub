@@ -1,9 +1,9 @@
 {
  "key": "chicagoland",
- "official_map": null,
- "official_map_page": null,
+ "official_map": "https://www.chicagolandspeedway.com/wp-content/uploads/sites/1031/2026/07/01/CLS-26-Facility-Map-Final-with-Info-booths.pdf",
+ "official_map_page": "https://www.chicagolandspeedway.com/maps/",
  "official_length_m": 2414,
- "official_length_source": null,
+ "official_length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications; NOT confirmed for this track because the PDF returned 403 -- nominal figure) 1.5 mi",
  "alt_lengths": [],
  "osm_length_m": 2468.2,
  "length_error_pct": 2.24,
@@ -18,10 +18,10 @@
   "n": 11490
  },
  "mirror_ratio": 1.02,
- "symmetric_shape": false,
+ "symmetric_shape": true,
  "checks": {
   "shape": true,
-  "not_mirrored": false,
+  "not_mirrored": true,
   "not_distorted": true,
   "length": false
  },

@@ -1,11 +1,75 @@
 {
  "key": "oschersleben",
  "name": "Motorsport Arena Oschersleben",
- "layout": "Circuito completo",
- "venue": {"lat": 52.0280, "lon": 11.2800, "radius_m": 1200},
- 
- "official": {"length_m": 3696},
- "select": {"mode": "cycle"},
- "render": {"rotate_deg": 0},
- "status": "draft"
+ "layout": "Circuito completo (3,667 km)",
+ "used_by": [
+  "dtm / oschersleben (r05-oschersleben) / 2026-07-26"
+ ],
+ "layout_source": "https://www.sportpresseportal.de/media/3XXC81/47397/download",
+ "venue": {
+  "lat": 52.028,
+  "lon": 11.28,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 3667,
+  "length_source": "https://www.sportpresseportal.de/media/3XXC81/47397/download (DTM press release, keyfacts Motorsport Arena Oschersleben, rounds 9-10 2026: Streckenlänge 3.667 Meter)",
+  "corners": 14,
+  "corners_source": "https://www.sportpresseportal.de/media/3XXC81/47397/download (14 Kurven: sieben Rechts-, sieben Linkskurven)",
+  "direction": "clockwise",
+  "direction_source": "https://www.sportpresseportal.de/media/3XXC81/47397/download (im Uhrzeigersinn befahren)",
+  "map_url": "https://www.motorsportarena.com/Media/public/Internes-Rennstrecke/ListenansichtStreckenskizze.jpg",
+  "map_page": "https://www.motorsportarena.com/Die-Arena/Ueber-uns/Rennstrecke",
+  "map_publisher": "Motorsport Arena Oschersleben (circuit)",
+  "map_file": "oschersleben.png"
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   255,
+   255,
+   255
+  ],
+  "tol": 12,
+  "crop": [
+   0.08,
+   0.17,
+   0.93,
+   0.68
+  ],
+  "erase": [
+   [
+    0.32,
+    0.262,
+    0.405,
+    0.284
+   ],
+   [
+    0.68,
+    0.535,
+    0.93,
+    0.68
+   ],
+   [
+    0.33,
+    0.49,
+    0.69,
+    0.68
+   ]
+  ],
+  "close": 3,
+  "keep": "all",
+  "min_size": 2500
+ },
+ "verify": {
+  "notes": "Official sketch cleaned for extraction (scratch clean_osch.py): the white page outside the green circuit area and the white areas wider than the track band (paddock, infield) painted black; the two short white connector roads at the top and the handling course/paddock below the pit straight erased by the extract rules. Remaining extra official points are the pit lane."
+ },
+ "render": {
+  "rotate_deg": 17.4
+ },
+ "status": "published",
+ "notes": "Lap = closed loop of the raceway ways closest to the official length."
 }

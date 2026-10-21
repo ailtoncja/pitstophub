@@ -2,10 +2,64 @@
  "key": "washington-dc",
  "name": "Streets of Washington, D.C.",
  "layout": "Street circuit",
- "venue": {"lat": 38.8905, "lon": -77.0170, "radius_m": 1100},
- "official": {"length_m": 2700},
- "select": {"mode": "cycle", "streets": true},
- "extract": {"mode": "mask", "max_lum": 0.5, "min_alpha": 0.5, "close": 3},
- "render": {"rotate_deg": 0},
+ "venue": {
+  "lat": 38.8905,
+  "lon": -77.017,
+  "radius_m": 1100
+ },
+ "official": {
+  "length_m": 2736
+ },
+ "select": {
+  "mode": "waypoints",
+  "streets": true,
+  "waypoints": [
+   [
+    38.8915437,
+    -77.0152099
+   ],
+   [
+    38.8939723,
+    -77.0239809
+   ],
+   [
+    38.8920842,
+    -77.0239648
+   ],
+   [
+    38.8920822,
+    -77.0219148
+   ],
+   [
+    38.8875736,
+    -77.0219177
+   ],
+   [
+    38.8875731,
+    -77.0175602
+   ],
+   [
+    38.8881885,
+    -77.0152018
+   ],
+   [
+    38.8888344,
+    -77.0152043
+   ],
+   [
+    38.8906302,
+    -77.0152133
+   ]
+  ]
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": 0
+ },
  "status": "draft"
 }

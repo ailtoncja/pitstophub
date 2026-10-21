@@ -2,7 +2,7 @@
  "key": "markham",
  "name": "Streets of Markham",
  "layout": "Street circuit",
- "venue": {"lat": 43.8560, "lon": -79.3270, "radius_m": 1200},
+ "venue": {"lat": 43.8545, "lon": -79.3095, "radius_m": 900},
  "official": {"length_m": 3520},
  "select": {"mode": "cycle", "streets": true},
  "extract": {"mode": "mask", "max_lum": 0.5, "min_alpha": 0.5, "close": 3},

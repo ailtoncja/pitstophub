@@ -1,9 +1,9 @@
 {
  "key": "charlotte-oval",
- "official_map": null,
- "official_map_page": null,
+ "official_map": "https://www.charlottemotorspeedway.com/documents/cms-nascar-seating-map.pdf",
+ "official_map_page": "https://www.charlottemotorspeedway.com/events/facility-maps/",
  "official_length_m": 2414,
- "official_length_source": null,
+ "official_length_source": "https://www.charlottemotorspeedway.com/fans/track-facts/ (1.5 miles or 7,920 feet)",
  "alt_lengths": [],
  "osm_length_m": 2365.1,
  "length_error_pct": -2.03,
@@ -18,10 +18,10 @@
   "n": 67603
  },
  "mirror_ratio": 1.15,
- "symmetric_shape": false,
+ "symmetric_shape": true,
  "checks": {
   "shape": true,
-  "not_mirrored": false,
+  "not_mirrored": true,
   "not_distorted": true,
   "length": false
  },
