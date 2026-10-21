@@ -60,6 +60,14 @@ export function findLiveTwin(calendar: Race[], base: Race): Race | null {
   return best;
 }
 
+/** Mesmo lugar no mesmo fim de semana (criterio mais estrito que findLiveTwin: o lugar precisa bater sempre). */
+export function sameEventAndPlace(a: Race, b: Race): boolean {
+  const gap = Math.abs(dayOf(a.date) - dayOf(b.date));
+  if (!Number.isFinite(gap) || gap > SAME_WEEKEND_DAYS) return false;
+  const tokens = tokensOf(a);
+  return [...tokensOf(b)].some((token) => tokens.has(token));
+}
+
 function dayOf(date: string): number {
   return Math.round(Date.parse(`${date.slice(0, 10)}T00:00:00Z`) / DAY_MS);
 }

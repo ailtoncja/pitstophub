@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { MapPin } from 'lucide-react';
 import { hasStartTime, racePlace, raceTitle, timeOf, timeZoneLabel, weekdayDayMonth } from '../lib/format';
 import { useT } from '../lib/i18n';
@@ -17,11 +18,14 @@ export function RaceSpotlight({
   categoryId,
   now,
   className,
+  cancelNote,
 }: {
   race: Race;
   categoryId: string;
   now: number;
   className?: string;
+  /** Complemento do "Etapa cancelada" (substituta ou "sem substituta"). Pode ter links: nao usar dentro de outro link. */
+  cancelNote?: ReactNode;
 }) {
   const { t, lang } = useT();
   const start = raceStartDate(race);
@@ -48,7 +52,10 @@ export function RaceSpotlight({
         </p>
         <div className="min-h-[2.25rem] flex items-center">
           {cancelled ? (
-            <StatusTag className="text-[1rem]">{t('cir.cancelled')}</StatusTag>
+            <p className="type-label-badge text-[1rem] text-silver leading-snug">
+              {t('cir.cancelled')}
+              {cancelNote && <> · {cancelNote}</>}
+            </p>
           ) : phase === 'live' ? (
             <StatusTag live className="text-[1rem] text-white">{t('home.liveNow')}</StatusTag>
           ) : phase === 'awaiting' ? (
