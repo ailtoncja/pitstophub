@@ -1,40 +1,62 @@
 {
  "key": "daytona-oval",
  "name": "Daytona International Speedway",
- "layout": "Tri-oval (2.5 mi)",
- "used_by": [],
+ "layout": "Oval (tri-oval, 2.5 mi)",
+ "used_by": [
+  "nascar / duels / 2026-02-12",
+  "nascar / daytona500 / 2026-02-15",
+  "nascar / daytona2 / 2026-08-29"
+ ],
+ "layout_source": "https://www.nascar.com/nascar-cup-series/schedule/ (Duels, Daytona 500 and the August race run on the oval)",
+ "status": "published",
  "venue": {
   "lat": 29.1852,
   "lon": -81.0705,
   "radius_m": 1600
  },
  "official": {
-  "length_m": 4023
+  "length_m": 4023,
+  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf",
+  "map_url": "https://www.daytonainternationalspeedway.com/wp-content/uploads/sites/1025/2026/09/17/DIS-25-1267622-General-DIS-Facility-Map-2025.pdf",
+  "map_page": "https://www.daytonainternationalspeedway.com/maps/",
+  "map_publisher": "Daytona International Speedway",
+  "map_file_note": "official/daytona-oval.png = vector path #708 (track edge line) of the official facility-map PDF redrawn black on white, geometry unchanged",
+  "length_source_note": "NASCAR Cup Series stage lengths and pit road speeds (January 2026), Track Length column; read 2026-10-21"
  },
  "select": {
   "mode": "cycle",
   "only_ways": [
-   11371365,
-   352067004,
-   352070311,
+   352070316,
    352070309,
+   352070311,
+   352067004,
+   11371365,
    352070316
   ],
   "relations": [
    5254137
-  ]
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
  },
  "extract": {
   "mode": "mask",
   "max_lum": 0.5,
   "close": 2
  },
- "render": {
-  "rotate_deg": 125.6
- },
- "status": "draft",
  "verify": {
   "symmetric": true,
-  "notes": "Tri-oval mirror-symmetric about the axis through the start/finish apex: the mirrored fit scores the same (0.74%), so the mirror check cannot discriminate; the shape match itself is the check."
+  "notes": "Tri-oval mirror-symmetric about the axis through the start/finish apex: the mirrored fit scores the same (0.74%), so the mirror check cannot discriminate; the shape match itself is the check.",
+  "scores": {
+   "osm_chamfer_pct": 0.76,
+   "osm_mirror_pct": 0.74,
+   "osm_aniso": 1.023,
+   "length_error_pct": -0.13,
+   "png_chamfer_pct": 0.81,
+   "png_rot_deg": -0.0,
+   "pass": true
+  }
+ },
+ "render": {
+  "rotate_deg": 125.6
  }
 }

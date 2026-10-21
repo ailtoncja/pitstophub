@@ -2,7 +2,11 @@
  "key": "sonoma-gtwc",
  "name": "Sonoma Raceway",
  "layout": "Long course with the Carousel (2.52 mi)",
- "used_by": [],
+ "status": "skipped",
+ "used_by": [
+  "gtwc-america / sonoma-raceway / 2026-03-29"
+ ],
+ "layout_source": "https://www.sonomaraceway.com/media/news/sonoma-raceway-host-world-challenge-powered-aws-march-2026.html (12-turn, 2.52-mile road course)",
  "venue": {
   "lat": 38.1611,
   "lon": -122.4547,
@@ -21,5 +25,5 @@
  "render": {
   "rotate_deg": 0
  },
- "status": "draft"
+ "notes": "SKIPPED (no flat official map), as sonoma. OSM lap (with the Carousel) 4055 m vs 2.52 mi 4056 m. Different layout from the NASCAR 1.99-mile course."
 }

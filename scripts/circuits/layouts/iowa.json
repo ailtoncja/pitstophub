@@ -9,16 +9,18 @@
  },
  "official": {
   "length_m": 1408,
-  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications Rev B, Jayski-hosted copy; figure read from a search excerpt, the PDF itself returned 403) 0.875 mi",
+  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf",
   "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/IowaSpeedway.png",
   "map_page": "https://www.indycar.com/",
-  "map_publisher": "INDYCAR (track outline used on its schedule pages)"
+  "map_publisher": "INDYCAR (track outline used on its schedule pages)",
+  "length_source_note": "NASCAR Cup Series stage lengths and pit road speeds (January 2026), Track Length column; read 2026-10-21"
  },
  "select": {
   "mode": "cycle",
   "only_ways": [
    119238784
-  ]
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
  },
  "render": {
   "rotate_deg": -128.1

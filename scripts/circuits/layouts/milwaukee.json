@@ -2,7 +2,11 @@
  "key": "milwaukee",
  "name": "Milwaukee Mile",
  "layout": "Oval (1 mile)",
- "used_by": [],
+ "status": "published",
+ "used_by": [
+  "indy / milwaukee-1 (r16-milwaukee-1) / 2026-08-29",
+  "indy / milwaukee-2 (r17-milwaukee-2) / 2026-08-30"
+ ],
  "layout_source": "https://www.indycar.com/Schedule/2026/Milwaukee-Race1",
  "venue": {
   "lat": 43.0195,
@@ -18,7 +22,11 @@
   "map_publisher": "INDYCAR"
  },
  "select": {
-  "mode": "cycle"
+  "mode": "cycle",
+  "only_ways": [
+   107508989
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
  },
  "extract": {
   "mode": "mask",
@@ -26,9 +34,12 @@
   "min_alpha": 0.5,
   "close": 3
  },
- "render": {
-  "rotate_deg": 0
+ "verify": {
+  "symmetric": true,
+  "notes": "Near-symmetric flat oval: mirrored fit equals the direct one."
  },
- "status": "published",
+ "render": {
+  "rotate_deg": -89.4
+ },
  "notes": ""
 }

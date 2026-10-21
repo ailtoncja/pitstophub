@@ -2,10 +2,52 @@
  "key": "jeddah",
  "name": "Jeddah Corniche Circuit",
  "layout": "Circuito completo",
- "venue": {"lat": 21.6320, "lon": 39.1040, "radius_m": 3000},
- "official": {"length_m": 6174},
- "select": {"mode": "cycle"},
- "extract": {},
- "render": {"rotate_deg": 0},
- "status": "draft"
+ "status": "published",
+ "used_by": [
+  "f1 / saudi / 2026-04-19 (cancelled)",
+  "f2 / jeddah-f2 / 2026-04-19 (cancelled)",
+  "f1-academy / jeddah-academy / 2026-04-19 (cancelled)"
+ ],
+ "layout_source": "https://www.formula1.com/en/racing/2025/saudi-arabia",
+ "venue": {
+  "lat": 21.632,
+  "lon": 39.104,
+  "radius_m": 3000
+ },
+ "official": {
+  "length_m": 6174,
+  "map_url": "https://media.formula1.com/image/upload/f_auto/q_auto/common/f1/2026/track/2026trackjeddahdetailed.png",
+  "map_page": "https://www.formula1.com/en/racing/2026/saudi-arabia",
+  "map_publisher": "Formula 1",
+  "length_source": "https://www.formula1.com/en/racing/2025/saudi-arabia",
+  "facts": {
+   "laps": 50,
+   "race_distance_km": 308.45,
+   "first_grand_prix": 2021,
+   "lap_record": "1:30.734, Lewis Hamilton (2021)",
+   "source": "https://www.formula1.com/en/racing/2025/saudi-arabia"
+  }
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   1359884761,
+   1121870473,
+   1257884704,
+   1257884703,
+   1359884758,
+   1359884756,
+   1359884762,
+   1007989410,
+   1359884757,
+   1257884699
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "f1"
+ },
+ "render": {
+  "rotate_deg": 111.2
+ }
 }

@@ -1,0 +1,22 @@
+{
+ "key": "beijing-street",
+ "name": "Beijing Street Circuit (Beijing E-Town)",
+ "layout": "Street circuit",
+ "status": "skipped",
+ "used_by": [
+  "gtwc-asia / beijing-street-circuit / 2026-10-04"
+ ],
+ "layout_source": "https://www.gt-world-challenge-asia.com/event/83/beijing-street-circuit",
+ "venue": {
+  "lat": 39.79,
+  "lon": 116.51,
+  "radius_m": 2500
+ },
+ "official": {
+  "length_m": 4900,
+  "length_source": "https://www.gt-world-challenge-asia.com/event/83/beijing-street-circuit (\"Circuit Length 4.9km\")",
+  "corners": 12,
+  "corners_source": "https://www.gt-world-challenge-asia.com/event/83/beijing-street-circuit (\"Number of Turns 12\")"
+ },
+ "notes": "SKIPPED: purpose-built street circuit in the Beijing Economic-Technological Development Area (E-Town), same as 2025. No official plan-view map found: the SRO event page has its \"Download Track PDF\" link commented out and the event poster outline is stylised and partly hidden. Venue coordinates approximate, OSM not fetched."
+}

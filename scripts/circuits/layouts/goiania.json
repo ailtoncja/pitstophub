@@ -15,12 +15,18 @@
   "map_publisher": "MotoGP (Dorna), rendered from SVG to PNG"
  },
  "select": {
-  "mode": "cycle"
+  "mode": "cycle",
+  "only_ways": [
+   288004307,
+   288004311,
+   288004307
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": 46.0
  },
- "status": "draft",
+ "status": "published",
  "extract": {
   "mode": "mask",
   "rgb": [
@@ -30,5 +36,12 @@
   ],
   "tol": 30,
   "close": 3
+ },
+ "used_by": [
+  "endurance-brasil / etapa-8-tres-horas-de-goiania / 2026-11-21"
+ ],
+ "layout_source": "https://www.motogp.com/en/calendar/2026/event/brazil/11588b5a-f76c-4c8e-ae06-acba82ff1303",
+ "verify": {
+  "notes": "MotoGP 2026 map of the reformed circuit. Small local deviation around T11-T12 (p95 9.9 m). Endurance BR etapa 8 assumed on the full reformed circuit (only layout raced since the 2026 reform)."
  }
 }

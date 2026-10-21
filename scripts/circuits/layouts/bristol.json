@@ -2,21 +2,27 @@
  "key": "bristol",
  "name": "Bristol Motor Speedway",
  "layout": "Oval (0.533 mi)",
- "used_by": [],
+ "used_by": [
+  "nascar / bristol1 / 2026-04-12",
+  "nascar / bristol2 / 2026-09-19"
+ ],
+ "status": "skipped",
+ "notes": "OSM lap 846 m (-1.35%, OK) but no independent top-down official map: the bristolmotorspeedway.com facility and seating maps are oblique/3D. Not published.",
  "venue": {
   "lat": 36.5157,
   "lon": -82.2571,
   "radius_m": 600
  },
  "official": {
-  "length_m": 858
+  "length_m": 858,
+  "length_source": "0.533 mi (nominal; no official page read in this run)"
  },
  "select": {
   "mode": "cycle"
  },
  "extract": {},
+ "verify": {},
  "render": {
   "rotate_deg": 0
- },
- "status": "draft"
+ }
 }

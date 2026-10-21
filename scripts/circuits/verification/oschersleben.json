@@ -11,16 +11,16 @@
  "osm_chamfer_m": 4.0,
  "osm_p95_m": 13.2,
  "osm_mirror_pct": 7.71,
- "osm_aniso": 1.021,
+ "osm_aniso": 1.02,
  "osm_rot_deg": 17.4,
  "extract": {
   "mode": "mask",
   "n": 47295
  },
  "png_chamfer_pct": 1.24,
- "png_mirror_pct": 7.9,
- "png_aniso": 1.024,
- "png_rot_deg": -0.0,
+ "png_mirror_pct": 7.62,
+ "png_aniso": 1.029,
+ "png_rot_deg": 0.0,
  "mirror_ratio": 6.32,
  "symmetric_shape": false,
  "checks": {

@@ -1,0 +1,42 @@
+{
+ "key": "fuji",
+ "official_map": "https://supergt.net/wp-content/uploads/2024/12/circuit_fuji.svg",
+ "official_map_page": "https://supergt.net/en/circuit/fuji",
+ "official_length_m": 4563,
+ "official_length_source": "https://www.fiawec.com/en/race/6-hours-of-fuji-2026",
+ "alt_lengths": [
+  {
+   "length_m": 4563,
+   "source": "https://www.gt-world-challenge-asia.com/event/82/fuji-international-speedway"
+  }
+ ],
+ "osm_length_m": 4553.7,
+ "length_error_pct": -0.2,
+ "osm_chamfer_pct": 0.64,
+ "osm_chamfer_m": 3.3,
+ "osm_p95_m": 6.9,
+ "osm_mirror_pct": 8.67,
+ "osm_aniso": 1.006,
+ "osm_rot_deg": -38.8,
+ "extract": {
+  "mode": "mask",
+  "n": 13032
+ },
+ "png_chamfer_pct": 0.69,
+ "png_mirror_pct": 8.44,
+ "png_aniso": 1.006,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 13.55,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

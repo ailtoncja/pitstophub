@@ -2,17 +2,50 @@
  "key": "vir",
  "name": "VIRginia International Raceway",
  "layout": "Full course (3.27 mi)",
- "used_by": [],
+ "status": "published",
+ "used_by": [
+  "imsa / vir (r09-vir) / 2026-08-23"
+ ],
+ "layout_source": "https://racer.com/2026/08/13/imsa-gt-classes-set-to-take-center-stage-at-vir",
  "venue": {
   "lat": 36.5682,
   "lon": -79.2061,
   "radius_m": 2500
  },
  "official": {
-  "length_m": 5263
+  "length_m": 5263,
+  "length_source": "https://virnow.com/track/configurations/ (Full Course 3.27 miles / 5.26 km)",
+  "corners": 17,
+  "corners_source": "https://www.imsa.com/news/2026/08/24/check-out-virginia-international-raceway-race-results-and-point-standings-here-3/ (3.27-mile, 17-turn road course)",
+  "direction": "clockwise",
+  "direction_source": "https://virnow.com/wp-content/uploads/2014/05/VIR_Full-Course_2018-1-1582x2048.jpg",
+  "map_url": "https://virnow.com/wp-content/uploads/2014/05/VIR_Full-Course_2018-1-1582x2048.jpg",
+  "map_page": "https://virnow.com/track/configurations/",
+  "map_publisher": "VIRginia International Raceway"
  },
  "select": {
-  "mode": "cycle"
+  "mode": "cycle",
+  "only_ways": [
+   91012202,
+   1315957528,
+   1315957527,
+   1315957526,
+   1315957525,
+   1315957524,
+   1315957523,
+   1315957522,
+   1315957521,
+   1315957520,
+   1315957519,
+   1315957518,
+   1315957517,
+   20293988,
+   1315957516,
+   1315957530,
+   1315957529,
+   91012202
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
  },
  "extract": {
   "mode": "mask",
@@ -42,5 +75,5 @@
  "render": {
   "rotate_deg": 0.4
  },
- "status": "draft"
+ "notes": "IMSA Michelin GT Challenge at VIR uses the 3.27-mile Full Course."
 }

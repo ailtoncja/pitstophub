@@ -4,22 +4,27 @@
  "official_map_page": "https://www.indycar.com/Schedule/2026/Road-America",
  "official_length_m": 6460,
  "official_length_source": "https://www.indycar.com/Schedule/2026/Road-America (Track Length 4.014 Miles)",
- "alt_lengths": [],
+ "alt_lengths": [
+  {
+   "length_m": 6477,
+   "source": "https://www.gt-world-challenge-america.com/event/115/road-america (6.477 km, 14 turns)"
+  }
+ ],
  "osm_length_m": 6437.9,
  "length_error_pct": -0.34,
  "osm_chamfer_pct": 0.9,
- "osm_chamfer_m": 4.9,
- "osm_p95_m": 10.2,
+ "osm_chamfer_m": 5.0,
+ "osm_p95_m": 10.1,
  "osm_mirror_pct": 11.33,
- "osm_aniso": 1.016,
+ "osm_aniso": 1.017,
  "osm_rot_deg": -91.4,
  "extract": {
   "mode": "mask",
   "n": 115948
  },
- "png_chamfer_pct": 0.99,
- "png_mirror_pct": 11.31,
- "png_aniso": 1.018,
+ "png_chamfer_pct": 0.96,
+ "png_mirror_pct": 11.67,
+ "png_aniso": 1.016,
  "png_rot_deg": 0.0,
  "mirror_ratio": 12.59,
  "symmetric_shape": false,

@@ -1,14 +1,17 @@
 {
  "key": "curvelo",
  "name": "Circuito dos Cristais (Curvelo)",
- "layout": "Oval",
+ "layout": "Oval (1,25 km)",
  "venue": {
   "lat": -18.806,
   "lon": -44.409,
   "radius_m": 1500
  },
  "official": {
-  "length_m": 1250
+  "length_m": 1250,
+  "length_source": "https://www.circuitodoscristais.com.br/autodromo/ (\"O CIRCUITO OVAL ... tem 1,2km de extensão e 2 curvas\"); 1,250 m per press",
+  "map_url": "https://www.circuitodoscristais.com.br/site/wp-content/uploads/2025/02/mapanovo.png",
+  "map_page": "https://www.circuitodoscristais.com.br/autodromo/"
  },
  "select": {
   "mode": "cycle"
@@ -16,5 +19,9 @@
  "render": {
   "rotate_deg": 0
  },
- "status": "draft"
+ "status": "skipped",
+ "used_by": [
+  "nascar-brasil / r07-curvelo / 2026-09-20 (\"Oval Track\")"
+ ],
+ "notes": "Skipped: the NASCAR Brasil round is on the oval, which OpenStreetMap does not map (only the road courses: way 583743501 \"Curvelo Short\" 3,309 m, a 2,992 m loop 834923789 and links)."
 }

@@ -2,14 +2,23 @@
  "key": "bowman-gray",
  "name": "Bowman Gray Stadium",
  "layout": "Quarter-mile oval",
- "used_by": [],
+ "used_by": [
+  "nascar / clash / 2026-02-04"
+ ],
+ "layout_source": "https://www.nascarclash.com/wp-content/uploads/sites/1029/2026/01/21/FINAL-Track-Map-CookOut-Clash-2026-.pdf",
+ "status": "skipped",
+ "notes": "OSM lap 403 m (+0.3%) but shape vs the official 2026 Clash map is 3.29% with aniso 1.11 (mean deviation only ~2 m, yet outside the 2% / 1.06 limits). Not published.",
  "venue": {
   "lat": 36.0826,
   "lon": -80.2221,
   "radius_m": 500
  },
  "official": {
-  "length_m": 402
+  "length_m": 402,
+  "length_source": "0.25 mi (nominal)",
+  "map_url": "https://www.nascarclash.com/wp-content/uploads/sites/1029/2026/01/21/FINAL-Track-Map-CookOut-Clash-2026-.pdf",
+  "map_publisher": "NASCAR Clash / Bowman Gray Stadium",
+  "map_file_note": "official/bowman-gray.png = outline of the infield region in the official 2026 Clash track map (embedded raster)"
  },
  "select": {
   "mode": "cycle"
@@ -19,8 +28,18 @@
   "max_lum": 0.5,
   "keep": "largest"
  },
+ "verify": {
+  "scores": {
+   "osm_chamfer_pct": 3.29,
+   "osm_mirror_pct": 3.29,
+   "osm_aniso": 1.11,
+   "length_error_pct": 0.31,
+   "png_chamfer_pct": null,
+   "png_rot_deg": null,
+   "pass": false
+  }
+ },
  "render": {
   "rotate_deg": 0
- },
- "status": "draft"
+ }
 }

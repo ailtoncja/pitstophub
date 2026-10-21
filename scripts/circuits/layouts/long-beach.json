@@ -2,10 +2,40 @@
  "key": "long-beach",
  "name": "Streets of Long Beach",
  "layout": "Street circuit",
- "venue": {"lat": 33.7640, "lon": -118.1920, "radius_m": 1200},
- "official": {"length_m": 3167},
- "select": {"mode": "cycle", "relations": [18052024]},
- "extract": {"mode": "mask", "max_lum": 0.5, "min_alpha": 0.5, "close": 3},
- "render": {"rotate_deg": 0},
- "status": "draft"
+ "status": "skipped",
+ "used_by": [
+  "indy / long-beach-indy (live r05-long-beach) / 2026-04-19",
+  "imsa / longbeach (live r03-long-beach) / 2026-04-18"
+ ],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Long-Beach",
+ "venue": {
+  "lat": 33.764,
+  "lon": -118.192,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 3167,
+  "length_source": "https://www.indycar.com/Schedule/2026/Long-Beach (1.968-mile)",
+  "corners": 11,
+  "corners_source": "https://www.indycar.com/Schedule/2026/Long-Beach (\"11-turn\")",
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/LongBeach.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/Long-Beach",
+  "map_publisher": "INDYCAR"
+ },
+ "select": {
+  "mode": "cycle",
+  "relations": [
+   18052024
+  ]
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "notes": "SKIPPED: OSM relation 18052024 follows the 2026 course turn by turn, but fails the thresholds: 2.23% vs the IndyCar outline (limit 2.0) and 3259 m vs 1.968 mi = 3167 m (+2.90%). The other official maps (IndyCar 2026 track map, gplb.com circuit map and SVG) are schematic, not to scale. No PNG published."
 }

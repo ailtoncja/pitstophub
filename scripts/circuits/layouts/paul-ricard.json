@@ -1,11 +1,29 @@
 {
  "key": "paul-ricard",
  "name": "Circuit Paul Ricard",
- "layout": "x",
- "venue": {"lat": 43.2525, "lon": 5.7943, "radius_m": 2200},
- "official": {"length_m": 5791},
- "select": {"mode": "cycle"},
+ "layout": "GTWC Europe configuration (5.791 km, 15 turns)",
+ "status": "skipped",
+ "used_by": [
+  "gtwc-europe / circuit-paul-ricard / 2026-04-12 (synced gt-world-challenge r1-6-hours-of-paul-ricard)"
+ ],
+ "layout_source": "https://www.gt-world-challenge-europe.com/event/246/circuit-paul-ricard",
+ "venue": {
+  "lat": 43.2525,
+  "lon": 5.7943,
+  "radius_m": 2200
+ },
+ "official": {
+  "length_m": 5791,
+  "length_source": "https://www.gt-world-challenge-europe.com/event/246/circuit-paul-ricard",
+  "corners": 15,
+  "corners_source": "https://www.gt-world-challenge-europe.com/event/246/circuit-paul-ricard"
+ },
+ "select": {
+  "mode": "cycle"
+ },
  "extract": {},
- "render": {"rotate_deg": 0},
- "status": "draft"
+ "render": {
+  "rotate_deg": 0
+ },
+ "notes": "SKIPPED: the circuit has 247 configurations (circuitpaulricard.com) and no official map of the exact 5.791 km GTWC configuration was found (SRO page shows only the venue plan; the KBYG and spotter PDFs have no track map). The OSM loop that matches 5.791 km is a combination of ways that does not form a real layout."
 }

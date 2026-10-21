@@ -2,10 +2,67 @@
  "key": "misano",
  "name": "Misano World Circuit Marco Simoncelli",
  "layout": "Circuito completo",
- "venue": {"lat": 43.9614, "lon": 12.6847, "radius_m": 1300},
- "official": {"length_m": 4226},
- "select": {"mode": "cycle"},
- "extract": {},
- "render": {"rotate_deg": 0},
- "status": "draft"
+ "status": "published",
+ "used_by": [
+  "gtwc-europe / misano / 2026-07-19"
+ ],
+ "layout_source": "https://www.gt-world-challenge-europe.com/event/250/misano",
+ "venue": {
+  "lat": 43.9614,
+  "lon": 12.6847,
+  "radius_m": 1300
+ },
+ "official": {
+  "length_m": 4226,
+  "length_source": "https://www.gt-world-challenge-europe.com/event/250/misano",
+  "map_url": "https://www.gt-world-challenge-europe.com/images/circuits/track-misano.png",
+  "map_page": "https://www.gt-world-challenge-europe.com/event/250/misano",
+  "map_publisher": "SRO",
+  "corners": 16,
+  "corners_source": "https://www.gt-world-challenge-europe.com/event/250/misano"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   624263855,
+   624263850,
+   624263854,
+   624263849,
+   624263853,
+   624263848,
+   1784572,
+   624263852,
+   624263860,
+   624263859,
+   624263858,
+   624263845,
+   624263847,
+   624263844,
+   624263857,
+   624263846,
+   624263856,
+   624263851,
+   624263855
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.9,
+  "close": 7,
+  "fill_holes_max": 30000,
+  "min_size": 300,
+  "erase": [
+   [
+    0.22,
+    0.15,
+    0.26,
+    0.2
+   ]
+  ]
+ },
+ "render": {
+  "rotate_deg": -64.7
+ },
+ "notes": "Official map is the SRO (GTWC Europe) Misano map with its black elements (pit lane, turn labels, intermediate marks) whitened by a 2 px dilated mask before extraction (cache official/misano.png; original misano_original.png)."
 }

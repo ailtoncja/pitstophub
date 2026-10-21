@@ -6,7 +6,8 @@ select.mode (layout file):
   "cycle"     (default) every closed loop the raceway ways form is listed and the one whose
               length is closest to the official length wins. select.require_ways (way ids the
               lap must use), select.exclude_ways and select.include_ways (extra ways, e.g. public
-              roads that are part of the circuit) disambiguate layouts that share a venue.
+              roads that are part of the circuit, or leisure=track ways of circuits not tagged as a
+              raceway) disambiguate layouts that share a venue; select.only_ways fixes the ways.
   "waypoints" the lap is the shortest route through select.waypoints ([lat, lon], in lap
               order) over the raceway ways plus, with select.streets, the public streets.
               Used for street circuits, whose streets are not tagged as a raceway.
@@ -15,6 +16,7 @@ A debug picture (all candidate ways with their ids, the chosen lap in red) goes 
 """
 import math
 import os
+import re
 import sys
 
 import networkx as nx
@@ -24,7 +26,9 @@ from PIL import Image, ImageDraw
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from lib import DATA, cache, keys_from_argv, load_json, load_layout, projector, save_json  # noqa: E402
 
-PITLIKE = ('pit', 'paddock', 'kart', 'drag', 'skid', 'drift', 'autocross', 'motocross', 'dirt', 'oval track access')
+# word starts, in the way's name/raceway/service tags (not 'paddock': Brands Hatch's Paddock Hill bend;
+# not the description: Magny-Cours' GP way mentions the karting track)
+PITLIKE = ('pit', 'boxengasse', 'kart', 'drag', 'skid', 'drift', 'autocross', 'motocross', 'dirt', 'oval track access')
 
 
 def is_pitlike(tags):
@@ -34,8 +38,9 @@ def is_pitlike(tags):
         return True
     if tags.get('sport') in ('karting', 'motocross', 'drag_racing', 'dirt_bike'):
         return True
-    text = ' '.join(str(tags.get(k, '')) for k in ('name', 'description', 'raceway', 'service', 'note')).lower()
-    return any(w in text for w in PITLIKE)
+    text = ' '.join(str(tags.get(k, '')) for k in ('name', 'raceway', 'service')).lower()
+    # whole words only: Hockenheim's hairpin is called "Spitzkehre"
+    return re.search(r'(' + '|'.join(PITLIKE) + r')', text) is not None
 
 
 def load_osm(layout, key):

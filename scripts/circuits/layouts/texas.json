@@ -1,18 +1,38 @@
 {
  "key": "texas",
  "name": "Texas Motor Speedway",
- "layout": "Quad-oval (1.5 mi)",
- "used_by": [],
+ "layout": "Oval (quad-oval, 1.5 mi)",
+ "used_by": [
+  "nascar / texas / 2026-05-03"
+ ],
+ "layout_source": "https://www.texasmotorspeedway.com/media/track-facts/",
+ "status": "published",
  "venue": {
   "lat": 33.0371,
   "lon": -97.2816,
   "radius_m": 1100
  },
  "official": {
-  "length_m": 2414
+  "length_m": 2414,
+  "length_source": "https://www.texasmotorspeedway.com/media/track-facts/ (\"Racing Surface Oval: 1.5 miles\"; turns 750-foot radius; banking 20 deg T1-2, 24 deg T3-4)",
+  "map_url": "https://www.texasmotorspeedway.com/documents/tms_2025seatingchart_nopricing_090924.pdf",
+  "map_page": "https://www.texasmotorspeedway.com/fans/facility-maps/",
+  "map_publisher": "Texas Motor Speedway",
+  "map_file_note": "official/texas.png = page render of the official seating-diagram PDF (unaltered); extraction crops the legend, the grandstand block and the pit-road island"
  },
  "select": {
-  "mode": "cycle"
+  "mode": "cycle",
+  "only_ways": [
+   489172989,
+   261968502,
+   261968505,
+   489172062,
+   261968503,
+   104503520,
+   261968504,
+   489172989
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
  },
  "extract": {
   "mode": "mask",
@@ -40,12 +60,20 @@
   "open": 2,
   "fill_holes_max": 6000
  },
- "render": {
-  "rotate_deg": -74.3
- },
- "status": "draft",
  "verify": {
   "symmetric": true,
-  "notes": "Quad-oval mirror-symmetric about the axis through start/finish: mirrored fit scores the same (0.95%), so the mirror check cannot discriminate. Official map is a seating diagram (stylised but top-down); pit-road island and start/finish divider erased from the mask."
+  "notes": "Quad-oval mirror-symmetric about the axis through start/finish: mirrored fit scores the same (0.95%), so the mirror check cannot discriminate. Official map is a seating diagram (stylised but top-down); pit-road island and start/finish divider erased from the mask.",
+  "scores": {
+   "osm_chamfer_pct": 0.95,
+   "osm_mirror_pct": 0.95,
+   "osm_aniso": 1.016,
+   "length_error_pct": -1.31,
+   "png_chamfer_pct": 0.97,
+   "png_rot_deg": 0.1,
+   "pass": true
+  }
+ },
+ "render": {
+  "rotate_deg": -74.3
  }
 }

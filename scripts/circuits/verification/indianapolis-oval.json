@@ -17,10 +17,10 @@
   "mode": "mask",
   "n": 25138
  },
- "png_chamfer_pct": 0.58,
+ "png_chamfer_pct": 0.59,
  "png_mirror_pct": 0.58,
  "png_aniso": 1.012,
- "png_rot_deg": 0.1,
+ "png_rot_deg": -179.9,
  "mirror_ratio": 1.0,
  "symmetric_shape": true,
  "checks": {

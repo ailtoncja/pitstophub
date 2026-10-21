@@ -1,9 +1,9 @@
 {
  "key": "nurburgring-sprint",
- "official_map": null,
- "official_map_page": null,
+ "official_map": "https://res.cloudinary.com/dmwcbhehi/image/upload/v1783594135/PSCCD_2026_Track_Map_N%C3%BCrburgring_ENG_yygmud.webp",
+ "official_map_page": "https://racing.porsche.com/events/pccd-07-nuerburgring-2026",
  "official_length_m": 3629,
- "official_length_source": null,
+ "official_length_source": "https://racing.porsche.com/events/pccd-07-nuerburgring-2026 (track map: Length 3,629 m)",
  "alt_lengths": [],
  "osm_length_m": 3612.0,
  "length_error_pct": -0.47,
@@ -17,13 +17,21 @@
   "mode": "mask",
   "n": 32473
  },
+ "png_chamfer_pct": 1.54,
+ "png_mirror_pct": 10.04,
+ "png_aniso": 1.027,
+ "png_rot_deg": 0.0,
  "mirror_ratio": 6.72,
  "symmetric_shape": false,
  "checks": {
   "shape": true,
   "not_mirrored": true,
   "not_distorted": true,
-  "length": true
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
  },
  "pass": true
 }

@@ -813,6 +813,20 @@ const IMOLA_CIRCUIT_INFO: CircuitInfo = {
   },
 };
 
+// Jeddah Corniche Circuit (GP da Arabia Saudita; cancelado em 2026, como as etapas de F2 e F1
+// Academy). A F1 nao publicou mapa novo: o desenho e do OpenStreetMap, conferido com o mapa oficial
+// 2026trackjeddahdetailed.png (scripts/circuits/verification/jeddah.json). Extensao, voltas,
+// distancia, primeiro GP e recorde: formula1.com/en/racing/2025/saudi-arabia.
+const JEDDAH_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/jeddah.png',
+  osm: true,
+  lengthKm: 6.174,
+  raceDistanceKm: 308.45,
+  laps: 50,
+  lapRecord: { time: '1:30.734', driver: 'L. Hamilton (Mercedes)', year: 2021 },
+  firstGrandPrix: 2021,
+};
+
 // Identifica GPs por texto (circuito/local/nome), nao pelo id estatico: o calendario de F1
 // e substituido pelos dados ao vivo da Jolpica, que pode gerar um id diferente do id local
 // quando o casamento por data/nome com a base local falha.
@@ -966,13 +980,18 @@ function isAbuDhabiRace(race: Race): boolean {
   return haystack.includes('yas marina') || haystack.includes('abu dhabi');
 }
 
+function isJeddahRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('jeddah') || haystack.includes('saudi arabian grand prix') || haystack.includes('arabia saudita');
+}
+
 function isImolaRace(race: Race): boolean {
   const haystack = raceHaystack(race);
   return haystack.includes('imola') || haystack.includes('enzo e dino ferrari') || haystack.includes('emilia');
 }
 
 // Paginas de teste habilitadas ate agora: as pistas do calendario de F1 2026 (incluindo
-// Sepang, que recebeu o GP do Bahrein; Jeddah Corniche segue sem pagina dedicada), Sakhir
+// Sepang, que recebeu o GP do Bahrein, e Jeddah, cancelado em 2026), Sakhir
 // (F2/F3/WEC e o GP de abril cancelado) e Imola -- fora do calendario da F1 em 2026, mas
 // onde F3 e WEC ainda correm.
 const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[] = [
@@ -1003,6 +1022,7 @@ const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[
   { match: isQatarRace, info: QATAR_CIRCUIT_INFO },
   { match: isAbuDhabiRace, info: ABUDHABI_CIRCUIT_INFO },
   { match: isImolaRace, info: IMOLA_CIRCUIT_INFO },
+  { match: isJeddahRace, info: JEDDAH_CIRCUIT_INFO },
 ];
 
 // ---------------------------------------------------------------------------------------------
@@ -1057,8 +1077,8 @@ const VENUES: Venue[] = [
   {
     terms: ['charlotte', 'concord'],
     layout: 'charlotte-oval',
+    // Em 2026 a corrida de outubro voltou para o oval; o Roval so quando a prova disser.
     byText: [{ terms: ['roval'], layout: 'charlotte-roval' }],
-    byEvent: [{ categoryId: 'nascar', date: '2026-10-11', layout: 'charlotte-roval' }],
   },
   { terms: ['nashville', 'lebanon'], layout: 'nashville-superspeedway' },
   { terms: ['michigan international', 'brooklyn'], layout: 'michigan' },
@@ -1121,7 +1141,6 @@ const VENUES: Venue[] = [
   { terms: ['mandalika'], layout: 'mandalika' },
   { terms: ['okayama'], layout: 'okayama' },
   { terms: ['beijing', 'pequim'], layout: 'beijing-street' },
-  { terms: ['jeddah'], layout: 'jeddah' },
   // Brasil
   { terms: ['velocitta', 'velo citta', 'mogi guacu'], layout: 'velocitta' },
   { terms: ['brasilia', 'nelson piquet'], layout: 'brasilia' },
@@ -1158,11 +1177,9 @@ function findDrawnCircuit(race: Race, categoryId?: string): CircuitInfo | null |
     if (!venue.terms.some((term) => hasTerm(haystack, term))) continue;
     if (venue.not?.some((term) => haystack.includes(term))) continue;
     const drawn = DRAWN_CIRCUITS[venueLayout(venue, race, haystack, categoryId)];
-    if (!drawn) {
-      // Lugar so de uma categoria (ex.: COTA na NASCAR): sem desenho proprio, vale a ficha da F1.
-      if (venue.categories) continue;
-      return null;
-    }
+    // Sem desenho verificado desse tracado: nenhum mapa, em vez do mapa de outro tracado (ex.: a
+    // NASCAR em COTA usa o National Course de 2,4 milhas, nao o tracado da F1).
+    if (!drawn) return null;
     return { trackImage: drawn.trackImage, osm: true, lengthKm: drawn.lengthKm, corners: drawn.corners, direction: drawn.direction };
   }
   return undefined;
@@ -1171,7 +1188,7 @@ function findDrawnCircuit(race: Race, categoryId?: string): CircuitInfo | null |
 // Voltas, distancia, recorde, primeiro GP, Straight Mode, frenagens e pneus sao dados do GP de F1:
 // nas outras categorias fica so o que e do circuito.
 function circuitOnly(info: CircuitInfo): CircuitInfo {
-  return { trackImage: info.trackImage, lengthKm: info.lengthKm, corners: info.corners, direction: info.direction };
+  return { trackImage: info.trackImage, osm: info.osm, lengthKm: info.lengthKm, corners: info.corners, direction: info.direction };
 }
 
 /**

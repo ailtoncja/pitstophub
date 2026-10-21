@@ -8,7 +8,10 @@
   "radius_m": 1500
  },
  "official": {
-  "length_m": 3058
+  "length_m": 3032,
+  "length_source": "https://www.cba.org.br/circuitos (Extensão 3.032m, anti-horário)",
+  "direction": "counterclockwise",
+  "direction_source": "https://www.cba.org.br/circuitos"
  },
  "select": {
   "mode": "cycle"
@@ -16,5 +19,9 @@
  "render": {
   "rotate_deg": 0
  },
- "status": "draft"
+ "status": "skipped",
+ "used_by": [
+  "nascar-brasil / r02-cascavel / 2026-05-03"
+ ],
+ "notes": "Skipped: no independent official track map found (circuit and series sites unreachable or without a map)."
 }

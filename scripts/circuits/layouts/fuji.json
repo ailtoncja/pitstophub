@@ -2,10 +2,52 @@
  "key": "fuji",
  "name": "Fuji Speedway",
  "layout": "Circuito completo",
- "venue": {"lat": 35.3715, "lon": 138.9290, "radius_m": 1500},
- "official": {"length_m": 4563},
- "select": {"mode": "cycle"},
- "extract": {},
- "render": {"rotate_deg": 0},
- "status": "draft"
+ "status": "published",
+ "used_by": [
+  "wec / fuji (synced r06-fuji) / 2026-09-27",
+  "gtwc-asia / fuji-international-speedway / 2026-07-12"
+ ],
+ "layout_source": "https://www.fiawec.com/en/race/6-hours-of-fuji-2026",
+ "venue": {
+  "lat": 35.3715,
+  "lon": 138.929,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 4563,
+  "length_source": "https://www.fiawec.com/en/race/6-hours-of-fuji-2026",
+  "alt_lengths": [
+   {
+    "length_m": 4563,
+    "source": "https://www.gt-world-challenge-asia.com/event/82/fuji-international-speedway"
+   }
+  ],
+  "map_url": "https://supergt.net/wp-content/uploads/2024/12/circuit_fuji.svg",
+  "map_page": "https://supergt.net/en/circuit/fuji",
+  "map_publisher": "SUPER GT (GTA)",
+  "corners": 16,
+  "corners_source": "https://www.gt-world-challenge-asia.com/event/82/fuji-international-speedway"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   148622740
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   153,
+   152,
+   153
+  ],
+  "tol": 60,
+  "close": 2,
+  "min_size": 500
+ },
+ "render": {
+  "rotate_deg": -38.8
+ },
+ "notes": "Official map: SUPER GT SVG rasterised with headless Chrome at 2400x1200. The FIA WEC Fuji map (fiawec.com/uploads/2024-tracks-rvb-fuji-b-...png) is a stylised drawing (affine stretch 1.21) and was not used."
 }

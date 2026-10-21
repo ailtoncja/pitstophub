@@ -2,7 +2,12 @@
  "key": "road-atlanta",
  "name": "Michelin Raceway Road Atlanta",
  "layout": "Grand Prix circuit (2.54 mi)",
- "used_by": [],
+ "status": "skipped",
+ "used_by": [
+  "imsa / roadatlanta (r11-road-atlanta) / 2026-10-03",
+  "gtwc-america / road-atlanta / 2026-06-14"
+ ],
+ "layout_source": "https://www.gt-world-challenge-america.com/event/114/road-atlanta (Circuit Length 2.540)",
  "venue": {
   "lat": 34.146,
   "lon": -83.8138,
@@ -15,10 +20,39 @@
   "mode": "cycle"
  },
  "extract": {
-  "mode": "mask"
+  "mode": "mask",
+  "rgb": [
+   235,
+   20,
+   20
+  ],
+  "tol": 80,
+  "min_sat": 0.6,
+  "crop": [
+   0.2143,
+   0.1042,
+   0.9929,
+   0.651
+  ],
+  "erase": [
+   [
+    0.7286,
+    0.2604,
+    0.7929,
+    0.3125
+   ],
+   [
+    0.8286,
+    0.2214,
+    0.8857,
+    0.2799
+   ]
+  ],
+  "close": 4,
+  "open": 2
  },
  "render": {
   "rotate_deg": 0
  },
- "status": "draft"
+ "notes": "SKIPPED (no flat official map): roadatlanta.com/track-info/track-map (ROAD-ATLANTA-MAP_Generic-3000.jpg) and the IMSA map are oblique 3D views (12.1 %, aniso 1.62). OSM lap 4090 m vs 2.54 mi 4088 m (+0.05 %)."
 }

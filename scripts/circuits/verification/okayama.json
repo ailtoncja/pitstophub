@@ -1,0 +1,37 @@
+{
+ "key": "okayama",
+ "official_map": "https://supergt.net/wp-content/uploads/2024/12/circuit_okayama-1.svg",
+ "official_map_page": "https://supergt.net/en/circuit/okayama",
+ "official_length_m": 3703,
+ "official_length_source": "https://www.gt-world-challenge-asia.com/event/84/okayama-international-circuit",
+ "alt_lengths": [],
+ "osm_length_m": 3699.6,
+ "length_error_pct": -0.09,
+ "osm_chamfer_pct": 0.85,
+ "osm_chamfer_m": 3.0,
+ "osm_p95_m": 5.4,
+ "osm_mirror_pct": 10.89,
+ "osm_aniso": 1.01,
+ "osm_rot_deg": 130.4,
+ "extract": {
+  "mode": "mask",
+  "n": 10949
+ },
+ "png_chamfer_pct": 0.9,
+ "png_mirror_pct": 10.45,
+ "png_aniso": 1.008,
+ "png_rot_deg": 0.0,
+ "mirror_ratio": 12.81,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

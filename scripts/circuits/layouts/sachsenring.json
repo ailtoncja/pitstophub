@@ -1,11 +1,52 @@
 {
  "key": "sachsenring",
  "name": "Sachsenring",
- "layout": "Circuito completo",
- "venue": {"lat": 50.7915, "lon": 12.6880, "radius_m": 1200},
- 
- "official": {"length_m": 3671},
- "select": {"mode": "cycle"},
- "render": {"rotate_deg": 0},
- "status": "draft"
+ "layout": "Circuito completo (3,645 km)",
+ "used_by": [
+  "dtm / sachsenring (r07-sachsenring) / 2026-09-13"
+ ],
+ "layout_source": "https://www.sportpresseportal.de/media/pcLkQV/48330/download (DTM press release, keyfacts Sachsenring, rounds 13-14 2026: 3.645 Meter, 14 Kurven)",
+ "venue": {
+  "lat": 50.7915,
+  "lon": 12.688,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 3645,
+  "length_source": "https://www.sportpresseportal.de/media/pcLkQV/48330/download (DTM 2026 keyfacts: Streckenlänge 3.645 Meter)",
+  "alt_lengths": [
+   {
+    "length_m": 3670,
+    "source": "https://www.motogp.com/de/calendar/2025/event/germany/965332bd-0229-4c71-8cc4-24dac546bc97 (MotoGP: Gesamtlänge 3,67 km)"
+   }
+  ],
+  "corners": 14,
+  "corners_source": "https://www.sportpresseportal.de/media/pcLkQV/48330/download (14 Kurven: vier Rechts-, zehn Linkskurven)",
+  "direction": "counterclockwise",
+  "direction_source": "https://www.sportpresseportal.de/media/pcLkQV/48330/download (gegen den Uhrzeigersinn)",
+  "map_url": "https://photos.motogp.com/events-admin/5/c/5cab1166-44c1-45ad-bc30-96d910170097/info/ger2-info.svg",
+  "map_page": "https://www.motogp.com/de/calendar/2025/event/germany/965332bd-0229-4c71-8cc4-24dac546bc97",
+  "map_publisher": "MotoGP (Dorna), Sachsenring circuit information",
+  "map_file": "sachsenring.png"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   31321783
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "close": 2
+ },
+ "verify": {
+  "notes": "Official reference: motogp.com circuit SVG. Its track is styled with CSS classes that PyMuPDF ignores, so the stroked track paths (classes st1/st2: lap and pit lane) were copied with inline black strokes into a plain SVG and rasterised (scratch motogp_svg.py). Cars and bikes use the same lap; the DTM keyfacts (14 corners, anticlockwise) match it."
+ },
+ "render": {
+  "rotate_deg": -34.8
+ },
+ "status": "published",
+ "notes": "Lap = closed loop of the raceway ways closest to the official length."
 }

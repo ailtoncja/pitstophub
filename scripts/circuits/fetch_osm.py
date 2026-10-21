@@ -35,13 +35,17 @@ def bbox(venue):
 def query(layout):
     bb = bbox(layout['venue'])
     streets = f'way["highway"~"^({ROADS})$"]({bb});' if layout.get('select', {}).get('streets') else ''
+    # relations named in the layout (e.g. Le Mans: type=route without a route=* value)
+    rels = ''.join(f'rel({rid});' for rid in layout.get('select', {}).get('relations', []))
     return f'''[out:json][timeout:180];
 (
   way["highway"="raceway"]({bb});
+  way["leisure"="track"]["sport"="motor"]({bb});
   rel["type"="circuit"]({bb});
   rel["route"="raceway"]({bb});
   rel["sport"="motor"]({bb});
   {streets}
+  {rels}
 )->.a;
 (.a; way(r.a););
 out body geom;'''

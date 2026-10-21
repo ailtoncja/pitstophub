@@ -2,10 +2,11 @@
  "key": "barber",
  "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/BarberMotorsportsPark.png",
  "official_map_page": "https://www.indycar.com/Schedule/2026/Barber",
- "official_length_m": 3830,
- "official_length_source": null,
+ "official_length_m": 3701,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/Barber (Track Length 2.3 Miles)",
+ "alt_lengths": [],
  "osm_length_m": 3720.1,
- "length_error_pct": -2.87,
+ "length_error_pct": 0.52,
  "osm_chamfer_pct": 0.65,
  "osm_chamfer_m": 2.0,
  "osm_p95_m": 4.2,
@@ -16,21 +17,21 @@
   "mode": "mask",
   "n": 100213
  },
- "png_chamfer_pct": 0.74,
- "png_mirror_pct": 9.4,
- "png_aniso": 1.009,
- "png_rot_deg": -0.0,
+ "png_chamfer_pct": 0.72,
+ "png_mirror_pct": 9.56,
+ "png_aniso": 1.01,
+ "png_rot_deg": 0.0,
  "mirror_ratio": 14.92,
  "symmetric_shape": false,
  "checks": {
   "shape": true,
   "not_mirrored": true,
   "not_distorted": true,
-  "length": false,
+  "length": true,
   "png_shape": true,
   "png_not_mirrored": true,
   "png_not_distorted": true,
   "png_orientation": true
  },
- "pass": false
+ "pass": true
 }

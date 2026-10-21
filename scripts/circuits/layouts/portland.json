@@ -2,7 +2,10 @@
  "key": "portland",
  "name": "Portland International Raceway",
  "layout": "Road course (1.967 mi, 12 turns)",
- "used_by": [],
+ "status": "skipped",
+ "used_by": [
+  "indy / portland (r13-portland) / 2026-08-09"
+ ],
  "layout_source": "https://www.indycar.com/Schedule/2026/Portland",
  "venue": {
   "lat": 45.595,
@@ -12,39 +15,30 @@
  "official": {
   "length_m": 3166,
   "length_source": "https://www.indycar.com/Schedule/2026/Portland (Track Length 1.967 Miles)",
-  "alt_lengths": [],
-  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackMaps/Portland_TrackMap.jpg",
+  "alt_lengths": [
+   {
+    "length_m": 3161,
+    "source": "https://www.indycar.com/Schedule/2026/Portland (\"1.964-mile\")"
+   }
+  ],
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/PortlandInternationalRaceway.png",
   "map_page": "https://www.indycar.com/Schedule/2026/Portland",
   "map_publisher": "INDYCAR",
-  "map_file": "portland.jpg"
+  "map_file": "t_portland_outline.png",
+  "corners": 12,
+  "corners_source": "https://www.indycar.com/Schedule/2026/Portland (\"12 turns\")"
  },
  "select": {
   "mode": "cycle"
  },
  "extract": {
   "mode": "mask",
-  "max_lum": 0.25,
-  "max_sat": 0.3,
-  "crop": [
-   0.16,
-   0.3,
-   0.84,
-   0.67
-  ],
-  "erase": [
-   [
-    0.45,
-    0.52,
-    0.52,
-    0.6
-   ]
-  ],
-  "close": 2,
-  "min_size": 200
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
  },
  "render": {
   "rotate_deg": 0
  },
- "status": "published",
- "notes": ""
+ "notes": "SKIPPED: OSM lap 3159 m (-0.2%) matches the INDYCAR outline at 1.29%, not mirrored, but the fit needs a 6.4% stretch (aniso 1.064 > 1.06). The INDYCAR spectator map says \"map not to scale\". No other accurate official map found."
 }

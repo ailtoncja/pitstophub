@@ -3,7 +3,6 @@ between two point sets, scored by the mean symmetric chamfer distance as a % of 
 Same method used to check the formula1.com maps (PR #6)."""
 import numpy as np
 from scipy.spatial import cKDTree
-rng=np.random.default_rng(0)
 def resample_poly(xy,n=700):
     xy=np.asarray(xy,float); d=np.r_[0,np.cumsum(np.linalg.norm(np.diff(xy,axis=0),axis=1))]
     t=np.linspace(0,d[-1],n,endpoint=False)
@@ -12,7 +11,8 @@ def subsample(pts,n=700):
     pts=np.asarray(pts,float)
     if len(pts)<=n: return pts
     # voxel-ish thinning then random
-    idx=rng.choice(len(pts),n,replace=False); return pts[idx]
+    # a fresh seeded generator per call: the same input always gives the same sample
+    idx=np.random.default_rng(0).choice(len(pts),n,replace=False); return pts[idx]
 def norm(p):
     c=p.mean(0); q=p-c; s=np.sqrt((q**2).sum(1).mean()); return q/s,c,s
 def umeyama(X,Y):

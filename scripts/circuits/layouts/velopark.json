@@ -22,7 +22,7 @@
  "render": {
   "rotate_deg": 0
  },
- "status": "draft",
+ "status": "skipped",
  "extract": {
   "mode": "mask",
   "rgb": [
@@ -40,5 +40,9 @@
   "close": 3,
   "keep": "all",
   "min_size": 2500
- }
+ },
+ "used_by": [
+  "endurance-brasil / etapa-4-a-definir (Três Horas do Velopark) / 2026-06-27"
+ ],
+ "notes": "Skipped: the only official map found (autódromo venue map) is an illustration not to scale (aniso 1.10, chamfer 3.27% with the drag strip and pit lanes in the same colour). OSM lap 2,269 m vs official 2,278 m (-0.41%) looks right but is unverified."
 }

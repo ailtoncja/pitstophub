@@ -84,3 +84,94 @@ describe('lugares com nome parecido', () => {
     expect(image(staticRace('nascar', 'vegas1'), 'nascar')).not.toBe('/circuits/vegas.png');
   });
 });
+
+// Amostras de cada categoria, como o catalogo (types.ts) e as fontes ao vivo (synced_races,
+// api-motorsports) descrevem as etapas de 2026.
+describe('tracado certo por categoria', () => {
+  const live = (name: string, circuit: string, location = '', date = '2026-06-01') => race({ name, circuit, location, date });
+  const cases: [string, string, Race, string | null][] = [
+    // NASCAR
+    ['nascar', 'Daytona 500', staticRace('nascar', 'daytona500'), 'daytona-oval'],
+    ['nascar', 'Daytona (ao vivo)', live('Daytona', 'Daytona International Speedway', '', '2026-08-29'), 'daytona-oval'],
+    ['nascar', 'Brickyard 400', staticRace('nascar', 'indy-brickyard'), 'indianapolis-oval'],
+    ['nascar', 'Watkins Glen', staticRace('nascar', 'watkinsglen'), 'watkins-glen-nascar'],
+    ['nascar', 'Phoenix', staticRace('nascar', 'phoenix2'), 'phoenix'],
+    ['nascar', 'Talladega', live('Talladega', 'Talladega Superspeedway'), 'talladega'],
+    ['nascar', 'Texas', staticRace('nascar', 'texas'), 'texas'],
+    ['nascar', 'Pocono', staticRace('nascar', 'pocono'), 'pocono'],
+    ['nascar', 'Michigan', live('Michigan', 'Michigan International Speedway'), 'michigan'],
+    ['nascar', 'Iowa', staticRace('nascar', 'iowa'), 'iowa'],
+    ['nascar', 'Nashville', staticRace('nascar', 'nashville-nascar'), 'nashville-superspeedway'],
+    ['nascar', 'Homestead', staticRace('nascar', 'homestead'), 'homestead'],
+    // NASCAR em COTA usa o National Course (sem desenho verificado): nenhum mapa, nao o da F1.
+    ['nascar', 'COTA', staticRace('nascar', 'cota-nascar'), null],
+    ['nascar', 'Charlotte (outubro, oval em 2026)', staticRace('nascar', 'charlotte-roval'), null],
+    // IndyCar
+    ['indy', 'Indy 500', staticRace('indy', 'indy-500'), 'indianapolis-oval'],
+    ['indy', 'GP de Indianapolis (misto)', staticRace('indy', 'indy-road'), 'indianapolis-road'],
+    ['indy', 'Indianapolis (misto, ao vivo)', live('Indianapolis (misto)', 'IMS Road Course', 'Indianapolis, Indiana'), 'indianapolis-road'],
+    ['indy', 'Indy 500 (ao vivo)', live('Indy 500', 'Indianapolis Motor Speedway', 'Indianapolis, Indiana'), 'indianapolis-oval'],
+    ['indy', 'St. Petersburg', live('St. Petersburg', 'Streets of St. Petersburg', 'St. Petersburg, Florida'), 'st-petersburg'],
+    ['indy', 'Phoenix', staticRace('indy', 'phoenix'), 'phoenix'],
+    ['indy', 'Barber', staticRace('indy', 'barber'), 'barber'],
+    ['indy', 'Detroit', staticRace('indy', 'detroit-indy'), 'detroit'],
+    ['indy', 'Road America', staticRace('indy', 'road-america-indy'), 'road-america'],
+    ['indy', 'Mid-Ohio', live('Mid-Ohio', 'Mid-Ohio Sports Car Course', 'Lexington, Ohio'), 'mid-ohio'],
+    ['indy', 'Nashville', staticRace('indy', 'nashville'), 'nashville-superspeedway'],
+    ['indy', 'Milwaukee 2', staticRace('indy', 'milwaukee-2'), 'milwaukee'],
+    ['indy', 'Long Beach (sem desenho verificado)', staticRace('indy', 'long-beach-indy'), null],
+    // IMSA
+    ['imsa', 'Rolex 24 (misto, sem desenho verificado)', staticRace('imsa', 'daytona'), null],
+    ['imsa', 'Indianapolis', staticRace('imsa', 'indianapolis'), 'indianapolis-road'],
+    ['imsa', 'Indianapolis RC (ao vivo)', live('Indianapolis', 'Indianapolis Motor Speedway RC'), 'indianapolis-road'],
+    ['imsa', 'Detroit', staticRace('imsa', 'detroit'), 'detroit'],
+    ['imsa', 'Road America', staticRace('imsa', 'roadamerica'), 'road-america'],
+    ['imsa', 'VIR', live('VIR', 'VIRginia International Raceway'), 'vir'],
+    ['imsa', 'Six Hours of The Glen (com o Boot, sem desenho verificado)', staticRace('imsa', 'watkins'), null],
+    // DTM
+    ['dtm', 'Lausitzring', live('Lausitzring', 'DEKRA Lausitzring Sprint', 'Alemanha'), 'lausitzring'],
+    ['dtm', 'Oschersleben', staticRace('dtm', 'oschersleben'), 'oschersleben'],
+    ['dtm', 'Nurburgring (Sprint)', staticRace('dtm', 'nurburgring'), 'nurburgring-sprint'],
+    ['dtm', 'Sachsenring', staticRace('dtm', 'sachsenring'), 'sachsenring'],
+    ['dtm', 'Hockenheim', staticRace('dtm', 'hockenheimring'), 'hockenheim'],
+    ['dtm', 'Norisring (sem desenho verificado)', staticRace('dtm', 'norisring'), null],
+    // WEC
+    ['wec', 'Le Mans', staticRace('wec', 'lemans'), 'le-mans'],
+    ['wec', 'Fuji', staticRace('wec', 'fuji'), 'fuji'],
+    // GT World Challenge
+    ['gtwc-europe', 'Brands Hatch', live('Brands Hatch', 'Brands Hatch', 'Grã-Bretanha'), 'brands-hatch'],
+    ['gtwc-europe', 'Misano', live('Misano', 'Misano', 'Itália'), 'misano'],
+    ['gtwc-europe', 'Nurburgring (GP)', live('Nürburgring', 'Nürburgring', 'Alemanha'), 'nurburgring-gp'],
+    ['gtwc-europe', 'Portimao', live('Portimao', 'Portimao', 'Portugal'), 'portimao'],
+    ['gtwc-america', 'Indianapolis 8 Hour', live('Indianapolis Motor Speedway', 'Indianapolis Motor Speedway', 'Estados Unidos'), 'indianapolis-road'],
+    ['gtwc-america', 'Road America', live('Road America', 'Road America'), 'road-america'],
+    ['gtwc-america', 'Barber', live('Barber Motorsports Park', 'Barber Motorsports Park'), 'barber'],
+    ['gtwc-asia', 'Fuji', live('Fuji International Speedway (SRO GT PowerTour)', 'Fuji International Speedway (SRO GT PowerTour)', 'Japão'), 'fuji'],
+    ['gtwc-asia', 'Okayama', live('Okayama International Circuit (SRO GT PowerTour)', 'Okayama International Circuit (SRO GT PowerTour)', 'Japão'), 'okayama'],
+    // Brasil (Endurance Brasil ao vivo; NASCAR Brasil e Porsche Cup em synced_races)
+    ['endurance-brasil', 'Goiania', live('Etapa 8 - Três Horas de Goiânia', 'Autódromo Internacional de Goiânia', 'Autódromo Internacional de Goiânia'), 'goiania'],
+    ['endurance-brasil', 'etapa 5 (nome Goiania, local Santa Cruz)', live('Etapa 5 - Três Horas de Goiânia', 'Autódromo Internacional de Santa Cruz do Sul', 'Autódromo Internacional de Santa Cruz do Sul'), null],
+    ['nascar-brasil', 'Londrina', live('Londrina', '', 'Londrina'), 'londrina'],
+    ['porsche-cup', 'Le Mans', live('Le Mans', '', 'Le Mans'), 'le-mans'],
+    ['porsche-cup', 'Algarve (Endurance)', live('Algarve (Endurance)', '', 'Algarve'), 'portimao'],
+  ];
+  it.each(cases)('%s: %s', (categoryId, _label, r, key) => {
+    const img = image(r, categoryId);
+    if (key === null) expect(img ?? null).toBeNull();
+    else expect(img).toBe(`/circuits/${key}.png`);
+  });
+
+  it('a F1 em Jeddah tem a ficha do GP; a F2 so o circuito', () => {
+    const f1 = getRaceCircuitInfo(staticRace('f1', 'saudi'), 'f1');
+    expect(f1?.trackImage).toBe('/circuits/jeddah.png');
+    expect(f1?.laps).toBe(50);
+    expect(f1?.osm).toBe(true);
+    const f2 = getRaceCircuitInfo(staticRace('f2', 'jeddah-f2'), 'f2');
+    expect(f2?.trackImage).toBe('/circuits/jeddah.png');
+    expect(f2?.laps).toBeUndefined();
+  });
+
+  it('GTWC America em COTA usa o tracado completo (o da F1)', () => {
+    expect(image(live('Circuit of the Americas', 'Circuit of the Americas'), 'gtwc-america')).toBe('/circuits/usa.png');
+  });
+});

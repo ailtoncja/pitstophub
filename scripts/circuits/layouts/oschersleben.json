@@ -24,7 +24,19 @@
   "map_file": "oschersleben.png"
  },
  "select": {
-  "mode": "cycle"
+  "mode": "cycle",
+  "only_ways": [
+   89251023,
+   300009193,
+   300009191,
+   299890015,
+   299890024,
+   299890030,
+   299890025,
+   299890017,
+   89251023
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
  },
  "extract": {
   "mode": "mask",

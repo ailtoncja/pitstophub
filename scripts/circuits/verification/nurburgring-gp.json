@@ -1,0 +1,42 @@
+{
+ "key": "nurburgring-gp",
+ "official_map": "https://media.formula1.com/image/upload/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Eifel_Circuit.png",
+ "official_map_page": "https://www.formula1.com/en/racing/2020/Eifel",
+ "official_length_m": 5137,
+ "official_length_source": "https://www.gt-world-challenge-europe.com/event/252/n%C3%BCrburgring (Circuit Length 5,137)",
+ "alt_lengths": [
+  {
+   "length_m": 5148,
+   "source": "https://nuerburgring.de/info/nuerburgring/race-tracks/grand-prix-track (5,148 Kilometer)"
+  }
+ ],
+ "osm_length_m": 5127.3,
+ "length_error_pct": -0.19,
+ "osm_chamfer_pct": 0.84,
+ "osm_chamfer_m": 4.4,
+ "osm_p95_m": 21.1,
+ "osm_mirror_pct": 11.07,
+ "osm_aniso": 1.017,
+ "osm_rot_deg": -38.7,
+ "extract": {
+  "mode": "mask",
+  "n": 101597
+ },
+ "png_chamfer_pct": 0.88,
+ "png_mirror_pct": 10.89,
+ "png_aniso": 1.016,
+ "png_rot_deg": 0.0,
+ "mirror_ratio": 13.18,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

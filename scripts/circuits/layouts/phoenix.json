@@ -2,7 +2,12 @@
  "key": "phoenix",
  "name": "Phoenix Raceway",
  "layout": "Oval (1 mile)",
- "used_by": [],
+ "status": "published",
+ "used_by": [
+  "indy / phoenix (r02-phoenix) / 2026-03-07",
+  "nascar / phoenix1 (r04-phoenix) / 2026-03-08",
+  "nascar / phoenix2 (r33-phoenix) / 2026-10-18"
+ ],
  "layout_source": "https://www.indycar.com/Schedule/2026/Phoenix",
  "venue": {
   "lat": 33.3747,
@@ -23,7 +28,11 @@
   "map_publisher": "INDYCAR"
  },
  "select": {
-  "mode": "cycle"
+  "mode": "cycle",
+  "only_ways": [
+   1177494773
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
  },
  "extract": {
   "mode": "mask",
@@ -34,6 +43,5 @@
  "render": {
   "rotate_deg": 0
  },
- "status": "published",
- "notes": ""
+ "notes": "OSM way 1177494773. Official nominal length is 1 mile; INDYCAR measured 1.022 mi in 2016 (alt length), which the OSM lap matches (+0.9%)."
 }

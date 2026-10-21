@@ -105,7 +105,9 @@ def verify(key):
         checks.update(png_shape=row['png_chamfer_pct'] <= LIMITS['chamfer_pct'],
                       png_not_mirrored=symmetric or pratio >= LIMITS['mirror_ratio'],
                       png_not_distorted=row['png_aniso'] <= LIMITS['aniso'],
-                      png_orientation=abs(row['png_rot_deg']) <= LIMITS['png_rot'])
+                      # a shape that looks the same turned 180 degrees (an oval) may fit either way
+                      png_orientation=abs(row['png_rot_deg']) <= LIMITS['png_rot']
+                      or (symmetric and 180 - abs(row['png_rot_deg']) <= LIMITS['png_rot']))
     row['mirror_ratio'] = round(ratio, 2)
     row['symmetric_shape'] = symmetric
     row['checks'] = checks

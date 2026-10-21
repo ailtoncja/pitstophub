@@ -2,10 +2,93 @@
  "key": "le-mans",
  "name": "Circuit des 24 Heures du Mans",
  "layout": "Circuit des 24 Heures",
- "venue": {"lat": 47.9300, "lon": 0.2120, "radius_m": 6500},
- "official": {"length_m": 13626},
- "select": {"mode": "cycle"},
- "extract": {},
- "render": {"rotate_deg": 0},
- "status": "draft"
+ "status": "published",
+ "used_by": [
+  "wec / lemans (synced r03-le-mans) / 2026-06-13..14",
+  "porsche-cup / r04-le-mans / 2026-06-13 (24h support race, Circuit de la Sarthe)"
+ ],
+ "layout_source": "https://www.fiawec.com/en/race/24-hours-of-le-mans-2026",
+ "venue": {
+  "lat": 47.93,
+  "lon": 0.212,
+  "radius_m": 6500
+ },
+ "official": {
+  "length_m": 13626,
+  "length_source": "https://www.fiawec.com/en/race/24-hours-of-le-mans-2026",
+  "map_url": "https://www.fiawec.com/uploads/2024-tracks-rvb-lemans-b-976827-697a1dbfdd5da760499701.png",
+  "map_page": "https://www.fiawec.com/en/race/24-hours-of-le-mans-2026",
+  "map_publisher": "FIA WEC"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   773623628,
+   773623629,
+   258242164,
+   226901639,
+   226901626,
+   226901635,
+   257319131,
+   226901650,
+   226901647,
+   1011729893,
+   34405909,
+   158840033,
+   1011729891,
+   231829814,
+   231829816,
+   1011729892,
+   1505387929,
+   1505387930,
+   121230938,
+   1505387935,
+   1505387934,
+   1494893860,
+   256130500,
+   1505387926,
+   158840027,
+   1505387925,
+   256130501,
+   159588880,
+   34405893,
+   25245509,
+   34405892,
+   1358131505,
+   159588882,
+   255699444,
+   158840041,
+   624045671,
+   624045670,
+   226901631,
+   226901643,
+   34405868,
+   1101935457,
+   773623627,
+   773623626,
+   1101935455,
+   773623628
+  ],
+  "notes_select": "members of OSM route relation 2126739 \"Circuit des 24 Heures du Mans\" (public road sections are not highway=raceway)",
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "min_alpha": 0.5,
+  "max_lum": 0.9,
+  "close": 6,
+  "min_size": 2000,
+  "erase": [
+   [
+    0.19,
+    0.9,
+    0.3,
+    1.0
+   ]
+  ]
+ },
+ "render": {
+  "rotate_deg": 94.8
+ },
+ "notes": "Porsche Carrera Cup Brasil ran as a 24 Hours of Le Mans support race on the Circuit de la Sarthe (racing.porsche.com live timing lists the sessions at the Circuit de la Sarthe), so no Bugatti drawing is needed."
 }

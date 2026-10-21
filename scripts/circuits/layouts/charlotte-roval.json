@@ -2,7 +2,9 @@
  "key": "charlotte-roval",
  "name": "Charlotte Motor Speedway",
  "layout": "ROVAL (2.28 mi)",
+ "status": "skipped",
  "used_by": [],
+ "layout_source": "https://vsin.com/auto-racing/bank-of-america-400-2026-nascar-betting-odds-and-predictions/ ; https://www.racer.com/2026/01/26/charlotte-expected-to-drop-the-roval-return-to-superspeedway-for-nascar-postseason-race",
  "venue": {
   "lat": 35.3523,
   "lon": -80.6829,
@@ -21,5 +23,5 @@
  "render": {
   "rotate_deg": 0
  },
- "status": "draft"
+ "notes": "SKIPPED (not used in 2026): the 2026-10-11 Charlotte Cup race (Bank of America 400) moved from the ROVAL back to the 1.5-mile oval; route nascar/charlotte-roval to the Charlotte oval drawing."
 }

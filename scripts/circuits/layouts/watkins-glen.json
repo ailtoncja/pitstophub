@@ -2,7 +2,11 @@
  "key": "watkins-glen",
  "name": "Watkins Glen International",
  "layout": "Full course with the Boot (3.4 mi)",
- "used_by": [],
+ "status": "skipped",
+ "used_by": [
+  "imsa / watkins (r06-watkins-glen) / 2026-06-28"
+ ],
+ "layout_source": "https://www.imsa.com/events/2026-watkins-glen-international (Six Hours of The Glen, full 3.4-mile course)",
  "venue": {
   "lat": 42.3369,
   "lon": -76.9272,
@@ -10,7 +14,13 @@
  },
  "venue_key": "watkins-glen",
  "official": {
-  "length_m": 5552
+  "length_m": 5552,
+  "length_source": "https://www.theglen.com/wp-content/uploads/sites/1022/2026/01/30/Track-Rental-Guide-2026.pdf (Long Course 3.40 mile)",
+  "direction": "clockwise",
+  "direction_source": "same Track Data Sheet",
+  "map_url": "https://www.theglen.com/wp-content/uploads/sites/1022/2026/01/30/Track-Rental-Guide-2026.pdf",
+  "map_page": "https://www.theglen.com/track-rental/",
+  "map_publisher": "Watkins Glen International (page 10, the short-course-only link erased)"
  },
  "select": {
   "mode": "cycle"
@@ -41,5 +51,5 @@
  "render": {
   "rotate_deg": 0
  },
- "status": "draft"
+ "notes": "SKIPPED: the only flat official map (Track Data Sheet) is schematic in the Boot: OSM vs map 2.27 % (> 2.0 %); the same sheet matches the short course at 1.12 %. IMSA and event maps are 3D/oblique. OSM lap 5473 m (-1.43 %)."
 }

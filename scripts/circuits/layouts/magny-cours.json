@@ -2,10 +2,30 @@
  "key": "magny-cours",
  "name": "Circuit de Nevers Magny-Cours",
  "layout": "Grand Prix",
- "venue": {"lat": 46.8642, "lon": 3.1636, "radius_m": 1500},
- "official": {"length_m": 4411},
- "select": {"mode": "cycle"},
+ "status": "skipped",
+ "used_by": [
+  "gtwc-europe / magny-cours / 2026-07-30"
+ ],
+ "layout_source": "https://www.gt-world-challenge-europe.com/event/251/magny-cours",
+ "venue": {
+  "lat": 46.8642,
+  "lon": 3.1636,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 4411,
+  "length_source": "OpenStreetMap way 63951656 description (circuit figure 4 411 m); SRO page gives no length"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   63951656
+  ],
+  "notes_select": "way 63951656 \"Circuit de Nevers Magny-Cours\" (GP circuit, closed way)"
+ },
  "extract": {},
- "render": {"rotate_deg": 0},
- "status": "draft"
+ "render": {
+  "rotate_deg": 0
+ },
+ "notes": "SKIPPED: no independent official map found (circuitmagnycours.com has no layout image; SRO event page has none). OSM way 63951656 (4 458 m, +1.1%) looks right but is unverified. Toolkit note: is_pitlike() drops this way because its description mentions \"karting\"."
 }

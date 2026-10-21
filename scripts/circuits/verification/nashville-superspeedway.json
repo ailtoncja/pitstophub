@@ -7,31 +7,31 @@
  "alt_lengths": [],
  "osm_length_m": 2116.3,
  "length_error_pct": -1.11,
- "osm_chamfer_pct": 1.26,
- "osm_chamfer_m": 4.1,
- "osm_p95_m": 6.9,
- "osm_mirror_pct": 1.26,
- "osm_aniso": 1.039,
+ "osm_chamfer_pct": 1.23,
+ "osm_chamfer_m": 4.0,
+ "osm_p95_m": 6.7,
+ "osm_mirror_pct": 1.23,
+ "osm_aniso": 1.038,
  "osm_rot_deg": 99.6,
  "extract": {
   "mode": "mask",
   "n": 63182
  },
- "png_chamfer_pct": 1.22,
- "png_mirror_pct": 1.21,
- "png_aniso": 1.037,
- "png_rot_deg": 99.5,
+ "png_chamfer_pct": 1.27,
+ "png_mirror_pct": 1.26,
+ "png_aniso": 1.039,
+ "png_rot_deg": -0.0,
  "mirror_ratio": 1.0,
- "symmetric_shape": false,
+ "symmetric_shape": true,
  "checks": {
   "shape": true,
-  "not_mirrored": false,
+  "not_mirrored": true,
   "not_distorted": true,
   "length": true,
   "png_shape": true,
-  "png_not_mirrored": false,
+  "png_not_mirrored": true,
   "png_not_distorted": true,
-  "png_orientation": false
+  "png_orientation": true
  },
- "pass": false
+ "pass": true
 }

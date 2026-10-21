@@ -2,7 +2,11 @@
  "key": "cota-national",
  "name": "Circuit of the Americas",
  "layout": "National course (2.4 mi)",
- "used_by": [],
+ "status": "skipped",
+ "used_by": [
+  "nascar / cota-nascar (r03-austin) / 2026-03-01"
+ ],
+ "layout_source": "https://www.nascaratcota.com/documents/cota-turns.pdf (National Course, 2.4 miles, 17 turns)",
  "venue": {
   "lat": 30.1328,
   "lon": -97.6411,
@@ -16,10 +20,33 @@
   "mode": "cycle"
  },
  "extract": {
-  "mode": "mask"
+  "mode": "mask",
+  "rgb": [
+   25,
+   100,
+   185
+  ],
+  "tol": 70,
+  "min_sat": 0.5,
+  "crop": [
+   0.06,
+   0.071,
+   0.85,
+   0.9059
+  ],
+  "erase": [
+   [
+    0.74,
+    0.5506,
+    0.96,
+    0.9236
+   ]
+  ],
+  "close": 4,
+  "open": 1
  },
  "render": {
   "rotate_deg": 0
  },
- "status": "draft"
+ "notes": "SKIPPED (no flat official map): the official National Course map (nascaratcota.com/documents/cota-turns.pdf) is a tilted 3D view (18.8 %, aniso 3.2). OSM lap 3871 m vs 2.4 mi 3862 m (+0.24 %)."
 }

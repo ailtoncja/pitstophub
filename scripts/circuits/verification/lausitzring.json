@@ -22,10 +22,10 @@
   "mode": "mask",
   "n": 27417
  },
- "png_chamfer_pct": 0.91,
- "png_mirror_pct": 9.58,
- "png_aniso": 1.006,
- "png_rot_deg": -0.1,
+ "png_chamfer_pct": 0.89,
+ "png_mirror_pct": 9.8,
+ "png_aniso": 1.005,
+ "png_rot_deg": -0.2,
  "mirror_ratio": 10.86,
  "symmetric_shape": false,
  "checks": {

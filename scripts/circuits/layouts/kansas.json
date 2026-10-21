@@ -1,15 +1,23 @@
 {
  "key": "kansas",
  "name": "Kansas Speedway",
- "layout": "Tri-oval (1.5 mi)",
- "used_by": [],
+ "layout": "Oval (tri-oval, 1.5 mi)",
+ "used_by": [
+  "nascar / kansas1 / 2026-04-19",
+  "nascar / kansas2 / 2026-09-27"
+ ],
+ "status": "skipped",
+ "notes": "OSM oval (way 37552701) is 2477 m, +2.6% vs 1.5 mi (outside 2%). Not published.",
  "venue": {
   "lat": 39.1158,
   "lon": -94.8306,
   "radius_m": 1100
  },
  "official": {
-  "length_m": 2414
+  "length_m": 2414,
+  "length_source": "1.5-mile tri-oval (nominal; no official page read in this run)",
+  "map_url": "https://www.kansasspeedway.com/wp-content/uploads/sites/1036/2026/09/15/KSC-26-Fall-Facility-Map-F.pdf",
+  "map_publisher": "Kansas Speedway"
  },
  "select": {
   "mode": "cycle",
@@ -18,8 +26,8 @@
   ]
  },
  "extract": {},
+ "verify": {},
  "render": {
   "rotate_deg": 0
- },
- "status": "draft"
+ }
 }

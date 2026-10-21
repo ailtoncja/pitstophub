@@ -49,16 +49,20 @@ def main():
             raise SystemExit(f'{key}: published but its verification did not pass')
         off = layout['official']
         e = {'name': layout['name'], 'layout': layout.get('layout', ''), 'trackImage': f'/circuits/{key}.png'}
-        src = {'map': off.get('map_page') or off['map_url']}
-        if off.get('length_source'):
+        src = {'map': off.get('map_url') or off['map_page']}
+
+        def sourced(field):
+            return str(off.get(field) or '').startswith('http')
+
+        if sourced('length_source'):
             e['lengthKm'] = round(off['length_m'] / 1000, 3)
-            src['length'] = off['length_source']
-        if off.get('corners') is not None and off.get('corners_source'):
+            src['length'] = off['length_source'].split(' ')[0]
+        if off.get('corners') is not None and sourced('corners_source'):
             e['corners'] = int(off['corners'])
-            src['corners'] = off['corners_source']
-        if off.get('direction') in ('clockwise', 'counterclockwise') and off.get('direction_source'):
+            src['corners'] = off['corners_source'].split(' ')[0]
+        if off.get('direction') in ('clockwise', 'counterclockwise') and sourced('direction_source'):
             e['direction'] = off['direction']
-            src['direction'] = off['direction_source']
+            src['direction'] = off['direction_source'].split(' ')[0]
         e['sources'] = src
         entries.append((key, e))
     body = 'export const DRAWN_CIRCUITS: Record<string, DrawnCircuit> = {\n'

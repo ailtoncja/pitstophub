@@ -8,7 +8,10 @@
   "radius_m": 1500
  },
  "official": {
-  "length_m": 3531
+  "length_m": 3530,
+  "length_source": "https://www.cba.org.br/circuitos (Extensão 3.530m, anti-horário)",
+  "direction": "counterclockwise",
+  "direction_source": "https://www.cba.org.br/circuitos"
  },
  "select": {
   "mode": "cycle"
@@ -16,5 +19,10 @@
  "render": {
   "rotate_deg": 0
  },
- "status": "draft"
+ "status": "skipped",
+ "used_by": [
+  "nascar-brasil / r01-santa-cruz / 2026-04-12",
+  "endurance-brasil / etapa-5 (API name \"Três Horas de Goiânia\", location Santa Cruz do Sul) / 2026-08-01"
+ ],
+ "notes": "Skipped: no independent official track map found (circuit and series sites unreachable or without a map)."
 }

@@ -2,10 +2,28 @@
  "key": "mandalika",
  "name": "Pertamina Mandalika International Circuit",
  "layout": "Circuito completo",
- "venue": {"lat": -8.8970, "lon": 116.3045, "radius_m": 2000},
- "official": {"length_m": 4310},
- "select": {"mode": "cycle"},
+ "status": "skipped",
+ "used_by": [
+  "gtwc-asia / pertamina-mandalika-international-circuit / 2026-05-03"
+ ],
+ "layout_source": "https://www.gt-world-challenge-asia.com/event/81/pertamina-mandalika-international-circuit",
+ "venue": {
+  "lat": -8.897,
+  "lon": 116.3045,
+  "radius_m": 2000
+ },
+ "official": {
+  "length_m": 4310,
+  "length_source": "https://www.gt-world-challenge-asia.com/event/81/pertamina-mandalika-international-circuit",
+  "corners": 17,
+  "corners_source": "https://www.gt-world-challenge-asia.com/event/81/pertamina-mandalika-international-circuit"
+ },
+ "select": {
+  "mode": "cycle"
+ },
  "extract": {},
- "render": {"rotate_deg": 0},
- "status": "draft"
+ "render": {
+  "rotate_deg": 0
+ },
+ "notes": "SKIPPED: no official map found (SRO page has no map; MotoGP/circuit sites gave none). OSM loop 4 313 m (+0.06%) unverified."
 }
