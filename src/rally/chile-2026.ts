@@ -20,10 +20,10 @@ export const CHILE_2026: RallyInfo = {
     {
       date: '2026-09-11',
       stages: [
-        stage(1, 'Turquia 1', 22.94, '2026-09-11', '08:53', TZ),
+        stage(1, 'Turquía 1', 22.94, '2026-09-11', '08:53', TZ),
         stage(2, 'Nuevo Rere 1', 10.76, '2026-09-11', '09:48', TZ),
         stage(3, 'Hualqui 1', 16.69, '2026-09-11', '10:36', TZ),
-        stage(4, 'Turquia 2', 22.94, '2026-09-11', '15:09', TZ),
+        stage(4, 'Turquía 2', 22.94, '2026-09-11', '15:09', TZ),
         stage(5, 'Nuevo Rere 2', 10.76, '2026-09-11', '16:04', TZ),
         stage(6, 'Hualqui 2', 16.69, '2026-09-11', '16:52', TZ),
       ],

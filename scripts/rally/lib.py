@@ -57,15 +57,85 @@ def load_rally(rally_id):
 
 
 def haversine_km(a, b):
-    """a, b = (lat, lon)."""
+    """a, b = (lat, lon). Sphere; fine for picking the nearest vertex, not for measuring stages."""
     r = 6371.0088
     la1, lo1, la2, lo2 = map(math.radians, (a[0], a[1], b[0], b[1]))
     d = math.sin((la2 - la1) / 2) ** 2 + math.cos(la1) * math.cos(la2) * math.sin((lo2 - lo1) / 2) ** 2
     return 2 * r * math.asin(math.sqrt(d))
 
 
+_WGS_A, _WGS_F = 6378137.0, 1 / 298.257223563
+_WGS_B = _WGS_A * (1 - _WGS_F)
+
+
+def geodesic_km(a, b):
+    """Distance on the WGS84 ellipsoid (Vincenty inverse), a, b = (lat, lon)."""
+    if a[0] == b[0] and a[1] == b[1]:
+        return 0.0
+    f = _WGS_F
+    big_l = math.radians(b[1] - a[1])
+    u1 = math.atan((1 - f) * math.tan(math.radians(a[0])))
+    u2 = math.atan((1 - f) * math.tan(math.radians(b[0])))
+    su1, cu1, su2, cu2 = math.sin(u1), math.cos(u1), math.sin(u2), math.cos(u2)
+    lam = big_l
+    for _ in range(200):
+        sl, cl = math.sin(lam), math.cos(lam)
+        ss = math.hypot(cu2 * sl, cu1 * su2 - su1 * cu2 * cl)
+        if ss == 0:
+            return 0.0
+        cs = su1 * su2 + cu1 * cu2 * cl
+        sig = math.atan2(ss, cs)
+        sa = cu1 * cu2 * sl / ss
+        c2a = 1 - sa * sa
+        c2sm = cs - 2 * su1 * su2 / c2a if c2a else 0.0
+        c = f / 16 * c2a * (4 + f * (4 - 3 * c2a))
+        prev = lam
+        lam = big_l + (1 - c) * f * sa * (sig + c * ss * (c2sm + c * cs * (-1 + 2 * c2sm * c2sm)))
+        if abs(lam - prev) < 1e-12:
+            break
+    u2_ = c2a * (_WGS_A ** 2 - _WGS_B ** 2) / _WGS_B ** 2
+    ka = 1 + u2_ / 16384 * (4096 + u2_ * (-768 + u2_ * (320 - 175 * u2_)))
+    kb = u2_ / 1024 * (256 + u2_ * (-128 + u2_ * (74 - 47 * u2_)))
+    ds = kb * ss * (c2sm + kb / 4 * (cs * (-1 + 2 * c2sm * c2sm) - kb / 6 * c2sm * (-3 + 4 * ss * ss) * (-3 + 4 * c2sm * c2sm)))
+    return _WGS_B * ka * (sig - ds) / 1000
+
+
 def line_km(coords):
-    return sum(haversine_km(coords[i], coords[i + 1]) for i in range(len(coords) - 1))
+    """Geodesic length (WGS84) of a polyline [(lat, lon)]."""
+    return sum(geodesic_km(coords[i], coords[i + 1]) for i in range(len(coords) - 1))
+
+
+def meridian_km_per_degree(lat):
+    """Length of one degree of latitude on WGS84 at `lat` (km)."""
+    phi = math.radians(lat)
+    return (111132.954 - 559.822 * math.cos(2 * phi) + 1.175 * math.cos(4 * phi)) / 1000
+
+
+def project_on_line(coords, p):
+    """(segment index, fraction, point) of the point of the polyline nearest to p (local plane)."""
+    k = math.cos(math.radians(p[0]))
+    best = None
+    for i in range(len(coords) - 1):
+        (y1, x1), (y2, x2) = coords[i], coords[i + 1]
+        ax, ay, bx, by = (x1 - p[1]) * k, y1 - p[0], (x2 - p[1]) * k, y2 - p[0]
+        dx, dy = bx - ax, by - ay
+        l2 = dx * dx + dy * dy
+        t = 0.0 if l2 == 0 else max(0.0, min(1.0, -(ax * dx + ay * dy) / l2))
+        d = (ax + dx * t) ** 2 + (ay + dy * t) ** 2
+        if best is None or d < best[0]:
+            best = (d, i, t)
+    _, i, t = best
+    (y1, x1), (y2, x2) = coords[i], coords[i + 1]
+    return i, t, (y1 + (y2 - y1) * t, x1 + (x2 - x1) * t)
+
+
+def cut_line(coords, start, finish):
+    """Part of the polyline between the projections of `start` and `finish` (start must come first)."""
+    ia, ta, qa = project_on_line(coords, start)
+    ib, tb, qb = project_on_line(coords, finish)
+    if (ib, tb) <= (ia, ta):
+        return None
+    return [qa] + list(coords[ia + 1:ib + 1]) + [qb]
 
 
 # ── KML / KMZ ──────────────────────────────────────────────────────────────────
@@ -215,5 +285,5 @@ def clip_polygon(poly, xmin, ymin, xmax, ymax):
     return pts
 
 
-def svg_path(points, closed=False):
-    return 'M' + ' '.join(f'{x:.1f} {y:.1f}' for x, y in points) + ('Z' if closed else '')
+def svg_path(points, closed=False, digits=1):
+    return 'M' + ' '.join(f'{x:.{digits}f} {y:.{digits}f}' for x, y in points) + ('Z' if closed else '')

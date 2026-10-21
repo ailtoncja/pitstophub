@@ -64,7 +64,7 @@ export const GREECE_2026: RallyInfo = {
     'ss14-16': { label: 'SS14/16', at: [685, 278], anchor: 'left' },
     'ss15-17': { label: 'SS15/17', at: [592, 208], anchor: 'left' },
   }),
-  mapNote: { pt: 'Os termos do site do organizador pedem autorização para uso comercial do material. SS1 (EKO SSS, Atenas) sem localização publicada.', en: 'The organiser\'s site terms require permission for commercial use of its material. SS1 (EKO SSS, Athens) has no published location.' },
+  mapNote: { pt: 'Os termos do site do organizador proíbem qualquer uso do material sem autorização escrita, por isso o traçado não é reproduzido. SS1 (EKO SSS, Atenas) sem localização publicada.', en: 'The organiser\'s site terms forbid any use of its material without written permission, so the routes are not reproduced. SS1 (EKO SSS, Athens) has no published location.' },
   sources: [
     { label: 'Itinerário oficial (V2-1 · 25/04/2026)', url: 'https://app-cdn.sportity.com/2283ac67-c0b8-47bf-a309-e64159463299/2f6ae796-6389-4623-ad95-3e696122ac8a_Supplementary%20Regulations%20-%20EKO%20Acropolis%20Rally%202026.pdf' },
     { label: 'Piso (documento oficial)', url: 'https://app-cdn.sportity.com/2283ac67-c0b8-47bf-a309-e64159463299/2f6ae796-6389-4623-ad95-3e696122ac8a_Supplementary%20Regulations%20-%20EKO%20Acropolis%20Rally%202026.pdf' },

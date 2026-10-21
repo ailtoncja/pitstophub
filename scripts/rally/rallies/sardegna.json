@@ -62,6 +62,16 @@
  "stages": [
   {
    "id": "ss1",
+   "km": 2.21,
+   "start": [
+    40.585615,
+    8.565508
+   ],
+   "finish": [
+    40.585615,
+    8.565508
+   ],
+   "source": "sardegna/ss1.kml arena loop: Track folder placemarks 'Start / Finish' (nearest to each end of the line)",
    "route": {
     "file": "sardegna/ss1.kml",
     "name": "SSS1 Ittiri Arena Show",
@@ -70,6 +80,16 @@
   },
   {
    "id": "ss2-5",
+   "km": 18.77,
+   "start": [
+    40.745221,
+    8.964237
+   ],
+   "finish": [
+    40.768379,
+    8.999662
+   ],
+   "source": "sardegna/ss2-5.kml Track folder placemarks 'START' / 'FINISH'",
    "route": {
     "file": "sardegna/ss2-5.kml",
     "name": "SS2/5",
@@ -78,6 +98,16 @@
   },
   {
    "id": "ss3-6",
+   "km": 17.83,
+   "start": [
+    40.692488,
+    9.14359
+   ],
+   "finish": [
+    40.627441,
+    9.156118
+   ],
+   "source": "sardegna/ss3-6.kml Track folder placemarks 'START' / 'FINISH'",
    "route": {
     "file": "sardegna/ss3-6.kml",
     "name": "SS3/6",
@@ -86,6 +116,16 @@
   },
   {
    "id": "ss4-7",
+   "km": 23.23,
+   "start": [
+    40.668089,
+    9.292929
+   ],
+   "finish": [
+    40.624498,
+    9.157652
+   ],
+   "source": "sardegna/ss4-7.kml Track folder placemarks 'START' / 'FINISH'",
    "route": {
     "file": "sardegna/ss4-7.kml",
     "name": "SS4/7",
@@ -94,6 +134,16 @@
   },
   {
    "id": "ss8-11",
+   "km": 24.14,
+   "start": [
+    40.603752,
+    9.18409
+   ],
+   "finish": [
+    40.692192,
+    9.29472
+   ],
+   "source": "sardegna/ss8-11.kml Track folder placemarks 'START' / 'FINISH'",
    "route": {
     "file": "sardegna/ss8-11.kml",
     "name": "SS8/11",
@@ -102,6 +152,16 @@
   },
   {
    "id": "ss9-12",
+   "km": 24.83,
+   "start": [
+    40.612735,
+    9.3443
+   ],
+   "finish": [
+    40.577532,
+    9.313706
+   ],
+   "source": "sardegna/ss9-12.kml Track folder placemarks 'START' / 'FINISH'",
    "route": {
     "file": "sardegna/ss9-12.kml",
     "name": "SS9/12",
@@ -110,6 +170,16 @@
   },
   {
    "id": "ss10-13",
+   "km": 12.86,
+   "start": [
+    40.552875,
+    9.158468
+   ],
+   "finish": [
+    40.54755,
+    9.090532
+   ],
+   "source": "sardegna/ss10-13.kml Track folder placemarks 'START' / 'FINISH'",
    "route": {
     "file": "sardegna/ss10-13.kml",
     "name": "SS10/13",
@@ -118,6 +188,16 @@
   },
   {
    "id": "ss14-16",
+   "km": 23.71,
+   "start": [
+    40.777139,
+    8.68163
+   ],
+   "finish": [
+    40.844562,
+    8.650213
+   ],
+   "source": "sardegna/ss14-16.kml Track folder placemarks 'START' / 'FINISH'",
    "route": {
     "file": "sardegna/ss14-16.kml",
     "name": "SS14/16",
@@ -126,6 +206,16 @@
   },
   {
    "id": "ss15-17",
+   "km": 7.1,
+   "start": [
+    40.766554,
+    8.192789
+   ],
+   "finish": [
+    40.750759,
+    8.157449
+   ],
+   "source": "sardegna/ss15-17.kml Track folder placemarks 'START' / 'FINISH'",
    "route": {
     "file": "sardegna/ss15-17.kml",
     "name": "SS15/17",
@@ -158,6 +248,7 @@
  "sources": {
   "stages": "Organiser My Maps per stage (downloads[].page)",
   "servicePark": "Rally Guide 2 §5.1.1 (Banchina Millelire e Piazzale della Pace); point = Piazzale della Pace, OSM way 38766078 via Nominatim",
-  "towns": "OSM Nominatim relations 40683 (Sassari), 40821 (Porto Torres), 40602 (Ozieri)"
+  "towns": "OSM Nominatim relations 40683 (Sassari), 40821 (Porto Torres), 40602 (Ozieri)",
+  "verification": "Re-checked 2026-10-21 against Tabella distanze e tempi V5.1 (14.09.2026): every Track line within 0.9% of the official km (WGS84), ends within 1 m of the START/FINISH placemarks (SS1 arena loop: 95 m / 67 m from the 'Start / Finish' markers)."
  }
 }
