@@ -23,16 +23,37 @@ export function stage(
   };
 }
 
-type GeneratedMap = {
+export type GeneratedMap = {
   readonly width: number;
   readonly height: number;
   readonly geometry: 'route' | 'points';
   readonly land: string;
+  readonly projection: { readonly lat0: number; readonly lon0: number; readonly kx: number; readonly pxPerDeg: number };
   readonly routes: { readonly [id: string]: string };
-  readonly stages: { readonly [id: string]: { readonly start: readonly number[]; readonly finish: readonly number[]; readonly mid: readonly number[] } };
+  readonly stages: { readonly [id: string]: GeneratedStage };
   readonly servicePark: readonly number[] | null;
   readonly towns: readonly { readonly name: string; readonly x: number; readonly y: number }[];
   readonly scaleBar: { readonly km: number; readonly px: number };
+};
+
+export type GeneratedStage = {
+  /** Distancia oficial da especial (itinerario), usada pelo gerador para validar o tracado. */
+  readonly km: number;
+  readonly start: readonly number[];
+  readonly finish: readonly number[];
+  readonly mid: readonly number[];
+  /** So nas especiais com tracado: comprimento da linha oficial e da desenhada (km, WGS84). */
+  readonly geomKm?: number;
+  readonly drawnKm?: number;
+  /** So nas especiais com tracado: largada e chegada oficiais [lat, lon]. */
+  readonly official?: { readonly start: readonly number[]; readonly finish: readonly number[] };
+};
+
+export type MapOptions = {
+  /** Usa dados do OpenStreetMap (costa, parque, cidades). Padrao: sim. */
+  usesOsm?: boolean;
+  /** Onde fica o texto "Assistencia" em relacao ao icone. Padrao: abaixo. */
+  serviceLabel?: RallyMap['serviceLabel'];
 };
 
 export type LabelSpec = {
@@ -44,7 +65,7 @@ export type LabelSpec = {
 };
 
 /** Junta a geometria gerada com os rotulos posicionados a mao (em unidades do viewBox). */
-export function rallyMap(generated: GeneratedMap, labels: Record<string, LabelSpec>, usesOsm = true): RallyMap {
+export function rallyMap(generated: GeneratedMap, labels: Record<string, LabelSpec>, options: MapOptions = {}): RallyMap {
   const xy = (p: readonly number[]) => [p[0], p[1]] as const;
   const routes = Object.entries(labels).map(([id, spec]): RallyRoute => {
     const meta = generated.stages[id];
@@ -69,6 +90,8 @@ export function rallyMap(generated: GeneratedMap, labels: Record<string, LabelSp
     servicePark: generated.servicePark ? { x: generated.servicePark[0], y: generated.servicePark[1] } : null,
     towns: generated.towns.map((town) => ({ ...town })),
     scaleBar: { ...generated.scaleBar },
-    usesOsm,
+    serviceLabel: options.serviceLabel ?? 'below',
+    projection: { ...generated.projection },
+    usesOsm: options.usesOsm ?? true,
   };
 }

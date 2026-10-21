@@ -40,3 +40,18 @@ export function dayKm(day: RallyDay): number {
 export function stageBaseName(name: string): string {
   return name.replace(/\s+\d+$/, '');
 }
+
+/**
+ * Horario de uma especial no fuso de quem abre a pagina (ou em `timeZone`). Os dias do itinerario seguem a
+ * data local do rali; quando a conversao cai em outro dia (ex.: Japao visto do Brasil, 12 h a menos),
+ * `day` traz o dia da semana do visitante ("Qui") para o horario nao parecer do dia errado.
+ */
+export function stageClock(iso: string, rallyDate: string, lang: 'pt' | 'en', timeZone?: string): { time: string; day: string | null } {
+  const date = new Date(iso);
+  const locale = lang === 'pt' ? 'pt-BR' : 'en-US';
+  const time = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', hour12: false, timeZone }).format(date);
+  const localDate = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone }).format(date);
+  if (localDate === rallyDate) return { time, day: null };
+  const weekday = new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone }).format(date).replace('.', '');
+  return { time, day: weekday.charAt(0).toUpperCase() + weekday.slice(1) };
+}

@@ -62,12 +62,16 @@ export const MONTECARLO_2026: RallyInfo = {
     'ss3-11': { label: 'SS3/11', at: [484, 256], anchor: 'left' },
     'ss4-7': { label: 'SS4/7', at: [196, 234], anchor: 'right' },
     'ss5-8': { label: 'SS5/8', at: [130, 144], anchor: 'center' },
-    'ss6-9': { label: 'SS6/9', at: [318, 238], anchor: 'left' },
+    'ss6-9': { label: 'SS6/9', at: [215, 45], anchor: 'center' },
     'ss10-12': { label: 'SS10/12', at: [537, 159], anchor: 'left' },
     'ss13': { label: 'SS13', at: [855, 515], anchor: 'right' },
     'ss14-16': { label: 'SS14/16', at: [833, 350], anchor: 'right' },
     'ss15-17': { label: 'SS15/17', at: [878, 271], anchor: 'center' },
-  }),
+  }, { serviceLabel: 'above' }),
+  mapNote: {
+    pt: 'SS13, SS14/16 e SS15/17: só largada e chegada; o traçado publicado difere mais de 2% da distância oficial (a SS13 são duas voltas no circuito de Mônaco).',
+    en: 'SS13, SS14/16 and SS15/17: start and finish only; the published route is more than 2% off the official distance (SS13 is two laps of the Monaco circuit).',
+  },
   sources: [
     { label: 'Itinerário oficial (Versão 1 · 19/11/2025)', url: 'https://www.rallye-infos.site/wp-content/uploads/2025/11/RAMC-2026-REGLEMENT-PARTICULIER.pdf' },
     { label: 'Piso (documento oficial)', url: 'https://www.rallye-infos.site/wp-content/uploads/2025/11/RAMC-2026-REGLEMENT-PARTICULIER.pdf' },

@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { MapPinOff, Wrench } from 'lucide-react';
-import { timeOf, timeZoneLabel } from '../lib/format';
+import { timeZoneLabel } from '../lib/format';
 import { useT } from '../lib/i18n';
 import { cn } from '../lib/utils';
-import { dayKm, rallyKeyNumbers, rallyStages, stageBaseName, type RallyDay, type RallyInfo, type RallyMap, type RallyRoute, type RallySurface } from '../rally-info';
+import { dayKm, rallyKeyNumbers, rallyStages, stageBaseName, stageClock, type RallyDay, type RallyInfo, type RallyMap, type RallyRoute, type RallySurface } from '../rally-info';
 import { FactList, ListGroup, Segmented, SectionTitle } from './ui';
 
 // Cor do piso: so a bolinha (marca de dado), nunca cor de texto ou de interface.
@@ -206,7 +206,7 @@ function DayColumn({ day, km, lang, selected }: { day: RallyDay; km: (value: num
               {day.shakedown.km != null && ` · ${km(day.shakedown.km)}`}
             </p>
           </div>
-          {day.shakedown.startsAt && <span className="type-label-badge text-silver-dim tabular shrink-0">{timeOf(new Date(day.shakedown.startsAt), lang)}</span>}
+          {day.shakedown.startsAt && <StageTime iso={day.shakedown.startsAt} rallyDate={day.date} lang={lang} className="text-silver-dim" />}
         </div>
       )}
       {day.stages.map((stage) => (
@@ -221,10 +221,21 @@ function DayColumn({ day, km, lang, selected }: { day: RallyDay; km: (value: num
               )}
             </p>
           </div>
-          {stage.startsAt && <span className="type-label-badge text-white tabular shrink-0">{timeOf(new Date(stage.startsAt), lang)}</span>}
+          {stage.startsAt && <StageTime iso={stage.startsAt} rallyDate={day.date} lang={lang} className="text-white" />}
         </div>
       ))}
     </ListGroup>
+  );
+}
+
+/** Horario no fuso do visitante; se cair em outro dia que o do itinerario, mostra o dia da semana antes. */
+function StageTime({ iso, rallyDate, lang, className }: { iso: string; rallyDate: string; lang: 'pt' | 'en'; className: string }) {
+  const { time, day } = stageClock(iso, rallyDate, lang);
+  return (
+    <span className={cn('type-label-badge tabular shrink-0 text-right', className)}>
+      {day && <span className="text-silver font-normal mr-1">{day}</span>}
+      {time}
+    </span>
   );
 }
 
@@ -314,7 +325,11 @@ function RallyMapView({ info, map, active }: { info: RallyInfo; map: RallyMap; a
               <Wrench className="w-3.5 h-3.5" strokeWidth={2.5} />
             </span>
             <span
-              className="absolute -translate-x-1/2 translate-y-4 type-label-telemetry text-white whitespace-nowrap pointer-events-none [text-shadow:0_1px_4px_rgba(0,0,0,.9)]"
+              className={cn(
+                'absolute -translate-x-1/2 type-label-telemetry text-white whitespace-nowrap pointer-events-none [text-shadow:0_1px_4px_rgba(0,0,0,.9)]',
+                map.serviceLabel === 'above' ? 'translate-y-[calc(-100%-16px)]' : 'translate-y-4',
+              )}
+              data-service-label={map.serviceLabel}
               style={pct(map.servicePark.x, map.servicePark.y)}
             >
               {t('rally.serviceShort')}
