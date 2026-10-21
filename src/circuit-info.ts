@@ -1077,7 +1077,10 @@ const VENUES: Venue[] = [
   {
     terms: ['charlotte', 'concord'],
     layout: 'charlotte-oval',
-    // Em 2026 a corrida de outubro voltou para o oval; o Roval so quando a prova disser.
+    // Em 2026 a corrida de outubro (Bank of America 400) voltou do Roval para o oval: a data
+    // vence o texto, para um nome antigo com "Roval" nao tirar o desenho. Fora disso, o Roval so
+    // quando a prova disser.
+    byEvent: [{ categoryId: 'nascar', date: '2026-10-11', layout: 'charlotte-oval' }],
     byText: [{ terms: ['roval'], layout: 'charlotte-roval' }],
   },
   { terms: ['nashville', 'lebanon'], layout: 'nashville-superspeedway' },
@@ -1111,7 +1114,8 @@ const VENUES: Venue[] = [
   { terms: ['mid-ohio', 'mid ohio'], layout: 'mid-ohio' },
   { terms: ['portland'], layout: 'portland' },
   { terms: ['markham'], layout: 'markham' },
-  { terms: ['washington'], layout: 'washington-dc' },
+  // So o circuito de rua de Washington, D.C. (IndyCar 2026), nao qualquer "Washington".
+  { terms: ['washington, d.c', 'washington d.c', 'washington dc', 'streets of washington', 'freedom 250'], layout: 'washington-dc' },
   { terms: ['milwaukee', 'west allis'], layout: 'milwaukee' },
   { terms: ['laguna seca', 'monterey'], layout: 'laguna-seca' },
   { terms: ['sebring'], layout: 'sebring' },
