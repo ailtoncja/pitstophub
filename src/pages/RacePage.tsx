@@ -152,6 +152,9 @@ export default function RacePage() {
                     value: info.lapRecord ? `${info.lapRecord.time} · ${info.lapRecord.driver} (${info.lapRecord.year})` : t('cir.noRecord'),
                   },
                   { label: t('cir.firstGp'), value: String(info.firstGrandPrix) },
+                  ...(info.straightModeZones != null
+                    ? [{ label: t('cir.straightMode'), value: String(info.straightModeZones) }]
+                    : []),
                 ]}
               />
             </section>
@@ -174,16 +177,6 @@ export default function RacePage() {
                     ))}
                   </ListGroup>
                 </>
-              )}
-              {info.drsZones.length > 0 && (
-                <div className="space-y-2">
-                  <h3 className="type-headline-sm text-white">{t('cir.drs')}</h3>
-                  <ul className="space-y-1">
-                    {info.drsZones.map((zone, i) => (
-                      <li key={i} className="type-body-md text-silver">{lang === 'en' ? zone.en : zone.pt}</li>
-                    ))}
-                  </ul>
-                </div>
               )}
               <div className="space-y-2">
                 <h3 className="type-headline-sm text-white">{t('cir.tyres')}</h3>
