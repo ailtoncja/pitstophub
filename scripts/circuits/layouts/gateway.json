@@ -1,0 +1,40 @@
+{
+ "key": "gateway",
+ "name": "World Wide Technology Raceway",
+ "layout": "Oval (1.25 mi)",
+ "status": "skipped",
+ "used_by": [
+  "indy / gateway (r09-gateway) / 2026-06-07",
+  "nascar / gateway-nascar (r28-gateway) / 2026-09-13"
+ ],
+ "layout_source": "https://www.indycar.com/Schedule/2026/WWTR",
+ "venue": {
+  "lat": 38.6506,
+  "lon": -90.1358,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 2012,
+  "length_source": "https://www.indycar.com/Schedule/2026/WWTR (Track Length 1.25 Miles)",
+  "alt_lengths": [],
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/GatewayMotorsportsPark.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/WWTR",
+  "map_publisher": "INDYCAR"
+ },
+ "select": {
+  "mode": "cycle",
+  "relations": [
+   20448916
+  ]
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "notes": "SKIPPED: OSM oval (relation 20448916, 2043 m, +1.5%) fails against the only clean official map, the stylised INDYCAR outline (3.38%, stretch 1.125, mirror ratio 1.0). The INDYCAR spectator map (Gateway_TrackMap.jpg) draws the track light grey on grey and cannot be extracted reliably; wwtraceway.com has no track map."
+}

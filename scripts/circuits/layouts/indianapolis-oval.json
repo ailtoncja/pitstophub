@@ -1,0 +1,67 @@
+{
+ "key": "indianapolis-oval",
+ "name": "Indianapolis Motor Speedway",
+ "layout": "Oval (2.5 mi)",
+ "status": "published",
+ "used_by": [
+  "indy / indy-500 (r07-indy-500) / 2026-05-24",
+  "nascar / indy-brickyard (r22-indianapolis) / 2026-07-26"
+ ],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Indianapolis-500",
+ "venue": {
+  "lat": 39.795,
+  "lon": -86.2347,
+  "radius_m": 1800
+ },
+ "venue_key": "indianapolis",
+ "official": {
+  "length_m": 4023,
+  "length_source": "https://www.indycar.com/Schedule/2026/Indianapolis-500 (Track Length 2.5 Miles)",
+  "alt_lengths": [],
+  "map_url": "https://www.indianapolismotorspeedway.com/-/media/IMS/maps/2027/master/27IMSMaster.pdf",
+  "map_page": "https://www.indianapolismotorspeedway.com/events/brickyard",
+  "map_publisher": "Indianapolis Motor Speedway (facility map, PDF page rendered to PNG)"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   588780347,
+   588780345,
+   588780343,
+   588780332,
+   588780335,
+   588780334,
+   588780333,
+   51308226,
+   588780349,
+   588780351,
+   588780347
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   77,
+   78,
+   78
+  ],
+  "tol": 30,
+  "crop": [
+   0.3,
+   0.12,
+   0.9,
+   0.62
+  ],
+  "close": 8,
+  "open": 2
+ },
+ "verify": {
+  "symmetric": true,
+  "notes": "The IMS oval (two equal straights, two equal short chutes, four equal turns) is mirror-symmetric, so the mirrored fit is as good as the direct one; orientation follows the map compass (north to the left)."
+ },
+ "render": {
+  "rotate_deg": -90.8
+ },
+ "notes": "Ways of OSM relation 20573682 \"Indianapolis Motor Speedway 2026\". Brickyard 400 runs on the oval (https://www.indianapolismotorspeedway.com/events/brickyard: \"returns to the famed Indianapolis Motor Speedway oval\"; 2026 race: 160 laps of the 2.5-mile oval). The INDYCAR outline is stylised (stretched ~10%), so the IMS facility map is the reference. The oval is 180-degree symmetric: rendered with rotate -90.8, equivalent within 0.6% to the map-compass orientation +89.2."
+}

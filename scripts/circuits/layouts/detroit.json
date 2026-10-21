@@ -1,0 +1,77 @@
+{
+ "key": "detroit",
+ "name": "Detroit Street Circuit",
+ "layout": "Street circuit (downtown)",
+ "status": "published",
+ "used_by": [
+  "indy / detroit-indy (live r08-detroit) / 2026-05-31",
+  "imsa / detroit (live r05-detroit) / 2026-05-30"
+ ],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Detroit",
+ "venue": {
+  "lat": 42.33,
+  "lon": -83.04,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 2647,
+  "length_source": "https://www.indycar.com/Schedule/2026/Detroit (1.645-mile)",
+  "corners": 9,
+  "corners_source": "https://www.indycar.com/Schedule/2026/Detroit (\"nine-turn street circuit\")",
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/Detroit.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/Detroit",
+  "map_publisher": "INDYCAR"
+ },
+ "select": {
+  "mode": "cycle",
+  "relations": [
+   17665938
+  ],
+  "only_ways": [
+   507295710,
+   68304728,
+   107561927,
+   782534927,
+   782534926,
+   1324281406,
+   1446468572,
+   1446468573,
+   107606558,
+   107606556,
+   8740420,
+   475334648,
+   8734148,
+   120432126,
+   8752315,
+   59511849,
+   119410892,
+   118727178,
+   8732681,
+   118727224,
+   552920202,
+   188307569,
+   742989462,
+   68309429,
+   672409594,
+   637351951,
+   90546623,
+   219846872,
+   119410886,
+   44667419,
+   270520094,
+   8734150,
+   507295710
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": -31.1
+ },
+ "notes": "OSM relation 17665938 \"Detroit Grand Prix circuit\" (downtown Jefferson Ave layout, 2023-). IMSA races the same Detroit Grand Prix weekend (May 30-June 1, downtown streets per the IndyCar event page); imsa.com returned 403."
+}

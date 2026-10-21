@@ -1,0 +1,29 @@
+{
+ "key": "washington-dc",
+ "official_map": null,
+ "official_map_page": null,
+ "official_length_m": 2736,
+ "official_length_source": null,
+ "alt_lengths": [],
+ "osm_length_m": 2670.4,
+ "length_error_pct": -2.4,
+ "osm_chamfer_pct": 0.77,
+ "osm_chamfer_m": 2.7,
+ "osm_p95_m": 5.7,
+ "osm_mirror_pct": 10.18,
+ "osm_aniso": 1.012,
+ "osm_rot_deg": -0.1,
+ "extract": {
+  "mode": "mask",
+  "n": 58826
+ },
+ "mirror_ratio": 13.22,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": false
+ },
+ "pass": false
+}

@@ -1,0 +1,38 @@
+{
+ "key": "jeddah",
+ "official_map": "https://media.formula1.com/image/upload/f_auto/q_auto/common/f1/2026/track/2026trackjeddahdetailed.png",
+ "official_map_page": "https://www.formula1.com/en/racing/2026/saudi-arabia",
+ "official_length_m": 6174,
+ "official_length_source": "https://www.formula1.com/en/racing/2025/saudi-arabia",
+ "alt_lengths": [],
+ "osm_length_m": 6165.4,
+ "length_error_pct": -0.14,
+ "osm_chamfer_pct": 0.65,
+ "osm_chamfer_m": 5.4,
+ "osm_p95_m": 12.9,
+ "osm_mirror_pct": 4.9,
+ "osm_aniso": 1.026,
+ "osm_rot_deg": 111.2,
+ "extract": {
+  "mode": "f1",
+  "src": "colour",
+  "n": 12952
+ },
+ "png_chamfer_pct": 0.66,
+ "png_mirror_pct": 4.75,
+ "png_aniso": 1.031,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 7.54,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

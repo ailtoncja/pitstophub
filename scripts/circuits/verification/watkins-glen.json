@@ -1,0 +1,29 @@
+{
+ "key": "watkins-glen",
+ "official_map": null,
+ "official_map_page": null,
+ "official_length_m": 5552,
+ "official_length_source": null,
+ "alt_lengths": [],
+ "osm_length_m": 5472.8,
+ "length_error_pct": -1.43,
+ "osm_chamfer_pct": 2.27,
+ "osm_chamfer_m": 12.9,
+ "osm_p95_m": 35.9,
+ "osm_mirror_pct": 10.37,
+ "osm_aniso": 1.059,
+ "osm_rot_deg": -4.4,
+ "extract": {
+  "mode": "mask",
+  "n": 80106
+ },
+ "mirror_ratio": 4.57,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": false,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true
+ },
+ "pass": false
+}

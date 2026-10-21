@@ -1,0 +1,37 @@
+{
+ "key": "milwaukee",
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/MilwaukeeMile.png",
+ "official_map_page": "https://www.indycar.com/Schedule/2026/Milwaukee-Race1",
+ "official_length_m": 1633,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/Milwaukee-Race1 (Track Length 1.015 Miles)",
+ "alt_lengths": [],
+ "osm_length_m": 1662.6,
+ "length_error_pct": 1.82,
+ "osm_chamfer_pct": 0.7,
+ "osm_chamfer_m": 1.8,
+ "osm_p95_m": 3.9,
+ "osm_mirror_pct": 0.7,
+ "osm_aniso": 1.012,
+ "osm_rot_deg": -89.4,
+ "extract": {
+  "mode": "mask",
+  "n": 82699
+ },
+ "png_chamfer_pct": 0.73,
+ "png_mirror_pct": 0.73,
+ "png_aniso": 1.01,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 1.0,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

@@ -1,0 +1,43 @@
+{
+ "key": "michigan",
+ "name": "Michigan International Speedway",
+ "layout": "Oval",
+ "venue": {
+  "lat": 42.06687,
+  "lon": -84.24076,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3219,
+  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf",
+  "map_url": "https://www.mispeedway.com/wp-content/uploads/sites/1037/2024/08/19/MIS-23-543779-2023-Grandstand-Map-web.pdf",
+  "map_page": "https://www.mispeedway.com/maps/",
+  "map_publisher": "Michigan International Speedway",
+  "map_file_note": "cleaned copy of the official map (work/circuits2-scratch/B2/outer_ring.py): only the track band, as the outer edge of the filled band (inner edge for Richmond); the original is at map_url",
+  "length_source_note": "NASCAR Cup Series stage lengths and pit road speeds (January 2026), Track Length column; read 2026-10-21"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   205025109
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "render": {
+  "rotate_deg": -75.9
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5
+ },
+ "used_by": [
+  "nascar / michigan / 2026-06-07"
+ ],
+ "layout_source": "https://www.mispeedway.com/maps/",
+ "status": "published",
+ "notes": "OSM way 205025109 (oval only; infield road course excluded).",
+ "verify": {
+  "symmetric": true,
+  "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."
+ }
+}
