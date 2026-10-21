@@ -33,11 +33,12 @@
   "max_lum": 0.5
  },
  "used_by": [
-  "nascar / charlotte600 / 2026-05-24 (Coca-Cola 600; synced r13-charlotte)"
+  "nascar / charlotte600 / 2026-05-24 (Coca-Cola 600; synced r13-charlotte)",
+  "nascar / charlotte-roval (r32-charlotte) / 2026-10-11 (oval in 2026)"
  ],
  "layout_source": "https://www.charlottemotorspeedway.com/fans/track-facts/",
  "status": "skipped",
- "notes": "Oval-only ways (Roval chicanes excluded) total 2365 m vs 2414 m (-2.03%): just outside the 2% rule. Shape 0.71%. The Oct 11 NASCAR race uses the Roval, not this layout.",
+ "notes": "Oval-only ways (Roval chicanes excluded) total 2365 m vs 2414 m (-2.03%): just outside the 2% rule. Shape 0.71%. The Oct 11 NASCAR race also runs on this oval in 2026 (NASCAR 2026 stage-length sheet: Charlotte, 1.50 mi).",
  "verify": {
   "symmetric": true,
   "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."
