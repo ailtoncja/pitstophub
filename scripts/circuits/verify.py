@@ -31,7 +31,10 @@ from extract import extract_drawing, extract_official  # noqa: E402
 from lib import DATA, PUBLIC, VERIFY, cache, keys_from_argv, latlon_to_xy, load_json, load_layout, save_json  # noqa: E402
 from shape import align, norm, resample_poly, subsample  # noqa: E402
 
-LIMITS = {'chamfer_pct': 2.0, 'mirror_ratio': 2.0, 'aniso': 1.06, 'length_pct': 2.0, 'png_rot': 3.0}
+# length_pct was 2.0 in PR #9; raised to 3.0 with the owner's approval (the OSM line of an oval
+# follows a track edge, not the line the official length is measured on). The shape checks are
+# unchanged.
+LIMITS = {'chamfer_pct': 2.0, 'mirror_ratio': 2.0, 'aniso': 1.06, 'length_pct': 3.0, 'png_rot': 3.0}
 
 
 def official_path(key, layout):

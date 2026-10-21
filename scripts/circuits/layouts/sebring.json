@@ -2,10 +2,10 @@
  "key": "sebring",
  "name": "Sebring International Raceway",
  "layout": "Full course (3.74 mi)",
- "status": "skipped",
+ "status": "published",
  "used_by": [
-  "imsa / sebring (r02-sebring) / 2026-03-21",
-  "gtwc-america / sebring-international-raceway / 2026-05-10"
+  "imsa / sebring (r02-sebring) / 2026-03-21 (Twelve Hours of Sebring, full course)",
+  "gtwc-america / sebring-international-raceway / 2026-05-09 (weekend May 8-10, full course 3.74 mi per the SRO event page)"
  ],
  "layout_source": "https://www.sebringraceway.com/wp-content/uploads/sites/1040/2026/04/07/2026-EVENT-MAP_8.5X11.pdf (2026 12 Hours event map, turns 1-17); https://www.gt-world-challenge-america.com/event/113/sebring-international-raceway (3.74, 17 turns)",
  "venue": {
@@ -73,7 +73,7 @@
   "min_size": 1500
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": 0.4
  },
- "notes": "SKIPPED (length): shape matches the official 2026 map (1.26 %, mirrored 7.38 %, aniso 1.012) but the OSM lap is 5866 m, 2.55 % shorter than the official 3.74 mi (6019 m), over the 2 % limit."
+ "notes": "Published in PR #12 under the 3% length rule approved by the owner (was skipped in PR #9 only because the OSM lap was just over 2%). OSM lap 5866 m vs official 6019 m (-2.55%). PR #9 note: shape matches the official 2026 map (1.26 %, mirrored 7.38 %, aniso 1.012) but the OSM lap is 5866 m, 2.55 % shorter than the official 3.74 mi (6019 m), over the 2 % limit."
 }

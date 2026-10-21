@@ -27,6 +27,25 @@ describe('desenhos do OpenStreetMap', () => {
     }
   });
 
+  it('todo desenho publicado passou em todas as verificacoes (forma <= 2%, extensao <= 3%)', () => {
+    for (const key of Object.keys(DRAWN_CIRCUITS)) {
+      const v = JSON.parse(readFileSync(`scripts/circuits/verification/${key}.json`, 'utf-8'));
+      for (const [check, ok] of Object.entries(v.checks)) expect(ok, `${key} ${check}`).toBe(true);
+      expect(v.osm_chamfer_pct, key).toBeLessThanOrEqual(2);
+      expect(v.png_chamfer_pct, key).toBeLessThanOrEqual(2);
+      expect(Math.abs(v.length_error_pct), key).toBeLessThanOrEqual(3);
+    }
+  });
+
+  it('os 7 tracados que so ficaram de fora pela regra de 2% estao publicados', () => {
+    for (const key of ['charlotte-oval', 'new-hampshire', 'chicagoland', 'markham', 'washington-dc', 'sebring', 'atlanta']) {
+      expect(DRAWN_CIRCUITS[key]?.trackImage, key).toBe(`/circuits/${key}.png`);
+      const v = JSON.parse(readFileSync(`scripts/circuits/verification/${key}.json`, 'utf-8'));
+      expect(Math.abs(v.length_error_pct), key).toBeGreaterThan(2);
+      expect(v.pass, key).toBe(true);
+    }
+  });
+
   it('todo mapa de qualquer etapa do catalogo existe em public/circuits', () => {
     for (const category of MOTORSPORT_DATA) {
       for (const r of category.calendar) {
@@ -79,6 +98,11 @@ describe('lugares com nome parecido', () => {
     expect(image(staticRace('wec', 'cota'), 'wec')).toBe('/circuits/usa.png');
   });
 
+  it('so o circuito de rua de Washington, D.C. usa o desenho de Washington', () => {
+    const kent = race({ name: 'Pacific Raceways', circuit: 'Pacific Raceways', location: 'Kent, Washington' });
+    expect(image(kent, 'gtwc-america')).not.toBe('/circuits/washington-dc.png');
+  });
+
   it('a F1 em Las Vegas usa o circuito de rua, a NASCAR nao', () => {
     expect(image(staticRace('f1', 'vegas'), 'f1')).toBe('/circuits/vegas.png');
     expect(image(staticRace('nascar', 'vegas1'), 'nascar')).not.toBe('/circuits/vegas.png');
@@ -105,7 +129,19 @@ describe('tracado certo por categoria', () => {
     ['nascar', 'Homestead', staticRace('nascar', 'homestead'), 'homestead'],
     // NASCAR em COTA usa o National Course (sem desenho verificado): nenhum mapa, nao o da F1.
     ['nascar', 'COTA', staticRace('nascar', 'cota-nascar'), null],
-    ['nascar', 'Charlotte (outubro, oval em 2026)', staticRace('nascar', 'charlotte-roval'), null],
+    // Tolerancia de extensao de 3% (antes 2%): Charlotte, New Hampshire, Chicagoland e Atlanta.
+    ['nascar', 'Coca-Cola 600', staticRace('nascar', 'charlotte600'), 'charlotte-oval'],
+    ['nascar', 'Coca-Cola 600 (ao vivo)', live('Coca-Cola 600', 'Charlotte Motor Speedway', '', '2026-05-24'), 'charlotte-oval'],
+    ['nascar', 'Charlotte (outubro, oval em 2026)', staticRace('nascar', 'charlotte-roval'), 'charlotte-oval'],
+    ['nascar', 'Bank of America 400 (ao vivo)', live('Bank of America 400', 'Charlotte Motor Speedway', '', '2026-10-11'), 'charlotte-oval'],
+    ['nascar', 'Charlotte 2026-10-11 com nome antigo "Roval"', live('Bank of America ROVAL 400', 'Charlotte Motor Speedway ROVAL', '', '2026-10-11'), 'charlotte-oval'],
+    ['nascar', 'New Hampshire', staticRace('nascar', 'newhampshire'), 'new-hampshire'],
+    ['nascar', 'Dollar Tree 301 (ao vivo)', live('Dollar Tree 301', 'New Hampshire Motor Speedway', '', '2026-08-23'), 'new-hampshire'],
+    ['nascar', 'Chicagoland', staticRace('nascar', 'chicagoland'), 'chicagoland'],
+    ['nascar', 'eero 400 (ao vivo)', live('eero 400', 'Chicagoland Speedway', '', '2026-07-05'), 'chicagoland'],
+    ['nascar', 'Atlanta 1', staticRace('nascar', 'atlanta1'), 'atlanta'],
+    ['nascar', 'Atlanta 2', staticRace('nascar', 'atlanta2'), 'atlanta'],
+    ['nascar', 'Quaker State 400 (ao vivo)', live('Quaker State 400 Available at Walmart', 'Atlanta Motor Speedway', '', '2026-07-12'), 'atlanta'],
     // IndyCar
     ['indy', 'Indy 500', staticRace('indy', 'indy-500'), 'indianapolis-oval'],
     ['indy', 'GP de Indianapolis (misto)', staticRace('indy', 'indy-road'), 'indianapolis-road'],
@@ -120,6 +156,10 @@ describe('tracado certo por categoria', () => {
     ['indy', 'Nashville', staticRace('indy', 'nashville'), 'nashville-superspeedway'],
     ['indy', 'Milwaukee 2', staticRace('indy', 'milwaukee-2'), 'milwaukee'],
     ['indy', 'Long Beach (sem desenho verificado)', staticRace('indy', 'long-beach-indy'), null],
+    ['indy', 'Markham', staticRace('indy', 'markham'), 'markham'],
+    ['indy', 'Markham (ao vivo)', live('Ontario Honda Dealers Indy at Markham', 'Streets of Markham', '', '2026-08-16'), 'markham'],
+    ['indy', 'Washington, D.C.', staticRace('indy', 'washington'), 'washington-dc'],
+    ['indy', 'Washington, D.C. (ao vivo)', live('Freedom 250 Grand Prix of Washington DC', 'Streets of Washington', '', '2026-08-23'), 'washington-dc'],
     // IMSA
     ['imsa', 'Rolex 24 (misto, sem desenho verificado)', staticRace('imsa', 'daytona'), null],
     ['imsa', 'Indianapolis', staticRace('imsa', 'indianapolis'), 'indianapolis-road'],
@@ -128,6 +168,8 @@ describe('tracado certo por categoria', () => {
     ['imsa', 'Road America', staticRace('imsa', 'roadamerica'), 'road-america'],
     ['imsa', 'VIR', live('VIR', 'VIRginia International Raceway'), 'vir'],
     ['imsa', 'Six Hours of The Glen (com o Boot, sem desenho verificado)', staticRace('imsa', 'watkins'), null],
+    ['imsa', '12 Horas de Sebring', staticRace('imsa', 'sebring'), 'sebring'],
+    ['imsa', 'Twelve Hours of Sebring (ao vivo)', live('74th Annual Mobil 1 Twelve Hours of Sebring', 'Sebring International Raceway', '', '2026-03-21'), 'sebring'],
     // DTM
     ['dtm', 'Lausitzring', live('Lausitzring', 'DEKRA Lausitzring Sprint', 'Alemanha'), 'lausitzring'],
     ['dtm', 'Oschersleben', staticRace('dtm', 'oschersleben'), 'oschersleben'],
@@ -146,6 +188,7 @@ describe('tracado certo por categoria', () => {
     ['gtwc-america', 'Indianapolis 8 Hour', live('Indianapolis Motor Speedway', 'Indianapolis Motor Speedway', 'Estados Unidos'), 'indianapolis-road'],
     ['gtwc-america', 'Road America', live('Road America', 'Road America'), 'road-america'],
     ['gtwc-america', 'Barber', live('Barber Motorsports Park', 'Barber Motorsports Park'), 'barber'],
+    ['gtwc-america', 'Sebring (tracado completo)', live('Sebring International Raceway', 'Sebring International Raceway', '', '2026-05-09'), 'sebring'],
     ['gtwc-asia', 'Fuji', live('Fuji International Speedway (SRO GT PowerTour)', 'Fuji International Speedway (SRO GT PowerTour)', 'Japão'), 'fuji'],
     ['gtwc-asia', 'Okayama', live('Okayama International Circuit (SRO GT PowerTour)', 'Okayama International Circuit (SRO GT PowerTour)', 'Japão'), 'okayama'],
     // Brasil (Endurance Brasil ao vivo; NASCAR Brasil e Porsche Cup em synced_races)

@@ -17,21 +17,13 @@
   "mode": "mask",
   "n": 87881
  },
- "png_chamfer_pct": 3.34,
- "png_mirror_pct": 3.42,
- "png_aniso": 1.123,
- "png_rot_deg": 54.0,
  "mirror_ratio": 1.02,
  "symmetric_shape": false,
  "checks": {
   "shape": false,
   "not_mirrored": false,
   "not_distorted": false,
-  "length": true,
-  "png_shape": false,
-  "png_not_mirrored": false,
-  "png_not_distorted": false,
-  "png_orientation": false
+  "length": true
  },
  "pass": false
 }

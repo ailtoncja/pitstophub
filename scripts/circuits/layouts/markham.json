@@ -2,7 +2,7 @@
  "key": "markham",
  "name": "Streets of Markham",
  "layout": "Street circuit",
- "status": "skipped",
+ "status": "published",
  "used_by": [
   "indy / markham (live r14-markham) / 2026-08-16"
  ],
@@ -34,7 +34,7 @@
   "close": 3
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": -0.5
  },
- "notes": "SKIPPED (length only): OSM raceway way 1548558439 \"Streets of Markham\" matches the shape (1.33%, mirrored 14.9%, aniso 1.014) but is 3439 m, -2.31% vs the official 3.52 km."
+ "notes": "Published in PR #12 under the 3% length rule approved by the owner (was skipped in PR #9 only because the OSM lap was just over 2%). OSM lap 3439 m vs official 3520 m (-2.31%). PR #9 note: OSM raceway way 1548558439 \"Streets of Markham\" matches the shape (1.33%, mirrored 14.9%, aniso 1.014) but is 3439 m, -2.31% vs the official 3.52 km."
 }

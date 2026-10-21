@@ -23,7 +23,7 @@
   "shape": false,
   "not_mirrored": true,
   "not_distorted": false,
-  "length": false
+  "length": true
  },
  "pass": false
 }

@@ -7,8 +7,8 @@
   "nascar / atlanta2 / 2026-07-12"
  ],
  "layout_source": "https://www.nascar.com/tracks/atlanta-motor-speedway/",
- "status": "skipped",
- "notes": "OSM lap (way 288853230, chicane way 1158426917 excluded) is 2412 m, -2.66% vs the official 1.54 mi: outside the 2% limit (the OSM line seems to follow an inner edge, not the measured line). Shape vs official 1.02%, but the mirrored fit is as good (0.97%). Not published.",
+ "status": "published",
+ "notes": "Published in PR #12 under the 3% length rule approved by the owner (was skipped in PR #9 only because the OSM lap was just over 2%). OSM lap 2412 m vs official 2478 m (-2.66%). PR #9 note: OSM lap (way 288853230, chicane way 1158426917 excluded) is 2412 m, -2.66% vs the official 1.54 mi: outside the 2% limit (the OSM line seems to follow an inner edge, not the measured line). Shape vs official 1.02%, but the mirrored fit is as good (0.97%). Not published.",
  "venue": {
   "lat": 33.384,
   "lon": -84.3168,
@@ -33,17 +33,10 @@
   "max_lum": 0.5
  },
  "verify": {
-  "scores": {
-   "osm_chamfer_pct": 1.02,
-   "osm_mirror_pct": 0.97,
-   "osm_aniso": 1.02,
-   "length_error_pct": -2.66,
-   "png_chamfer_pct": null,
-   "png_rot_deg": null,
-   "pass": false
-  }
+  "symmetric": true,
+  "notes": "Quad-oval mirror-symmetric about the axis through start/finish, like Charlotte and Texas: the OSM lap fits its own mirror image at 0.23% (Charlotte 0.51%, Texas 0.52%), so the mirrored fit scores the same (0.97% vs 1.02%) and the mirror check cannot discriminate. The drawing is rendered from OSM coordinates and is never mirrored."
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": 19.3
  }
 }

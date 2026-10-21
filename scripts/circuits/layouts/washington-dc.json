@@ -2,7 +2,7 @@
  "key": "washington-dc",
  "name": "Streets of Washington, D.C.",
  "layout": "Street circuit",
- "status": "skipped",
+ "status": "published",
  "used_by": [
   "indy / washington (live r15-washington) / 2026-08-23"
  ],
@@ -72,7 +72,7 @@
   "close": 3
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": -0.1
  },
- "notes": "SKIPPED (length only): no raceway in OSM; lap routed over the real streets (Pennsylvania Ave NW, 9th St NW, Constitution Ave NW, 7th St, Independence Ave SW, 3rd St) through the corners of the 2026 IndyCar track map. Shape passes (0.77%, mirrored 10.18%, aniso 1.012) but 2670 m is -2.40% vs 1.7 mi; the only official figure is rounded to 0.1 mi (1.659 mi rounds to 1.7). Publish only if the owner accepts the rounded figure."
+ "notes": "Published in PR #12 under the 3% length rule approved by the owner (was skipped in PR #9 only because the OSM lap was just over 2%). OSM lap 2670 m vs official 2736 m (-2.40%). PR #9 note: no raceway in OSM; lap routed over the real streets (Pennsylvania Ave NW, 9th St NW, Constitution Ave NW, 7th St, Independence Ave SW, 3rd St) through the corners of the 2026 IndyCar track map. Shape passes (0.77%, mirrored 10.18%, aniso 1.012) but 2670 m is -2.40% vs 1.7 mi; the only official figure is rounded to 0.1 mi (1.659 mi rounds to 1.7). Publish only if the owner accepts the rounded figure."
 }
