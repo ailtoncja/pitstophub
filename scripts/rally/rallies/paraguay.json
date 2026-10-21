@@ -1,0 +1,134 @@
+{
+ "id": "paraguay",
+ "out": "src/rally/paraguay-2026-map.ts",
+ "export": "PARAGUAY_2026_MAP",
+ "viewBox": [
+  1000,
+  560
+ ],
+ "credits": [
+  "Rally del Paraguay 2026: tracado das especiais do Google My Maps oficial \"Rally 2026\" embutido em https://rallydelparaguay.com/tramos-de-carrera/",
+  "(linhas desenhadas a mao pelo organizador; Trinidad e Artigas Este estao digitalizadas ao contrario e sao invertidas).",
+  "Costa: OpenStreetMap land polygons (osmdata.openstreetmap.de), (c) OpenStreetMap contributors, ODbL."
+ ],
+ "downloads": [
+  {
+   "url": "https://www.google.com/maps/d/kml?mid=1hu76Ti74rUnxnMwrk5CnoJQC0RjCmj8&forcekml=1",
+   "file": "paraguay/mymap.kml"
+  }
+ ],
+ "stages": [
+  {
+   "id": "ss1-5",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS1/5 CAMBYRETA",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss2-6",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS2/6 NUEVA ALBORADA",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss3-7",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS3/7 YERBATERAS",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss4-8",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS4/8 AUTODROMO",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss9-13",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS9/13 BELLA VISTA",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss10-14",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS10/14 BELLA VISTA SUR",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss11-15",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS11/15 HOHENAU",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss12-16",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS12/16 TRINIDAD",
+    "match": "exact",
+    "reverse": true
+   }
+  },
+  {
+   "id": "ss17",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS 17 COSTANERA",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss18-22",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS18/22 ENCARNACION",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss19-21",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS19/21 ARTIGAS ESTE",
+    "match": "exact",
+    "reverse": true
+   }
+  },
+  {
+   "id": "ss20",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS20 ARTIGAS OESTE",
+    "match": "exact"
+   }
+  }
+ ],
+ "servicePark": [
+  -27.32915,
+  -55.875317
+ ],
+ "towns": [],
+ "land": true,
+ "sources": {
+  "geometry": [
+   "https://rallydelparaguay.com/tramos-de-carrera/ (embeds Google My Maps mid=1hu76Ti74rUnxnMwrk5CnoJQC0RjCmj8, title 'Rally 2026')",
+   "https://www.google.com/maps/d/kml?mid=1hu76Ti74rUnxnMwrk5CnoJQC0RjCmj8&forcekml=1"
+  ],
+  "servicePark": "https://rallydelparaguay.com/wp-content/uploads/rally-Guide-2_WRCpy2026-copy.pdf (9.1 'GPS Coordinates: S27°19.749' W55°52.519''), converted from degrees and decimal minutes; organiser My Map placemark 'SERVICE' is at -27.329110, -55.874869",
+  "notes": "The organiser's own 'Tramos de Carrera' page embeds a Google My Map titled 'Rally 2026', with folders SHAKEDOWN/FRIDAY/SATURDAY/SUNDAY. Each stage has a LineString plus start (SS/SSS) and finish (FSS) placemarks; there are also liaison lines, TC, STOP, refuel and service points. All 12 distinct stage roads (22 SS) are covered. Start/finish above are from the placemarks. The Trinidad and Artigas Este lines are digitised in reverse (first vertex = FSS); this was checked against the liaison lines, which end at SSS12/16 and SSS19/21. Matching to SS numbers is by the placemark labels (e.g. 'SS1/5'). Stage names match the itinerary except 'ARTIGAS ESTE' = itinerary 'Artigas 1/2'; RG recce table also calls SS19/21 'Artigas Este'. This match is confident. Haversine lengths of the lines vs v.1 km: Cambyreta 24.61/24.65, Nueva Alborada 15.78/15.66, Yerbateras 34.00/33.88, Autodromo 2.57/2.50, Bella Vista 21.25/21.15, Bella Vista Sur 11.90/11.57, Hohenau 19.54/19.40, Trinidad 14.95/15.00, Costanera 3.13/3.10, Encarnacion 9.59/10.26, Artigas Este 19.85/19.60, Artigas Oeste 8.58/8.44. These are hand-digitised lines, roughly accurate. Encarnacion is notably short (9.59 vs 10.26/10.21). The text on the same page describes 2025 stages, but the embedded map itself is the 2026 route."
+ }
+}

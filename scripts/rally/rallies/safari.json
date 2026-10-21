@@ -1,0 +1,153 @@
+{
+ "id": "safari",
+ "out": "src/rally/safari-2026-map.ts",
+ "export": "SAFARI_2026_MAP",
+ "viewBox": [
+  1000,
+  560
+ ],
+ "credits": [
+  "Safari Rally Kenya 2026: largada/chegada das especiais de fontes oficiais (ver sources).",
+  "Costa: OpenStreetMap land polygons (osmdata.openstreetmap.de), (c) OpenStreetMap contributors, ODbL."
+ ],
+ "downloads": [],
+ "stages": [
+  {
+   "id": "ss1-3",
+   "start": [
+    -0.5551,
+    36.279533
+   ],
+   "finish": [
+    -0.506,
+    36.256533
+   ],
+   "source": "https://safarirally.ke/storage/documents/TmGLVqossFlYfMAcvcgwFt3AeoWc1e2YYryn7quO.pdf (Road Book 1 V.2, page 5 'GPS Coordinates - Special Stages Start / FF')"
+  },
+  {
+   "id": "ss2-10",
+   "start": [
+    -0.67755,
+    36.399333
+   ],
+   "finish": [
+    -0.678517,
+    36.402283
+   ],
+   "source": "https://safarirally.ke/storage/documents/TmGLVqossFlYfMAcvcgwFt3AeoWc1e2YYryn7quO.pdf (Road Book 1 V.2, page 5 'GPS Coordinates - Special Stages Start / FF')"
+  },
+  {
+   "id": "ss4-9",
+   "start": [
+    -0.696533,
+    36.30325
+   ],
+   "finish": [
+    -0.6909,
+    36.304133
+   ],
+   "source": "https://safarirally.ke/storage/documents/TmGLVqossFlYfMAcvcgwFt3AeoWc1e2YYryn7quO.pdf (Road Book 1 V.2, page 5 'GPS Coordinates - Special Stages Start / FF'); identical start/FF in the revised Loldia reroute pages https://safarirally.ke/storage/documents/kwCdxPDtSSoHsY84Xh2mCQ3l5FmxlixTSMHQXWqh.pdf. WARNING: KMZ line is the pre-reroute ~25.5 km route; the stage actually used the revised 18.95 km route (same start/FF, different middle) - do not draw this line as the 2026 route."
+  },
+  {
+   "id": "ss5-8",
+   "start": [
+    -0.904933,
+    36.272733
+   ],
+   "finish": [
+    -0.884967,
+    36.282067
+   ],
+   "source": "https://safarirally.ke/storage/documents/TmGLVqossFlYfMAcvcgwFt3AeoWc1e2YYryn7quO.pdf (Road Book 1 V.2, page 5 'GPS Coordinates - Special Stages Start / FF') (KMZ name has two spaces: 'Geothermal  2026')"
+  },
+  {
+   "id": "ss6-7",
+   "start": [
+    -0.809133,
+    36.4109
+   ],
+   "finish": [
+    -0.815283,
+    36.406167
+   ],
+   "source": "https://safarirally.ke/storage/documents/TmGLVqossFlYfMAcvcgwFt3AeoWc1e2YYryn7quO.pdf (Road Book 1 V.2, page 5 'GPS Coordinates - Special Stages Start / FF')"
+  },
+  {
+   "id": "ss11-14",
+   "start": [
+    -0.474533,
+    36.158567
+   ],
+   "finish": [
+    -0.386267,
+    36.2285
+   ],
+   "source": "https://safarirally.ke/storage/documents/TmGLVqossFlYfMAcvcgwFt3AeoWc1e2YYryn7quO.pdf (Road Book 1 V.2, page 5 'GPS Coordinates - Special Stages Start / FF')"
+  },
+  {
+   "id": "ss12-15",
+   "start": [
+    -0.40225,
+    36.203717
+   ],
+   "finish": [
+    -0.48335,
+    36.2196
+   ],
+   "source": "https://safarirally.ke/storage/documents/TmGLVqossFlYfMAcvcgwFt3AeoWc1e2YYryn7quO.pdf (Road Book 1 V.2, page 5 'GPS Coordinates - Special Stages Start / FF') (KMZ spells 'Elmenteita')"
+  },
+  {
+   "id": "ss13-16",
+   "start": [
+    -0.508767,
+    36.178017
+   ],
+   "finish": [
+    -0.4858,
+    36.2149
+   ],
+   "source": "https://safarirally.ke/storage/documents/TmGLVqossFlYfMAcvcgwFt3AeoWc1e2YYryn7quO.pdf (Road Book 1 V.2, page 5 'GPS Coordinates - Special Stages Start / FF'); NOTE road-book FF is ~256 m off the KMZ line end (KMZ 'SL-FF' -0.486144,36.217184); route end may have changed after the KMZ (V1 18.49 km -> V1.4 18.41 km)."
+  },
+  {
+   "id": "ss17-19",
+   "start": [
+    -0.829583,
+    36.238933
+   ],
+   "finish": [
+    -0.88515,
+    36.243417
+   ],
+   "source": "https://safarirally.ke/storage/documents/TmGLVqossFlYfMAcvcgwFt3AeoWc1e2YYryn7quO.pdf (Road Book 1 V.2, page 5 'GPS Coordinates - Special Stages Start / FF')"
+  },
+  {
+   "id": "ss18-20",
+   "start": [
+    -0.897283,
+    36.349383
+   ],
+   "finish": [
+    -0.858283,
+    36.363483
+   ],
+   "source": "https://safarirally.ke/storage/documents/TmGLVqossFlYfMAcvcgwFt3AeoWc1e2YYryn7quO.pdf (Road Book 1 V.2, page 5 'GPS Coordinates - Special Stages Start / FF')"
+  }
+ ],
+ "servicePark": [
+  -0.745,
+  36.451667
+ ],
+ "towns": [],
+ "land": true,
+ "sources": {
+  "geometry": [
+   "https://safarirally.ke/storage/documents/YOeBQOjNAZ7PdKI6rw4Cikq5v7abIAaIF4LUvQUz.zip",
+   "https://safarirally.ke/storage/documents/TmGLVqossFlYfMAcvcgwFt3AeoWc1e2YYryn7quO.pdf",
+   "https://safarirally.ke/storage/documents/kwCdxPDtSSoHsY84Xh2mCQ3l5FmxlixTSMHQXWqh.pdf",
+   "https://safarirally.ke/storage/documents/tEl4UF2lzjWJd4LukpQCBg0Keav7yVg3AYEitI8c.pdf",
+   "https://safarirally.ke/competitors"
+  ],
+  "servicePark": "https://safarirally.ke/storage/documents/TmGLVqossFlYfMAcvcgwFt3AeoWc1e2YYryn7quO.pdf (Road Book 1 V.2, page 5 'GPS Coordinates - Service Park S0° 44.700’ E36° 27.100’')",
+  "notes": "Official KMZ 'Safari Rally Kenya KMZ' (zip containing doc.kml, posted on safarirally.ke/competitors 2026-02-19, internal timestamps 2026-01-30) with Documents per day, Waypoints (XX-TC, XX-Start, XX-FF, XX-Stop) and Tracks (stage LineStrings named '<Stage> 2026', plus liaison tracks). Start/finish here are the Road Book 1 V.2 (4 Mar 2026) GPS list, converted from S/E degrees+decimal minutes; KMZ Start/FF waypoints agree within ~0-30 m except Sleeping Warrior FF. Stage lines START->FF along-line vs V1.4 km: Camp Moran 24.40/24.35, Mzabibu 8.87/8.86, Loldia 25.52/18.95 (outdated, see SS4/9), Geothermal 13.11/13.16, Kedong 13.89/13.79, Soysambu 25.20/24.94 (=SR V1 25.20), Elmenteita 18.10/18.01, Sleeping Warrior 18.49/18.41 (=SR V1), Oserengoni 18.53/18.22, Hell's Gate 10.61/10.48 - i.e. the KMZ reflects the earlier (V1-era) routes; small end changes possible. Shakedown (not in stages list): RB start S0°42.969' E36°26.946' (-0.71615,36.4491), FF S0°43.528' E36°27.253' (-0.725467,36.454217); KMZ line 'Shakedown NAWISA 2026' 6.30 km. Matching by stage name in RB list and KMZ track names is unambiguous."
+ }
+}

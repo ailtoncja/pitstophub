@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, CalendarPlus, Cloud, CloudFog, CloudLightning, CloudRain, CloudSnow, MapPin, Share2, Sun, Timer } from 'lucide-react';
 import { paths } from '../app/paths';
@@ -7,6 +7,7 @@ import { RaceSpotlight } from '../components/RaceSpotlight';
 import { useToast } from '../components/Toast';
 import { Button, EmptyState, FactList, ListGroup, SectionTitle, Skeleton } from '../components/ui';
 import { getRaceCircuitInfo, type CircuitInfo } from '../circuit-info';
+import { rallyIdFor } from '../rally/dates';
 import { findCategoryDriver } from '../lib/entities';
 import { useRaceResults } from '../lib/f1-hooks';
 import { hasStartTime, raceTitle, timeOf, timeZoneLabel, weekdayShort } from '../lib/format';
@@ -22,6 +23,9 @@ import { fetchRaceWeather, weatherWindowOpen, type RaceWeather } from '../lib/we
 import { raceStartDate } from '../race-time';
 import { useCategory, useLiveData } from '../state/live-data';
 import { MOTORSPORT_DATA, type RaceSession, type RaceSessionKind } from '../types';
+
+// A ficha do rali (mapas + itinerarios do WRC) so carrega nas etapas do WRC.
+const RallySection = lazy(() => import('../components/RallySection'));
 
 const SESSION_LABEL: Record<RaceSessionKind, string> = {
   fp1: 'ses.fp1',
@@ -64,6 +68,8 @@ export default function RacePage() {
 
   // Com a categoria: o tracado certo do lugar (oval x misto) e os dados do GP so na F1.
   const info = useMemo(() => (race ? getRaceCircuitInfo(race, category?.id) : null), [race, category?.id]);
+  // Rali nao tem circuito: no WRC a ficha do rali (mapa das especiais + itinerario) ocupa o lugar do tracado.
+  const rally = useMemo(() => (race && category?.id === 'wrc' && race.status !== 'cancelled' ? rallyIdFor(race) : null), [race, category?.id]);
   const results = useRaceResults(category, race);
   const highlights = useMemo(() => (results.data ? raceHighlights(results.data) : null), [results.data]);
 
@@ -100,6 +106,8 @@ export default function RacePage() {
   const cancelled = race.status === 'cancelled';
   // Etapa cancelada nao tem numero de rodada (o aviso "Etapa cancelada" ja esta no destaque acima).
   const stageLabel = !cancelled && round > 0 ? t('cir.stage', { n: round }) : null;
+  // Com a ficha do rali em largura total e sem tracado/clima, a coluna da esquerda ficaria vazia.
+  const leftEmpty = Boolean(rally) && !info && !weather.data && weather.status !== 'loading';
   const numberFormat = lang === 'pt' ? 'pt-BR' : 'en-US';
   const facts = info ? circuitFacts(info, t, numberFormat) : [];
 
@@ -166,8 +174,16 @@ export default function RacePage() {
         </div>
       </div>
 
+      {rally && race && (
+        <div className="mt-10">
+          <Suspense fallback={<Skeleton className="h-[28rem]" />}>
+            <RallySection race={race} />
+          </Suspense>
+        </div>
+      )}
+
       <div className="mt-10 lg:grid lg:grid-cols-12 lg:gap-10 space-y-10 lg:space-y-0">
-        <div className="lg:col-span-7 space-y-10 min-w-0">
+        <div className={cn('lg:col-span-7 space-y-10 min-w-0', leftEmpty && 'hidden')}>
           {(weather.data || weather.status === 'loading') && (
             <section className="space-y-3">
               <SectionTitle>{t('cir.forecast')}</SectionTitle>
@@ -223,10 +239,10 @@ export default function RacePage() {
             </section>
           )}
 
-          {!info && <EmptyState icon={MapPin} title={t('cir.noInfo')} hint={t('cir.noInfoHint')} />}
+          {!info && !rally && <EmptyState icon={MapPin} title={t('cir.noInfo')} hint={t('cir.noInfoHint')} />}
         </div>
 
-        <div className="lg:col-span-5 space-y-10 min-w-0">
+        <div className={cn('space-y-10 min-w-0', leftEmpty ? 'lg:col-span-12 lg:grid lg:grid-cols-2 lg:gap-10 lg:space-y-0 lg:items-start' : 'lg:col-span-5')}>
           <section className="space-y-3">
             <div className="flex items-baseline justify-between gap-2">
               <SectionTitle>{t('cir.schedule')}</SectionTitle>
