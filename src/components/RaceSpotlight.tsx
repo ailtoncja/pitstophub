@@ -27,7 +27,8 @@ export function RaceSpotlight({
   const start = raceStartDate(race);
   const timed = hasStartTime(race);
   const completed = race.status === 'completed';
-  const phase = completed ? 'wrapped' : phaseOf(race, now);
+  const cancelled = race.status === 'cancelled';
+  const phase = completed || cancelled ? 'wrapped' : phaseOf(race, now);
   const place = race.circuit && race.circuit !== racePlace(race, lang) ? [race.circuit, racePlace(race, lang)].filter(Boolean).join(' · ') : racePlace(race, lang);
 
   return (
@@ -41,12 +42,14 @@ export function RaceSpotlight({
           ) : (
             <>
               {weekdayDayMonth(start, lang)}
-              {timed && <> · {timeOf(start, lang)} <span className="text-silver font-semibold">{timeZoneLabel(start)}</span></>}
+              {timed && !cancelled && <> · {timeOf(start, lang)} <span className="text-silver font-semibold">{timeZoneLabel(start)}</span></>}
             </>
           )}
         </p>
         <div className="min-h-[2.25rem] flex items-center">
-          {phase === 'live' ? (
+          {cancelled ? (
+            <StatusTag className="text-[1rem]">{t('cir.cancelled')}</StatusTag>
+          ) : phase === 'live' ? (
             <StatusTag live className="text-[1rem] text-white">{t('home.liveNow')}</StatusTag>
           ) : phase === 'awaiting' ? (
             <StatusTag className="text-[1rem]">{t('home.awaiting')}</StatusTag>

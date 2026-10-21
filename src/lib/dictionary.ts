@@ -206,6 +206,7 @@ const entries: Record<string, readonly [pt: string, en: string]> = {
   // ── circuito / etapa ─────────────────────────────────────────────────────────
   'cir.braking': ['Zonas de frenagem', 'Braking zones'],
   'cir.calendar': ['Calendário {year}', 'Calendar {year}'],
+  'cir.cancelled': ['Etapa cancelada', 'Round cancelled'],
   'cir.clockwise': ['Sentido horário', 'Clockwise'],
   'cir.corners': ['Curvas', 'Corners'],
   'cir.counterclockwise': ['Sentido anti-horário', 'Counter-clockwise'],

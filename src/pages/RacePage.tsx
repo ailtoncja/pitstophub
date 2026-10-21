@@ -1,24 +1,25 @@
 import { useMemo } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, CalendarPlus, Cloud, CloudFog, CloudLightning, CloudRain, CloudSnow, MapPin, Share2, Sun, Timer } from 'lucide-react';
 import { paths } from '../app/paths';
 import { RaceSpotlight } from '../components/RaceSpotlight';
 import { useToast } from '../components/Toast';
 import { Button, EmptyState, FactList, ListGroup, SectionTitle, Skeleton } from '../components/ui';
 import { getRaceCircuitInfo } from '../circuit-info';
-import { findCategoryDriver, raceKey } from '../lib/entities';
+import { findCategoryDriver } from '../lib/entities';
 import { useRaceResults } from '../lib/f1-hooks';
 import { hasStartTime, raceTitle, timeOf, timeZoneLabel, weekdayShort } from '../lib/format';
 import { useAsync, useScrollTopOn } from '../lib/hooks';
 import { useT } from '../lib/i18n';
 import { buildIcs, downloadIcs } from '../lib/ics';
+import { resolveRaceRoute, type RaceRoute } from '../lib/race-route';
 import { raceHighlights, roundNumber } from '../lib/season';
 import { useNow } from '../lib/useNow';
 import { cn } from '../lib/utils';
 import { fetchRaceWeather, weatherWindowOpen, type RaceWeather } from '../lib/weather';
 import { raceStartDate } from '../race-time';
-import { useCategory } from '../state/live-data';
-import type { RaceSession, RaceSessionKind } from '../types';
+import { useCategory, useLiveData } from '../state/live-data';
+import { MOTORSPORT_DATA, type RaceSession, type RaceSessionKind } from '../types';
 
 const SESSION_LABEL: Record<RaceSessionKind, string> = {
   fp1: 'ses.fp1',
@@ -47,8 +48,15 @@ export default function RacePage() {
   const navigate = useNavigate();
   const toast = useToast();
   const now = useNow(30_000);
+  const { ready } = useLiveData();
   const category = useCategory(categoryId);
-  const race = category?.calendar.find((r) => raceKey(r) === raceId);
+  // O calendario ao vivo troca os ids do catalogo e nao lista etapas canceladas: o catalogo cobre esses links.
+  const route = useMemo<RaceRoute>(() => {
+    if (!category || !raceId) return { kind: 'missing' };
+    const catalog = MOTORSPORT_DATA.find((item) => item.id === category.id)?.calendar ?? [];
+    return resolveRaceRoute(category.calendar, catalog, raceId);
+  }, [category, raceId]);
+  const race = route.kind === 'found' ? route.race : undefined;
 
   const info = useMemo(() => (race ? getRaceCircuitInfo(race) : null), [race]);
   const results = useRaceResults(category, race);
@@ -58,7 +66,20 @@ export default function RacePage() {
   const weatherEnabled = Boolean(race && hasCoords && race.status === 'upcoming' && weatherWindowOpen(race.date));
   const weather = useAsync(() => fetchRaceWeather(race!.lat!, race!.lng!, race!.date), [race?.id, race?.date], weatherEnabled);
 
+  if (category && route.kind === 'redirect') {
+    return <Navigate to={paths.race(category.id, route.raceId)} replace />;
+  }
+
   if (!category || !race) {
+    // Um id da fonte ao vivo (ex.: "r01-melbourne") so existe depois da sincronizacao: espera antes de dizer que nao existe.
+    if (category && !ready) {
+      return (
+        <div className="px-margin lg:px-0 pt-6 space-y-4">
+          <Skeleton className="h-72 lg:h-96" />
+          <Skeleton className="h-40" />
+        </div>
+      );
+    }
     return (
       <div className="px-margin lg:px-0 pt-6">
         <EmptyState title={t('cir.notFound')} action={<Button to={categoryId ? paths.calendarOf(categoryId) : paths.agenda}>{t('common.back')}</Button>} />
@@ -71,6 +92,9 @@ export default function RacePage() {
   const round = race.round ?? roundNumber(category.calendar, race);
   const sessions = race.sessions ?? [];
   const upcoming = race.status === 'upcoming';
+  const cancelled = race.status === 'cancelled';
+  // Etapa cancelada nao tem numero de rodada (o aviso "Etapa cancelada" ja esta no destaque acima).
+  const stageLabel = !cancelled && round > 0 ? t('cir.stage', { n: round }) : null;
   const numberFormat = lang === 'pt' ? 'pt-BR' : 'en-US';
 
   const saveToCalendar = () => {
@@ -110,7 +134,7 @@ export default function RacePage() {
 
         <div className="flex items-center gap-x-4 gap-y-2 flex-wrap justify-between">
           <p className="type-body-md text-silver">
-            {[t('cir.stage', { n: round }), info ? t('cir.laps', { n: info.laps }) : null, info ? (info.direction === 'clockwise' ? t('cir.clockwise') : t('cir.counterclockwise')) : null].filter(Boolean).join(' · ')}
+            {[stageLabel, info ? t('cir.laps', { n: info.laps }) : null, info ? (info.direction === 'clockwise' ? t('cir.clockwise') : t('cir.counterclockwise')) : null].filter(Boolean).join(' · ')}
           </p>
           <div className="flex items-center gap-2">
             {upcoming && (
@@ -196,7 +220,7 @@ export default function RacePage() {
             </div>
             {sessions.length > 0 ? (
               <ListGroup>
-                {sessions.map((session) => <SessionRow key={session.kind} session={session} lang={lang} label={t(SESSION_LABEL[session.kind])} />)}
+                {sessions.map((session) => <SessionRow key={session.kind} session={session} lang={lang} label={t(SESSION_LABEL[session.kind])} cancelled={cancelled} />)}
               </ListGroup>
             ) : (
               <ListGroup>
@@ -205,6 +229,7 @@ export default function RacePage() {
                   lang={lang}
                   label={t('ses.race')}
                   dateOnly={!timed}
+                  cancelled={cancelled}
                 />
               </ListGroup>
             )}
@@ -281,10 +306,23 @@ function WeatherList({ weather }: { weather: RaceWeather }) {
   );
 }
 
-function SessionRow({ session, lang, label, dateOnly = false }: { session: RaceSession; lang: 'pt' | 'en'; label: string; dateOnly?: boolean }) {
+function SessionRow({
+  session,
+  lang,
+  label,
+  dateOnly = false,
+  cancelled = false,
+}: {
+  session: RaceSession;
+  lang: 'pt' | 'en';
+  label: string;
+  dateOnly?: boolean;
+  cancelled?: boolean;
+}) {
   const date = new Date(session.startsAt);
   const isRace = session.kind === 'race';
-  const past = date.getTime() < Date.now();
+  // Sessao de etapa cancelada nao vai acontecer: aparece apagada e sem o marcador de proxima largada.
+  const past = cancelled || date.getTime() < Date.now();
   return (
     <div className={cn('flex items-center gap-4 px-4 py-3', past && 'opacity-60')}>
       <div className="w-12 shrink-0 text-center leading-none">
