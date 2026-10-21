@@ -5,6 +5,7 @@ import { paths } from '../app/paths';
 import { Avatar } from '../components/Avatar';
 import { CategoryHeader } from '../components/CategoryHeader';
 import { StatusTag } from '../components/pit';
+import { raceChangeText } from '../components/RaceChangeNote';
 import { RaceSpotlight } from '../components/RaceSpotlight';
 import { useToast } from '../components/Toast';
 import { Button, EmptyState, SectionTitle, Skeleton } from '../components/ui';
@@ -12,13 +13,14 @@ import { findCategoryDriver, findCategoryTeam, teamOfDriver } from '../lib/entit
 import { hasStartTime, monthShort, pad2, racePlace, raceTitle, timeOf, timeZoneLabel, weekdayShort } from '../lib/format';
 import { useT } from '../lib/i18n';
 import { buildIcs, downloadIcs } from '../lib/ics';
+import { calendarSections, raceChange } from '../lib/race-changes';
 import { roundNumber, upcomingRaces } from '../lib/season';
 import { useNow } from '../lib/useNow';
 import { cn } from '../lib/utils';
 import { raceStartDate } from '../race-time';
 import { useCategory, useLiveData } from '../state/live-data';
 import { useSelectedCategory } from '../state/selected-category';
-import type { Category, Race } from '../types';
+import { MOTORSPORT_DATA, type Category, type Race } from '../types';
 
 const SESSION_KEYS = { fp1: 'ses.fp1', fp2: 'ses.fp2', fp3: 'ses.fp3', 'sprint-qualifying': 'ses.sprintQualifying', sprint: 'ses.sprint', qualifying: 'ses.qualifying', race: 'ses.race' } as const;
 const dayMonthNumericShort = (date: Date) => `${pad2(date.getDate())}/${pad2(date.getMonth() + 1)}`;
@@ -44,6 +46,9 @@ export default function CalendarPage() {
   const upcoming = useMemo(() => (category ? upcomingRaces(category.calendar, now) : []), [category, now]);
   const next = upcoming[0] ?? null;
   const done = useMemo(() => races.filter((race) => race.status === 'completed').reverse(), [races]);
+  // As listas mostram tambem as etapas canceladas (riscadas, na posicao da data); a contagem acima e a proxima etapa nao.
+  const catalog = useMemo(() => MOTORSPORT_DATA.find((item) => item.id === category?.id)?.calendar ?? [], [category?.id]);
+  const sections = useMemo(() => calendarSections(category?.calendar ?? [], catalog, now), [category, catalog, now]);
 
   if (!category) {
     return <div className="px-margin lg:px-0 pt-6 space-y-3"><Skeleton className="h-10 w-1/2" /><Skeleton className="h-28" /><Skeleton className="h-48" /></div>;
@@ -83,30 +88,66 @@ export default function CalendarPage() {
             </Link>
           )}
 
-          {upcoming.length > 0 && (
+          {sections.toCome.length > 0 && (
             <section className="space-y-3">
               <SectionTitle>{t('cal.toCome')}</SectionTitle>
               <ul className="rounded-2xl bg-asphalt border border-hairline divide-y divide-hairline-soft overflow-hidden">
-                {upcoming.map((race) => (
-                  <RoundRow key={race.id} category={category} race={race} highlighted={race.id === next?.id} now={now} />
-                ))}
+                {sections.toCome.map((race) =>
+                  race.status === 'cancelled' ? (
+                    <CancelledRow key={race.id} category={category} race={race} catalog={catalog} />
+                  ) : (
+                    <RoundRow key={race.id} category={category} race={race} highlighted={race.id === next?.id} now={now} />
+                  ),
+                )}
               </ul>
             </section>
           )}
 
-          {done.length > 0 && (
+          {sections.played.length > 0 && (
             <section className="space-y-3">
               <SectionTitle>{t('cal.played')}</SectionTitle>
               <ul className="rounded-2xl bg-asphalt border border-hairline divide-y divide-hairline-soft overflow-hidden">
-                {done.map((race) => (
-                  <RoundRow key={race.id} category={category} race={race} highlighted={false} now={now} />
-                ))}
+                {sections.played.map((race) =>
+                  race.status === 'cancelled' ? (
+                    <CancelledRow key={race.id} category={category} race={race} catalog={catalog} />
+                  ) : (
+                    <RoundRow key={race.id} category={category} race={race} highlighted={false} now={now} />
+                  ),
+                )}
               </ul>
             </section>
           )}
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Etapa cancelada na lista: apagada e riscada, sem numero de rodada nem acoes de agenda, com a substituta (ou "sem
+ * substituta") na linha de baixo. A linha toda leva a pagina da etapa, que tem o link para a substituta.
+ */
+function CancelledRow({ category, race, catalog }: { category: Category; race: Race; catalog: Race[] }) {
+  const { t, lang } = useT();
+  const date = raceStartDate(race);
+  const change = raceChange(catalog, race);
+  const place = race.circuit || racePlace(race, lang);
+  const status = [t('cir.cancelled'), change && change.kind !== 'replaces' ? raceChangeText(change, t, lang) : null].filter(Boolean).join(' · ');
+
+  return (
+    <li>
+      <Link to={paths.race(category.id, race.id)} className="flex items-center gap-4 pl-4 pr-4 py-4 group">
+        <span className="w-12 shrink-0 text-center leading-none">
+          <span className="type-headline-md text-silver-dim tabular block">{pad2(date.getDate())}</span>
+          <span className="type-label-telemetry text-silver-dim block mt-1">{monthShort(date, lang)}</span>
+        </span>
+        <span className="flex-1 min-w-0">
+          <span className="type-body-md font-semibold text-silver block truncate line-through decoration-silver/60 group-hover:decoration-white/60">{raceTitle(race, lang)}</span>
+          {place && <span className="type-body-sm text-silver-dim block truncate">{place}</span>}
+          <span className="type-body-sm text-silver block mt-0.5">{status}</span>
+        </span>
+      </Link>
+    </li>
   );
 }
 

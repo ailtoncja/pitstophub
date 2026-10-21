@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, CalendarPlus, Cloud, CloudFog, CloudLightning, CloudRain, CloudSnow, MapPin, Share2, Sun, Timer } from 'lucide-react';
 import { paths } from '../app/paths';
+import { RaceChangeNote } from '../components/RaceChangeNote';
 import { RaceSpotlight } from '../components/RaceSpotlight';
 import { useToast } from '../components/Toast';
 import { Button, EmptyState, FactList, ListGroup, SectionTitle, Skeleton } from '../components/ui';
@@ -12,6 +13,7 @@ import { hasStartTime, raceTitle, timeOf, timeZoneLabel, weekdayShort } from '..
 import { useAsync, useScrollTopOn } from '../lib/hooks';
 import { useT } from '../lib/i18n';
 import { buildIcs, downloadIcs } from '../lib/ics';
+import { raceChange } from '../lib/race-changes';
 import { resolveRaceRoute, type RaceRoute } from '../lib/race-route';
 import { raceHighlights, roundNumber } from '../lib/season';
 import { useNow } from '../lib/useNow';
@@ -51,12 +53,14 @@ export default function RacePage() {
   const { ready } = useLiveData();
   const category = useCategory(categoryId);
   // O calendario ao vivo troca os ids do catalogo e nao lista etapas canceladas: o catalogo cobre esses links.
+  const catalog = useMemo(() => MOTORSPORT_DATA.find((item) => item.id === categoryId)?.calendar ?? [], [categoryId]);
   const route = useMemo<RaceRoute>(() => {
     if (!category || !raceId) return { kind: 'missing' };
-    const catalog = MOTORSPORT_DATA.find((item) => item.id === category.id)?.calendar ?? [];
     return resolveRaceRoute(category.calendar, catalog, raceId);
-  }, [category, raceId]);
+  }, [category, catalog, raceId]);
   const race = route.kind === 'found' ? route.race : undefined;
+  // Etapa cancelada -> substituta(s); substituta -> cancelada(s). Os pares ficam no catalogo.
+  const change = useMemo(() => (race ? raceChange(catalog, race) : null), [catalog, race]);
 
   const info = useMemo(() => (race ? getRaceCircuitInfo(race) : null), [race]);
   const results = useRaceResults(category, race);
@@ -130,7 +134,18 @@ export default function RacePage() {
 
       <h1 className="sr-only">{raceTitle(race, lang)}</h1>
       <div className="mt-2 space-y-4">
-        <RaceSpotlight race={race} categoryId={category.id} now={now} />
+        <RaceSpotlight
+          race={race}
+          categoryId={category.id}
+          now={now}
+          cancelNote={cancelled && change && change.kind !== 'replaces' ? <RaceChangeNote change={change} categoryId={category.id} /> : undefined}
+        />
+
+        {!cancelled && change?.kind === 'replaces' && (
+          <p className="type-body-md text-silver">
+            <RaceChangeNote change={change} categoryId={category.id} />
+          </p>
+        )}
 
         <div className="flex items-center gap-x-4 gap-y-2 flex-wrap justify-between">
           <p className="type-body-md text-silver">
