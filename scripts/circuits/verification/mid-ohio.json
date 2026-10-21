@@ -1,0 +1,37 @@
+{
+ "key": "mid-ohio",
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/MidOhioSportsCarCourse.png",
+ "official_map_page": "https://www.indycar.com/Schedule/2026/Mid-Ohio",
+ "official_length_m": 3634,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/Mid-Ohio (Track Length 2.258 Miles)",
+ "alt_lengths": [],
+ "osm_length_m": 3646.2,
+ "length_error_pct": 0.33,
+ "osm_chamfer_pct": 2.15,
+ "osm_chamfer_m": 9.0,
+ "osm_p95_m": 16.3,
+ "osm_mirror_pct": 15.58,
+ "osm_aniso": 1.043,
+ "osm_rot_deg": -90.6,
+ "extract": {
+  "mode": "mask",
+  "n": 83759
+ },
+ "png_chamfer_pct": 2.11,
+ "png_mirror_pct": 15.64,
+ "png_aniso": 1.04,
+ "png_rot_deg": -90.6,
+ "mirror_ratio": 7.25,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": false,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": false,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": false
+ },
+ "pass": false
+}

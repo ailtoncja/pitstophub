@@ -1,0 +1,9 @@
+{
+ "key": "new-hampshire",
+ "name": "New Hampshire Motor Speedway",
+ "layout": "Oval",
+ "venue": {"lat": 43.3626, "lon": -71.4605, "radius_m": 1000},
+ "official": {"length_m": 1703},
+ "select": {"mode": "cycle"},
+ "render": {"rotate_deg": 0}
+}

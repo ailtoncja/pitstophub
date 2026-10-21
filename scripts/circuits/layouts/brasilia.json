@@ -1,0 +1,20 @@
+{
+ "key": "brasilia",
+ "name": "Autódromo Internacional Nelson Piquet (Brasília)",
+ "layout": "",
+ "venue": {
+  "lat": -15.7745,
+  "lon": -47.9,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 5384
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

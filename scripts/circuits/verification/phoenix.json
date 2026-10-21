@@ -1,0 +1,42 @@
+{
+ "key": "phoenix",
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/PhoenixRaceway.png",
+ "official_map_page": "https://www.indycar.com/Schedule/2026/Phoenix",
+ "official_length_m": 1609,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/Phoenix (Track Length 1.0 Miles)",
+ "alt_lengths": [
+  {
+   "length_m": 1645,
+   "source": "https://www.indycar.com/news/2016/03/03-31-phoenix-preview (INDYCAR: \"the 1.022-mile oval\"; the 2018 start/finish move kept the same lap)"
+  }
+ ],
+ "osm_length_m": 1660.5,
+ "length_error_pct": 0.94,
+ "osm_chamfer_pct": 0.56,
+ "osm_chamfer_m": 1.4,
+ "osm_p95_m": 2.9,
+ "osm_mirror_pct": 3.59,
+ "osm_aniso": 1.005,
+ "osm_rot_deg": -0.1,
+ "extract": {
+  "mode": "mask",
+  "n": 56989
+ },
+ "png_chamfer_pct": 0.59,
+ "png_mirror_pct": 3.65,
+ "png_aniso": 1.009,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 6.41,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

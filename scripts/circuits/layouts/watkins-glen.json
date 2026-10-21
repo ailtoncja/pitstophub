@@ -1,0 +1,25 @@
+{
+ "key": "watkins-glen",
+ "name": "Watkins Glen International",
+ "layout": "Full course with the Boot (3.4 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 42.3369,
+  "lon": -76.9272,
+  "radius_m": 2000
+ },
+ "venue_key": "watkins-glen",
+ "official": {
+  "length_m": 5552
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

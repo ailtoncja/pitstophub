@@ -1,0 +1,22 @@
+{
+ "key": "las-vegas-motor-speedway",
+ "name": "Las Vegas Motor Speedway",
+ "layout": "Tri-oval (1.5 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 36.272,
+  "lon": -115.011,
+  "radius_m": 1100
+ },
+ "official": {
+  "length_m": 2414
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {},
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

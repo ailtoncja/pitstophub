@@ -1,0 +1,22 @@
+{
+ "key": "kansas",
+ "name": "Kansas Speedway",
+ "layout": "Tri-oval (1.5 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 39.1158,
+  "lon": -94.8306,
+  "radius_m": 1100
+ },
+ "official": {
+  "length_m": 2414
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {},
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

@@ -1,0 +1,11 @@
+{
+ "key": "long-beach",
+ "name": "Streets of Long Beach",
+ "layout": "Street circuit",
+ "venue": {"lat": 33.7640, "lon": -118.1920, "radius_m": 1200},
+ "official": {"length_m": 3167},
+ "select": {"mode": "cycle", "relations": [18052024]},
+ "extract": {"mode": "mask", "max_lum": 0.5, "min_alpha": 0.5, "close": 3},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

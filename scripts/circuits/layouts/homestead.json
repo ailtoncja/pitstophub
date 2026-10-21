@@ -1,0 +1,23 @@
+{
+ "key": "homestead",
+ "name": "Homestead-Miami Speedway",
+ "layout": "Oval",
+ "venue": {
+  "lat": 25.4519,
+  "lon": -80.4089,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 2414
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5
+ }
+}

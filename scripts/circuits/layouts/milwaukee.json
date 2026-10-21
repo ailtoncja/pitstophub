@@ -1,0 +1,34 @@
+{
+ "key": "milwaukee",
+ "name": "Milwaukee Mile",
+ "layout": "Oval (1 mile)",
+ "used_by": [],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Milwaukee-Race1",
+ "venue": {
+  "lat": 43.0195,
+  "lon": -88.0136,
+  "radius_m": 1000
+ },
+ "official": {
+  "length_m": 1633,
+  "length_source": "https://www.indycar.com/Schedule/2026/Milwaukee-Race1 (Track Length 1.015 Miles)",
+  "alt_lengths": [],
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/MilwaukeeMile.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/Milwaukee-Race1",
+  "map_publisher": "INDYCAR"
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "published",
+ "notes": ""
+}

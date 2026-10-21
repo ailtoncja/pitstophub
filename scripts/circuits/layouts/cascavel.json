@@ -1,0 +1,20 @@
+{
+ "key": "cascavel",
+ "name": "Autódromo Internacional de Cascavel (Zilmar Beux)",
+ "layout": "",
+ "venue": {
+  "lat": -24.9815,
+  "lon": -53.3813,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3058
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

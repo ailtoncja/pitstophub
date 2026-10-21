@@ -1,0 +1,9 @@
+{
+ "key": "velocitta",
+ "name": "Autódromo Velocittà",
+ "layout": "Circuito completo",
+ "venue": {"lat": -22.2893, "lon": -46.8487, "radius_m": 1000},
+ "official": {"length_m": 3493},
+ "select": {"mode": "cycle"},
+ "render": {"rotate_deg": 0}
+}

@@ -1,0 +1,9 @@
+{
+ "key": "iowa",
+ "name": "Iowa Speedway",
+ "layout": "Oval",
+ "venue": {"lat": 41.6772, "lon": -93.0137, "radius_m": 900},
+ "official": {"length_m": 1408},
+ "select": {"mode": "cycle"},
+ "render": {"rotate_deg": 0}
+}

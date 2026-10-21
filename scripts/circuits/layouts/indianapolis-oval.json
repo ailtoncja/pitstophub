@@ -1,0 +1,62 @@
+{
+ "key": "indianapolis-oval",
+ "name": "Indianapolis Motor Speedway",
+ "layout": "Oval (2.5 mi)",
+ "used_by": [],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Indianapolis-500",
+ "venue": {
+  "lat": 39.795,
+  "lon": -86.2347,
+  "radius_m": 1800
+ },
+ "official": {
+  "length_m": 4023,
+  "length_source": "https://www.indycar.com/Schedule/2026/Indianapolis-500 (Track Length 2.5 Miles)",
+  "alt_lengths": [],
+  "map_url": "https://www.indianapolismotorspeedway.com/-/media/IMS/maps/2027/master/27IMSMaster.pdf",
+  "map_page": "https://www.indianapolismotorspeedway.com/events/brickyard",
+  "map_publisher": "Indianapolis Motor Speedway (facility map, PDF page rendered to PNG)"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   588780345,
+   588780347,
+   588780351,
+   588780349,
+   51308226,
+   588780333,
+   588780334,
+   588780335,
+   588780332,
+   588780343
+  ]
+ },
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   77,
+   78,
+   78
+  ],
+  "tol": 30,
+  "crop": [
+   0.3,
+   0.12,
+   0.9,
+   0.62
+  ],
+  "close": 8,
+  "open": 2
+ },
+ "render": {
+  "rotate_deg": -90.8
+ },
+ "status": "published",
+ "notes": "",
+ "venue_key": "indianapolis",
+ "verify": {
+  "symmetric": true,
+  "notes": "The IMS oval (two equal straights, two equal short chutes, four equal turns) is mirror-symmetric, so the mirrored fit is as good as the direct one; orientation follows the map compass (north to the left)."
+ }
+}

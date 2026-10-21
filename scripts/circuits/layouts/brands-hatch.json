@@ -1,0 +1,11 @@
+{
+ "key": "brands-hatch",
+ "name": "Brands Hatch",
+ "layout": "Grand Prix Circuit",
+ "venue": {"lat": 51.3580, "lon": 0.2620, "radius_m": 1300},
+ "official": {"length_m": 3916},
+ "select": {"mode": "cycle"},
+ "extract": {},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

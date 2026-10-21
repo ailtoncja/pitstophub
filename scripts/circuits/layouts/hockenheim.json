@@ -1,0 +1,11 @@
+{
+ "key": "hockenheim",
+ "name": "Hockenheimring",
+ "layout": "Grand Prix",
+ "venue": {"lat": 49.3290, "lon": 8.5680, "radius_m": 1500},
+ 
+ "official": {"length_m": 4574},
+ "select": {"mode": "cycle"},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

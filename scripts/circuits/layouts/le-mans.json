@@ -1,0 +1,11 @@
+{
+ "key": "le-mans",
+ "name": "Circuit des 24 Heures du Mans",
+ "layout": "Circuit des 24 Heures",
+ "venue": {"lat": 47.9300, "lon": 0.2120, "radius_m": 6500},
+ "official": {"length_m": 13626},
+ "select": {"mode": "cycle"},
+ "extract": {},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

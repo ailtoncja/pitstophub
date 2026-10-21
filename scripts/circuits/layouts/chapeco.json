@@ -1,0 +1,20 @@
+{
+ "key": "chapeco",
+ "name": "Autódromo Internacional de Chapecó",
+ "layout": "",
+ "venue": {
+  "lat": -27.2207,
+  "lon": -52.7157,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3000
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

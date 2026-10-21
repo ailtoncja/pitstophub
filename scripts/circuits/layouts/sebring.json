@@ -1,0 +1,24 @@
+{
+ "key": "sebring",
+ "name": "Sebring International Raceway",
+ "layout": "Full course (3.74 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 27.4545,
+  "lon": -81.3484,
+  "radius_m": 2000
+ },
+ "official": {
+  "length_m": 6019
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

@@ -1,0 +1,25 @@
+{
+ "key": "charlotte-roval",
+ "name": "Charlotte Motor Speedway",
+ "layout": "ROVAL (2.28 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 35.3523,
+  "lon": -80.6829,
+  "radius_m": 1800
+ },
+ "venue_key": "charlotte",
+ "official": {
+  "length_m": 3669
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

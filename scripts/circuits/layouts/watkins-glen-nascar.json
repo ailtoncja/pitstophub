@@ -1,0 +1,25 @@
+{
+ "key": "watkins-glen-nascar",
+ "name": "Watkins Glen International",
+ "layout": "Short course without the Boot (2.45 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 42.3369,
+  "lon": -76.9272,
+  "radius_m": 2000
+ },
+ "venue_key": "watkins-glen",
+ "official": {
+  "length_m": 3943
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

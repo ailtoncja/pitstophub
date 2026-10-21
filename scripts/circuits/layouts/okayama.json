@@ -1,0 +1,11 @@
+{
+ "key": "okayama",
+ "name": "Okayama International Circuit",
+ "layout": "Circuito completo",
+ "venue": {"lat": 34.9150, "lon": 134.2210, "radius_m": 1300},
+ "official": {"length_m": 3703},
+ "select": {"mode": "cycle"},
+ "extract": {},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

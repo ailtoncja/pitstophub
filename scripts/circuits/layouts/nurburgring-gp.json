@@ -1,0 +1,11 @@
+{
+ "key": "nurburgring-gp",
+ "name": "Nürburgring",
+ "layout": "Grand Prix",
+ "venue": {"lat": 50.3330, "lon": 6.9450, "radius_m": 1800},
+ "venue_key": "nurburgring",
+ "official": {"length_m": 5137},
+ "select": {"mode": "cycle"},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

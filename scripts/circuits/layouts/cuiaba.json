@@ -1,0 +1,20 @@
+{
+ "key": "cuiaba",
+ "name": "Autódromo Internacional de Mato Grosso (Cuiabá)",
+ "layout": "",
+ "venue": {
+  "lat": -15.4522,
+  "lon": -56.0828,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 4450
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

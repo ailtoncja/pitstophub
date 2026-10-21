@@ -1,0 +1,26 @@
+{
+ "key": "michigan",
+ "name": "Michigan International Speedway",
+ "layout": "Oval",
+ "venue": {
+  "lat": 42.06687,
+  "lon": -84.24076,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3219
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   205025109
+  ]
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5
+ }
+}

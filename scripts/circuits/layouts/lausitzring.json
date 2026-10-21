@@ -1,0 +1,50 @@
+{
+ "key": "lausitzring",
+ "name": "DEKRA Lausitzring",
+ "layout": "Sprint",
+ "venue": {
+  "lat": 51.534,
+  "lon": 13.923,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3478
+ },
+ "select": {
+  "mode": "cycle",
+  "require_ways": [
+   115077605,
+   470914466,
+   470915848,
+   766115999,
+   864182816
+  ],
+  "only_ways": [
+   115077605,
+   470914466,
+   470915848,
+   766115999,
+   864182816
+  ]
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft",
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   175,
+   175,
+   175
+  ],
+  "tol": 45,
+  "crop": [
+   0.33,
+   0.05,
+   1,
+   0.95
+  ],
+  "close": 2
+ }
+}

@@ -1,0 +1,37 @@
+{
+ "key": "indianapolis-oval",
+ "official_map": "https://www.indianapolismotorspeedway.com/-/media/IMS/maps/2027/master/27IMSMaster.pdf",
+ "official_map_page": "https://www.indianapolismotorspeedway.com/events/brickyard",
+ "official_length_m": 4023,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/Indianapolis-500 (Track Length 2.5 Miles)",
+ "alt_lengths": [],
+ "osm_length_m": 4071.1,
+ "length_error_pct": 1.19,
+ "osm_chamfer_pct": 0.58,
+ "osm_chamfer_m": 3.6,
+ "osm_p95_m": 5.5,
+ "osm_mirror_pct": 0.58,
+ "osm_aniso": 1.013,
+ "osm_rot_deg": 89.2,
+ "extract": {
+  "mode": "mask",
+  "n": 25138
+ },
+ "png_chamfer_pct": 0.58,
+ "png_mirror_pct": 0.58,
+ "png_aniso": 1.012,
+ "png_rot_deg": 0.1,
+ "mirror_ratio": 1.0,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

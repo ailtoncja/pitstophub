@@ -1,0 +1,35 @@
+{
+ "key": "chicagoland",
+ "name": "Chicagoland Speedway",
+ "layout": "Oval",
+ "venue": {
+  "lat": 41.4748,
+  "lon": -88.0573,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 2414
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   33119599
+  ]
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.15,
+  "max_sat": 0.3,
+  "crop": [
+   0.45,
+   0.15,
+   0.75,
+   0.7
+  ],
+  "close": 2,
+  "min_size": 500
+ }
+}

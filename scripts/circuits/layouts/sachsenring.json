@@ -1,0 +1,11 @@
+{
+ "key": "sachsenring",
+ "name": "Sachsenring",
+ "layout": "Circuito completo",
+ "venue": {"lat": 50.7915, "lon": 12.6880, "radius_m": 1200},
+ 
+ "official": {"length_m": 3671},
+ "select": {"mode": "cycle"},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

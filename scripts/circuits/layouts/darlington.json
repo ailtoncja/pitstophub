@@ -1,0 +1,22 @@
+{
+ "key": "darlington",
+ "name": "Darlington Raceway",
+ "layout": "Egg-shaped oval (1.366 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 34.2955,
+  "lon": -79.9055,
+  "radius_m": 900
+ },
+ "official": {
+  "length_m": 2198
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {},
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

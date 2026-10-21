@@ -1,0 +1,34 @@
+{
+ "key": "gateway",
+ "name": "World Wide Technology Raceway",
+ "layout": "Oval (1.25 mi)",
+ "used_by": [],
+ "layout_source": "https://www.indycar.com/Schedule/2026/WWTR",
+ "venue": {
+  "lat": 38.6506,
+  "lon": -90.1358,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 2012,
+  "length_source": "https://www.indycar.com/Schedule/2026/WWTR (Track Length 1.25 Miles)",
+  "alt_lengths": [],
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/GatewayMotorsportsPark.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/WWTR",
+  "map_publisher": "INDYCAR"
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "published",
+ "notes": ""
+}

@@ -1,0 +1,11 @@
+{
+ "key": "misano",
+ "name": "Misano World Circuit Marco Simoncelli",
+ "layout": "Circuito completo",
+ "venue": {"lat": 43.9614, "lon": 12.6847, "radius_m": 1300},
+ "official": {"length_m": 4226},
+ "select": {"mode": "cycle"},
+ "extract": {},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

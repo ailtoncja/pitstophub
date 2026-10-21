@@ -1,0 +1,20 @@
+{
+ "key": "velopark",
+ "name": "Autódromo Internacional Velopark",
+ "layout": "",
+ "venue": {
+  "lat": -29.8239,
+  "lon": -51.3201,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 2278
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

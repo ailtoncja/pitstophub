@@ -1,0 +1,39 @@
+{
+ "key": "phoenix",
+ "name": "Phoenix Raceway",
+ "layout": "Oval (1 mile)",
+ "used_by": [],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Phoenix",
+ "venue": {
+  "lat": 33.3747,
+  "lon": -112.3113,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 1609,
+  "length_source": "https://www.indycar.com/Schedule/2026/Phoenix (Track Length 1.0 Miles)",
+  "alt_lengths": [
+   {
+    "length_m": 1645,
+    "source": "https://www.indycar.com/news/2016/03/03-31-phoenix-preview (INDYCAR: \"the 1.022-mile oval\"; the 2018 start/finish move kept the same lap)"
+   }
+  ],
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/PhoenixRaceway.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/Phoenix",
+  "map_publisher": "INDYCAR"
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "published",
+ "notes": ""
+}

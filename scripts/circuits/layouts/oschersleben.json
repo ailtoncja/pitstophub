@@ -1,0 +1,11 @@
+{
+ "key": "oschersleben",
+ "name": "Motorsport Arena Oschersleben",
+ "layout": "Circuito completo",
+ "venue": {"lat": 52.0280, "lon": 11.2800, "radius_m": 1200},
+ 
+ "official": {"length_m": 3696},
+ "select": {"mode": "cycle"},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

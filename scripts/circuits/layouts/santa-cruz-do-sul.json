@@ -1,0 +1,20 @@
+{
+ "key": "santa-cruz-do-sul",
+ "name": "Autódromo Internacional de Santa Cruz do Sul",
+ "layout": "",
+ "venue": {
+  "lat": -29.8003,
+  "lon": -52.4364,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3531
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

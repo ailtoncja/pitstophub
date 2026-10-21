@@ -1,0 +1,29 @@
+{
+ "key": "michigan",
+ "official_map": null,
+ "official_map_page": null,
+ "official_length_m": 3219,
+ "official_length_source": null,
+ "alt_lengths": [],
+ "osm_length_m": 3236.2,
+ "length_error_pct": 0.53,
+ "osm_chamfer_pct": 0.67,
+ "osm_chamfer_m": 3.3,
+ "osm_p95_m": 6.5,
+ "osm_mirror_pct": 0.68,
+ "osm_aniso": 1.018,
+ "osm_rot_deg": -75.9,
+ "extract": {
+  "mode": "mask",
+  "n": 91450
+ },
+ "mirror_ratio": 1.01,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": false,
+  "not_distorted": true,
+  "length": true
+ },
+ "pass": false
+}

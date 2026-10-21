@@ -1,0 +1,20 @@
+{
+ "key": "goiania",
+ "name": "Autódromo Internacional Ayrton Senna (Goiânia)",
+ "layout": "",
+ "venue": {
+  "lat": -16.7186,
+  "lon": -49.1924,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3835
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

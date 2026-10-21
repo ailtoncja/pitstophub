@@ -1,0 +1,22 @@
+{
+ "key": "bowman-gray",
+ "name": "Bowman Gray Stadium",
+ "layout": "Quarter-mile oval",
+ "used_by": [],
+ "venue": {
+  "lat": 36.0826,
+  "lon": -80.2221,
+  "radius_m": 500
+ },
+ "official": {
+  "length_m": 402
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {},
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

@@ -1,0 +1,22 @@
+{
+ "key": "martinsville",
+ "name": "Martinsville Speedway",
+ "layout": "Paperclip oval (0.526 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 36.634,
+  "lon": -79.851,
+  "radius_m": 600
+ },
+ "official": {
+  "length_m": 847
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {},
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

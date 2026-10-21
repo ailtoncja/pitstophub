@@ -1,0 +1,20 @@
+{
+ "key": "londrina",
+ "name": "Autódromo Internacional Ayrton Senna (Londrina)",
+ "layout": "",
+ "venue": {
+  "lat": -23.2818,
+  "lon": -51.1678,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 3000
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

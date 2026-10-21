@@ -1,0 +1,30 @@
+{
+ "key": "charlotte-oval",
+ "name": "Charlotte Motor Speedway",
+ "layout": "Oval",
+ "venue": {
+  "lat": 35.35165,
+  "lon": -80.68291,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 2414
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   396483278,
+   116034341,
+   402168709,
+   1052107104,
+   402168711
+  ]
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5
+ }
+}

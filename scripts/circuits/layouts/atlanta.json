@@ -1,0 +1,28 @@
+{
+ "key": "atlanta",
+ "name": "EchoPark Speedway (Atlanta)",
+ "layout": "Quad-oval (1.54 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 33.384,
+  "lon": -84.3168,
+  "radius_m": 1100
+ },
+ "official": {
+  "length_m": 2478
+ },
+ "select": {
+  "mode": "cycle",
+  "exclude_ways": [
+   1158426917
+  ]
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

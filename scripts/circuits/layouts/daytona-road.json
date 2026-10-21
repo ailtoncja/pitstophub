@@ -1,0 +1,25 @@
+{
+ "key": "daytona-road",
+ "name": "Daytona International Speedway",
+ "layout": "Road course (3.56 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 29.1852,
+  "lon": -81.0705,
+  "radius_m": 2000
+ },
+ "venue_key": "daytona",
+ "official": {
+  "length_m": 5729
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

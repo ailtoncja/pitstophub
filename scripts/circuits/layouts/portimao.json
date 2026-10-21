@@ -1,0 +1,11 @@
+{
+ "key": "portimao",
+ "name": "Autódromo Internacional do Algarve",
+ "layout": "Grand Prix",
+ "venue": {"lat": 37.2297, "lon": -8.6267, "radius_m": 1500},
+ "official": {"length_m": 4692},
+ "select": {"mode": "cycle"},
+ "extract": {},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

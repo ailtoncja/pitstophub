@@ -1,0 +1,11 @@
+{
+ "key": "jeddah",
+ "name": "Jeddah Corniche Circuit",
+ "layout": "Circuito completo",
+ "venue": {"lat": 21.6320, "lon": 39.1040, "radius_m": 3000},
+ "official": {"length_m": 6174},
+ "select": {"mode": "cycle"},
+ "extract": {},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

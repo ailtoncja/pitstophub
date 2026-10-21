@@ -1,0 +1,37 @@
+{
+ "key": "indianapolis-road",
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/Indianapolis-RC.png",
+ "official_map_page": "https://www.indycar.com/Schedule/2026/Indianapolis",
+ "official_length_m": 3925,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/Indianapolis (Track Length 2.439 Miles)",
+ "alt_lengths": [],
+ "osm_length_m": 3911.0,
+ "length_error_pct": -0.36,
+ "osm_chamfer_pct": 1.13,
+ "osm_chamfer_m": 5.7,
+ "osm_p95_m": 15.7,
+ "osm_mirror_pct": 11.97,
+ "osm_aniso": 1.014,
+ "osm_rot_deg": 89.1,
+ "extract": {
+  "mode": "mask",
+  "n": 94062
+ },
+ "png_chamfer_pct": 1.14,
+ "png_mirror_pct": 12.11,
+ "png_aniso": 1.015,
+ "png_rot_deg": 0.0,
+ "mirror_ratio": 10.59,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

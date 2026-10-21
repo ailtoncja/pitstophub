@@ -1,0 +1,32 @@
+{
+ "key": "dover",
+ "name": "Dover Motor Speedway",
+ "layout": "Oval",
+ "venue": {
+  "lat": 39.18963,
+  "lon": -75.53036,
+  "radius_m": 900
+ },
+ "official": {
+  "length_m": 1609
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   154,
+   156,
+   158
+  ],
+  "tol": 14,
+  "open": 3,
+  "close": 8,
+  "keep": "largest",
+  "min_size": 2000
+ }
+}

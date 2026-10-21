@@ -1,0 +1,37 @@
+{
+ "key": "pocono",
+ "official_map": null,
+ "official_map_page": null,
+ "official_length_m": 4023,
+ "official_length_source": null,
+ "alt_lengths": [],
+ "osm_length_m": 4058.1,
+ "length_error_pct": 0.87,
+ "osm_chamfer_pct": 0.58,
+ "osm_chamfer_m": 3.5,
+ "osm_p95_m": 8.5,
+ "osm_mirror_pct": 8.62,
+ "osm_aniso": 1.008,
+ "osm_rot_deg": 21.9,
+ "extract": {
+  "mode": "mask",
+  "n": 18347
+ },
+ "png_chamfer_pct": 0.59,
+ "png_mirror_pct": 8.13,
+ "png_aniso": 1.007,
+ "png_rot_deg": 0.0,
+ "mirror_ratio": 14.86,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

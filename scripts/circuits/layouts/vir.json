@@ -1,0 +1,24 @@
+{
+ "key": "vir",
+ "name": "VIRginia International Raceway",
+ "layout": "Full course (3.27 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 36.5682,
+  "lon": -79.2061,
+  "radius_m": 2500
+ },
+ "official": {
+  "length_m": 5263
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

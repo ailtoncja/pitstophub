@@ -1,0 +1,11 @@
+{
+ "key": "mandalika",
+ "name": "Pertamina Mandalika International Circuit",
+ "layout": "Circuito completo",
+ "venue": {"lat": -8.8970, "lon": 116.3045, "radius_m": 2000},
+ "official": {"length_m": 4310},
+ "select": {"mode": "cycle"},
+ "extract": {},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

@@ -1,0 +1,9 @@
+{
+ "key": "north-wilkesboro",
+ "name": "North Wilkesboro Speedway",
+ "layout": "Oval",
+ "venue": {"lat": 36.1418, "lon": -81.0703, "radius_m": 700},
+ "official": {"length_m": 1006},
+ "select": {"mode": "cycle"},
+ "render": {"rotate_deg": 0}
+}

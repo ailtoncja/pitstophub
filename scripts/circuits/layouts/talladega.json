@@ -1,0 +1,22 @@
+{
+ "key": "talladega",
+ "name": "Talladega Superspeedway",
+ "layout": "Tri-oval (2.66 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 33.568,
+  "lon": -86.065,
+  "radius_m": 1800
+ },
+ "official": {
+  "length_m": 4281
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {},
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

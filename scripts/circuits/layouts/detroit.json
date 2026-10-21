@@ -1,0 +1,11 @@
+{
+ "key": "detroit",
+ "name": "Detroit Street Circuit",
+ "layout": "Street circuit (downtown)",
+ "venue": {"lat": 42.3300, "lon": -83.0400, "radius_m": 1200},
+ "official": {"length_m": 2647},
+ "select": {"mode": "cycle", "relations": [17665938]},
+ "extract": {"mode": "mask", "max_lum": 0.5, "min_alpha": 0.5, "close": 3},
+ "render": {"rotate_deg": -31.1},
+ "status": "draft"
+}

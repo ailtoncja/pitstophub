@@ -1,0 +1,40 @@
+{
+ "key": "daytona-oval",
+ "name": "Daytona International Speedway",
+ "layout": "Tri-oval (2.5 mi)",
+ "used_by": [],
+ "venue": {
+  "lat": 29.1852,
+  "lon": -81.0705,
+  "radius_m": 1600
+ },
+ "official": {
+  "length_m": 4023
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   11371365,
+   352067004,
+   352070311,
+   352070309,
+   352070316
+  ],
+  "relations": [
+   5254137
+  ]
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "close": 2
+ },
+ "render": {
+  "rotate_deg": 125.6
+ },
+ "status": "draft",
+ "verify": {
+  "symmetric": true,
+  "notes": "Tri-oval mirror-symmetric about the axis through the start/finish apex: the mirrored fit scores the same (0.74%), so the mirror check cannot discriminate; the shape match itself is the check."
+ }
+}

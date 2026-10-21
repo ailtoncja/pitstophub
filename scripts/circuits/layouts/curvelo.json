@@ -1,0 +1,20 @@
+{
+ "key": "curvelo",
+ "name": "Circuito dos Cristais (Curvelo)",
+ "layout": "",
+ "venue": {
+  "lat": -18.806,
+  "lon": -44.409,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3000
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "draft"
+}

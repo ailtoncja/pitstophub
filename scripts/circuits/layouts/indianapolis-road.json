@@ -1,0 +1,44 @@
+{
+ "key": "indianapolis-road",
+ "name": "Indianapolis Motor Speedway",
+ "layout": "Road course (2.439 mi, 14 turns)",
+ "used_by": [],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Indianapolis",
+ "venue": {
+  "lat": 39.795,
+  "lon": -86.2347,
+  "radius_m": 1800
+ },
+ "official": {
+  "length_m": 3925,
+  "length_source": "https://www.indycar.com/Schedule/2026/Indianapolis (Track Length 2.439 Miles)",
+  "alt_lengths": [],
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/Indianapolis-RC.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/Indianapolis",
+  "map_publisher": "INDYCAR"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   1213055866,
+   1213055864,
+   297115178,
+   588780307,
+   992135043,
+   588780271,
+   1213055867
+  ]
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": 89.2
+ },
+ "status": "published",
+ "notes": "",
+ "venue_key": "indianapolis"
+}

@@ -1,0 +1,11 @@
+{
+ "key": "paul-ricard",
+ "name": "Circuit Paul Ricard",
+ "layout": "x",
+ "venue": {"lat": 43.2525, "lon": 5.7943, "radius_m": 2200},
+ "official": {"length_m": 5791},
+ "select": {"mode": "cycle"},
+ "extract": {},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

@@ -1,0 +1,10 @@
+{
+ "key": "barber",
+ "name": "Barber Motorsports Park",
+ "layout": "Road course",
+ "venue": {"lat": 33.5326, "lon": -86.6194, "radius_m": 1500},
+ "official": {"length_m": 3830, "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/BarberMotorsportsPark.png", "map_page": "https://www.indycar.com/Schedule/2026/Barber"},
+ "select": {"mode": "cycle"},
+ "extract": {"mode": "mask", "max_lum": 0.5, "min_alpha": 0.5, "close": 3},
+ "render": {"rotate_deg": -44.7}
+}

@@ -1,0 +1,11 @@
+{
+ "key": "norisring",
+ "name": "Norisring",
+ "layout": "Circuito de rua",
+ "venue": {"lat": 49.4310, "lon": 11.1220, "radius_m": 1000},
+ 
+ "official": {"length_m": 2300},
+ "select": {"mode": "cycle"},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

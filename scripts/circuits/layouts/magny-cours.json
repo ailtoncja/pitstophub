@@ -1,0 +1,11 @@
+{
+ "key": "magny-cours",
+ "name": "Circuit de Nevers Magny-Cours",
+ "layout": "Grand Prix",
+ "venue": {"lat": 46.8642, "lon": 3.1636, "radius_m": 1500},
+ "official": {"length_m": 4411},
+ "select": {"mode": "cycle"},
+ "extract": {},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

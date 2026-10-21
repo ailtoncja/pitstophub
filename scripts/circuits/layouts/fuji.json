@@ -1,0 +1,11 @@
+{
+ "key": "fuji",
+ "name": "Fuji Speedway",
+ "layout": "Circuito completo",
+ "venue": {"lat": 35.3715, "lon": 138.9290, "radius_m": 1500},
+ "official": {"length_m": 4563},
+ "select": {"mode": "cycle"},
+ "extract": {},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}

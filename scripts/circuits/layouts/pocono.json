@@ -1,0 +1,26 @@
+{
+ "key": "pocono",
+ "name": "Pocono Raceway",
+ "layout": "Oval",
+ "venue": {
+  "lat": 41.05532,
+  "lon": -75.50904,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 4023
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   109767460
+  ]
+ },
+ "render": {
+  "rotate_deg": 21.9
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5
+ }
+}

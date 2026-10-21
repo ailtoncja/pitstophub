@@ -1,0 +1,23 @@
+{
+ "key": "richmond",
+ "name": "Richmond Raceway",
+ "layout": "Oval",
+ "venue": {
+  "lat": 37.5925,
+  "lon": -77.4196,
+  "radius_m": 800
+ },
+ "official": {
+  "length_m": 1207
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5
+ }
+}

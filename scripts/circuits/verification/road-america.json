@@ -1,0 +1,37 @@
+{
+ "key": "road-america",
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/RoadAmerica.png",
+ "official_map_page": "https://www.indycar.com/Schedule/2026/Road-America",
+ "official_length_m": 6460,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/Road-America (Track Length 4.014 Miles)",
+ "alt_lengths": [],
+ "osm_length_m": 6437.9,
+ "length_error_pct": -0.34,
+ "osm_chamfer_pct": 0.88,
+ "osm_chamfer_m": 4.8,
+ "osm_p95_m": 9.9,
+ "osm_mirror_pct": 11.37,
+ "osm_aniso": 1.017,
+ "osm_rot_deg": -91.4,
+ "extract": {
+  "mode": "mask",
+  "n": 115948
+ },
+ "png_chamfer_pct": 0.9,
+ "png_mirror_pct": 11.42,
+ "png_aniso": 1.015,
+ "png_rot_deg": -91.4,
+ "mirror_ratio": 12.92,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": false
+ },
+ "pass": false
+}

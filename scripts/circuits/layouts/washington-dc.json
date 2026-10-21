@@ -1,0 +1,11 @@
+{
+ "key": "washington-dc",
+ "name": "Streets of Washington, D.C.",
+ "layout": "Street circuit",
+ "venue": {"lat": 38.8905, "lon": -77.0170, "radius_m": 1100},
+ "official": {"length_m": 2700},
+ "select": {"mode": "cycle", "streets": true},
+ "extract": {"mode": "mask", "max_lum": 0.5, "min_alpha": 0.5, "close": 3},
+ "render": {"rotate_deg": 0},
+ "status": "draft"
+}
