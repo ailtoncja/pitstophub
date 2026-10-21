@@ -70,6 +70,10 @@ export const PARAGUAY_2026: RallyInfo = {
     'ss19-21': { label: 'SS19/21', at: [290, 90], anchor: 'left' },
     'ss20': { label: 'SS20', at: [181, 154], anchor: 'left' },
   }),
+  mapNote: {
+    pt: 'SS4/8, SS10/14 e SS18/22: só largada e chegada; o traçado do mapa do organizador difere mais de 2% da distância oficial.',
+    en: "SS4/8, SS10/14 and SS18/22: start and finish only; the route on the organiser's map is more than 2% off the official distance.",
+  },
   sources: [
     { label: 'Itinerário oficial (v1)', url: 'https://webassets.redbull.com/media/r8TgPyrsRmdqyJWdNYQiE8/WRC/WRC%20events%202026/itinerary-paraguay-2026_1.pdf' },
     { label: 'Total de especiais e km', url: 'https://rallydelparaguay.com/wp-content/uploads/SUPPLEMENTARY-REGULATIONS-2026-10.6.2026.pdf' },

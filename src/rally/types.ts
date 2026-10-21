@@ -42,12 +42,22 @@ export type RallyMap = {
   height: number;
   /** Terra (poligonos de costa do OSM); vazio = so fundo de terra. */
   land: string;
-  /** 'route' = tracado oficial; 'points' = so largada/chegada. */
+  /**
+   * 'route' = tracado oficial (especiais cujo tracado nao confere com a distancia oficial ficam so com
+   * largada/chegada, sem `path`, e a nota do mapa cita quais); 'points' = so largada/chegada.
+   */
   geometry: 'route' | 'points';
   routes: RallyRoute[];
   servicePark: { x: number; y: number } | null;
   towns: { name: string; x: number; y: number }[];
   scaleBar: { km: number; px: number };
+  /** Lado do icone do parque de assistencia em que fica o texto "Assistencia" (padrao: abaixo). */
+  serviceLabel: 'below' | 'above';
+  /**
+   * Projecao equiretangular usada pelo gerador: x = (lon - lon0) * kx * pxPerDeg + width/2,
+   * y = (lat0 - lat) * pxPerDeg + height/2. O teste a usa para medir o que e desenhado em km reais.
+   */
+  projection: { lat0: number; lon0: number; kx: number; pxPerDeg: number };
   usesOsm: boolean;
 };
 

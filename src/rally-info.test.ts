@@ -72,8 +72,10 @@ describe('fichas de rali do WRC 2026', () => {
           if (!stage.routeId) expect(info.mapNote?.pt, `SS${stage.number} sem lugar no mapa`).toContain(`SS${stage.number} `);
           else expect(roads.has(stage.routeId), `SS${stage.number}`).toBe(true);
         }
+        // Mapa de tracados: ao menos um tracado; as especiais sem tracado sao conferidas em rally/maps.test.ts.
+        if (info.map.geometry === 'route') expect(info.map.routes.some((route) => route.path)).toBe(true);
+        else expect(info.map.routes.every((route) => !route.path)).toBe(true);
         for (const route of info.map.routes) {
-          if (info.map.geometry === 'route') expect(route.path, route.id).toBeTruthy();
           for (const [x, y] of [route.start, route.finish, route.labelAt]) {
             expect(x).toBeGreaterThanOrEqual(0);
             expect(x).toBeLessThanOrEqual(info.map.width);
