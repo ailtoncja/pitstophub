@@ -1,0 +1,29 @@
+{
+ "key": "sebring",
+ "official_map": null,
+ "official_map_page": null,
+ "official_length_m": 6019,
+ "official_length_source": null,
+ "alt_lengths": [],
+ "osm_length_m": 5865.6,
+ "length_error_pct": -2.55,
+ "osm_chamfer_pct": 1.26,
+ "osm_chamfer_m": 5.9,
+ "osm_p95_m": 17.7,
+ "osm_mirror_pct": 7.38,
+ "osm_aniso": 1.012,
+ "osm_rot_deg": 0.4,
+ "extract": {
+  "mode": "mask",
+  "n": 49532
+ },
+ "mirror_ratio": 5.86,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": false
+ },
+ "pass": false
+}

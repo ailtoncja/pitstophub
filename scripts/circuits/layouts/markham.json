@@ -1,0 +1,40 @@
+{
+ "key": "markham",
+ "name": "Streets of Markham",
+ "layout": "Street circuit",
+ "status": "skipped",
+ "used_by": [
+  "indy / markham (live r14-markham) / 2026-08-16"
+ ],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Markham",
+ "venue": {
+  "lat": 43.8545,
+  "lon": -79.3095,
+  "radius_m": 900
+ },
+ "official": {
+  "length_m": 3520,
+  "length_source": "https://www.indycar.com/Schedule/2026/Markham (\"12-turn, 3.52-kilometre (2.19-mile) layout\")",
+  "corners": 12,
+  "corners_source": "https://www.indycar.com/Schedule/2026/Markham",
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/Markham.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/Markham",
+  "map_publisher": "INDYCAR"
+ },
+ "select": {
+  "mode": "cycle",
+  "require_ways": [
+   1548558439
+  ]
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "notes": "SKIPPED (length only): OSM raceway way 1548558439 \"Streets of Markham\" matches the shape (1.33%, mirrored 14.9%, aniso 1.014) but is 3439 m, -2.31% vs the official 3.52 km."
+}

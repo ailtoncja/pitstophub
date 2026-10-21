@@ -1,0 +1,29 @@
+{
+ "key": "new-hampshire",
+ "official_map": "https://www.nhms.com/documents/nascar-cup-series-seating-chart.pdf",
+ "official_map_page": "https://www.nhms.com/fans/maps/",
+ "official_length_m": 1703,
+ "official_length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications; NOT confirmed for this track because the PDF returned 403 -- nominal figure) 1.058 mi",
+ "alt_lengths": [],
+ "osm_length_m": 1667.5,
+ "length_error_pct": -2.09,
+ "osm_chamfer_pct": 0.99,
+ "osm_chamfer_m": 2.5,
+ "osm_p95_m": 3.9,
+ "osm_mirror_pct": 0.99,
+ "osm_aniso": 1.029,
+ "osm_rot_deg": -71.1,
+ "extract": {
+  "mode": "mask",
+  "n": 32508
+ },
+ "mirror_ratio": 1.0,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": false
+ },
+ "pass": false
+}

@@ -1,0 +1,50 @@
+{
+ "key": "chicagoland",
+ "name": "Chicagoland Speedway",
+ "layout": "Oval",
+ "venue": {
+  "lat": 41.4748,
+  "lon": -88.0573,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 2414,
+  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications; NOT confirmed for this track because the PDF returned 403 -- nominal figure) 1.5 mi",
+  "map_url": "https://www.chicagolandspeedway.com/wp-content/uploads/sites/1031/2026/07/01/CLS-26-Facility-Map-Final-with-Info-booths.pdf",
+  "map_page": "https://www.chicagolandspeedway.com/maps/",
+  "map_publisher": "Chicagoland Speedway",
+  "map_file_note": "PDF rasterised and reduced to 3000 px wide"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   33119599
+  ]
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.15,
+  "max_sat": 0.3,
+  "crop": [
+   0.45,
+   0.15,
+   0.75,
+   0.7
+  ],
+  "close": 2,
+  "min_size": 500
+ },
+ "used_by": [
+  "nascar / chicagoland / 2026-07-05"
+ ],
+ "layout_source": "https://www.chicagolandspeedway.com/maps/",
+ "status": "skipped",
+ "notes": "OSM way 33119599 is 2468 m vs 1.5 mi (+2.24%): fails the 2% length rule. Shape 0.54% vs the 2026 facility map.",
+ "verify": {
+  "symmetric": true,
+  "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."
+ }
+}

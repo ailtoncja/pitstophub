@@ -1,0 +1,48 @@
+{
+ "key": "homestead",
+ "name": "Homestead-Miami Speedway",
+ "layout": "Oval",
+ "venue": {
+  "lat": 25.4519,
+  "lon": -80.4089,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 2414,
+  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf",
+  "map_url": "https://www.homesteadmiamispeedway.com/wp-content/uploads/sites/1038/2026/09/22/HMS-26-2387403-HMS-Map-Update-Tram-Route-1.pdf",
+  "map_page": "https://www.homesteadmiamispeedway.com/maps/",
+  "map_publisher": "Homestead-Miami Speedway",
+  "map_file_note": "cleaned copy of the official map (work/circuits2-scratch/B2/outer_ring.py): only the track band, as the outer edge of the filled band (inner edge for Richmond); the original is at map_url",
+  "length_source_note": "NASCAR Cup Series stage lengths and pit road speeds (January 2026), Track Length column; read 2026-10-21"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   108159182,
+   1146967011,
+   1146967010,
+   1146967009,
+   1146967012,
+   108159182
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "render": {
+  "rotate_deg": -179.9
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5
+ },
+ "used_by": [
+  "nascar / homestead / 2026-11-08 (Championship)"
+ ],
+ "layout_source": "https://www.homesteadmiamispeedway.com/maps/",
+ "status": "published",
+ "notes": "Oval ways named \"Homestead-Miami Speedway\" (infield road course and access roads excluded). The official map is drawn with north down, hence rot ~180.",
+ "verify": {
+  "symmetric": true,
+  "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."
+ }
+}

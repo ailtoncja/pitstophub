@@ -1,0 +1,37 @@
+{
+ "key": "portland",
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackMaps/Portland_TrackMap.jpg",
+ "official_map_page": "https://www.indycar.com/Schedule/2026/Portland",
+ "official_length_m": 3166,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/Portland (Track Length 1.967 Miles)",
+ "alt_lengths": [],
+ "osm_length_m": 3159.0,
+ "length_error_pct": -0.22,
+ "osm_chamfer_pct": 10.82,
+ "osm_chamfer_m": 45.0,
+ "osm_p95_m": 156.4,
+ "osm_mirror_pct": 14.25,
+ "osm_aniso": 1.29,
+ "osm_rot_deg": 16.3,
+ "extract": {
+  "mode": "mask",
+  "n": 16356
+ },
+ "png_chamfer_pct": 10.83,
+ "png_mirror_pct": 14.34,
+ "png_aniso": 1.278,
+ "png_rot_deg": 15.7,
+ "mirror_ratio": 1.32,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": false,
+  "not_mirrored": false,
+  "not_distorted": false,
+  "length": true,
+  "png_shape": false,
+  "png_not_mirrored": false,
+  "png_not_distorted": false,
+  "png_orientation": false
+ },
+ "pass": false
+}

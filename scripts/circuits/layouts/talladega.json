@@ -1,0 +1,55 @@
+{
+ "key": "talladega",
+ "name": "Talladega Superspeedway",
+ "layout": "Oval (tri-oval, 2.66 mi)",
+ "used_by": [
+  "nascar / talladega1 / 2026-04-26",
+  "nascar / talladega2 / 2026-10-25"
+ ],
+ "layout_source": "https://www.talladegasuperspeedway.com/track-facts/",
+ "status": "published",
+ "venue": {
+  "lat": 33.568,
+  "lon": -86.065,
+  "radius_m": 1800
+ },
+ "official": {
+  "length_m": 4281,
+  "length_source": "https://www.talladegasuperspeedway.com/track-facts/ (\"TRACK LENGTH 2.66 Miles, TRACK TYPE Tri-Oval, BANKING 16.5 - 33 Degrees\")",
+  "map_url": "https://www.talladegasuperspeedway.com/wp-content/uploads/sites/1030/2024/09/19/TSS-24-1031389-Talladega-Hauler-Parade-Map.pdf",
+  "map_page": "https://www.talladegasuperspeedway.com/maps/",
+  "map_publisher": "Talladega Superspeedway",
+  "map_file_note": "official/talladega.png = filled vector path #228 (track band) of the official hauler-parade map PDF redrawn black on white, geometry unchanged"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   8835825,
+   532106116,
+   426163859,
+   426163860,
+   8835825
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5
+ },
+ "verify": {
+  "symmetric": true,
+  "notes": "Tri-oval mirror-symmetric about the axis through the start/finish apex: mirrored fit 1.07% vs 1.05%, the mirror check cannot discriminate.",
+  "scores": {
+   "osm_chamfer_pct": 1.06,
+   "osm_mirror_pct": 1.09,
+   "osm_aniso": 1.034,
+   "length_error_pct": 0.65,
+   "png_chamfer_pct": 1.08,
+   "png_rot_deg": 0.0,
+   "pass": true
+  }
+ },
+ "render": {
+  "rotate_deg": 90.2
+ }
+}

@@ -6,7 +6,7 @@ import { RaceChangeNote } from '../components/RaceChangeNote';
 import { RaceSpotlight } from '../components/RaceSpotlight';
 import { useToast } from '../components/Toast';
 import { Button, EmptyState, FactList, ListGroup, SectionTitle, Skeleton } from '../components/ui';
-import { getRaceCircuitInfo } from '../circuit-info';
+import { getRaceCircuitInfo, type CircuitInfo } from '../circuit-info';
 import { findCategoryDriver } from '../lib/entities';
 import { useRaceResults } from '../lib/f1-hooks';
 import { hasStartTime, raceTitle, timeOf, timeZoneLabel, weekdayShort } from '../lib/format';
@@ -62,7 +62,8 @@ export default function RacePage() {
   // Etapa cancelada -> substituta(s); substituta -> cancelada(s). Os pares ficam no catalogo.
   const change = useMemo(() => (race ? raceChange(catalog, race) : null), [catalog, race]);
 
-  const info = useMemo(() => (race ? getRaceCircuitInfo(race) : null), [race]);
+  // Com a categoria: o tracado certo do lugar (oval x misto) e os dados do GP so na F1.
+  const info = useMemo(() => (race ? getRaceCircuitInfo(race, category?.id) : null), [race, category?.id]);
   const results = useRaceResults(category, race);
   const highlights = useMemo(() => (results.data ? raceHighlights(results.data) : null), [results.data]);
 
@@ -100,6 +101,7 @@ export default function RacePage() {
   // Etapa cancelada nao tem numero de rodada (o aviso "Etapa cancelada" ja esta no destaque acima).
   const stageLabel = !cancelled && round > 0 ? t('cir.stage', { n: round }) : null;
   const numberFormat = lang === 'pt' ? 'pt-BR' : 'en-US';
+  const facts = info ? circuitFacts(info, t, numberFormat) : [];
 
   const saveToCalendar = () => {
     downloadIcs(`pitstophub-${category.id}-${race.id}.ics`, buildIcs([{ category, race }], lang));
@@ -149,7 +151,7 @@ export default function RacePage() {
 
         <div className="flex items-center gap-x-4 gap-y-2 flex-wrap justify-between">
           <p className="type-body-md text-silver">
-            {[stageLabel, info ? t('cir.laps', { n: info.laps }) : null, info ? (info.direction === 'clockwise' ? t('cir.clockwise') : t('cir.counterclockwise')) : null].filter(Boolean).join(' · ')}
+            {[stageLabel, info?.laps != null ? t('cir.laps', { n: info.laps }) : null, info?.direction ? (info.direction === 'clockwise' ? t('cir.clockwise') : t('cir.counterclockwise')) : null].filter(Boolean).join(' · ')}
           </p>
           <div className="flex items-center gap-2">
             {upcoming && (
@@ -177,31 +179,26 @@ export default function RacePage() {
             <section className="space-y-3">
               <SectionTitle>{t('cir.layout')}</SectionTitle>
               {info.trackImage && (
-                <div className="relative rounded-2xl bg-asphalt border border-hairline overflow-hidden aspect-[16/10] flex items-center justify-center">
-                  <img src={info.trackImage} alt={race.circuit} className="w-full h-full object-contain p-4" loading="lazy" />
-                </div>
+                <figure className="space-y-2">
+                  <div className="relative rounded-2xl bg-asphalt border border-hairline overflow-hidden aspect-[16/10] flex items-center justify-center">
+                    <img src={info.trackImage} alt={race.circuit} className="w-full h-full object-contain p-4" loading="lazy" />
+                  </div>
+                  {info.osm && (
+                    <figcaption className="type-label-telemetry text-silver-dim text-right">
+                      <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" className="hover:text-white underline-offset-2 hover:underline">
+                        {t('cir.osmCredit')}
+                      </a>
+                    </figcaption>
+                  )}
+                </figure>
               )}
-              <FactList
-                items={[
-                  { label: t('cir.length'), value: `${info.lengthKm.toLocaleString(numberFormat, { minimumFractionDigits: 3 })} km` },
-                  { label: t('cir.corners'), value: String(info.corners) },
-                  { label: t('cir.distance'), value: `${info.raceDistanceKm.toLocaleString(numberFormat, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} km` },
-                  {
-                    label: t('cir.record'),
-                    value: info.lapRecord ? `${info.lapRecord.time} · ${info.lapRecord.driver} (${info.lapRecord.year})` : t('cir.noRecord'),
-                  },
-                  { label: t('cir.firstGp'), value: String(info.firstGrandPrix) },
-                  ...(info.straightModeZones != null
-                    ? [{ label: t('cir.straightMode'), value: String(info.straightModeZones) }]
-                    : []),
-                ]}
-              />
+              {facts.length > 0 && <FactList items={facts} />}
             </section>
           )}
 
-          {info && (
+          {info && (info.brakingZones?.length || info.tyreStrategyNote) && (
             <section className="space-y-4">
-              {info.brakingZones.length > 0 && (
+              {info.brakingZones && info.brakingZones.length > 0 && (
                 <>
                   <SectionTitle>{t('cir.braking')}</SectionTitle>
                   <ListGroup>
@@ -217,10 +214,12 @@ export default function RacePage() {
                   </ListGroup>
                 </>
               )}
-              <div className="space-y-2">
-                <h3 className="type-headline-sm text-white">{t('cir.tyres')}</h3>
-                <p className="type-body-md text-silver max-w-[68ch]">{lang === 'en' ? info.tyreStrategyNote.en : info.tyreStrategyNote.pt}</p>
-              </div>
+              {info.tyreStrategyNote && (
+                <div className="space-y-2">
+                  <h3 className="type-headline-sm text-white">{t('cir.tyres')}</h3>
+                  <p className="type-body-md text-silver max-w-[68ch]">{lang === 'en' ? info.tyreStrategyNote.en : info.tyreStrategyNote.pt}</p>
+                </div>
+              )}
             </section>
           )}
 
@@ -296,6 +295,23 @@ export default function RacePage() {
       </div>
     </div>
   );
+}
+
+// So os dados que a ficha tem: fora da F1 (e nos circuitos desenhados) nao ha voltas, recorde etc.
+function circuitFacts(info: CircuitInfo, t: ReturnType<typeof useT>['t'], numberFormat: string) {
+  const items: { label: string; value: string }[] = [];
+  if (info.lengthKm != null) items.push({ label: t('cir.length'), value: `${info.lengthKm.toLocaleString(numberFormat, { minimumFractionDigits: 3 })} km` });
+  if (info.corners != null) items.push({ label: t('cir.corners'), value: String(info.corners) });
+  if (info.raceDistanceKm != null) {
+    items.push({ label: t('cir.distance'), value: `${info.raceDistanceKm.toLocaleString(numberFormat, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} km` });
+  }
+  // A ficha do GP sempre diz o recorde (ou que a pista ainda nao tem um).
+  if (info.laps != null) {
+    items.push({ label: t('cir.record'), value: info.lapRecord ? `${info.lapRecord.time} · ${info.lapRecord.driver} (${info.lapRecord.year})` : t('cir.noRecord') });
+  }
+  if (info.firstGrandPrix != null) items.push({ label: t('cir.firstGp'), value: String(info.firstGrandPrix) });
+  if (info.straightModeZones != null) items.push({ label: t('cir.straightMode'), value: String(info.straightModeZones) });
+  return items;
 }
 
 function WeatherList({ weather }: { weather: RaceWeather }) {

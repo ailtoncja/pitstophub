@@ -1,0 +1,31 @@
+{
+ "key": "cuiaba",
+ "name": "Autódromo Internacional de Mato Grosso (Cuiabá)",
+ "layout": "",
+ "venue": {
+  "lat": -15.4522,
+  "lon": -56.0828,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 4488,
+  "length_source": "https://www.cba.org.br/circuitos (\"Autódromo Mato Grosso\" Extensão 4.488m); 4,450 m in press",
+  "alt_lengths": [
+   {
+    "length_m": 4450,
+    "source": "press / Wikipedia"
+   }
+  ]
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "skipped",
+ "used_by": [
+  "nascar-brasil / r05-cuiaba / 2026-08-02"
+ ],
+ "notes": "Skipped: no independent official track map found (circuit and series sites unreachable or without a map)."
+}

@@ -1,0 +1,43 @@
+{
+ "key": "barber",
+ "name": "Barber Motorsports Park",
+ "layout": "Road course (2.3 mi, 17 turns)",
+ "status": "published",
+ "used_by": [
+  "indy / barber (r04-barber) / 2026-03-29",
+  "gtwc-america / barber-motorsports-park / 2026-09-27"
+ ],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Barber",
+ "venue": {
+  "lat": 33.5326,
+  "lon": -86.6194,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3701,
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/BarberMotorsportsPark.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/Barber",
+  "length_source": "https://www.indycar.com/Schedule/2026/Barber (Track Length 2.3 Miles)",
+  "alt_lengths": [],
+  "map_publisher": "INDYCAR",
+  "corners": 17,
+  "corners_source": "https://www.indycar.com/Schedule/2026/Barber (\"17 turns\")"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   237456804
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": -44.7
+ },
+ "notes": "Barber has a single road course. GT World Challenge America (gt-world-challenge-america.com/event/116) lists \"2.283m, 15 turns\" for its round; not used as a length source. The earlier 3830 m figure had no official source and was dropped."
+}

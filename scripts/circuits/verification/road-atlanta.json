@@ -1,0 +1,29 @@
+{
+ "key": "road-atlanta",
+ "official_map": null,
+ "official_map_page": null,
+ "official_length_m": 4088,
+ "official_length_source": null,
+ "alt_lengths": [],
+ "osm_length_m": 4090.0,
+ "length_error_pct": 0.05,
+ "osm_chamfer_pct": 12.11,
+ "osm_chamfer_m": 67.7,
+ "osm_p95_m": 141.0,
+ "osm_mirror_pct": 14.76,
+ "osm_aniso": 1.621,
+ "osm_rot_deg": 82.9,
+ "extract": {
+  "mode": "mask",
+  "n": 3483
+ },
+ "mirror_ratio": 1.22,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": false,
+  "not_mirrored": false,
+  "not_distorted": false,
+  "length": true
+ },
+ "pass": false
+}

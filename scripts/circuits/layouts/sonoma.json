@@ -1,0 +1,29 @@
+{
+ "key": "sonoma",
+ "name": "Sonoma Raceway",
+ "layout": "NASCAR course",
+ "status": "skipped",
+ "used_by": [
+  "nascar / sonoma (r18-sonoma) / 2026-06-28"
+ ],
+ "layout_source": "https://www.jayski.com/2026/06/24/statistical-advance-analyzing-the-toyota-save-mart-350-10/ (1.99-mile, 12 turns)",
+ "venue": {
+  "lat": 38.1611,
+  "lon": -122.4547,
+  "radius_m": 1800
+ },
+ "venue_key": "sonoma",
+ "official": {
+  "length_m": 3203
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "notes": "SKIPPED (no flat official map): the 2026 NASCAR event maps on sonomaraceway.com/fans/maps/ are oblique 3D views. OSM lap (Chute layout) 3202 m vs 1.99 mi 3203 m."
+}

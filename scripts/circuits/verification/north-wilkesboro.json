@@ -1,0 +1,29 @@
+{
+ "key": "north-wilkesboro",
+ "official_map": "https://www.northwilkesborospeedway.com/documents/nws-map-seating.pdf",
+ "official_map_page": "https://www.northwilkesborospeedway.com/events/maps/",
+ "official_length_m": 1006,
+ "official_length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications; NOT confirmed for this track because the PDF returned 403 -- nominal figure) 0.625 mi",
+ "alt_lengths": [],
+ "osm_length_m": 844.9,
+ "length_error_pct": -16.02,
+ "osm_chamfer_pct": 0.7,
+ "osm_chamfer_m": 0.9,
+ "osm_p95_m": 2.0,
+ "osm_mirror_pct": 0.77,
+ "osm_aniso": 1.007,
+ "osm_rot_deg": 88.1,
+ "extract": {
+  "mode": "mask",
+  "n": 145297
+ },
+ "mirror_ratio": 1.1,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": false
+ },
+ "pass": false
+}

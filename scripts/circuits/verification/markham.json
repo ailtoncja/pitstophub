@@ -1,0 +1,29 @@
+{
+ "key": "markham",
+ "official_map": null,
+ "official_map_page": null,
+ "official_length_m": 3520,
+ "official_length_source": null,
+ "alt_lengths": [],
+ "osm_length_m": 3438.7,
+ "length_error_pct": -2.31,
+ "osm_chamfer_pct": 1.33,
+ "osm_chamfer_m": 4.3,
+ "osm_p95_m": 10.8,
+ "osm_mirror_pct": 14.9,
+ "osm_aniso": 1.014,
+ "osm_rot_deg": -0.5,
+ "extract": {
+  "mode": "mask",
+  "n": 69311
+ },
+ "mirror_ratio": 11.2,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": false
+ },
+ "pass": false
+}

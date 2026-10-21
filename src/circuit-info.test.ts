@@ -89,13 +89,12 @@ describe('outras pistas', () => {
     expect(info?.lapRecord).toEqual({ time: '1:35.587', driver: 'G. Russell (Mercedes)', year: 2026 });
   });
 
-  it('toda etapa da F1 2026 tem ficha com mapa, exceto Jeddah', () => {
+  it('toda etapa da F1 2026 tem ficha com mapa', () => {
     const f1 = category('f1');
     for (const r of f1.calendar) {
-      if (r.id === 'saudi') continue;
       expect(hasCircuitPage(f1, r), r.id).toBe(true);
       const img = getRaceCircuitInfo(r)?.trackImage ?? '';
-      expect(img, r.id).toMatch(/^\/circuits\/\w+\.png$/);
+      expect(img, r.id).toMatch(/^\/circuits\/[\w-]+\.png$/);
       expect(existsSync(`public${img}`), img).toBe(true);
     }
   });

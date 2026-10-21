@@ -1,0 +1,29 @@
+{
+ "key": "darlington",
+ "official_map": null,
+ "official_map_page": null,
+ "official_length_m": 2198,
+ "official_length_source": null,
+ "alt_lengths": [],
+ "osm_length_m": 2102.9,
+ "length_error_pct": -4.33,
+ "osm_chamfer_pct": 0.61,
+ "osm_chamfer_m": 2.0,
+ "osm_p95_m": 3.2,
+ "osm_mirror_pct": 0.62,
+ "osm_aniso": 1.013,
+ "osm_rot_deg": 6.5,
+ "extract": {
+  "mode": "mask",
+  "n": 12919
+ },
+ "mirror_ratio": 1.02,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": false,
+  "not_distorted": true,
+  "length": false
+ },
+ "pass": false
+}

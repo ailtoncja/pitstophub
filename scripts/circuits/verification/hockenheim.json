@@ -1,0 +1,37 @@
+{
+ "key": "hockenheim",
+ "official_map": "https://www.hockenheimring.de/wp-content/uploads/2025/06/hockenheimring-circuit-white.svg",
+ "official_map_page": "https://www.hockenheimring.de/",
+ "official_length_m": 4574,
+ "official_length_source": "https://www.hockenheimring.de/infos/hockenheimring/daten-fakten/ (Grand-Prix-Kurs, Streckenlänge 4,574 km)",
+ "alt_lengths": [],
+ "osm_length_m": 4564.7,
+ "length_error_pct": -0.2,
+ "osm_chamfer_pct": 1.54,
+ "osm_chamfer_m": 7.5,
+ "osm_p95_m": 21.8,
+ "osm_mirror_pct": 11.82,
+ "osm_aniso": 1.033,
+ "osm_rot_deg": -9.6,
+ "extract": {
+  "mode": "mask",
+  "n": 201081
+ },
+ "png_chamfer_pct": 1.56,
+ "png_mirror_pct": 11.67,
+ "png_aniso": 1.03,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 7.68,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

@@ -11,3 +11,6 @@ coverage/
 supabase/.temp/
 
 .vercel
+
+scripts/circuits/.cache/
+__pycache__/

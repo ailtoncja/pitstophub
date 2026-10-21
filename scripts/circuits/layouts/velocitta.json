@@ -1,0 +1,34 @@
+{
+ "key": "velocitta",
+ "name": "Autódromo Velocittà",
+ "layout": "Circuito completo",
+ "venue": {
+  "lat": -22.2893,
+  "lon": -46.8487,
+  "radius_m": 1000
+ },
+ "official": {
+  "length_m": 3493,
+  "length_source": "https://www.autodromovelocitta.com.br/automobilismo (\"original 3.493m e 14 curvas; competição 3.443m e 12 curvas\"); CBA 3.493 m anti-horário",
+  "alt_lengths": [
+   {
+    "length_m": 3443,
+    "source": "https://www.autodromovelocitta.com.br/automobilismo (traçado competição)"
+   }
+  ],
+  "direction": "counterclockwise",
+  "direction_source": "https://www.cba.org.br/circuitos"
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "skipped",
+ "used_by": [
+  "nascar-brasil / r04-velocitta / 2026-06-28",
+  "porsche-cup / r02-velocitta / 2026-03-29"
+ ],
+ "notes": "Skipped: the circuit publishes no track map; two layouts exist (original 3,493 m / competição 3,443 m, the latter used by Stock Car 2026) and the one used by NASCAR Brasil / Porsche Cup 2026 is not confirmed. OSM lap = original (3,491 m)."
+}

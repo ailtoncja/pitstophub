@@ -1,0 +1,42 @@
+{
+ "key": "sachsenring",
+ "official_map": "https://photos.motogp.com/events-admin/5/c/5cab1166-44c1-45ad-bc30-96d910170097/info/ger2-info.svg",
+ "official_map_page": "https://www.motogp.com/de/calendar/2025/event/germany/965332bd-0229-4c71-8cc4-24dac546bc97",
+ "official_length_m": 3645,
+ "official_length_source": "https://www.sportpresseportal.de/media/pcLkQV/48330/download (DTM 2026 keyfacts: Streckenlänge 3.645 Meter)",
+ "alt_lengths": [
+  {
+   "length_m": 3670,
+   "source": "https://www.motogp.com/de/calendar/2025/event/germany/965332bd-0229-4c71-8cc4-24dac546bc97 (MotoGP: Gesamtlänge 3,67 km)"
+  }
+ ],
+ "osm_length_m": 3649.0,
+ "length_error_pct": 0.11,
+ "osm_chamfer_pct": 0.68,
+ "osm_chamfer_m": 2.2,
+ "osm_p95_m": 4.4,
+ "osm_mirror_pct": 8.8,
+ "osm_aniso": 1.006,
+ "osm_rot_deg": -34.8,
+ "extract": {
+  "mode": "mask",
+  "n": 63796
+ },
+ "png_chamfer_pct": 0.71,
+ "png_mirror_pct": 8.7,
+ "png_aniso": 1.005,
+ "png_rot_deg": 0.0,
+ "mirror_ratio": 12.94,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

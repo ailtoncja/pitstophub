@@ -1,0 +1,45 @@
+{
+ "key": "nashville-superspeedway",
+ "name": "Nashville Superspeedway",
+ "layout": "Oval (1.33 mi)",
+ "status": "published",
+ "used_by": [
+  "indy / nashville (r12-nashville) / 2026-07-20",
+  "nascar / nashville-nascar (r14-nashville) / 2026-05-31"
+ ],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Nashville",
+ "venue": {
+  "lat": 36.0446,
+  "lon": -86.411,
+  "radius_m": 1300
+ },
+ "official": {
+  "length_m": 2140,
+  "length_source": "https://www.indycar.com/Schedule/2026/Nashville (Track Length 1.33 Miles)",
+  "alt_lengths": [],
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/NashvilleSuperSpeedway.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/Nashville",
+  "map_publisher": "INDYCAR"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   185563917
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "verify": {
+  "symmetric": true,
+  "notes": "D-shaped oval: symmetric about the axis through the middle of the back straight, so the mirrored fit equals the direct one."
+ },
+ "render": {
+  "rotate_deg": 99.6
+ },
+ "notes": "INDYCAR 2026 Nashville round is on Nashville Superspeedway (Lebanon, TN): \"The 1.33-mile, D-shaped concrete oval\"."
+}

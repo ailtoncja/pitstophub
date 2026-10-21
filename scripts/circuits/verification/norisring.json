@@ -1,0 +1,29 @@
+{
+ "key": "norisring",
+ "official_map": "https://res.cloudinary.com/dmwcbhehi/image/upload/v1779962608/PSCCD_2026_Track_Map_Norisring_ENG_gt0wyv.webp",
+ "official_map_page": "https://racing.porsche.com/events/pccd-06-norisring-2026",
+ "official_length_m": 2162,
+ "official_length_source": "https://www.sportpresseportal.de/media/Pkqh7i/47127/download (DTM 2026 keyfacts Norisring, per search summary: 2.162 Meter) and https://racing.porsche.com/events/pccd-06-norisring-2026 (Length 2.162 m)",
+ "alt_lengths": [],
+ "osm_length_m": 2247.6,
+ "length_error_pct": 3.96,
+ "osm_chamfer_pct": 2.16,
+ "osm_chamfer_m": 6.6,
+ "osm_p95_m": 12.9,
+ "osm_mirror_pct": 7.23,
+ "osm_aniso": 1.143,
+ "osm_rot_deg": 11.5,
+ "extract": {
+  "mode": "mask",
+  "n": 19043
+ },
+ "mirror_ratio": 3.35,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": false,
+  "not_mirrored": true,
+  "not_distorted": false,
+  "length": false
+ },
+ "pass": false
+}

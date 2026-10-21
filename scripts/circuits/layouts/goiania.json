@@ -1,0 +1,47 @@
+{
+ "key": "goiania",
+ "name": "Autódromo Internacional Ayrton Senna (Goiânia)",
+ "layout": "Circuito reformado (traçado MotoGP 2026)",
+ "venue": {
+  "lat": -16.7186,
+  "lon": -49.1924,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3835,
+  "length_source": "https://www.motogp.com/en/calendar/2026/event/brazil/11588b5a-f76c-4c8e-ae06-acba82ff1303",
+  "map_url": "https://photos.motogp.com/events-admin/5/0/50941f7f-e112-4404-8dcf-5fb2c47e9617/info/bra2-info.svg",
+  "map_page": "https://www.motogp.com/en/calendar/2026/event/brazil/11588b5a-f76c-4c8e-ae06-acba82ff1303",
+  "map_publisher": "MotoGP (Dorna), rendered from SVG to PNG"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   288004307,
+   288004311,
+   288004307
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "render": {
+  "rotate_deg": 46.0
+ },
+ "status": "published",
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   160,
+   160,
+   160
+  ],
+  "tol": 30,
+  "close": 3
+ },
+ "used_by": [
+  "endurance-brasil / etapa-8-tres-horas-de-goiania / 2026-11-21"
+ ],
+ "layout_source": "https://www.motogp.com/en/calendar/2026/event/brazil/11588b5a-f76c-4c8e-ae06-acba82ff1303",
+ "verify": {
+  "notes": "MotoGP 2026 map of the reformed circuit. Small local deviation around T11-T12 (p95 9.9 m). Endurance BR etapa 8 assumed on the full reformed circuit (only layout raced since the 2026 reform)."
+ }
+}

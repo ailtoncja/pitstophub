@@ -1,0 +1,56 @@
+{
+ "key": "norisring",
+ "name": "Norisring",
+ "layout": "Circuito de rua (2,162 km)",
+ "used_by": [
+  "dtm / norisring (r04-norisring) / 2026-07-05"
+ ],
+ "layout_source": "https://racing.porsche.com/events/pccd-06-norisring-2026",
+ "venue": {
+  "lat": 49.431,
+  "lon": 11.122,
+  "radius_m": 1000
+ },
+ "official": {
+  "length_m": 2162,
+  "length_source": "https://www.sportpresseportal.de/media/Pkqh7i/47127/download (DTM 2026 keyfacts Norisring, per search summary: 2.162 Meter) and https://racing.porsche.com/events/pccd-06-norisring-2026 (Length 2.162 m)",
+  "corners": 4,
+  "corners_source": "https://www.sportpresseportal.de/media/Pkqh7i/47127/download (vier Kurven: eine Rechts-, drei Linkskurven) -- not re-read from the PDF; the PCCD 2026 map numbers 5 turns",
+  "direction": "counterclockwise",
+  "direction_source": "https://www.sportpresseportal.de/media/Pkqh7i/47127/download (gegen den Uhrzeigersinn) -- not re-read from the PDF",
+  "map_url": "https://res.cloudinary.com/dmwcbhehi/image/upload/v1779962608/PSCCD_2026_Track_Map_Norisring_ENG_gt0wyv.webp",
+  "map_page": "https://racing.porsche.com/events/pccd-06-norisring-2026",
+  "map_publisher": "Porsche Motorsport (Porsche Carrera Cup Deutschland 2026)",
+  "map_file": "norisring.png"
+ },
+ "select": {
+  "mode": "cycle",
+  "relations": [
+   1889538
+  ]
+ },
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   175,
+   175,
+   175
+  ],
+  "tol": 45,
+  "crop": [
+   0.33,
+   0.05,
+   1,
+   0.95
+  ],
+  "close": 2
+ },
+ "verify": {
+  "notes": "FAIL: OSM lap (circuit relation 1889538, public streets) is 2,248 m vs the official 2026 length 2,162 m (+4.0%); shape vs the PCCD 2026 map 2.16% with stretch 1.143. The only other official 2026 map (norisring.de Lageplan, https://norisring.de/wp-content/uploads/2026/05/Norisring-Lageplan-V2_ORGA-260519.pdf) is an oblique 3-D illustration, unusable for a shape check. Could not tell whether OSM shows an older/longer line at a hairpin or the PCCD map is schematic."
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "skipped",
+ "notes": "Skipped: no drawing published. Needs a to-scale official plan of the 2026 layout (or an OSM fix) before it can pass."
+}

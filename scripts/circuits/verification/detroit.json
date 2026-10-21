@@ -1,0 +1,37 @@
+{
+ "key": "detroit",
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/Detroit.png",
+ "official_map_page": "https://www.indycar.com/Schedule/2026/Detroit",
+ "official_length_m": 2647,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/Detroit (1.645-mile)",
+ "alt_lengths": [],
+ "osm_length_m": 2684.8,
+ "length_error_pct": 1.43,
+ "osm_chamfer_pct": 0.68,
+ "osm_chamfer_m": 2.4,
+ "osm_p95_m": 6.5,
+ "osm_mirror_pct": 8.98,
+ "osm_aniso": 1.023,
+ "osm_rot_deg": -31.1,
+ "extract": {
+  "mode": "mask",
+  "n": 52160
+ },
+ "png_chamfer_pct": 0.71,
+ "png_mirror_pct": 9.35,
+ "png_aniso": 1.021,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 13.21,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

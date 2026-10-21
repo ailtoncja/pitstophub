@@ -1,0 +1,28 @@
+{
+ "key": "chapeco",
+ "name": "Autódromo Internacional de Chapecó",
+ "layout": "Circuito principal (~4,0 km)",
+ "venue": {
+  "lat": -27.2207,
+  "lon": -52.7157,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 4004,
+  "length_source": "press (correiodoestado.com.br \"4.004 metros\"); no official circuit source found"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   1523801531
+  ]
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "skipped",
+ "notes": "Skipped: new circuit; no official track map found (circuit/series sites unreachable). OSM has it as leisure=track way 1523801531 (4,013 m, +0.22%), saved by hand to the cache. Event confirmed by the Copa Truck/NASCAR Brasil ticketing link \"etapa-8-chapeco\" on copatruck.com.br/calendario.",
+ "used_by": [
+  "nascar-brasil / r08-chapeco / 2026-11-01"
+ ]
+}

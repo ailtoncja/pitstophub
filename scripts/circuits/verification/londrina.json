@@ -1,0 +1,42 @@
+{
+ "key": "londrina",
+ "official_map": "https://superbike.com.br/wp-content/uploads/2023/01/londrina.png",
+ "official_map_page": "https://superbike.com.br/calendario-2026/",
+ "official_length_m": 3154,
+ "official_length_source": "https://www.cba.org.br/circuitos",
+ "alt_lengths": [
+  {
+   "length_m": 3055,
+   "source": "CBA (circuito alternativo)"
+  }
+ ],
+ "osm_length_m": 3156.9,
+ "length_error_pct": 0.09,
+ "osm_chamfer_pct": 0.55,
+ "osm_chamfer_m": 2.1,
+ "osm_p95_m": 4.5,
+ "osm_mirror_pct": 5.89,
+ "osm_aniso": 1.007,
+ "osm_rot_deg": -0.0,
+ "extract": {
+  "mode": "mask",
+  "n": 55773
+ },
+ "png_chamfer_pct": 0.6,
+ "png_mirror_pct": 5.84,
+ "png_aniso": 1.006,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 10.71,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

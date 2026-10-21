@@ -1,3 +1,4 @@
+import { DRAWN_CIRCUITS } from './circuit-drawings';
 import type { Category, Race } from './types';
 
 // Dados de circuitos (extensao, curvas, recorde, zonas de Straight Mode, frenagem, estrategia de pneus).
@@ -13,20 +14,25 @@ import type { Category, Race } from './types';
 
 export type CircuitInfo = {
   trackImage?: string;
-  lengthKm: number;
-  raceDistanceKm: number;
-  laps: number;
-  corners: number;
-  direction: 'clockwise' | 'counterclockwise';
+  // Desenho feito a partir do OpenStreetMap (src/circuit-drawings.ts): exige o credito
+  // "© OpenStreetMap" onde o desenho aparece (licenca ODbL).
+  osm?: boolean;
+  // Os campos abaixo so existem quando ha fonte. Voltas, distancia, recorde, primeira corrida,
+  // Straight Mode, frenagens e pneus sao dados do GP de F1 e so valem na pagina da F1.
+  lengthKm?: number;
+  raceDistanceKm?: number;
+  laps?: number;
+  corners?: number;
+  direction?: 'clockwise' | 'counterclockwise';
   // Ausente quando a pista ainda nao tem recorde de corrida.
   lapRecord?: { time: string; driver: string; year: number };
-  firstGrandPrix: number;
+  firstGrandPrix?: number;
   // O DRS deixou de existir na F1 em 2026; os mapas oficiais de 2026 marcam as zonas de
   // Straight Mode (aero ativa) com hachuras vermelhas. Numero de zonas contado nesses mapas;
   // ausente quando o mapa da F1 ainda nao traz as zonas (mapa antigo ou sem hachura).
   straightModeZones?: number;
-  brakingZones: { turn: string; name: string; pt: string; en: string }[];
-  tyreStrategyNote: { pt: string; en: string };
+  brakingZones?: { turn: string; name: string; pt: string; en: string }[];
+  tyreStrategyNote?: { pt: string; en: string };
 };
 
 // Dados reais do Autódromo José Carlos Pace (Interlagos), usados só na página de teste do GP de São Paulo.
@@ -807,6 +813,20 @@ const IMOLA_CIRCUIT_INFO: CircuitInfo = {
   },
 };
 
+// Jeddah Corniche Circuit (GP da Arabia Saudita; cancelado em 2026, como as etapas de F2 e F1
+// Academy). A F1 nao publicou mapa novo: o desenho e do OpenStreetMap, conferido com o mapa oficial
+// 2026trackjeddahdetailed.png (scripts/circuits/verification/jeddah.json). Extensao, voltas,
+// distancia, primeiro GP e recorde: formula1.com/en/racing/2025/saudi-arabia.
+const JEDDAH_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/jeddah.png',
+  osm: true,
+  lengthKm: 6.174,
+  raceDistanceKm: 308.45,
+  laps: 50,
+  lapRecord: { time: '1:30.734', driver: 'L. Hamilton (Mercedes)', year: 2021 },
+  firstGrandPrix: 2021,
+};
+
 // Identifica GPs por texto (circuito/local/nome), nao pelo id estatico: o calendario de F1
 // e substituido pelos dados ao vivo da Jolpica, que pode gerar um id diferente do id local
 // quando o casamento por data/nome com a base local falha.
@@ -838,7 +858,8 @@ function isAlbertParkRace(race: Race): boolean {
 
 function isSpaRace(race: Race): boolean {
   const haystack = raceHaystack(race);
-  return haystack.includes('francorchamps') || haystack.includes('belgian grand prix');
+  // A GTWC chama a prova de "CrowdStrike 24 Hours of Spa" (local: Belgium/Stavelot).
+  return haystack.includes('francorchamps') || haystack.includes('belgian grand prix') || /\bspa\b/.test(haystack) || haystack.includes('stavelot');
 }
 
 function isChinaRace(race: Race): boolean {
@@ -878,7 +899,8 @@ function isSakhirRace(race: Race): boolean {
 
 function isMiamiRace(race: Race): boolean {
   const haystack = raceHaystack(race);
-  return haystack.includes('miami');
+  // Homestead-Miami Speedway (NASCAR) e outro circuito, fora de Miami.
+  return haystack.includes('miami') && !haystack.includes('homestead');
 }
 
 function isCanadaRace(race: Race): boolean {
@@ -958,13 +980,18 @@ function isAbuDhabiRace(race: Race): boolean {
   return haystack.includes('yas marina') || haystack.includes('abu dhabi');
 }
 
+function isJeddahRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('jeddah') || haystack.includes('saudi arabian grand prix') || haystack.includes('arabia saudita');
+}
+
 function isImolaRace(race: Race): boolean {
   const haystack = raceHaystack(race);
   return haystack.includes('imola') || haystack.includes('enzo e dino ferrari') || haystack.includes('emilia');
 }
 
 // Paginas de teste habilitadas ate agora: as pistas do calendario de F1 2026 (incluindo
-// Sepang, que recebeu o GP do Bahrein; Jeddah Corniche segue sem pagina dedicada), Sakhir
+// Sepang, que recebeu o GP do Bahrein, e Jeddah, cancelado em 2026), Sakhir
 // (F2/F3/WEC e o GP de abril cancelado) e Imola -- fora do calendario da F1 em 2026, mas
 // onde F3 e WEC ainda correm.
 const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[] = [
@@ -995,23 +1022,189 @@ const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[
   { match: isQatarRace, info: QATAR_CIRCUIT_INFO },
   { match: isAbuDhabiRace, info: ABUDHABI_CIRCUIT_INFO },
   { match: isImolaRace, info: IMOLA_CIRCUIT_INFO },
+  { match: isJeddahRace, info: JEDDAH_CIRCUIT_INFO },
 ];
 
-export function getRaceCircuitInfo(race: Race): CircuitInfo | null {
-  return RACE_TEST_CIRCUITS.find(({ match }) => match(race))?.info ?? null;
+// ---------------------------------------------------------------------------------------------
+// Circuitos desenhados a partir do OpenStreetMap (src/circuit-drawings.ts). Um lugar pode ter
+// mais de um tracado (oval e misto de Daytona e Indianapolis, Watkins Glen com e sem o Boot...):
+// o tracado sai da prova (categoria + data), do texto (ex.: "misto", "Road Course") ou da categoria.
+
+type Venue = {
+  // Termos (sem acento, minusculos) que identificam o lugar; basta um.
+  terms: (string | RegExp)[];
+  // Termos que descartam o lugar mesmo quando um dos termos aparece.
+  not?: string[];
+  // So nestas categorias (ex.: "Las Vegas" sozinho so e o oval na NASCAR).
+  categories?: string[];
+  // Desenho padrao do lugar.
+  layout: string;
+  // Tracado por categoria, quando o lugar tem mais de um.
+  byCategory?: Record<string, string>;
+  // Tracado pelo texto da prova (vence a categoria).
+  byText?: { terms: (string | RegExp)[]; layout: string }[];
+  // Tracado de uma prova especifica (categoria + data da etapa, +-2 dias; vence o resto).
+  byEvent?: { categoryId: string; date: string; layout: string }[];
+};
+
+function hasTerm(haystack: string, term: string | RegExp): boolean {
+  return typeof term === 'string' ? haystack.includes(term) : term.test(haystack);
 }
 
-// Categorias que, em pesquisa, realmente correm em algum dos 24 circuitos acima
-// (mesmo tracado fisico, nao so a mesma cidade). F2/F3/F1 Academy dividem varios
-// finais de semana com a F1; WEC, DTM e NASCAR passam por algumas dessas pistas
-// em seus proprios calendarios. IMSA e IndyCar, nos calendarios atuais do site,
-// nao tocam nenhuma delas. WRC fica de fora de proposito: mesmo quando o nome
-// da etapa cita a mesma cidade (ex.: Rallye Monte-Carlo), a prova roda em
-// estradas de montanha, nao no circuito de verdade.
-const CIRCUIT_PAGE_CATEGORY_IDS = new Set([
-  'f1', 'f2', 'f3', 'f1-academy', 'wec', 'dtm', 'nascar',
-]);
+const VENUES: Venue[] = [
+  // NASCAR / IndyCar / IMSA / GTWC America
+  { terms: ['bowman gray', 'winston-salem'], layout: 'bowman-gray' },
+  {
+    terms: ['daytona'],
+    layout: 'daytona-oval',
+    byCategory: { imsa: 'daytona-road' },
+    byText: [{ terms: ['rolex 24', 'road course'], layout: 'daytona-road' }],
+  },
+  { terms: ['road atlanta', 'braselton', 'petit le mans'], layout: 'road-atlanta' },
+  { terms: ['echopark', 'atlanta motor speedway', 'hampton'], layout: 'atlanta' },
+  { terms: ['circuit of the americas', 'austin', /\bcota\b/], categories: ['nascar'], layout: 'cota-national' },
+  { terms: ['phoenix', 'avondale'], layout: 'phoenix' },
+  { terms: ['las vegas motor speedway'], layout: 'las-vegas-motor-speedway' },
+  { terms: ['las vegas'], categories: ['nascar'], layout: 'las-vegas-motor-speedway' },
+  { terms: ['darlington'], layout: 'darlington' },
+  { terms: ['martinsville'], layout: 'martinsville' },
+  { terms: ['bristol'], layout: 'bristol' },
+  { terms: ['kansas'], layout: 'kansas' },
+  { terms: ['talladega'], layout: 'talladega' },
+  { terms: ['texas motor speedway', 'fort worth'], layout: 'texas' },
+  { terms: ['watkins glen'], layout: 'watkins-glen', byCategory: { nascar: 'watkins-glen-nascar' } },
+  { terms: ['dover'], layout: 'dover' },
+  {
+    terms: ['charlotte', 'concord'],
+    layout: 'charlotte-oval',
+    // Em 2026 a corrida de outubro voltou para o oval; o Roval so quando a prova disser.
+    byText: [{ terms: ['roval'], layout: 'charlotte-roval' }],
+  },
+  { terms: ['nashville', 'lebanon'], layout: 'nashville-superspeedway' },
+  { terms: ['michigan international', 'brooklyn'], layout: 'michigan' },
+  { terms: [/\bmichigan\b/], categories: ['nascar'], layout: 'michigan' },
+  { terms: ['pocono', 'long pond'], layout: 'pocono' },
+  { terms: ['san diego', 'coronado'], layout: 'san-diego' },
+  { terms: ['sonoma'], layout: 'sonoma', byCategory: { 'gtwc-america': 'sonoma-gtwc' } },
+  { terms: ['chicagoland', 'joliet'], layout: 'chicagoland' },
+  { terms: ['north wilkesboro'], layout: 'north-wilkesboro' },
+  {
+    terms: ['indianapolis', 'indy 500', 'brickyard'],
+    layout: 'indianapolis-oval',
+    byCategory: { imsa: 'indianapolis-road', 'gtwc-america': 'indianapolis-road' },
+    byText: [
+      { terms: [/\b500\b/, 'brickyard'], layout: 'indianapolis-oval' },
+      { terms: ['misto', 'road course', 'ims road', /\brc\b/, 'gp de indianapolis'], layout: 'indianapolis-road' },
+    ],
+  },
+  { terms: [/\biowa\b/, 'newton'], layout: 'iowa' },
+  { terms: ['richmond'], layout: 'richmond' },
+  { terms: ['new hampshire', 'loudon'], layout: 'new-hampshire' },
+  { terms: ['gateway', 'world wide technology', 'wwtr', 'madison'], layout: 'gateway' },
+  { terms: ['homestead'], layout: 'homestead' },
+  { terms: ['petersburg'], layout: 'st-petersburg' },
+  { terms: ['arlington'], layout: 'arlington' },
+  { terms: ['barber'], layout: 'barber' },
+  { terms: ['long beach'], layout: 'long-beach' },
+  { terms: ['detroit'], layout: 'detroit' },
+  { terms: ['road america', 'elkhart lake'], layout: 'road-america' },
+  { terms: ['mid-ohio', 'mid ohio'], layout: 'mid-ohio' },
+  { terms: ['portland'], layout: 'portland' },
+  { terms: ['markham'], layout: 'markham' },
+  { terms: ['washington'], layout: 'washington-dc' },
+  { terms: ['milwaukee', 'west allis'], layout: 'milwaukee' },
+  { terms: ['laguna seca', 'monterey'], layout: 'laguna-seca' },
+  { terms: ['sebring'], layout: 'sebring' },
+  { terms: ['mosport', 'canadian tire', 'bowmanville'], layout: 'mosport' },
+  { terms: ['virginia international', /\bvir\b/, /\balton\b/], layout: 'vir' },
+  // Europa e Asia (DTM, WEC, GTWC)
+  { terms: ['lausitz'], layout: 'lausitzring' },
+  { terms: ['norisring'], layout: 'norisring' },
+  { terms: ['oschersleben'], layout: 'oschersleben' },
+  {
+    terms: ['nurburg'],
+    not: ['nordschleife'],
+    layout: 'nurburgring-gp',
+    byCategory: { dtm: 'nurburgring-sprint' },
+    byText: [{ terms: ['sprint'], layout: 'nurburgring-sprint' }],
+  },
+  { terms: ['sachsenring'], layout: 'sachsenring' },
+  { terms: ['hockenheim'], layout: 'hockenheim' },
+  // "Petit Le Mans" (Road Atlanta, acima) e "Lone Star Le Mans" (COTA) nao sao em Le Mans.
+  { terms: ['sarthe', /\ble mans\b/], not: ['petit le mans', 'lone star'], layout: 'le-mans' },
+  { terms: ['fuji'], layout: 'fuji' },
+  { terms: ['paul ricard', 'le castellet'], layout: 'paul-ricard' },
+  { terms: ['brands hatch'], layout: 'brands-hatch' },
+  { terms: ['misano'], layout: 'misano' },
+  { terms: ['magny'], layout: 'magny-cours' },
+  { terms: ['portimao', 'algarve'], layout: 'portimao' },
+  { terms: ['mandalika'], layout: 'mandalika' },
+  { terms: ['okayama'], layout: 'okayama' },
+  { terms: ['beijing', 'pequim'], layout: 'beijing-street' },
+  // Brasil
+  { terms: ['velocitta', 'velo citta', 'mogi guacu'], layout: 'velocitta' },
+  { terms: ['brasilia', 'nelson piquet'], layout: 'brasilia' },
+  { terms: ['velopark', 'nova santa rita'], layout: 'velopark' },
+  { terms: ['santa cruz'], layout: 'santa-cruz-do-sul' },
+  { terms: ['goiania'], layout: 'goiania' },
+  { terms: ['cascavel'], layout: 'cascavel' },
+  { terms: ['cuiaba', 'mato grosso'], layout: 'cuiaba' },
+  { terms: ['londrina'], layout: 'londrina' },
+  { terms: ['curvelo', 'cristais'], layout: 'curvelo' },
+  { terms: ['chapeco'], layout: 'chapeco' },
+];
+
+const DAY_MS = 86_400_000;
+
+function sameWeekend(a: string, b: string): boolean {
+  const gap = Math.abs(Date.parse(`${a.slice(0, 10)}T00:00:00Z`) - Date.parse(`${b.slice(0, 10)}T00:00:00Z`)) / DAY_MS;
+  return Number.isFinite(gap) && gap <= 2;
+}
+
+function venueLayout(venue: Venue, race: Race, haystack: string, categoryId?: string): string {
+  const event = venue.byEvent?.find((e) => e.categoryId === categoryId && sameWeekend(e.date, race.date));
+  if (event) return event.layout;
+  const text = venue.byText?.find((option) => option.terms.some((term) => hasTerm(haystack, term)));
+  if (text) return text.layout;
+  return (categoryId && venue.byCategory?.[categoryId]) || venue.layout;
+}
+
+/** undefined: nenhum lugar desenhado reconhecido; null: lugar reconhecido, mas sem desenho verificado do tracado. */
+function findDrawnCircuit(race: Race, categoryId?: string): CircuitInfo | null | undefined {
+  const haystack = raceHaystack({ ...race, enName: `${race.enName ?? ''} ${race.country ?? ''}` });
+  for (const venue of VENUES) {
+    if (venue.categories && !(categoryId && venue.categories.includes(categoryId))) continue;
+    if (!venue.terms.some((term) => hasTerm(haystack, term))) continue;
+    if (venue.not?.some((term) => haystack.includes(term))) continue;
+    const drawn = DRAWN_CIRCUITS[venueLayout(venue, race, haystack, categoryId)];
+    // Sem desenho verificado desse tracado: nenhum mapa, em vez do mapa de outro tracado (ex.: a
+    // NASCAR em COTA usa o National Course de 2,4 milhas, nao o tracado da F1).
+    if (!drawn) return null;
+    return { trackImage: drawn.trackImage, osm: true, lengthKm: drawn.lengthKm, corners: drawn.corners, direction: drawn.direction };
+  }
+  return undefined;
+}
+
+// Voltas, distancia, recorde, primeiro GP, Straight Mode, frenagens e pneus sao dados do GP de F1:
+// nas outras categorias fica so o que e do circuito.
+function circuitOnly(info: CircuitInfo): CircuitInfo {
+  return { trackImage: info.trackImage, osm: info.osm, lengthKm: info.lengthKm, corners: info.corners, direction: info.direction };
+}
+
+/**
+ * Ficha do circuito de uma etapa. Com a categoria, escolhe o tracado certo do lugar (ex.: Daytona
+ * oval na NASCAR, misto na IMSA) e deixa os dados do GP de F1 so na F1. O WRC nao tem ficha: o nome
+ * da etapa cita cidades (Monte-Carlo...), mas o rali roda em estradas, nao num circuito.
+ */
+export function getRaceCircuitInfo(race: Race, categoryId?: string): CircuitInfo | null {
+  if (categoryId === 'wrc') return null;
+  const drawn = findDrawnCircuit(race, categoryId);
+  if (drawn !== undefined) return drawn;
+  const info = RACE_TEST_CIRCUITS.find(({ match }) => match(race))?.info ?? null;
+  if (!info || !categoryId || categoryId === 'f1') return info;
+  return circuitOnly(info);
+}
 
 export function hasCircuitPage(category: Category, race: Race): boolean {
-  return CIRCUIT_PAGE_CATEGORY_IDS.has(category.id) && getRaceCircuitInfo(race) != null;
+  return getRaceCircuitInfo(race, category.id) != null;
 }
