@@ -137,8 +137,8 @@ export const MOTORSPORT_DATA: Category[] = [
       {
         title: 'Curiosidades e regras especiais',
         enTitle: 'Quirks and special rules',
-        body: 'O DRS tradicional convive com o novo sistema de aero ativa e o modo ultrapassagem, dando à F1 2026 até três ferramentas simultâneas de ultrapassagem em algumas retas. O orçamento das equipes segue limitado pelo teto de custos (cost cap), que nivela o poder de desenvolvimento entre times grandes e pequenos. E como o parc fermé trava a configuração do carro após a classificação, qualquer equipe que precise mexer no setup depois disso é obrigada a largar do pit lane.',
-        enBody: 'Traditional DRS now coexists with the new active-aero system and overtake mode, giving 2026-spec F1 up to three simultaneous overtaking tools on some straights. Team budgets remain capped by the cost cap, which levels development power between big and small teams. And because parc fermé locks the car\'s setup after qualifying, any team that needs to change it afterward is forced to start from the pit lane.',
+        body: 'O DRS deixou de existir em 2026: no lugar dele entram a aero ativa, liberada para todos nas zonas de Straight Mode marcadas em cada pista, e o modo ultrapassagem, reservado a quem persegue outro carro. O orçamento das equipes segue limitado pelo teto de custos (cost cap), que nivela o poder de desenvolvimento entre times grandes e pequenos. E como o parc fermé trava a configuração do carro após a classificação, qualquer equipe que precise mexer no setup depois disso é obrigada a largar do pit lane.',
+        enBody: 'DRS is gone in 2026: it is replaced by active aero, open to everyone in the Straight Mode zones marked on each track, and by overtake mode, reserved for the car chasing another. Team budgets remain capped by the cost cap, which levels development power between big and small teams. And because parc fermé locks the car\'s setup after qualifying, any team that needs to change it afterward is forced to start from the pit lane.',
       },
     ],
     icon: 'OpenWheelCar',
@@ -183,7 +183,7 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'australia', name: 'GP da Austrália', enName: 'Australian GP', location: 'Melbourne', date: '2026-03-08', circuit: 'Albert Park', status: 'completed', winner: 'George Russell' },
       { id: 'china', name: 'GP da China', enName: 'Chinese GP', location: 'Xangai', enLocation: 'Shanghai', date: '2026-03-15', circuit: 'Shanghai International Circuit', status: 'completed', winner: 'Kimi Antonelli' },
       { id: 'japan', name: 'GP do Japão', enName: 'Japanese GP', location: 'Suzuka', date: '2026-03-29', circuit: 'Suzuka International Racing Course', status: 'completed', winner: 'Kimi Antonelli' },
-      { id: 'bahrain', name: 'GP do Bahrein', enName: 'Bahrain GP', location: 'Sakhir', date: '2026-04-12', circuit: 'Bahrain International Circuit', status: 'cancelled' },
+      { id: 'bahrain-sakhir', name: 'GP do Bahrein', enName: 'Bahrain GP', location: 'Sakhir', date: '2026-04-12', circuit: 'Bahrain International Circuit', status: 'cancelled' },
       { id: 'saudi', name: 'GP da Arábia Saudita', enName: 'Saudi Arabian GP', location: 'Jeddah', date: '2026-04-19', circuit: 'Jeddah Corniche Circuit', status: 'cancelled' },
       { id: 'miami', name: 'GP de Miami', enName: 'Miami GP', location: 'Miami', date: '2026-05-03', circuit: 'Miami International Autodrome', status: 'completed', winner: 'Kimi Antonelli' },
       { id: 'canada', name: 'GP do Canadá', enName: 'Canadian GP', location: 'Montreal', date: '2026-05-24', circuit: 'Circuit Gilles Villeneuve', status: 'completed', winner: 'Kimi Antonelli' },
@@ -197,6 +197,9 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'italy', name: 'GP da Itália', enName: 'Italian GP', location: 'Monza', date: '2026-09-06', circuit: 'Autodromo Nazionale Monza', status: 'upcoming' },
       { id: 'madrid', name: 'GP de Madri', enName: 'Madrid GP', location: 'Madri', enLocation: 'Madrid', date: '2026-09-13', circuit: 'Madrid Street Circuit', status: 'upcoming' },
       { id: 'azerbaijan', name: 'GP do Azerbaijão', enName: 'Azerbaijan GP', location: 'Baku', date: '2026-09-26', circuit: 'Baku City Circuit', status: 'upcoming' },
+      // O GP do Bahrein de 2026 foi transferido para Sepang (formula1.com/en/racing/2026/bahrain).
+      // Mantem o id 'bahrain', que e o que a pagina dessa etapa ja usava.
+      { id: 'bahrain', name: 'GP do Bahrein na Malásia', enName: 'Bahrain GP in Malaysia', location: 'Sepang', enLocation: 'Sepang', date: '2026-10-04', circuit: 'Sepang International Circuit', status: 'completed', winner: 'Max Verstappen' },
       { id: 'singapore', name: 'GP de Singapura', enName: 'Singapore GP', location: 'Marina Bay', date: '2026-10-11', circuit: 'Marina Bay Street Circuit', status: 'upcoming' },
       { id: 'usa', name: 'GP dos EUA', enName: 'USA GP', location: 'Austin', date: '2026-10-25', circuit: 'Circuit of the Americas', status: 'upcoming' },
       { id: 'mexico', name: 'GP do México', enName: 'Mexican GP', location: 'Cidade do México', enLocation: 'Mexico City', date: '2026-11-01', circuit: 'Autódromo Hermanos Rodríguez', status: 'upcoming' },

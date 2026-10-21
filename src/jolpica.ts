@@ -39,7 +39,7 @@ type StandingsTableWrapper = {
 
 type JolpicaSessionSlot = { date: string; time?: string };
 
-type JolpicaRace = {
+export type JolpicaRace = {
   season?: string;
   round: string;
   raceName: string;
@@ -446,13 +446,18 @@ async function fetchConstructorStandings(year: string): Promise<JolpicaConstruct
 
 // ─── Builders ─────────────────────────────────────────────────────────────────
 
-function buildCalendar(
+// Exportado para os testes.
+export function buildCalendar(
   category: Category,
   races: JolpicaRace[],
   winnerMap: Map<string, string>,
 ): Race[] {
   return races.map((race) => {
     const base = matchBaseRace(category.calendar, race);
+    // Uma etapa local casada so pelo nome (data diferente) pode ser de outro lugar -- ex.: o
+    // "Bahrain Grand Prix in Malaysia" de 2026 casa com o GP do Bahrein de Sakhir. Nesse
+    // caso o local (pista/cidade) vem da Jolpica, que sabe onde a prova acontece.
+    const baseVenue = base && (base.date === race.date || sameVenue(base, race)) ? base : null;
     const status = getRaceStatus(race, winnerMap.has(race.round));
     const lat = Number(race.Circuit.Location.lat);
     const lng = Number(race.Circuit.Location.long);
@@ -460,11 +465,11 @@ function buildCalendar(
       id: base?.id ?? slugify(race.raceName),
       name: base?.name ?? formatPt(race.raceName),
       enName: base?.enName ?? race.raceName,
-      location: base?.location ?? race.Circuit.Location.locality,
-      enLocation: base?.enLocation ?? race.Circuit.Location.locality,
+      location: baseVenue?.location ?? race.Circuit.Location.locality,
+      enLocation: baseVenue?.enLocation ?? race.Circuit.Location.locality,
       date: race.date,
       startsAt: jolpicaStartsAt(race.date, race.time),
-      circuit: base?.circuit ?? race.Circuit.circuitName,
+      circuit: baseVenue?.circuit ?? race.Circuit.circuitName,
       status,
       winner: winnerMap.get(race.round) ?? (status === 'completed' ? base?.winner : undefined),
       round: Number.parseInt(race.round, 10) || undefined,
@@ -589,6 +594,15 @@ function matchBaseRace(baseCalendar: Race[], race: JolpicaRace): Race | null {
     }
   }
   return bestScore >= 1 ? best : null;
+}
+
+// A etapa local e a da Jolpica citam o mesmo lugar (cidade/pais/pista)?
+function sameVenue(base: Race, race: JolpicaRace): boolean {
+  const live = extractTokens([race.Circuit.Location.locality, race.Circuit.Location.country, race.Circuit.circuitName]);
+  for (const t of extractTokens([base.location, base.enLocation])) {
+    if (live.has(t)) return true;
+  }
+  return false;
 }
 
 function findBaseDriver(drivers: Driver[], fullName: string): Driver | null {
