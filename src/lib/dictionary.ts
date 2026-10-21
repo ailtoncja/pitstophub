@@ -21,6 +21,7 @@ const entries: Record<string, readonly [pt: string, en: string]> = {
   'app.notFoundHint': ['O endereço não existe ou foi movido.', 'This address does not exist or has moved.'],
 
   // ── comuns ───────────────────────────────────────────────────────────────────
+  'common.and': ['e', 'and'],
   'common.back': ['Voltar', 'Back'],
   'common.clear': ['Limpar', 'Clear'],
   'common.close': ['Fechar', 'Close'],
@@ -207,6 +208,12 @@ const entries: Record<string, readonly [pt: string, en: string]> = {
   'cir.braking': ['Zonas de frenagem', 'Braking zones'],
   'cir.calendar': ['Calendário {year}', 'Calendar {year}'],
   'cir.cancelled': ['Etapa cancelada', 'Round cancelled'],
+  'cir.replacedBy': ['substituída por {names}', 'replaced by {names}'],
+  'cir.movedTo': ['transferida para {names}', 'moved to {names}'],
+  'cir.noReplacement': ['sem substituta', 'no replacement'],
+  'cir.replaces': ['Substitui {names} (cancelada)', 'Replaces {names} (cancelled)'],
+  'cir.replacesMany': ['Substitui {names} (canceladas)', 'Replaces {names} (cancelled)'],
+  'cir.movedFrom': ['Transferida de {names}, onde foi cancelada', 'Moved from {names}, where it was cancelled'],
   'cir.clockwise': ['Sentido horário', 'Clockwise'],
   'cir.corners': ['Curvas', 'Corners'],
   'cir.counterclockwise': ['Sentido anti-horário', 'Counter-clockwise'],
