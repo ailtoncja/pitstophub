@@ -1,0 +1,190 @@
+{
+ "id": "portugal",
+ "out": "src/rally/portugal-2026-map.ts",
+ "export": "PORTUGAL_2026_MAP",
+ "viewBox": [
+  1000,
+  560
+ ],
+ "credits": [
+  "Rally de Portugal 2026: largada/chegada das especiais de fontes oficiais (ver sources).",
+  "Costa: OpenStreetMap land polygons (osmdata.openstreetmap.de), (c) OpenStreetMap contributors, ODbL."
+ ],
+ "downloads": [],
+ "stages": [
+  {
+   "id": "ss1",
+   "start": [
+    40.681092,
+    -8.430466
+   ],
+   "finish": [
+    40.679213,
+    -8.343459
+   ],
+   "source": "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/AGUEDASEVER.html, GPS Visualizer markers 'SSS' (start) / 'SSF' (finish); map title 'SS01 ÁGUEDA - SEVER'"
+  },
+  {
+   "id": "ss2",
+   "start": [
+    40.729346,
+    -8.390453
+   ],
+   "finish": [
+    40.721099,
+    -8.440628
+   ],
+   "source": "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/SEVERALBERGARIA.html, GPS Visualizer markers 'SSS' (start) / 'SSF' (finish); map title 'SS02 SEVER - ALBERGARIA'"
+  },
+  {
+   "id": "ss4-10",
+   "start": [
+    40.464575,
+    -8.180534
+   ],
+   "finish": [
+    40.405604,
+    -8.200033
+   ],
+   "source": "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/MORTAGUA.html, GPS Visualizer markers 'SSS' (start) / 'SSF' (finish); map title 'SS04-10 MORTÁGUA'"
+  },
+  {
+   "id": "ss5-7",
+   "start": [
+    40.236605,
+    -7.980998
+   ],
+   "finish": [
+    40.201485,
+    -7.925782
+   ],
+   "source": "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/ARGANIL.html, GPS Visualizer markers 'SSS' (start) / 'SSF' (finish); map title 'SS05-07 ARGANIL'"
+  },
+  {
+   "id": "ss6-9",
+   "start": [
+    40.173598,
+    -8.166968
+   ],
+   "finish": [
+    40.138469,
+    -8.159958
+   ],
+   "source": "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/LOUSA.html, GPS Visualizer markers 'SSS' (start) / 'SSF' (finish); map title 'SS06-09 LOUSÃ'"
+  },
+  {
+   "id": "ss8",
+   "start": [
+    40.141826,
+    -8.007699
+   ],
+   "finish": [
+    40.164267,
+    -8.087632
+   ],
+   "source": "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/GOIS.html, GPS Visualizer markers 'SSS' (start) / 'SSF' (finish); map title 'SS8 GÓIS'"
+  },
+  {
+   "id": "ss11-15",
+   "start": [
+    41.375263,
+    -8.195653
+   ],
+   "finish": [
+    41.391127,
+    -8.197703
+   ],
+   "source": "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/Mapas-2/FELGUEIRAS.html, GPS Visualizer markers 'SSS' (start) / 'SSF' (finish); map title 'SS11-15 FELGUEIRAS'"
+  },
+  {
+   "id": "ss12-16",
+   "start": [
+    41.589082,
+    -8.013432
+   ],
+   "finish": [
+    41.553325,
+    -8.010978
+   ],
+   "source": "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/Mapas-2/CABECEIRASDEBASTO-2.html, GPS Visualizer markers 'SSS' (start) / 'SSF' (finish); map title 'SS12-16 CABECEIRAS DE BASTO'"
+  },
+  {
+   "id": "ss13-17",
+   "start": [
+    41.339553,
+    -7.973149
+   ],
+   "finish": [
+    41.290747,
+    -7.968382
+   ],
+   "source": "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/Mapas-2/AMARANTE.html, GPS Visualizer markers 'SSS' (start) / 'SSF' (finish); map title 'SS13-17 AMARANTE'"
+  },
+  {
+   "id": "ss14-18",
+   "start": [
+    41.170103,
+    -8.401077
+   ],
+   "finish": [
+    41.188368,
+    -8.395487
+   ],
+   "source": "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/Mapas-2/PAREDES.html, GPS Visualizer markers 'SSS' (start) / 'SSF' (finish); map title 'SS14-18 PAREDES'"
+  },
+  {
+   "id": "ss20-22",
+   "start": [
+    41.657725,
+    -8.133376
+   ],
+   "finish": [
+    41.603349,
+    -8.065632
+   ],
+   "source": "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/Mapas-2/VIEIRADOMINHO.html, GPS Visualizer markers 'SSS' (start) / 'SSF' (finish); map title 'SS20-22 VIEIRA DO MINHO'"
+  },
+  {
+   "id": "ss21-23",
+   "start": [
+    41.458254,
+    -8.120193
+   ],
+   "finish": [
+    41.505889,
+    -8.090421
+   ],
+   "source": "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/Mapas-2/FAFE.html, GPS Visualizer markers 'SSS' (start) / 'SSF' (finish); map title 'SS21-23 FAFE'"
+  }
+ ],
+ "servicePark": [
+  41.199528,
+  -8.69225
+ ],
+ "towns": [],
+ "land": true,
+ "sources": {
+  "geometry": [
+   "https://www.rallydeportugal.pt/content.aspx?menuid=5552 (Zonas Espetáculo; legend: SSS = Início da PEC, SSF = Fim da PEC)",
+   "https://www.rallydeportugal.pt/content.aspx?menuid=5527&eid=15500",
+   "https://www.rallydeportugal.pt/content.aspx?menuid=5528&eid=15501",
+   "https://www.rallydeportugal.pt/content.aspx?menuid=5529&eid=15504",
+   "https://www.rallydeportugal.pt/content.aspx?menuid=5530&eid=15505",
+   "https://www.rallydeportugal.pt/content.aspx?menuid=5545&eid=15712",
+   "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/AGUEDASEVER.html",
+   "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/SEVERALBERGARIA.html",
+   "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/MORTAGUA.html",
+   "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/ARGANIL.html",
+   "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/LOUSA.html",
+   "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/GOIS.html",
+   "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/Mapas-2/FELGUEIRAS.html",
+   "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/Mapas-2/CABECEIRASDEBASTO-2.html",
+   "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/Mapas-2/AMARANTE.html",
+   "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/Mapas-2/PAREDES.html",
+   "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/Mapas-2/VIEIRADOMINHO.html",
+   "https://www.rallydeportugal.pt/ResourcesUser/Imagens/Espectadores/OndeVer2026/MAPAS/Mapas-2/FAFE.html"
+  ],
+  "servicePark": "https://www.rallydeportugal.pt/ResourcesUser/Documentos/2026/Supplementary-Regulations---VRP-2026.pdf (2.8 HQ location: GPS 41°11'58.3\"N 8°41'32.1\"W - this is the Rally HQ at Exponor; service park is at the same venue)",
+  "notes": "Organiser spectator-zone pages embed GPS Visualizer HTML maps (one per stage road) containing the stage as a vector track plus 'SSS' (start) and 'SSF' (finish) markers; the page legend defines SSS/SSF as start/finish of the special stage. Start/finish taken from those markers. 12 of 14 distinct stage roads covered (21 of 23 SS). MISSING: SS3 Figueira da Foz (SSS, 1.93 km, tarmac) and SS19 Lousada (SSS, 3.78 km, at Eurocircuito da Costilha) - no spectator map, no coordinates on the municipality pages; road books (VRP2026_RB1-4.pdf) and Rally Guide 2 PDFs are password-protected; Rally_Maps PDF is raster. kind set to 'points' because ACP terms prohibit reproduction for non-personal purposes without written permission; vector tracks exist (routeRef kept). Lengths: SS1 Águeda / Sever: line 15.07 km vs official 15.08 (-0.0%); SS2 Sever / Albergaria: line 20.30 km vs official 20.24 (+0.3%) [track drawn finish->start]; SS4/10 Mortágua: line 14.73 km vs official 14.59 (+1.0%); SS5/7 Arganil: line 18.37 km vs official 18.62 (-1.3%) [track drawn finish->start]; SS6/9 Lousã: line 7.03 km vs official 7.07 (-0.5%) [track drawn finish->start]; SS8 Góis: line 15.33 km vs official 15.66 (-2.1%) [track drawn finish->start]; SS11/15 Felgueiras: line 8.96 km vs official 8.81 (+1.7%); SS12/16 Cabeceiras de Basto: line 20.08 km vs official 19.91 (+0.8%); SS13/17 Amarante: line 26.00 km vs official 26.24 (-0.9%); SS14/18 Paredes: line 16.04 km vs official 16.09 (-0.3%); SS20/22 Vieira do Minho: line 21.41 km vs official 21.60 (-0.9%); SS21/23 Fafe: line 11.08 km vs official 11.18 (-0.9%). Shakedown map 'SHAKEDOWN' track 5.55 km vs official 5.72; NOTE its SSS/SSF markers and track ends are identical to the Paredes map (Baltar shakedown shares start/finish area with Paredes stage) - treat shakedown geometry with caution. Matching by map title (e.g. 'SS21-23 FAFE') - unambiguous."
+ }
+}

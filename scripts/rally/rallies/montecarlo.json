@@ -1,0 +1,253 @@
+{
+ "id": "montecarlo",
+ "out": "src/rally/montecarlo-2026-map.ts",
+ "export": "MONTECARLO_2026_MAP",
+ "viewBox": [
+  1000,
+  560
+ ],
+ "credits": [
+  "Rallye Monte-Carlo 2026: tracado das especiais dos KMZ oficiais do ACM (anexos da pagina",
+  "https://acm.mc/epreuves/rallye-automobile-monte-carlo/espace-spectateurs/cartes/), cortado entre os pontos START e FINISH.",
+  "Costa e parque de assistencia: OpenStreetMap, (c) OpenStreetMap contributors, ODbL."
+ ],
+ "downloads": [
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-1.kmz",
+   "file": "montecarlo/SS-1.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-2.kmz",
+   "file": "montecarlo/SS-2.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-3.kmz",
+   "file": "montecarlo/SS-3.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-4-7.kmz",
+   "file": "montecarlo/SS-4-7.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-5-8.kmz",
+   "file": "montecarlo/SS-5-8.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-6-9.kmz",
+   "file": "montecarlo/SS-6-9.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-10-12.kmz",
+   "file": "montecarlo/SS-10-12.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SSS-13.kmz",
+   "file": "montecarlo/SSS-13.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-14-16.kmz",
+   "file": "montecarlo/SS-14-16.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-15-17.kmz",
+   "file": "montecarlo/SS-15-17.kmz"
+  }
+ ],
+ "stages": [
+  {
+   "id": "ss1",
+   "route": {
+    "file": "montecarlo/SS-1.kmz",
+    "name": "SS 1",
+    "match": "exact",
+    "trim": {
+     "start": [
+      43.899532,
+      7.121211
+     ],
+     "finish": [
+      43.9004,
+      6.961843
+     ]
+    }
+   }
+  },
+  {
+   "id": "ss2",
+   "route": {
+    "file": "montecarlo/SS-2.kmz",
+    "name": "SS 2",
+    "match": "exact",
+    "trim": {
+     "start": [
+      44.196365,
+      6.276555
+     ],
+     "finish": [
+      44.33206,
+      6.351253
+     ]
+    }
+   }
+  },
+  {
+   "id": "ss3-11",
+   "route": {
+    "file": "montecarlo/SS-3.kmz",
+    "name": "SS 3",
+    "match": "exact",
+    "trim": {
+     "start": [
+      44.288903,
+      5.957292
+     ],
+     "finish": [
+      44.371815,
+      5.959173
+     ]
+    }
+   }
+  },
+  {
+   "id": "ss4-7",
+   "route": {
+    "file": "montecarlo/SS-4-7.kmz",
+    "name": "SS 4/7",
+    "match": "exact",
+    "trim": {
+     "start": [
+      44.292689,
+      5.596289
+     ],
+     "finish": [
+      44.334353,
+      5.512247
+     ]
+    }
+   }
+  },
+  {
+   "id": "ss5-8",
+   "route": {
+    "file": "montecarlo/SS-5-8.kmz",
+    "name": "SS 5/8",
+    "match": "exact",
+    "trim": {
+     "start": [
+      44.558155,
+      5.286628
+     ],
+     "finish": [
+      44.491155,
+      5.374411
+     ]
+    }
+   }
+  },
+  {
+   "id": "ss6-9",
+   "route": {
+    "file": "montecarlo/SS-6-9.kmz",
+    "name": "SS 6/9",
+    "match": "exact",
+    "trim": {
+     "start": [
+      44.51342,
+      5.638392
+     ],
+     "finish": [
+      44.485181,
+      5.721943
+     ]
+    }
+   }
+  },
+  {
+   "id": "ss10-12",
+   "route": {
+    "file": "montecarlo/SS-10-12.kmz",
+    "name": "SS10/12",
+    "match": "exact",
+    "trim": {
+     "start": [
+      44.442319,
+      6.304193
+     ],
+     "finish": [
+      44.416254,
+      6.184682
+     ]
+    }
+   }
+  },
+  {
+   "id": "ss13",
+   "route": {
+    "file": "montecarlo/SSS-13.kmz",
+    "name": "SSS 13",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss14-16",
+   "route": {
+    "file": "montecarlo/SS-14-16.kmz",
+    "name": "SS 14/16",
+    "match": "exact",
+    "trim": {
+     "start": [
+      43.876252,
+      7.393492
+     ],
+     "finish": [
+      43.91166,
+      7.354224
+     ]
+    }
+   }
+  },
+  {
+   "id": "ss15-17",
+   "route": {
+    "file": "montecarlo/SS-15-17.kmz",
+    "name": "SS 15/17",
+    "match": "exact",
+    "trim": {
+     "start": [
+      43.990699,
+      7.331892
+     ],
+     "finish": [
+      43.942552,
+      7.415866
+     ]
+    }
+   }
+  }
+ ],
+ "servicePark": [
+  44.5404805,
+  6.0611382
+ ],
+ "towns": [],
+ "land": true,
+ "sources": {
+  "geometry": [
+   "https://acm.mc/epreuves/rallye-automobile-monte-carlo/espace-spectateurs/cartes/",
+   "https://acm.mc/wp-content/uploads/2025/05/SHAKEDOWN.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-1.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-2.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-3.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-4-7.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-5-8.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-6-9.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-10-12.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-11.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SSS-13.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-14-16.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-15-17.kmz"
+  ],
+  "servicePark": "OpenStreetMap way 90869743 'COSEC' (leisure=sports_centre, Avenue de Traunstein, Gap) via Nominatim: https://www.openstreetmap.org/way/90869743",
+  "notes": "Official per-stage KMZ files uploaded by the ACM on 2025-12-18/19 as attachments of the spectator maps page (found via acm.mc WP REST media API). Each KMZ has one LineString plus Points TC / START / FINISH / STOP and ZP (public zone) points; only START/FINISH used. The LineStrings run TC -> STOP (include approach and stop zone), so trim to START..FINISH for display. Along-line START->FINISH lengths (nearest vertex) vs official km: SS1 22.31/21.90, SS2 24.03/23.80, SS3/11 15.21/15.06, SS4/7 18.10/17.95, SS5/8 28.93/28.70, SS6/9 17.95/17.79, SS10/12 30.11/29.93, SS14/16 12.81/12.50, SS15/17 23.93/23.45 (lines ~1-2% longer, normal digitising noise); SSS13 is a loop on the Monaco circuit (line 2.99 km incl. TC/stop, official 2.69). All locations match stage names geographically. Match by file name = stage numbers (certain). Shakedown (not in stages list): SHAKEDOWN.kmz 'START SD' 44.560021,6.042557 / 'FINISH SD' 44.559855,6.017924 (line 'SD', START->FINISH 4.26 km vs 4.25 official). Ignored: SS2.kmz and SS2-copie.kmz (uploaded 2025-12-18) contain a different 'SS 2' (TC near 44.3976,6.0906, ~21.1 km) that does not match SS2 Esclangon/Seyne-les-Alpes of the 2026 WRC itinerary - probably another event/draft."
+ }
+}
