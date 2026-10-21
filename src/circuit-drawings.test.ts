@@ -1,0 +1,86 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import { DRAWN_CIRCUITS } from './circuit-drawings';
+import { getRaceCircuitInfo } from './circuit-info';
+import { MOTORSPORT_DATA, type Race } from './types';
+
+const race = (over: Partial<Race>): Race => ({ id: 'r', name: '', location: '', circuit: '', date: '2026-06-01', status: 'upcoming', ...over });
+const image = (r: Race, categoryId?: string) => getRaceCircuitInfo(r, categoryId)?.trackImage;
+const staticRace = (categoryId: string, raceId: string): Race => {
+  const found = MOTORSPORT_DATA.find((c) => c.id === categoryId)?.calendar.find((r) => r.id === raceId);
+  if (!found) throw new Error(`etapa ${categoryId}/${raceId} nao encontrada`);
+  return found;
+};
+
+describe('desenhos do OpenStreetMap', () => {
+  it('todo desenho publicado existe, passou na verificacao e tem os dados da volta', () => {
+    for (const [key, drawn] of Object.entries(DRAWN_CIRCUITS)) {
+      expect(drawn.trackImage, key).toBe(`/circuits/${key}.png`);
+      expect(existsSync(`public${drawn.trackImage}`), key).toBe(true);
+      const verification = JSON.parse(readFileSync(`scripts/circuits/verification/${key}.json`, 'utf-8'));
+      expect(verification.pass, key).toBe(true);
+      expect(existsSync(`scripts/circuits/data/${key}.json`), key).toBe(true);
+      expect(drawn.sources.map, key).toMatch(/^https:\/\//);
+      if (drawn.lengthKm != null) expect(drawn.sources.length, key).toMatch(/^https?:\/\//);
+      if (drawn.corners != null) expect(drawn.sources.corners, key).toMatch(/^https?:\/\//);
+      if (drawn.direction != null) expect(drawn.sources.direction, key).toMatch(/^https?:\/\//);
+    }
+  });
+
+  it('todo mapa de qualquer etapa do catalogo existe em public/circuits', () => {
+    for (const category of MOTORSPORT_DATA) {
+      for (const r of category.calendar) {
+        const img = image(r, category.id);
+        if (img) expect(existsSync(`public${img}`), `${category.id}/${r.id} ${img}`).toBe(true);
+      }
+    }
+  });
+
+  it('os desenhos do OpenStreetMap levam o credito', () => {
+    for (const category of MOTORSPORT_DATA) {
+      for (const r of category.calendar) {
+        const info = getRaceCircuitInfo(r, category.id);
+        if (info?.trackImage && info.trackImage.slice(10, -4) in DRAWN_CIRCUITS) expect(info.osm, r.id).toBe(true);
+      }
+    }
+  });
+});
+
+describe('dados do GP so na F1', () => {
+  it('a WEC em Spa usa o mapa de Spa, sem voltas nem recorde da F1', () => {
+    const info = getRaceCircuitInfo(staticRace('wec', 'spa'), 'wec');
+    expect(info?.trackImage).toBe('/circuits/spa.png');
+    expect(info?.lengthKm).toBe(7.004);
+    expect(info?.laps).toBeUndefined();
+    expect(info?.lapRecord).toBeUndefined();
+    expect(info?.brakingZones).toBeUndefined();
+    expect(getRaceCircuitInfo(staticRace('f1', 'belgium'), 'f1')?.laps).toBe(44);
+  });
+
+  it('o WRC nao tem ficha de circuito (Monte-Carlo e rali, nao o circuito de Monaco)', () => {
+    expect(getRaceCircuitInfo(staticRace('wrc', 'montecarlo'), 'wrc')).toBeNull();
+  });
+});
+
+describe('GT World Challenge', () => {
+  it('Spa e Monza da GTWC Europe usam os mapas de Spa e Monza', () => {
+    expect(image(race({ name: 'CrowdStrike 24 Hours of Spa', circuit: 'CrowdStrike 24 Hours of Spa', location: 'Bélgica', enLocation: 'Belgium' }), 'gtwc-europe')).toBe('/circuits/spa.png');
+    expect(image(race({ name: 'Monza', circuit: 'Monza', location: 'Itália', enLocation: 'Italy' }), 'gtwc-europe')).toBe('/circuits/italy.png');
+  });
+});
+
+describe('lugares com nome parecido', () => {
+  it('Homestead-Miami Speedway nao e o autodromo de Miami da F1', () => {
+    expect(image(staticRace('nascar', 'homestead'), 'nascar')).not.toBe('/circuits/miami.png');
+  });
+
+  it('Petit Le Mans e Lone Star Le Mans nao sao em Le Mans', () => {
+    expect(image(staticRace('imsa', 'roadatlanta'), 'imsa')).not.toBe('/circuits/le-mans.png');
+    expect(image(staticRace('wec', 'cota'), 'wec')).toBe('/circuits/usa.png');
+  });
+
+  it('a F1 em Las Vegas usa o circuito de rua, a NASCAR nao', () => {
+    expect(image(staticRace('f1', 'vegas'), 'f1')).toBe('/circuits/vegas.png');
+    expect(image(staticRace('nascar', 'vegas1'), 'nascar')).not.toBe('/circuits/vegas.png');
+  });
+});

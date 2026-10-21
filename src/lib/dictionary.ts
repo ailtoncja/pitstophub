@@ -228,6 +228,7 @@ const entries: Record<string, readonly [pt: string, en: string]> = {
   'cir.noInfoHint': ['Ainda não temos dados técnicos desta pista.', 'We do not have technical data for this track yet.'],
   'cir.noRecord': ['Sem recorde — pista nova', 'No record — new track'],
   'cir.noResult': ['Resultado indisponível', 'Result unavailable'],
+  'cir.osmCredit': ['Desenho do traçado: © colaboradores do OpenStreetMap', 'Track drawing: © OpenStreetMap contributors'],
   'cir.notFound': ['Etapa não encontrada', 'Round not found'],
   'cir.pole': ['Pole position', 'Pole position'],
   'cir.rain': ['Chuva', 'Rain'],
