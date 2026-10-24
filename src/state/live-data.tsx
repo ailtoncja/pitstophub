@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { MOTORSPORT_DATA, type Category, type CategoryStandings, type Race, type StandingItem } from '../types';
+import { MOTORSPORT_DATA, type Category, type CategoryStandings, type Driver, type Race, type StandingItem } from '../types';
 import { fetchCategoryLiveData, mergeCategoryWithLiveData, type JolpicaCategoryData } from '../jolpica';
 import {
   fetchSyncedCalendar,
@@ -28,6 +28,15 @@ import {
   mergeCategoryWithEbStandings,
   type EbRoster,
 } from '../endurance-brasil-live';
+import {
+  fetchBrasilCalendar,
+  fetchBrasilDrivers,
+  fetchBrasilStandings,
+  getBrasilCategoryIds,
+  mergeCategoryWithBrasilCalendar,
+  mergeCategoryWithBrasilDrivers,
+  mergeCategoryWithBrasilStandings,
+} from '../brasil-live';
 
 type ById<T> = Partial<Record<string, T | null>>;
 
@@ -65,6 +74,10 @@ export function LiveDataProvider({ children }: { children: ReactNode }) {
   const [ebRosters, setEbRosters] = useState<ById<EbRoster>>({});
   const [ebStandings, setEbStandings] = useState<ById<CategoryStandings>>({});
   const [ebReady, setEbReady] = useState(false);
+  const [brCalendars, setBrCalendars] = useState<ById<Race[]>>({});
+  const [brDrivers, setBrDrivers] = useState<ById<Driver[]>>({});
+  const [brStandings, setBrStandings] = useState<ById<CategoryStandings>>({});
+  const [brReady, setBrReady] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
 
   const refresh = useCallback(() => setRefreshTick((n) => n + 1), []);
@@ -214,6 +227,46 @@ export function LiveDataProvider({ children }: { children: ReactNode }) {
     };
   }, [refreshTick]);
 
+  // NASCAR Brasil e Porsche Cup Brasil (api-motorsports)
+  useEffect(() => {
+    let mounted = true;
+    const sync = async (force = false) => {
+      const results = await Promise.allSettled(
+        getBrasilCategoryIds().map(async (categoryId) => {
+          const [calendar, drivers, standings] = await Promise.all([
+            fetchBrasilCalendar(categoryId, force),
+            fetchBrasilDrivers(categoryId, force),
+            fetchBrasilStandings(categoryId, force),
+          ]);
+          return { categoryId, calendar, drivers, standings };
+        }),
+      );
+      if (!mounted) return;
+      setBrCalendars((prev) => {
+        const next = { ...prev };
+        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.calendar;
+        return next;
+      });
+      setBrDrivers((prev) => {
+        const next = { ...prev };
+        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.drivers;
+        return next;
+      });
+      setBrStandings((prev) => {
+        const next = { ...prev };
+        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.standings;
+        return next;
+      });
+      setBrReady(true);
+    };
+    void sync(refreshTick > 0);
+    const id = window.setInterval(() => void sync(true), THIRTY_MIN);
+    return () => {
+      mounted = false;
+      window.clearInterval(id);
+    };
+  }, [refreshTick]);
+
   const categories = useMemo(
     () =>
       MOTORSPORT_DATA.map((category) => {
@@ -225,20 +278,26 @@ export function LiveDataProvider({ children }: { children: ReactNode }) {
         const gtwcStandingsMerged = mergeCategoryWithGtwcStandings(gtwcRosterMerged, gtwcStandings[category.id] ?? null);
         const ebCalendarMerged = mergeCategoryWithEbCalendar(gtwcStandingsMerged, ebCalendars[category.id] ?? null);
         const ebRosterMerged = mergeCategoryWithEbRoster(ebCalendarMerged, ebRosters[category.id] ?? null);
-        return mergeCategoryWithEbStandings(ebRosterMerged, ebStandings[category.id] ?? null);
+        const ebStandingsMerged = mergeCategoryWithEbStandings(ebRosterMerged, ebStandings[category.id] ?? null);
+        const brCalendarMerged = mergeCategoryWithBrasilCalendar(ebStandingsMerged, brCalendars[category.id] ?? null);
+        const brDriversMerged = mergeCategoryWithBrasilDrivers(brCalendarMerged, brDrivers[category.id] ?? null);
+        return mergeCategoryWithBrasilStandings(brDriversMerged, brStandings[category.id] ?? null);
       }),
-    [f1Data, syncedCalendars, syncedStandings, gtwcCalendars, gtwcRosters, gtwcStandings, ebCalendars, ebRosters, ebStandings],
+    [
+      f1Data, syncedCalendars, syncedStandings, gtwcCalendars, gtwcRosters, gtwcStandings,
+      ebCalendars, ebRosters, ebStandings, brCalendars, brDrivers, brStandings,
+    ],
   );
 
   const value = useMemo<LiveDataValue>(
     () => ({
       categories,
       byId: new Map(categories.map((category) => [category.id, category])),
-      ready: syncedReady && gtwcReady && ebReady && f1State !== 'loading',
+      ready: syncedReady && gtwcReady && ebReady && brReady && f1State !== 'loading',
       f1State,
       refresh,
     }),
-    [categories, syncedReady, gtwcReady, ebReady, f1State, refresh],
+    [categories, syncedReady, gtwcReady, ebReady, brReady, f1State, refresh],
   );
 
   return <LiveDataContext.Provider value={value}>{children}</LiveDataContext.Provider>;

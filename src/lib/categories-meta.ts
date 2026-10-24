@@ -1,6 +1,6 @@
 import type { Category } from '../types';
 
-export type GroupId = 'formulas' | 'americanas' | 'endurance' | 'rally';
+export type GroupId = 'formulas' | 'americanas' | 'endurance' | 'brasil' | 'rally';
 
 export type CategoryGroup = {
   id: GroupId;
@@ -15,7 +15,12 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
   {
     id: 'endurance',
     label: { pt: 'Endurance / GT', en: 'Endurance / GT' },
-    ids: ['wec', 'imsa', 'dtm', 'gtwc-europe', 'gtwc-america', 'gtwc-asia', 'endurance-brasil'],
+    ids: ['wec', 'imsa', 'dtm', 'gtwc-europe', 'gtwc-america', 'gtwc-asia'],
+  },
+  {
+    id: 'brasil',
+    label: { pt: 'Brasil', en: 'Brazil' },
+    ids: ['nascar-brasil', 'porsche-cup', 'endurance-brasil'],
   },
   { id: 'rally', label: { pt: 'Rally', en: 'Rally' }, ids: ['wrc'] },
 ];
@@ -45,6 +50,8 @@ export const CATEGORY_ACCENTS: Record<string, string> = {
   'gtwc-america': '#f39c12',
   'gtwc-asia': '#9b59b6',
   'endurance-brasil': '#009b3a',
+  'nascar-brasil': '#2f7fd1',
+  'porsche-cup': '#c9a227',
 };
 
 export const accentOf = (categoryId: string) => CATEGORY_ACCENTS[categoryId] ?? '#9aa5b8';
@@ -63,6 +70,9 @@ export const DATA_STATE: Record<string, DataState> = {
   'gtwc-america': 'live',
   'gtwc-asia': 'live',
   'endurance-brasil': 'live',
+  // Raspadas das fontes oficiais pelo motor do Supabase e publicadas pela api-motorsports.
+  'nascar-brasil': 'daily',
+  'porsche-cup': 'daily',
   f2: 'daily',
   f3: 'daily',
   dtm: 'daily',
