@@ -1,0 +1,37 @@
+{
+ "key": "new-hampshire",
+ "official_map": "https://www.nhms.com/documents/nascar-cup-series-seating-chart.pdf",
+ "official_map_page": "https://www.nhms.com/fans/maps/",
+ "official_length_m": 1703,
+ "official_length_source": "https://www.nhms.com/track-facts/ (\"1.058-Mile Oval\"; checked 2026-10-21)",
+ "alt_lengths": [],
+ "osm_length_m": 1667.5,
+ "length_error_pct": -2.09,
+ "osm_chamfer_pct": 0.99,
+ "osm_chamfer_m": 2.5,
+ "osm_p95_m": 3.9,
+ "osm_mirror_pct": 0.99,
+ "osm_aniso": 1.029,
+ "osm_rot_deg": -71.1,
+ "extract": {
+  "mode": "mask",
+  "n": 32508
+ },
+ "png_chamfer_pct": 0.97,
+ "png_mirror_pct": 0.98,
+ "png_aniso": 1.027,
+ "png_rot_deg": -0.1,
+ "mirror_ratio": 1.0,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

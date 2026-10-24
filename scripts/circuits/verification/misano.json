@@ -1,0 +1,37 @@
+{
+ "key": "misano",
+ "official_map": "https://www.gt-world-challenge-europe.com/images/circuits/track-misano.png",
+ "official_map_page": "https://www.gt-world-challenge-europe.com/event/250/misano",
+ "official_length_m": 4226,
+ "official_length_source": "https://www.gt-world-challenge-europe.com/event/250/misano",
+ "alt_lengths": [],
+ "osm_length_m": 4218.3,
+ "length_error_pct": -0.18,
+ "osm_chamfer_pct": 1.59,
+ "osm_chamfer_m": 5.9,
+ "osm_p95_m": 11.9,
+ "osm_mirror_pct": 14.97,
+ "osm_aniso": 1.046,
+ "osm_rot_deg": -64.7,
+ "extract": {
+  "mode": "mask",
+  "n": 84081
+ },
+ "png_chamfer_pct": 1.6,
+ "png_mirror_pct": 15.43,
+ "png_aniso": 1.046,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 9.42,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

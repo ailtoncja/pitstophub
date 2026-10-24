@@ -1,0 +1,82 @@
+{
+ "key": "st-petersburg",
+ "name": "Streets of St. Petersburg",
+ "layout": "Street circuit",
+ "status": "published",
+ "used_by": [
+  "indy / st-pete (live r01-st-petersburg) / 2026-03-01"
+ ],
+ "layout_source": "https://www.indycar.com/Schedule/2026/St-Petersburg",
+ "venue": {
+  "lat": 27.766,
+  "lon": -82.63,
+  "radius_m": 1300
+ },
+ "official": {
+  "length_m": 2897,
+  "map_file": "st-petersburg-map-nopit.png",
+  "length_source": "https://www.indycar.com/Schedule/2026/St-Petersburg (1.8-mile)",
+  "corners": 14,
+  "corners_source": "https://www.indycar.com/Schedule/2026/St-Petersburg (\"14-turn (5 lefts, 9 rights)\")",
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackMaps/StPete_TrackMap.jpg",
+  "map_page": "https://www.indycar.com/Schedule/2026/St-Petersburg",
+  "map_publisher": "INDYCAR (2026 track map)"
+ },
+ "select": {
+  "mode": "cycle",
+  "relations": [
+   8668325
+  ],
+  "only_ways": [
+   512696306,
+   480523720,
+   512696306
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   35,
+   31,
+   32
+  ],
+  "tol": 40,
+  "crop": [
+   0.24,
+   0.26,
+   0.7,
+   0.86
+  ],
+  "erase": [
+   [
+    0.2,
+    0.58,
+    0.335,
+    0.625
+   ],
+   [
+    0.59,
+    0.28,
+    0.635,
+    0.35
+   ],
+   [
+    0.43,
+    0.61,
+    0.475,
+    0.66
+   ]
+  ],
+  "close": 6,
+  "keep": "all",
+  "min_size": 400
+ },
+ "verify": {
+  "notes": "Official 2026 IndyCar track map; the pit-lane band beside the front straight was painted white in the cached copy (st-petersburg-map-nopit.png) so it is not read as track. The IndyCar outline https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/StPetersburg.png scores 2.05% (hand-drawn, aniso 1.059)."
+ },
+ "render": {
+  "rotate_deg": 89.2
+ },
+ "notes": "OSM relation 8668325 \"Grand Prix of Saint Petersburg Raceway\"."
+}

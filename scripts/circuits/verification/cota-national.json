@@ -1,0 +1,29 @@
+{
+ "key": "cota-national",
+ "official_map": null,
+ "official_map_page": null,
+ "official_length_m": 3862,
+ "official_length_source": null,
+ "alt_lengths": [],
+ "osm_length_m": 3871.2,
+ "length_error_pct": 0.24,
+ "osm_chamfer_pct": 18.75,
+ "osm_chamfer_m": 67.7,
+ "osm_p95_m": 213.1,
+ "osm_mirror_pct": 20.58,
+ "osm_aniso": 3.221,
+ "osm_rot_deg": -34.5,
+ "extract": {
+  "mode": "mask",
+  "n": 83416
+ },
+ "mirror_ratio": 1.1,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": false,
+  "not_mirrored": false,
+  "not_distorted": false,
+  "length": true
+ },
+ "pass": false
+}

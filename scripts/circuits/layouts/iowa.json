@@ -1,0 +1,44 @@
+{
+ "key": "iowa",
+ "name": "Iowa Speedway",
+ "layout": "Oval",
+ "venue": {
+  "lat": 41.6772,
+  "lon": -93.0137,
+  "radius_m": 900
+ },
+ "official": {
+  "length_m": 1408,
+  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf",
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/IowaSpeedway.png",
+  "map_page": "https://www.indycar.com/",
+  "map_publisher": "INDYCAR (track outline used on its schedule pages)",
+  "length_source_note": "NASCAR Cup Series stage lengths and pit road speeds (January 2026), Track Length column; read 2026-10-21"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   119238784
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "render": {
+  "rotate_deg": -128.1
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "used_by": [
+  "nascar / iowa / 2026-08-09"
+ ],
+ "layout_source": "https://www.iowaspeedway.com/maps/",
+ "status": "published",
+ "notes": "OSM way 119238784 (oval only; pit road, 1/5-mile oval and road course excluded). Official map is the IndyCar track outline (IndyCar raced at Iowa through 2025).",
+ "verify": {
+  "symmetric": true,
+  "notes": "Oval is mirror-symmetric about its minor axis, so the mirrored fit scores the same; the drawing is rendered from OSM coordinates and is never mirrored."
+ }
+}

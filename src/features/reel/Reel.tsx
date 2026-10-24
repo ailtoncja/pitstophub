@@ -109,7 +109,7 @@ function ReelCard({ item, index, active, next, setRef, onNext }: { item: ReelIte
   const settings = useSettings();
   const { select } = useSelectedCategory();
   const { category, race, phase } = item;
-  const hasTrack = Boolean(getRaceCircuitInfo(race)?.trackImage);
+  const hasTrack = Boolean(getRaceCircuitInfo(race, category.id)?.trackImage);
   // So o item atual entra na ordem de tabulacao (sao quatro glifos por item); os outros continuam lidos por leitores de tela.
   const tab = active ? 0 : -1;
 

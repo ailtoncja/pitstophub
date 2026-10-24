@@ -1,0 +1,37 @@
+{
+ "key": "atlanta",
+ "official_map": "https://www.echoparkspeedway.com/documents/eps---2025_nascarseatingdiagram_cc.pdf",
+ "official_map_page": "https://www.atlantamotorspeedway.com/fans/maps/",
+ "official_length_m": 2478,
+ "official_length_source": "https://www.nascar.com/tracks/atlanta-motor-speedway/ (\"Length/Track type: 1.54 miles, Paved\")",
+ "alt_lengths": [],
+ "osm_length_m": 2412.2,
+ "length_error_pct": -2.66,
+ "osm_chamfer_pct": 1.02,
+ "osm_chamfer_m": 3.8,
+ "osm_p95_m": 7.6,
+ "osm_mirror_pct": 0.97,
+ "osm_aniso": 1.02,
+ "osm_rot_deg": 19.3,
+ "extract": {
+  "mode": "mask",
+  "n": 92495
+ },
+ "png_chamfer_pct": 1.02,
+ "png_mirror_pct": 0.98,
+ "png_aniso": 1.021,
+ "png_rot_deg": 0.1,
+ "mirror_ratio": 0.95,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

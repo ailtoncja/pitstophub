@@ -1,0 +1,81 @@
+{
+ "key": "portimao",
+ "name": "Autódromo Internacional do Algarve",
+ "layout": "Grand Prix",
+ "status": "published",
+ "used_by": [
+  "gtwc-europe / portimao / 2026-10-18 (synced gt-world-challenge r10-3-hours-of-portimao)",
+  "porsche-cup / r05-algarve / 2026-07-05",
+  "porsche-cup / r06-algarve / 2026-07-12"
+ ],
+ "layout_source": "https://www.gt-world-challenge-europe.com/event/255/portimao",
+ "venue": {
+  "lat": 37.2297,
+  "lon": -8.6267,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 4692,
+  "length_source": "https://www.gt-world-challenge-europe.com/event/255/portimao",
+  "alt_lengths": [
+   {
+    "length_m": 4653,
+    "source": "https://www.formula1.com/en/racing/2021/portugal"
+   }
+  ],
+  "map_url": "https://media.formula1.com/image/upload/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Portugal_Circuit.png",
+  "map_page": "https://www.formula1.com/en/racing/2021/portugal",
+  "map_publisher": "Formula 1",
+  "corners": 18,
+  "corners_source": "https://www.gt-world-challenge-europe.com/event/255/portimao"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   511858146,
+   363133191,
+   511858147,
+   363133200,
+   511858148,
+   363133199,
+   363133195,
+   363133198,
+   511859283,
+   363133196,
+   511859282,
+   511859285,
+   363133197,
+   511859286,
+   511859288,
+   511859287,
+   363133193,
+   511859289,
+   511859290,
+   511859291,
+   511858539,
+   511858543,
+   511858533,
+   363133190,
+   511858536,
+   363133194,
+   511859284,
+   511858546,
+   363133187,
+   511858547,
+   511858548,
+   363133201,
+   511858549,
+   511858150,
+   511858149,
+   511858151
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "f1"
+ },
+ "render": {
+  "rotate_deg": 73.9
+ },
+ "notes": "Porsche Cup Brasil Algarve rounds assumed on the same Grand Prix circuit (the only full-length layout); not confirmed by a Porsche Cup source. F1 2021 lists 4.653 km for the same layout."
+}

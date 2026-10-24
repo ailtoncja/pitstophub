@@ -1,0 +1,37 @@
+{
+ "key": "pocono",
+ "official_map": "https://ik.imagekit.io/poconoraceway/wp-content/uploads/2019/09/Camping-Map-Update-2025.png",
+ "official_map_page": "https://www.poconoraceway.com/3d-seat-map.html",
+ "official_length_m": 4023,
+ "official_length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf",
+ "alt_lengths": [],
+ "osm_length_m": 4058.1,
+ "length_error_pct": 0.87,
+ "osm_chamfer_pct": 0.58,
+ "osm_chamfer_m": 3.5,
+ "osm_p95_m": 8.5,
+ "osm_mirror_pct": 8.62,
+ "osm_aniso": 1.008,
+ "osm_rot_deg": 21.9,
+ "extract": {
+  "mode": "mask",
+  "n": 18347
+ },
+ "png_chamfer_pct": 0.61,
+ "png_mirror_pct": 8.4,
+ "png_aniso": 1.005,
+ "png_rot_deg": 0.0,
+ "mirror_ratio": 14.86,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

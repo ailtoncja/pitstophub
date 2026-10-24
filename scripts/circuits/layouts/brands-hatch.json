@@ -1,0 +1,140 @@
+{
+ "key": "brands-hatch",
+ "name": "Brands Hatch",
+ "layout": "Grand Prix Circuit",
+ "status": "published",
+ "used_by": [
+  "gtwc-europe / brands-hatch / 2026-05-03"
+ ],
+ "layout_source": "https://www.gt-world-challenge-europe.com/event/247/brands-hatch",
+ "venue": {
+  "lat": 51.358,
+  "lon": 0.262,
+  "radius_m": 1300
+ },
+ "official": {
+  "length_m": 3916,
+  "length_source": "https://www.gt-world-challenge-europe.com/event/247/brands-hatch",
+  "map_url": "https://www.gt-world-challenge-europe.com/images/circuits/track_12.png",
+  "map_page": "https://www.gt-world-challenge-europe.com/event/247/brands-hatch",
+  "map_publisher": "SRO / MotorSport Vision (Brands Hatch)",
+  "corners": 9,
+  "corners_source": "https://www.gt-world-challenge-europe.com/event/247/brands-hatch"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   25804846,
+   25804824,
+   25804875,
+   820329314,
+   171570164,
+   25804935,
+   171570162,
+   4906929,
+   25804993,
+   25804999,
+   25805047,
+   171570163,
+   25805049,
+   171570165,
+   25805072,
+   171570251,
+   171570252,
+   820329315,
+   25804641,
+   171570166,
+   25805012,
+   25804653,
+   171570161,
+   25804669,
+   171570167
+  ],
+  "notes_select": "members of OSM circuit relation 7218462 \"Brands Hatch Grand Prix circuit\" minus the pit lane",
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   186,
+   40,
+   46
+  ],
+  "tol": 75,
+  "crop": [
+   0.08,
+   0.25,
+   0.72,
+   0.79
+  ],
+  "keep": "all",
+  "close": 4,
+  "min_size": 150,
+  "erase": [
+   [
+    0.18,
+    0.62,
+    0.29,
+    0.65
+   ],
+   [
+    0.11,
+    0.735,
+    0.19,
+    0.765
+   ],
+   [
+    0.46,
+    0.68,
+    0.54,
+    0.71
+   ],
+   [
+    0.53,
+    0.715,
+    0.6,
+    0.74
+   ],
+   [
+    0.27,
+    0.545,
+    0.32,
+    0.565
+   ],
+   [
+    0.585,
+    0.57,
+    0.635,
+    0.595
+   ],
+   [
+    0.68,
+    0.685,
+    0.76,
+    0.705
+   ],
+   [
+    0.16,
+    0.68,
+    0.2,
+    0.715
+   ],
+   [
+    0.46,
+    0.775,
+    0.5,
+    0.79
+   ],
+   [
+    0.27,
+    0.78,
+    0.36,
+    0.79
+   ]
+  ]
+ },
+ "render": {
+  "rotate_deg": 164.3
+ },
+ "notes": "The SRO event page shows the \"Brands Hatch Grand Prix Circuit\" map and the GP length (3.916 km). OSM relation 7218462 used directly because the generic raceway filter drops \"Paddock Hill\" (name contains \"paddock\")."
+}

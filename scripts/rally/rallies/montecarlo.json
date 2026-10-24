@@ -1,0 +1,256 @@
+{
+ "id": "montecarlo",
+ "out": "src/rally/montecarlo-2026-map.ts",
+ "export": "MONTECARLO_2026_MAP",
+ "viewBox": [
+  1000,
+  560
+ ],
+ "credits": [
+  "Rallye Monte-Carlo 2026: tracado das especiais dos KMZ oficiais do ACM (anexos da pagina",
+  "https://acm.mc/epreuves/rallye-automobile-monte-carlo/espace-spectateurs/cartes/), cortado entre os pontos START e FINISH.",
+  "Costa e parque de assistencia: OpenStreetMap, (c) OpenStreetMap contributors, ODbL."
+ ],
+ "downloads": [
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-1.kmz",
+   "file": "montecarlo/SS-1.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-2.kmz",
+   "file": "montecarlo/SS-2.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-3.kmz",
+   "file": "montecarlo/SS-3.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-4-7.kmz",
+   "file": "montecarlo/SS-4-7.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-5-8.kmz",
+   "file": "montecarlo/SS-5-8.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-6-9.kmz",
+   "file": "montecarlo/SS-6-9.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-10-12.kmz",
+   "file": "montecarlo/SS-10-12.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SSS-13.kmz",
+   "file": "montecarlo/SSS-13.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-14-16.kmz",
+   "file": "montecarlo/SS-14-16.kmz"
+  },
+  {
+   "url": "https://acm.mc/wp-content/uploads/2025/05/SS-15-17.kmz",
+   "file": "montecarlo/SS-15-17.kmz"
+  }
+ ],
+ "stages": [
+  {
+   "id": "ss1",
+   "km": 21.9,
+   "start": [
+    43.8995323,
+    7.1212105
+   ],
+   "finish": [
+    43.9004,
+    6.961843
+   ],
+   "source": "montecarlo/SS-1.kmz KMZ placemarks 'START SS ..' / 'FINISH SS ..'",
+   "route": {
+    "file": "montecarlo/SS-1.kmz",
+    "name": "SS 1",
+    "match": "exact",
+    "trim": true
+   }
+  },
+  {
+   "id": "ss2",
+   "km": 23.8,
+   "start": [
+    44.1963652,
+    6.2765553
+   ],
+   "finish": [
+    44.3320603,
+    6.3512529
+   ],
+   "source": "montecarlo/SS-2.kmz KMZ placemarks 'START SS ..' / 'FINISH SS ..'",
+   "route": {
+    "file": "montecarlo/SS-2.kmz",
+    "name": "SS 2",
+    "match": "exact",
+    "trim": true
+   }
+  },
+  {
+   "id": "ss3-11",
+   "km": 15.06,
+   "start": [
+    44.2889029,
+    5.9572916
+   ],
+   "finish": [
+    44.3718152,
+    5.9591733
+   ],
+   "source": "montecarlo/SS-3.kmz KMZ placemarks 'START SS ..' / 'FINISH SS ..'",
+   "route": {
+    "file": "montecarlo/SS-3.kmz",
+    "name": "SS 3",
+    "match": "exact",
+    "trim": true
+   }
+  },
+  {
+   "id": "ss4-7",
+   "km": 17.95,
+   "start": [
+    44.2926895,
+    5.5962887
+   ],
+   "finish": [
+    44.3343527,
+    5.5122468
+   ],
+   "source": "montecarlo/SS-4-7.kmz KMZ placemarks 'START SS ..' / 'FINISH SS ..'",
+   "route": {
+    "file": "montecarlo/SS-4-7.kmz",
+    "name": "SS 4/7",
+    "match": "exact",
+    "trim": true
+   }
+  },
+  {
+   "id": "ss5-8",
+   "km": 28.7,
+   "start": [
+    44.5581549,
+    5.2866277
+   ],
+   "finish": [
+    44.4911552,
+    5.3744106
+   ],
+   "source": "montecarlo/SS-5-8.kmz KMZ placemarks 'START SS ..' / 'FINISH SS ..'",
+   "route": {
+    "file": "montecarlo/SS-5-8.kmz",
+    "name": "SS 5/8",
+    "match": "exact",
+    "trim": true
+   }
+  },
+  {
+   "id": "ss6-9",
+   "km": 17.79,
+   "start": [
+    44.5134196,
+    5.6383916
+   ],
+   "finish": [
+    44.4851807,
+    5.7219427
+   ],
+   "source": "montecarlo/SS-6-9.kmz KMZ placemarks 'START SS ..' / 'FINISH SS ..'",
+   "route": {
+    "file": "montecarlo/SS-6-9.kmz",
+    "name": "SS 6/9",
+    "match": "exact",
+    "trim": true
+   }
+  },
+  {
+   "id": "ss10-12",
+   "km": 29.93,
+   "start": [
+    44.4423189,
+    6.3041929
+   ],
+   "finish": [
+    44.4162535,
+    6.1846819
+   ],
+   "source": "montecarlo/SS-10-12.kmz KMZ placemarks 'START SS ..' / 'FINISH SS ..'",
+   "route": {
+    "file": "montecarlo/SS-10-12.kmz",
+    "name": "SS10/12",
+    "match": "exact",
+    "trim": true
+   }
+  },
+  {
+   "id": "ss13",
+   "km": 2.69,
+   "start": [
+    43.7325422,
+    7.4236768
+   ],
+   "finish": [
+    43.7331023,
+    7.4230398
+   ],
+   "source": "montecarlo/SSS-13.kmz KMZ placemarks 'START SS ..' / 'FINISH SS ..'. Route NOT drawn (start/finish only): SSS13: two laps of the Monaco circuit; START->FINISH along the official line (both laps) is 2.79 km vs 2.69 km official (+3.7%), more than the 2% tolerance."
+  },
+  {
+   "id": "ss14-16",
+   "km": 12.5,
+   "start": [
+    43.8762521,
+    7.3934917
+   ],
+   "finish": [
+    43.91166,
+    7.3542239
+   ],
+   "source": "montecarlo/SS-14-16.kmz KMZ placemarks 'START SS ..' / 'FINISH SS ..'. Route NOT drawn (start/finish only): official line START->FINISH 12.81 km vs 12.50 km official (+2.5%), more than the 2% tolerance."
+  },
+  {
+   "id": "ss15-17",
+   "km": 23.45,
+   "start": [
+    43.9906992,
+    7.3318925
+   ],
+   "finish": [
+    43.9425519,
+    7.4158663
+   ],
+   "source": "montecarlo/SS-15-17.kmz KMZ placemarks 'START SS ..' / 'FINISH SS ..'. Route NOT drawn (start/finish only): official line START->FINISH 23.97 km vs 23.45 km official (+2.2%), more than the 2% tolerance."
+  }
+ ],
+ "servicePark": [
+  44.5404805,
+  6.0611382
+ ],
+ "towns": [],
+ "land": true,
+ "sources": {
+  "geometry": [
+   "https://acm.mc/epreuves/rallye-automobile-monte-carlo/espace-spectateurs/cartes/",
+   "https://acm.mc/wp-content/uploads/2025/05/SHAKEDOWN.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-1.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-2.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-3.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-4-7.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-5-8.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-6-9.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-10-12.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-11.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SSS-13.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-14-16.kmz",
+   "https://acm.mc/wp-content/uploads/2025/05/SS-15-17.kmz"
+  ],
+  "servicePark": "OpenStreetMap way 90869743 'COSEC' (leisure=sports_centre, Avenue de Traunstein, Gap) via Nominatim: https://www.openstreetmap.org/way/90869743",
+  "notes": "Official per-stage KMZ files uploaded by the ACM on 2025-12-18/19 as attachments of the spectator maps page (found via acm.mc WP REST media API). Each KMZ has one LineString plus Points TC / START / FINISH / STOP and ZP (public zone) points; only START/FINISH used. The LineStrings run TC -> STOP (include approach and stop zone), so trim to START..FINISH for display. Along-line START->FINISH lengths (nearest vertex) vs official km: SS1 22.31/21.90, SS2 24.03/23.80, SS3/11 15.21/15.06, SS4/7 18.10/17.95, SS5/8 28.93/28.70, SS6/9 17.95/17.79, SS10/12 30.11/29.93, SS14/16 12.81/12.50, SS15/17 23.93/23.45 (lines ~1-2% longer, normal digitising noise); SSS13 is a loop on the Monaco circuit (line 2.99 km incl. TC/stop, official 2.69). All locations match stage names geographically. Match by file name = stage numbers (certain). Shakedown (not in stages list): SHAKEDOWN.kmz 'START SD' 44.560021,6.042557 / 'FINISH SD' 44.559855,6.017924 (line 'SD', START->FINISH 4.26 km vs 4.25 official). Ignored: SS2.kmz and SS2-copie.kmz (uploaded 2025-12-18) contain a different 'SS 2' (TC near 44.3976,6.0906, ~21.1 km) that does not match SS2 Esclangon/Seyne-les-Alpes of the 2026 WRC itinerary - probably another event/draft.",
+  "verification": "Re-checked 2026-10-21 against the itinerary (RP Annexe 1, Version 1 19.11.2025): lines are cut at the projections of the official START/FINISH placemarks and measured on WGS84. SS1 +1.96%, SS2 +0.97%, SS3/11 +1.26%, SS4/7 +0.95%, SS5/8 +0.94%, SS6/9 +1.01%, SS10/12 +0.53% (drawn). SS13 (2 laps, START->FINISH along the line 2.79 vs 2.69 km), SS14/16 (12.81 vs 12.50) and SS15/17 (23.97 vs 23.45) exceed 2% and are shown as start/finish only. Service park: RP art. 2.8 gives COSEC 44°32'24.8\"N 6°03'39.7\"E (30 m from the OSM point)."
+ }
+}

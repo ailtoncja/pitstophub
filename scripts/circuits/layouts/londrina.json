@@ -1,0 +1,51 @@
+{
+ "key": "londrina",
+ "name": "Autódromo Internacional Ayrton Senna (Londrina)",
+ "layout": "Circuito principal",
+ "venue": {
+  "lat": -23.2818,
+  "lon": -51.1678,
+  "radius_m": 1200
+ },
+ "official": {
+  "length_m": 3154,
+  "length_source": "https://www.cba.org.br/circuitos",
+  "alt_lengths": [
+   {
+    "length_m": 3055,
+    "source": "CBA (circuito alternativo)"
+   }
+  ],
+  "direction": "counterclockwise",
+  "direction_source": "https://www.cba.org.br/circuitos",
+  "map_url": "https://superbike.com.br/wp-content/uploads/2023/01/londrina.png",
+  "map_page": "https://superbike.com.br/calendario-2026/",
+  "map_publisher": "SuperBike Brasil (official series site), 130x83 outline"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   118729437,
+   541388519,
+   118729437
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "render": {
+  "rotate_deg": 0.0
+ },
+ "status": "published",
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.4,
+  "close": 2
+ },
+ "used_by": [
+  "nascar-brasil / r06-londrina / 2026-08-23 (synced_races, not yet on the site)"
+ ],
+ "layout_source": "https://en.wikipedia.org/wiki/2026_NASCAR_Brasil_Series (round 6 Londrina); circuit not specified, main 3,154 m layout assumed",
+ "verify": {
+  "notes": "SuperBike Brasil outline is small (130x83) but matches closely; OSM lap length equals the CBA main-circuit figure."
+ }
+}

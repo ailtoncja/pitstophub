@@ -1,0 +1,254 @@
+{
+ "id": "sardegna",
+ "out": "src/rally/sardegna-2026-map.ts",
+ "export": "SARDEGNA_2026_MAP",
+ "viewBox": [
+  1000,
+  500
+ ],
+ "credits": [
+  "Rally Italia Sardegna 2026: tracado das PS dos mapas oficiais do organizador (Google My Maps \"Accessi\" ligados em",
+  "https://rallyitaliasardegna.com/guida-alle-ps-spettatori/ , pasta \"Track\" de cada mapa, exportados em KML).",
+  "Costa: OpenStreetMap land polygons (osmdata.openstreetmap.de). Parque de assistencia e cidades: OpenStreetMap (Nominatim).",
+  "(c) OpenStreetMap contributors, ODbL."
+ ],
+ "downloads": [
+  {
+   "url": "https://www.google.com/maps/d/kml?mid=1uOTQcsX27L4iuAO4KGlQN0IdSFDNA9I&forcekml=1",
+   "file": "sardegna/ss1.kml",
+   "page": "https://rallyitaliasardegna.com/guida_alle_ps/sss1-ittiri-arena-show/"
+  },
+  {
+   "url": "https://www.google.com/maps/d/kml?mid=1jUiJq_h1eQzvw_Nq-9Ex-wxLyNmzdTE&forcekml=1",
+   "file": "sardegna/ss2-5.kml",
+   "page": "https://rallyitaliasardegna.com/guida_alle_ps/ss2-5-tula-erula/"
+  },
+  {
+   "url": "https://www.google.com/maps/d/kml?mid=1L6rc9nVcTGvZ-5Qe4wX_JUsXWIfZ0Eg&forcekml=1",
+   "file": "sardegna/ss3-6.kml",
+   "page": "https://rallyitaliasardegna.com/guida_alle_ps/ss3-6-su-filigosu-lerno/"
+  },
+  {
+   "url": "https://www.google.com/maps/d/kml?mid=1TfT6Znc1kTndpB774gtyWCAJFltbDzA&forcekml=1",
+   "file": "sardegna/ss4-7.kml",
+   "page": "https://rallyitaliasardegna.com/guida_alle_ps/ss4-7-monti-di-ala-conchedda-lerno/"
+  },
+  {
+   "url": "https://www.google.com/maps/d/kml?mid=1aeZ039KRKmFkicOF0ZRL0M1pukbXG6s&forcekml=1",
+   "file": "sardegna/ss8-11.kml",
+   "page": "https://rallyitaliasardegna.com/guida_alle_ps/ss8-11-lerno-sa-conchedda-monti-di-ala/"
+  },
+  {
+   "url": "https://www.google.com/maps/d/kml?mid=1dVDHo8oiVt9sdYno2CIsNLDm9StNanY&forcekml=1",
+   "file": "sardegna/ss9-12.kml",
+   "page": "https://rallyitaliasardegna.com/guida_alle_ps/ss9-12-coiluna-loelle/"
+  },
+  {
+   "url": "https://www.google.com/maps/d/kml?mid=1ywLWmiaqTGrJy1D3rOdqITWQNqm6QCY&forcekml=1",
+   "file": "sardegna/ss10-13.kml",
+   "page": "https://rallyitaliasardegna.com/guida_alle_ps/ss10-13-solorche/"
+  },
+  {
+   "url": "https://www.google.com/maps/d/kml?mid=1-UgCL8n1O6kso_L11HZcApgH0UtluEY&forcekml=1",
+   "file": "sardegna/ss14-16.kml",
+   "page": "https://rallyitaliasardegna.com/guida_alle_ps/ss14-16-osilo-tergu/"
+  },
+  {
+   "url": "https://www.google.com/maps/d/kml?mid=1g55gXtiUH4qmUn9LNWVy6vqOP6c0SCs&forcekml=1",
+   "file": "sardegna/ss15-17.kml",
+   "page": "https://rallyitaliasardegna.com/guida_alle_ps/ss15-17-sassari-argentiera/"
+  }
+ ],
+ "stages": [
+  {
+   "id": "ss1",
+   "km": 2.21,
+   "start": [
+    40.585615,
+    8.565508
+   ],
+   "finish": [
+    40.585615,
+    8.565508
+   ],
+   "source": "sardegna/ss1.kml arena loop: Track folder placemarks 'Start / Finish' (nearest to each end of the line)",
+   "route": {
+    "file": "sardegna/ss1.kml",
+    "name": "SSS1 Ittiri Arena Show",
+    "match": "prefix"
+   }
+  },
+  {
+   "id": "ss2-5",
+   "km": 18.77,
+   "start": [
+    40.745221,
+    8.964237
+   ],
+   "finish": [
+    40.768379,
+    8.999662
+   ],
+   "source": "sardegna/ss2-5.kml Track folder placemarks 'START' / 'FINISH'",
+   "route": {
+    "file": "sardegna/ss2-5.kml",
+    "name": "SS2/5",
+    "match": "prefix"
+   }
+  },
+  {
+   "id": "ss3-6",
+   "km": 17.83,
+   "start": [
+    40.692488,
+    9.14359
+   ],
+   "finish": [
+    40.627441,
+    9.156118
+   ],
+   "source": "sardegna/ss3-6.kml Track folder placemarks 'START' / 'FINISH'",
+   "route": {
+    "file": "sardegna/ss3-6.kml",
+    "name": "SS3/6",
+    "match": "prefix"
+   }
+  },
+  {
+   "id": "ss4-7",
+   "km": 23.23,
+   "start": [
+    40.668089,
+    9.292929
+   ],
+   "finish": [
+    40.624498,
+    9.157652
+   ],
+   "source": "sardegna/ss4-7.kml Track folder placemarks 'START' / 'FINISH'",
+   "route": {
+    "file": "sardegna/ss4-7.kml",
+    "name": "SS4/7",
+    "match": "prefix"
+   }
+  },
+  {
+   "id": "ss8-11",
+   "km": 24.14,
+   "start": [
+    40.603752,
+    9.18409
+   ],
+   "finish": [
+    40.692192,
+    9.29472
+   ],
+   "source": "sardegna/ss8-11.kml Track folder placemarks 'START' / 'FINISH'",
+   "route": {
+    "file": "sardegna/ss8-11.kml",
+    "name": "SS8/11",
+    "match": "prefix"
+   }
+  },
+  {
+   "id": "ss9-12",
+   "km": 24.83,
+   "start": [
+    40.612735,
+    9.3443
+   ],
+   "finish": [
+    40.577532,
+    9.313706
+   ],
+   "source": "sardegna/ss9-12.kml Track folder placemarks 'START' / 'FINISH'",
+   "route": {
+    "file": "sardegna/ss9-12.kml",
+    "name": "SS9/12",
+    "match": "prefix"
+   }
+  },
+  {
+   "id": "ss10-13",
+   "km": 12.86,
+   "start": [
+    40.552875,
+    9.158468
+   ],
+   "finish": [
+    40.54755,
+    9.090532
+   ],
+   "source": "sardegna/ss10-13.kml Track folder placemarks 'START' / 'FINISH'",
+   "route": {
+    "file": "sardegna/ss10-13.kml",
+    "name": "SS10/13",
+    "match": "prefix"
+   }
+  },
+  {
+   "id": "ss14-16",
+   "km": 23.71,
+   "start": [
+    40.777139,
+    8.68163
+   ],
+   "finish": [
+    40.844562,
+    8.650213
+   ],
+   "source": "sardegna/ss14-16.kml Track folder placemarks 'START' / 'FINISH'",
+   "route": {
+    "file": "sardegna/ss14-16.kml",
+    "name": "SS14/16",
+    "match": "prefix"
+   }
+  },
+  {
+   "id": "ss15-17",
+   "km": 7.1,
+   "start": [
+    40.766554,
+    8.192789
+   ],
+   "finish": [
+    40.750759,
+    8.157449
+   ],
+   "source": "sardegna/ss15-17.kml Track folder placemarks 'START' / 'FINISH'",
+   "route": {
+    "file": "sardegna/ss15-17.kml",
+    "name": "SS15/17",
+    "match": "prefix"
+   }
+  }
+ ],
+ "servicePark": [
+  40.5624591,
+  8.3172503
+ ],
+ "towns": [
+  {
+   "name": "Sassari",
+   "lat": 40.7234746,
+   "lon": 8.5612674
+  },
+  {
+   "name": "Porto Torres",
+   "lat": 40.8370333,
+   "lon": 8.4013292
+  },
+  {
+   "name": "Ozieri",
+   "lat": 40.5859373,
+   "lon": 9.0010431
+  }
+ ],
+ "land": true,
+ "sources": {
+  "stages": "Organiser My Maps per stage (downloads[].page)",
+  "servicePark": "Rally Guide 2 §5.1.1 (Banchina Millelire e Piazzale della Pace); point = Piazzale della Pace, OSM way 38766078 via Nominatim",
+  "towns": "OSM Nominatim relations 40683 (Sassari), 40821 (Porto Torres), 40602 (Ozieri)",
+  "verification": "Re-checked 2026-10-21 against Tabella distanze e tempi V5.1 (14.09.2026): every Track line within 0.9% of the official km (WGS84), ends within 1 m of the START/FINISH placemarks (SS1 arena loop: 95 m / 67 m from the 'Start / Finish' markers)."
+ }
+}

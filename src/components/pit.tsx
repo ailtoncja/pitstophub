@@ -70,13 +70,18 @@ export function ReelBackdrop({
   className?: string;
 }) {
   const hue = hueOverride ?? accentOf(categoryId);
-  const track = useMemo(() => (race && !bare && art === 'track' ? getRaceCircuitInfo(race)?.trackImage : undefined), [race, bare, art]);
+  const circuit = useMemo(() => (race && !bare && art === 'track' ? getRaceCircuitInfo(race, categoryId) : null), [race, bare, art, categoryId]);
+  const track = circuit?.trackImage;
   const car = bare ? undefined : carArtOf(categoryId);
   return (
     <div className={cn('absolute inset-0 overflow-hidden bg-black', className)} aria-hidden>
       <div className="absolute inset-0" style={{ background: `radial-gradient(120% 80% at 75% 8%, color-mix(in oklab, ${hue} 46%, #000) 0%, color-mix(in oklab, ${hue} 18%, #000) 46%, #000 82%)` }} />
       {track ? (
-        <img src={track} alt="" className="absolute top-[7%] inset-x-0 mx-auto h-[50%] w-[92%] object-contain" loading={eager ? 'eager' : 'lazy'} />
+        <>
+          <img src={track} alt="" className="absolute top-[7%] inset-x-0 mx-auto h-[50%] w-[92%] object-contain" loading={eager ? 'eager' : 'lazy'} />
+          {/* Desenho feito a partir do OpenStreetMap: o credito (ODbL) acompanha o desenho. */}
+          {circuit?.osm && <span className="absolute top-[57%] right-[5%] type-label-telemetry text-white/60">© OpenStreetMap</span>}
+        </>
       ) : car ? (
         <>
           {/* pre-carrega a arte (mask-image nao tem loading="eager") */}

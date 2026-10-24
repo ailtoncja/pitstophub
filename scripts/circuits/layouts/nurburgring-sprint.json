@@ -1,0 +1,73 @@
+{
+ "key": "nurburgring-sprint",
+ "name": "Nürburgring",
+ "layout": "Sprintstrecke (3,629 km)",
+ "used_by": [
+  "dtm / nurburgring (r06-nurburgring) / 2026-08-16"
+ ],
+ "layout_source": "https://racing.porsche.com/events/pccd-07-nuerburgring-2026 (Porsche Carrera Cup Deutschland 2026 round at the DTM weekend: 'Sprint track layout', 3,629 m); the site's synced DTM calendar also names the circuit 'Nürburgring Sprint'",
+ "venue": {
+  "lat": 50.333,
+  "lon": 6.945,
+  "radius_m": 1800
+ },
+ "venue_key": "nurburgring",
+ "official": {
+  "length_m": 3629,
+  "length_source": "https://racing.porsche.com/events/pccd-07-nuerburgring-2026 (track map: Length 3,629 m)",
+  "corners": 11,
+  "corners_source": "https://racing.porsche.com/events/pccd-07-nuerburgring-2026 (track map: Turns 11)",
+  "map_url": "https://res.cloudinary.com/dmwcbhehi/image/upload/v1783594135/PSCCD_2026_Track_Map_N%C3%BCrburgring_ENG_yygmud.webp",
+  "map_page": "https://racing.porsche.com/events/pccd-07-nuerburgring-2026",
+  "map_publisher": "Porsche Motorsport (Porsche Carrera Cup Deutschland 2026)",
+  "map_file": "nurburgring-sprint.png"
+ },
+ "select": {
+  "mode": "cycle",
+  "exclude_ways": [
+   1113008496,
+   1113008501,
+   1113008502,
+   1113009320,
+   1113009321,
+   1113009324
+  ],
+  "only_ways": [
+   1149161208,
+   1149161210,
+   1149161211,
+   27852990,
+   1443047844,
+   1443047845,
+   1149161209,
+   1443047847,
+   1443047846,
+   1149161208
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   175,
+   175,
+   175
+  ],
+  "tol": 45,
+  "crop": [
+   0.33,
+   0.05,
+   1,
+   0.95
+  ],
+  "close": 2
+ },
+ "verify": {
+  "notes": "Official map cleaned for extraction: red corner-number boxes and the white start/finish mark on the track painted track grey (scratch clean_pccd.py). Rallycross ways excluded from the OSM graph. The sprint layout is the GP circuit without the Müllenbach loop (short link 'Anbindung zur Sprintstrecke' after the Mercedes-Arena)."
+ },
+ "render": {
+  "rotate_deg": -24.3
+ },
+ "status": "published",
+ "notes": "Lap = closed loop of the raceway ways closest to the official length."
+}

@@ -1,0 +1,37 @@
+{
+ "key": "brands-hatch",
+ "official_map": "https://www.gt-world-challenge-europe.com/images/circuits/track_12.png",
+ "official_map_page": "https://www.gt-world-challenge-europe.com/event/247/brands-hatch",
+ "official_length_m": 3916,
+ "official_length_source": "https://www.gt-world-challenge-europe.com/event/247/brands-hatch",
+ "alt_lengths": [],
+ "osm_length_m": 3895.2,
+ "length_error_pct": -0.53,
+ "osm_chamfer_pct": 1.61,
+ "osm_chamfer_m": 5.6,
+ "osm_p95_m": 15.4,
+ "osm_mirror_pct": 6.19,
+ "osm_aniso": 1.013,
+ "osm_rot_deg": 164.3,
+ "extract": {
+  "mode": "mask",
+  "n": 45026
+ },
+ "png_chamfer_pct": 1.58,
+ "png_mirror_pct": 6.17,
+ "png_aniso": 1.01,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 3.84,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

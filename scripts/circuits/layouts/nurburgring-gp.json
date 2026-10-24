@@ -1,0 +1,81 @@
+{
+ "key": "nurburgring-gp",
+ "name": "Nürburgring",
+ "layout": "Grand Prix (5,137 km)",
+ "used_by": [
+  "gtwc-europe / nürburgring (r7-3-hours-of-nurburgring) / 2026-08-30"
+ ],
+ "layout_source": "https://www.gt-world-challenge-europe.com/event/252/n%C3%BCrburgring (Circuit Length 5,137, Number of Turns 17 = full GP circuit with Mercedes-Arena and Müllenbach loop)",
+ "venue": {
+  "lat": 50.333,
+  "lon": 6.945,
+  "radius_m": 1800
+ },
+ "venue_key": "nurburgring",
+ "official": {
+  "length_m": 5137,
+  "length_source": "https://www.gt-world-challenge-europe.com/event/252/n%C3%BCrburgring (Circuit Length 5,137)",
+  "alt_lengths": [
+   {
+    "length_m": 5148,
+    "source": "https://nuerburgring.de/info/nuerburgring/race-tracks/grand-prix-track (5,148 Kilometer)"
+   }
+  ],
+  "corners": 17,
+  "corners_source": "https://www.gt-world-challenge-europe.com/event/252/n%C3%BCrburgring (Number of Turns 17)",
+  "map_url": "https://media.formula1.com/image/upload/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Eifel_Circuit.png",
+  "map_page": "https://www.formula1.com/en/racing/2020/Eifel",
+  "map_publisher": "Formula 1 (2020 Eifel Grand Prix, Nürburgring GP circuit)",
+  "map_file": "nurburgring-gp.png"
+ },
+ "select": {
+  "mode": "cycle",
+  "exclude_ways": [
+   1113008496,
+   1113008501,
+   1113008502,
+   1113009320,
+   1113009321,
+   1113009324
+  ],
+  "only_ways": [
+   1149161208,
+   1149161210,
+   1149161211,
+   27852990,
+   1443047844,
+   1443047845,
+   1079809245,
+   820330152,
+   820330153,
+   1113009624,
+   820330154,
+   820330155,
+   820679445,
+   1113009623,
+   820679446,
+   820679448,
+   820679447,
+   1079809244,
+   1443047847,
+   1443047846,
+   1149161208
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.35,
+  "close": 4,
+  "fill_holes_max": 400,
+  "min_size": 2000
+ },
+ "verify": {
+  "notes": "Official reference is the formula1.com map of the same GP layout (2020 Eifel GP); the layout is unchanged since 2002 and GTWC lists the same 17-turn, 5.137 km circuit. The SRO event-page site plan (images/circuits/track_27.jpg) is a venue map, not to scale enough to extract. Corner-number badges leave short spurs in the extraction. Rallycross ways excluded from the OSM graph."
+ },
+ "render": {
+  "rotate_deg": -38.8
+ },
+ "status": "published",
+ "notes": "Lap = closed loop of the raceway ways closest to the official length."
+}

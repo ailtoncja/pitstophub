@@ -1,0 +1,71 @@
+{
+ "key": "hockenheim",
+ "name": "Hockenheimring",
+ "layout": "Grand Prix (4,574 km)",
+ "used_by": [
+  "dtm / hockenheimring (r08-hockenheimring) / 2026-10-11"
+ ],
+ "layout_source": "https://racing.porsche.com/events/pccd-08-hockenheimring-2026 (Porsche Carrera Cup Deutschland 2026 season finale on the DTM weekend: 17-turn current GP layout)",
+ "venue": {
+  "lat": 49.329,
+  "lon": 8.568,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 4574,
+  "length_source": "https://www.hockenheimring.de/infos/hockenheimring/daten-fakten/ (Grand-Prix-Kurs, Streckenlänge 4,574 km)",
+  "corners": 17,
+  "corners_source": "https://www.hockenheimring.de/infos/hockenheimring/daten-fakten/ (Streckenprofil: 6 Linkskurven, 11 Rechtskurven); PCCD 2026 map: Turns 17",
+  "map_url": "https://www.hockenheimring.de/wp-content/uploads/2025/06/hockenheimring-circuit-white.svg",
+  "map_page": "https://www.hockenheimring.de/",
+  "map_publisher": "Hockenheim-Ring GmbH (circuit)",
+  "map_file": "hockenheim.png"
+ },
+ "select": {
+  "mode": "cycle",
+  "exclude_ways": [
+   15446020,
+   446193574,
+   446193575,
+   446193576,
+   446193577,
+   1416119746
+  ],
+  "include_ways": [
+   117570502
+  ],
+  "only_ways": [
+   117570507,
+   117570502,
+   117570503,
+   117570506,
+   446193573,
+   117570493,
+   117568831,
+   1386056979,
+   117568830,
+   117568833,
+   117568832,
+   117570499,
+   117570496,
+   117570513,
+   117570511,
+   15444543,
+   117570507
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "close": 2
+ },
+ "verify": {
+  "notes": "Official reference: the circuit's own GP outline (SVG, white on transparent) rasterised with PyMuPDF to hockenheim.png (track dark on white). It is a stylised outline, hence the slightly higher 1.5% score. Excluded from the OSM graph: rallycross ways (446193574-77), the drag strip 'Rico Anthes Quartermile' (1416119746) and the pit lane 'Boxengasse' (15446020). include_ways 117570502 'Spitzkehre' (the hairpin): build_loop.is_pitlike() drops it because its name contains 'pit' (toolkit bug)."
+ },
+ "render": {
+  "rotate_deg": -9.6
+ },
+ "status": "published",
+ "notes": "Lap = closed loop of the raceway ways closest to the official length. The PCCD 2026 graphic of Hockenheim states 'Length 4,754 m' (apparently a digit swap of 4,574) and is drawn schematically, so it was not used as the reference."
+}

@@ -1,0 +1,29 @@
+{
+ "key": "dover",
+ "official_map": "https://www.dovermotorspeedway.com/documents/dms_seating-chart_31126.pdf",
+ "official_map_page": "https://www.dovermotorspeedway.com/fans/seating-chart/",
+ "official_length_m": 1609,
+ "official_length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications; NOT confirmed for this track because the PDF returned 403 -- nominal figure) 1.0 mi (\"The Monster Mile\")",
+ "alt_lengths": [],
+ "osm_length_m": 1661.7,
+ "length_error_pct": 3.27,
+ "osm_chamfer_pct": 0.91,
+ "osm_chamfer_m": 2.3,
+ "osm_p95_m": 4.8,
+ "osm_mirror_pct": 0.9,
+ "osm_aniso": 1.024,
+ "osm_rot_deg": -99.9,
+ "extract": {
+  "mode": "mask",
+  "n": 91066
+ },
+ "mirror_ratio": 0.99,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": false
+ },
+ "pass": false
+}

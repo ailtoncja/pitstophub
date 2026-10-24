@@ -1,0 +1,37 @@
+{
+ "key": "chicagoland",
+ "official_map": "https://www.chicagolandspeedway.com/wp-content/uploads/sites/1031/2026/07/01/CLS-26-Facility-Map-Final-with-Info-booths.pdf",
+ "official_map_page": "https://www.chicagolandspeedway.com/maps/",
+ "official_length_m": 2414,
+ "official_length_source": "https://www.chicagolandspeedway.com/?p=104 (Track Facts: \"Chicagoland Speedway in Joliet is a $130 million, 1.5-Mile D-shaped tri-oval Speedway\"; checked 2026-10-21)",
+ "alt_lengths": [],
+ "osm_length_m": 2468.2,
+ "length_error_pct": 2.24,
+ "osm_chamfer_pct": 0.54,
+ "osm_chamfer_m": 2.1,
+ "osm_p95_m": 4.4,
+ "osm_mirror_pct": 0.55,
+ "osm_aniso": 1.012,
+ "osm_rot_deg": 0.8,
+ "extract": {
+  "mode": "mask",
+  "n": 11490
+ },
+ "png_chamfer_pct": 0.56,
+ "png_mirror_pct": 0.57,
+ "png_aniso": 1.013,
+ "png_rot_deg": 0.1,
+ "mirror_ratio": 1.02,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

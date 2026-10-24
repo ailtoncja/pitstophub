@@ -52,6 +52,15 @@ export interface Race {
   lat?: number;
   lng?: number;
   sessions?: RaceSession[];
+  // Cancelamentos e substituicoes (so no catalogo; ids da mesma categoria). Ver src/lib/race-changes.ts.
+  /** Etapa cancelada: etapas que entraram no lugar dela. [] = confirmado que nao houve substituta. */
+  replacedBy?: string[];
+  /** Etapa que entrou no lugar das etapas canceladas listadas. */
+  replaces?: string[];
+  /** O mesmo evento foi transferido para outro circuito (nao trocado por outra etapa). Vale nos dois lados do par. */
+  relocated?: boolean;
+  /** Fonte oficial do cancelamento/substituicao. */
+  changeSource?: string;
 }
 
 export interface StandingItem {
@@ -138,8 +147,8 @@ export const MOTORSPORT_DATA: Category[] = [
       {
         title: 'Curiosidades e regras especiais',
         enTitle: 'Quirks and special rules',
-        body: 'O DRS tradicional convive com o novo sistema de aero ativa e o modo ultrapassagem, dando à F1 2026 até três ferramentas simultâneas de ultrapassagem em algumas retas. O orçamento das equipes segue limitado pelo teto de custos (cost cap), que nivela o poder de desenvolvimento entre times grandes e pequenos. E como o parc fermé trava a configuração do carro após a classificação, qualquer equipe que precise mexer no setup depois disso é obrigada a largar do pit lane.',
-        enBody: 'Traditional DRS now coexists with the new active-aero system and overtake mode, giving 2026-spec F1 up to three simultaneous overtaking tools on some straights. Team budgets remain capped by the cost cap, which levels development power between big and small teams. And because parc fermé locks the car\'s setup after qualifying, any team that needs to change it afterward is forced to start from the pit lane.',
+        body: 'O DRS deixou de existir em 2026: no lugar dele entram a aero ativa, liberada para todos nas zonas de Straight Mode marcadas em cada pista, e o modo ultrapassagem, reservado a quem persegue outro carro. O orçamento das equipes segue limitado pelo teto de custos (cost cap), que nivela o poder de desenvolvimento entre times grandes e pequenos. E como o parc fermé trava a configuração do carro após a classificação, qualquer equipe que precise mexer no setup depois disso é obrigada a largar do pit lane.',
+        enBody: 'DRS is gone in 2026: it is replaced by active aero, open to everyone in the Straight Mode zones marked on each track, and by overtake mode, reserved for the car chasing another. Team budgets remain capped by the cost cap, which levels development power between big and small teams. And because parc fermé locks the car\'s setup after qualifying, any team that needs to change it afterward is forced to start from the pit lane.',
       },
     ],
     icon: 'OpenWheelCar',
@@ -184,8 +193,11 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'australia', name: 'GP da Austrália', enName: 'Australian GP', location: 'Melbourne', date: '2026-03-08', circuit: 'Albert Park', status: 'completed', winner: 'George Russell' },
       { id: 'china', name: 'GP da China', enName: 'Chinese GP', location: 'Xangai', enLocation: 'Shanghai', date: '2026-03-15', circuit: 'Shanghai International Circuit', status: 'completed', winner: 'Kimi Antonelli' },
       { id: 'japan', name: 'GP do Japão', enName: 'Japanese GP', location: 'Suzuka', date: '2026-03-29', circuit: 'Suzuka International Racing Course', status: 'completed', winner: 'Kimi Antonelli' },
-      { id: 'bahrain', name: 'GP do Bahrein', enName: 'Bahrain GP', location: 'Sakhir', date: '2026-04-12', circuit: 'Bahrain International Circuit', status: 'cancelled' },
-      { id: 'saudi', name: 'GP da Arábia Saudita', enName: 'Saudi Arabian GP', location: 'Jeddah', date: '2026-04-19', circuit: 'Jeddah Corniche Circuit', status: 'cancelled' },
+      // Bahrein e Arabia Saudita sairam de abril sem substituta naquele momento (formula1.com, 14/mar). Em 26/jul o
+      // GP do Bahrein foi transferido para Sepang em outubro, mantendo o nome ("Bahrain Grand Prix in Malaysia").
+      { id: 'bahrain-sakhir', name: 'GP do Bahrein', enName: 'Bahrain GP', location: 'Sakhir', date: '2026-04-12', circuit: 'Bahrain International Circuit', status: 'cancelled', replacedBy: ['bahrain'], relocated: true, changeSource: 'https://www.formula1.com/en/latest/article/formula-1-and-fia-confirm-malaysia-will-join-2026-calendar-as-host-venue-for-bahrain-grand-prix.6lL7vjFEM2VVynRHvg1TCf' },
+      // Sem substituta e sem nova data: https://www.the-race.com/formula-1/f1-bahrain-saudi-arabia-races-cancelled-no-replacement/
+      { id: 'saudi', name: 'GP da Arábia Saudita', enName: 'Saudi Arabian GP', location: 'Jeddah', date: '2026-04-19', circuit: 'Jeddah Corniche Circuit', status: 'cancelled', replacedBy: [], changeSource: 'https://www.formula1.com/en/latest/article/bahrain-and-saudi-arabian-grands-prix-will-not-take-place-in-april.1hnqllVG85RSt8pbFc5Ivx' },
       { id: 'miami', name: 'GP de Miami', enName: 'Miami GP', location: 'Miami', date: '2026-05-03', circuit: 'Miami International Autodrome', status: 'completed', winner: 'Kimi Antonelli' },
       { id: 'canada', name: 'GP do Canadá', enName: 'Canadian GP', location: 'Montreal', date: '2026-05-24', circuit: 'Circuit Gilles Villeneuve', status: 'completed', winner: 'Kimi Antonelli' },
       { id: 'monaco', name: 'GP de Mônaco', enName: 'Monaco GP', location: 'Monte Carlo', date: '2026-06-07', circuit: 'Circuit de Monaco', status: 'completed', winner: 'Kimi Antonelli' },
@@ -198,6 +210,9 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'italy', name: 'GP da Itália', enName: 'Italian GP', location: 'Monza', date: '2026-09-06', circuit: 'Autodromo Nazionale Monza', status: 'upcoming' },
       { id: 'madrid', name: 'GP de Madri', enName: 'Madrid GP', location: 'Madri', enLocation: 'Madrid', date: '2026-09-13', circuit: 'Madrid Street Circuit', status: 'upcoming' },
       { id: 'azerbaijan', name: 'GP do Azerbaijão', enName: 'Azerbaijan GP', location: 'Baku', date: '2026-09-26', circuit: 'Baku City Circuit', status: 'upcoming' },
+      // O GP do Bahrein de 2026 foi transferido para Sepang (formula1.com/en/racing/2026/bahrain).
+      // Mantem o id 'bahrain', que e o que a pagina dessa etapa ja usava.
+      { id: 'bahrain', name: 'GP do Bahrein na Malásia', enName: 'Bahrain GP in Malaysia', location: 'Sepang', enLocation: 'Sepang', date: '2026-10-04', circuit: 'Sepang International Circuit', status: 'completed', winner: 'Max Verstappen', replaces: ['bahrain-sakhir'], relocated: true, changeSource: 'https://www.formula1.com/en/latest/article/formula-1-and-fia-confirm-malaysia-will-join-2026-calendar-as-host-venue-for-bahrain-grand-prix.6lL7vjFEM2VVynRHvg1TCf' },
       { id: 'singapore', name: 'GP de Singapura', enName: 'Singapore GP', location: 'Marina Bay', date: '2026-10-11', circuit: 'Marina Bay Street Circuit', status: 'upcoming' },
       { id: 'usa', name: 'GP dos EUA', enName: 'USA GP', location: 'Austin', date: '2026-10-25', circuit: 'Circuit of the Americas', status: 'upcoming' },
       { id: 'mexico', name: 'GP do México', enName: 'Mexican GP', location: 'Cidade do México', enLocation: 'Mexico City', date: '2026-11-01', circuit: 'Autódromo Hermanos Rodríguez', status: 'upcoming' },
@@ -315,10 +330,12 @@ export const MOTORSPORT_DATA: Category[] = [
     ],
     calendar: [
       { id: 'melbourne-f2', name: 'Rodada de Melbourne', enName: 'Melbourne Round', location: 'Melbourne', enLocation: 'Melbourne', date: '2026-03-08', circuit: 'Albert Park', status: 'completed', winner: 'N. Tsolov' },
-      { id: 'sakhir-f2', name: 'Rodada de Sakhir', enName: 'Sakhir Round', location: 'Sakhir', enLocation: 'Sakhir', date: '2026-04-12', circuit: 'Bahrain International Circuit', status: 'cancelled' },
-      { id: 'jeddah-f2', name: 'Rodada de Jeddah', enName: 'Jeddah Round', location: 'Jeddah', enLocation: 'Jeddah', date: '2026-04-19', circuit: 'Jeddah Corniche Circuit', status: 'cancelled' },
-      { id: 'miami-f2', name: 'Rodada de Miami', enName: 'Miami Round', location: 'Miami', enLocation: 'Miami', date: '2026-05-03', circuit: 'Miami International Autodrome', status: 'completed', winner: 'G. Minì' },
-      { id: 'montreal-f2', name: 'Rodada de Montreal', enName: 'Montreal Round', location: 'Montreal', enLocation: 'Montreal', date: '2026-05-24', circuit: 'Circuit Gilles Villeneuve', status: 'completed', winner: 'M. Stenshorne' },
+      // Sakhir e Jeddah sairam do calendario; Miami e Montreal entraram como rodadas 2 e 3. O anuncio oficial nao diz
+      // qual substitui qual, entao as duas canceladas apontam para as duas novas (e vice-versa).
+      { id: 'sakhir-f2', name: 'Rodada de Sakhir', enName: 'Sakhir Round', location: 'Sakhir', enLocation: 'Sakhir', date: '2026-04-12', circuit: 'Bahrain International Circuit', status: 'cancelled', replacedBy: ['miami-f2', 'montreal-f2'], changeSource: 'https://www.fia.com/news/miami-and-montreal-host-fia-formula-2-championship-rounds-2026' },
+      { id: 'jeddah-f2', name: 'Rodada de Jeddah', enName: 'Jeddah Round', location: 'Jeddah', enLocation: 'Jeddah', date: '2026-04-19', circuit: 'Jeddah Corniche Circuit', status: 'cancelled', replacedBy: ['miami-f2', 'montreal-f2'], changeSource: 'https://www.fia.com/news/miami-and-montreal-host-fia-formula-2-championship-rounds-2026' },
+      { id: 'miami-f2', name: 'Rodada de Miami', enName: 'Miami Round', location: 'Miami', enLocation: 'Miami', date: '2026-05-03', circuit: 'Miami International Autodrome', status: 'completed', winner: 'G. Minì', replaces: ['sakhir-f2', 'jeddah-f2'], changeSource: 'https://www.fia.com/news/miami-and-montreal-host-fia-formula-2-championship-rounds-2026' },
+      { id: 'montreal-f2', name: 'Rodada de Montreal', enName: 'Montreal Round', location: 'Montreal', enLocation: 'Montreal', date: '2026-05-24', circuit: 'Circuit Gilles Villeneuve', status: 'completed', winner: 'M. Stenshorne', replaces: ['sakhir-f2', 'jeddah-f2'], changeSource: 'https://www.fia.com/news/miami-and-montreal-host-fia-formula-2-championship-rounds-2026' },
       { id: 'monaco-f2', name: 'Rodada de Mônaco', enName: 'Monaco Round', location: 'Monte Carlo', enLocation: 'Monte Carlo', date: '2026-06-07', circuit: 'Circuit de Monaco', status: 'completed', winner: 'N. Tsolov' },
       { id: 'barcelona-f2', name: 'Rodada de Barcelona', enName: 'Barcelona Round', location: 'Barcelona', enLocation: 'Barcelona', date: '2026-06-14', circuit: 'Circuit de Barcelona-Catalunya', status: 'completed', winner: 'R. Câmara' },
       { id: 'spielberg-f2', name: 'Rodada de Spielberg', enName: 'Spielberg Round', location: 'Spielberg', enLocation: 'Spielberg', date: '2026-06-28', circuit: 'Red Bull Ring', status: 'completed', winner: 'N. Tsolov' },
@@ -451,6 +468,8 @@ export const MOTORSPORT_DATA: Category[] = [
     ],
     calendar: [
       { id: 'melbourne-f3', name: 'Rodada de Melbourne', enName: 'Melbourne Round', location: 'Melbourne', enLocation: 'Melbourne', date: '2026-03-08', circuit: 'Albert Park', status: 'completed', winner: 'U. Ugochukwu' },
+      // Rodada 2 do calendario original (10-12/abr, fia.com/news/fia-and-formula-3-announce-2026-calendar), cancelada sem substituta.
+      { id: 'sakhir-f3', name: 'Rodada de Sakhir', enName: 'Sakhir Round', location: 'Sakhir', enLocation: 'Sakhir', date: '2026-04-12', circuit: 'Bahrain International Circuit', status: 'cancelled', replacedBy: [], changeSource: 'https://speedcafe.com/f2-news-2026-new-rounds-montreal-canada-miami-usa-formula-2-replacement-middle-east-cancellation-where-when/' },
       { id: 'monaco-f3', name: 'Rodada de Mônaco', enName: 'Monaco Round', location: 'Monte Carlo', enLocation: 'Monte Carlo', date: '2026-06-07', circuit: 'Circuit de Monaco', status: 'completed' },
       { id: 'barcelona-f3', name: 'Rodada de Barcelona', enName: 'Barcelona Round', location: 'Barcelona', enLocation: 'Barcelona', date: '2026-06-14', circuit: 'Circuit de Barcelona-Catalunya', status: 'completed', winner: 'U. Ugochukwu' },
       { id: 'spielberg-f3', name: 'Rodada de Spielberg', enName: 'Spielberg Round', location: 'Spielberg', enLocation: 'Spielberg', date: '2026-06-28', circuit: 'Red Bull Ring', status: 'completed', winner: 'U. Ugochukwu' },
@@ -552,6 +571,10 @@ export const MOTORSPORT_DATA: Category[] = [
     ],
     calendar: [
       { id: 'shanghai-academy', name: 'Shanghai', enName: 'Shanghai', location: 'China', enLocation: 'China', date: '2026-03-15', circuit: 'Shanghai International Circuit', status: 'completed', winner: 'N. Gademan / E. Felbermayr' },
+      // Rodada 2 do calendario original (17-19/abr, f1academy.com/Latest/1C0Ca5XnCCSeV6ybe4f1Ai), cancelada com o GP da
+      // Arabia Saudita. Nao houve rodada substituta: as corridas perdidas voltaram como uma terceira corrida em Montreal e
+      // Austin (f1academy.com/Latest/2yLXCGLOvdRDoHwDlYxj6h), por isso "sem substituta".
+      { id: 'jeddah-academy', name: 'Jeddah', enName: 'Jeddah', location: 'Arábia Saudita', enLocation: 'Saudi Arabia', date: '2026-04-19', circuit: 'Jeddah Corniche Circuit', status: 'cancelled', replacedBy: [], changeSource: 'https://www.formula1.com/en/latest/article/bahrain-and-saudi-arabian-grands-prix-will-not-take-place-in-april.1hnqllVG85RSt8pbFc5Ivx' },
       { id: 'montreal-academy', name: 'Montreal', enName: 'Montreal', location: 'Canadá', enLocation: 'Canada', date: '2026-05-24', circuit: 'Circuit Gilles Villeneuve', status: 'completed', winner: 'A. Palmowski / M. Paatz / A. Palmowski' },
       { id: 'silverstone-academy', name: 'Silverstone', enName: 'Silverstone', location: 'Reino Unido', enLocation: 'United Kingdom', date: '2026-07-05', circuit: 'Silverstone Circuit', status: 'completed', winner: 'E. Felbermayr / A. Palmowski' },
       { id: 'zandvoort-academy', name: 'Zandvoort', enName: 'Zandvoort', location: 'Países Baixos', enLocation: 'Netherlands', date: '2026-08-23', circuit: 'Circuit Zandvoort', status: 'upcoming' },
@@ -756,10 +779,13 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'saopaulo', name: '6 Horas de São Paulo', enName: '6 Hours of São Paulo', location: 'São Paulo', enLocation: 'São Paulo', date: '2026-07-12', circuit: 'Autódromo de Interlagos', status: 'completed', winner: 'Kevin Magnussen' },
       { id: 'cota', name: 'Lone Star Le Mans', enName: 'Lone Star Le Mans', location: 'Austin', enLocation: 'Austin', date: '2026-09-06', circuit: 'Circuit of the Americas', status: 'upcoming' },
       { id: 'fuji', name: '6 Horas de Fuji', enName: '6 Hours of Fuji', location: 'Fuji', enLocation: 'Fuji', date: '2026-09-27', circuit: 'Fuji Speedway', status: 'upcoming' },
-      { id: 'barcelona-wec', name: '6 Horas de Barcelona', enName: '6 Hours of Barcelona', location: 'Barcelona', enLocation: 'Barcelona', date: '2026-10-18', circuit: 'Circuit de Barcelona-Catalunya', status: 'upcoming' },
-      { id: 'monza-wec', name: '6 Horas de Monza', enName: '6 Hours of Monza', location: 'Monza', enLocation: 'Monza', date: '2026-11-08', circuit: 'Autodromo Nazionale Monza', status: 'upcoming' },
-      { id: 'qatar', name: '1812km do Catar', enName: 'Qatar 1812km', location: 'Lusail', enLocation: 'Lusail', date: '2026-10-24', circuit: 'Lusail International Circuit', status: 'cancelled' },
-      { id: 'bahrain', name: '8 Horas do Bahrein', enName: '8 Hours of Bahrain', location: 'Sakhir', enLocation: 'Sakhir', date: '2026-11-07', circuit: 'Bahrain International Circuit', status: 'cancelled' },
+      // Barcelona e Monza substituem as duas ultimas etapas (Catar e Bahrein). O anuncio oficial nao diz qual substitui
+      // qual, entao as duas canceladas apontam para as duas novas (e vice-versa).
+      { id: 'barcelona-wec', name: '6 Horas de Barcelona', enName: '6 Hours of Barcelona', location: 'Barcelona', enLocation: 'Barcelona', date: '2026-10-18', circuit: 'Circuit de Barcelona-Catalunya', status: 'upcoming', replaces: ['qatar', 'bahrain'], changeSource: 'https://www.fiawec.com/en/news/fia-wec-and-fia-confirm-venues-for-final-two-rounds-of-2026/13698' },
+      { id: 'monza-wec', name: '6 Horas de Monza', enName: '6 Hours of Monza', location: 'Monza', enLocation: 'Monza', date: '2026-11-08', circuit: 'Autodromo Nazionale Monza', status: 'upcoming', replaces: ['qatar', 'bahrain'], changeSource: 'https://www.fiawec.com/en/news/fia-wec-and-fia-confirm-venues-for-final-two-rounds-of-2026/13698' },
+      // Data remarcada do 1812km (22-24/out, fiawec.com/en/news/.../13118) e data original do 8h do Bahrein (7/nov).
+      { id: 'qatar', name: '1812km do Catar', enName: 'Qatar 1812km', location: 'Lusail', enLocation: 'Lusail', date: '2026-10-24', circuit: 'Lusail International Circuit', status: 'cancelled', replacedBy: ['barcelona-wec', 'monza-wec'], changeSource: 'https://www.fiawec.com/en/news/fia-wec-and-fia-confirm-venues-for-final-two-rounds-of-2026/13698' },
+      { id: 'bahrain', name: '8 Horas do Bahrein', enName: '8 Hours of Bahrain', location: 'Sakhir', enLocation: 'Sakhir', date: '2026-11-07', circuit: 'Bahrain International Circuit', status: 'cancelled', replacedBy: ['barcelona-wec', 'monza-wec'], changeSource: 'https://www.fiawec.com/en/news/fia-wec-and-fia-confirm-venues-for-final-two-rounds-of-2026/13698' },
     ],
     standings: {
       // Fonte: fiawec.com/en/page/manufacturers-classification
@@ -1225,7 +1251,8 @@ export const MOTORSPORT_DATA: Category[] = [
       { id: 'paraguay', name: 'Rally del Paraguay', enName: 'Paraguay Rally', location: 'Encarnación', enLocation: 'Encarnación', date: '2026-08-30', circuit: 'Cascalho', status: 'upcoming' },
       { id: 'chile', name: 'Rally Chile Bio Bío', enName: 'Rally Chile Bio Bío', location: 'Concepción', enLocation: 'Concepción', date: '2026-09-13', circuit: 'Cascalho', status: 'upcoming' },
       { id: 'sardegna', name: 'Rally Italia Sardegna', enName: 'Rally Italia Sardegna', location: 'Alghero', enLocation: 'Alghero', date: '2026-10-04', circuit: 'Cascalho', status: 'upcoming' },
-      { id: 'saudi', name: 'Rally Saudi Arabia', enName: 'Rally Saudi Arabia', location: 'Jeddah', enLocation: 'Jeddah', date: '2026-11-14', circuit: 'Cascalho', status: 'upcoming' },
+      // Cancelado em setembro, sem substituto: o Rally Italia Sardegna virou a ultima etapa.
+      { id: 'saudi', name: 'Rally Saudi Arabia', enName: 'Rally Saudi Arabia', location: 'Jeddah', enLocation: 'Jeddah', date: '2026-11-14', circuit: 'Cascalho', status: 'cancelled', replacedBy: [], changeSource: 'https://www.autosport.com/wrc/news/wrc-cancels-saudi-arabia-finale/10856625/' },
     ],
     standings: {
       drivers: [

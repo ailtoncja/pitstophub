@@ -1,0 +1,28 @@
+{
+ "key": "martinsville",
+ "name": "Martinsville Speedway",
+ "layout": "Oval (paperclip, 0.526 mi)",
+ "used_by": [
+  "nascar / martinsville1 / 2026-03-29",
+  "nascar / martinsville2 / 2026-11-01"
+ ],
+ "status": "skipped",
+ "notes": "OSM lap 826 m, -2.49% vs 0.526 mi (outside 2%); official maps found are stylised seating charts or 3D facility art. Not published.",
+ "venue": {
+  "lat": 36.634,
+  "lon": -79.851,
+  "radius_m": 600
+ },
+ "official": {
+  "length_m": 847,
+  "length_source": "0.526 mi (nominal; no official page read in this run)"
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {},
+ "verify": {},
+ "render": {
+  "rotate_deg": 0
+ }
+}

@@ -1,0 +1,30 @@
+{
+ "key": "brasilia",
+ "name": "Autódromo Internacional Nelson Piquet (Brasília)",
+ "layout": "",
+ "venue": {
+  "lat": -15.7745,
+  "lon": -47.9,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 5384,
+  "length_source": "https://www.cba.org.br/circuitos (Extensão circuito completo 5.384m, sentido horário)",
+  "direction": "clockwise",
+  "direction_source": "https://www.cba.org.br/circuitos"
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "skipped",
+ "used_by": [
+  "nascar-brasil / r09-brasilia / 2026-11-29",
+  "porsche-cup / r08-brasilia / 2026-10-03",
+  "endurance-brasil / 1-etapa-quatro-horas-de-brasilia / 2026-04-11",
+  "endurance-brasil / etapa-7-tres-horas-de-brasilia / 2026-10-24"
+ ],
+ "notes": "Skipped: no independent official track map found (circuit and series sites unreachable or without a map)."
+}

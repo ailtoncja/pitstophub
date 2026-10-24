@@ -1,0 +1,37 @@
+{
+ "key": "washington-dc",
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/WashingtonDC.png",
+ "official_map_page": "https://www.indycar.com/Schedule/2026/Washington-DC",
+ "official_length_m": 2736,
+ "official_length_source": "https://www.indycar.com/news/2026/08/08-20-dc-preview (\"seven-turn, 1.7-mile circuit travels in a counterclockwise direction\")",
+ "alt_lengths": [],
+ "osm_length_m": 2670.4,
+ "length_error_pct": -2.4,
+ "osm_chamfer_pct": 0.77,
+ "osm_chamfer_m": 2.7,
+ "osm_p95_m": 5.7,
+ "osm_mirror_pct": 10.18,
+ "osm_aniso": 1.012,
+ "osm_rot_deg": -0.1,
+ "extract": {
+  "mode": "mask",
+  "n": 58826
+ },
+ "png_chamfer_pct": 0.83,
+ "png_mirror_pct": 10.04,
+ "png_aniso": 1.013,
+ "png_rot_deg": 0.0,
+ "mirror_ratio": 13.22,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

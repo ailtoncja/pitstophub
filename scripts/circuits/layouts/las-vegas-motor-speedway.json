@@ -1,0 +1,31 @@
+{
+ "key": "las-vegas-motor-speedway",
+ "name": "Las Vegas Motor Speedway",
+ "layout": "Oval (tri-oval, 1.5 mi)",
+ "used_by": [
+  "nascar / vegas1 / 2026-03-15",
+  "nascar / vegas2 / 2026-10-04"
+ ],
+ "status": "skipped",
+ "notes": "OSM oval (way 27545411) is 2477 m, +2.6% vs 1.5 mi (outside 2%); no top-down official map found (lvms.com facility map is a small schematic). Not published.",
+ "venue": {
+  "lat": 36.272,
+  "lon": -115.011,
+  "radius_m": 1100
+ },
+ "official": {
+  "length_m": 2414,
+  "length_source": "1.5-mile tri-oval (nominal; no official page read in this run)"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   27545411
+  ]
+ },
+ "extract": {},
+ "verify": {},
+ "render": {
+  "rotate_deg": 0
+ }
+}

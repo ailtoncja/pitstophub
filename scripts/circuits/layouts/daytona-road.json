@@ -1,0 +1,29 @@
+{
+ "key": "daytona-road",
+ "name": "Daytona International Speedway",
+ "layout": "Road course (3.56 mi)",
+ "status": "skipped",
+ "used_by": [
+  "imsa / daytona (r01-daytona) / 2026-01-24"
+ ],
+ "layout_source": "https://www.imsa.com/events/2026-rolex-24-at-daytona/",
+ "venue": {
+  "lat": 29.1852,
+  "lon": -81.0705,
+  "radius_m": 2000
+ },
+ "venue_key": "daytona",
+ "official": {
+  "length_m": 5729
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask"
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "notes": "SKIPPED (no flat official map): the IMSA track map (imsa.com/wp-content/uploads/sites/32/2019/09/DIS_1346x916-1.png) is a 3D perspective render and the DIS facility map does not separate the road course from service roads. OSM lap 5731 m vs 3.56 mi 5729 m (+0.03 %), not verified."
+}

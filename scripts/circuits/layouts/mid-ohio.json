@@ -1,0 +1,51 @@
+{
+ "key": "mid-ohio",
+ "name": "Mid-Ohio Sports Car Course",
+ "layout": "Road course (2.258 mi, 13 turns)",
+ "status": "published",
+ "used_by": [
+  "indy / mid-ohio (r11-mid-ohio) / 2026-07-05"
+ ],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Mid-Ohio",
+ "venue": {
+  "lat": 40.6892,
+  "lon": -82.6364,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3634,
+  "length_source": "https://www.indycar.com/Schedule/2026/Mid-Ohio (Track Length 2.258 Miles)",
+  "alt_lengths": [],
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/MidOhioSportsCarCourse.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/Mid-Ohio",
+  "map_publisher": "INDYCAR",
+  "corners": 13,
+  "corners_source": "https://www.indycar.com/Schedule/2026/Mid-Ohio (\"13 turns\")"
+ },
+ "select": {
+  "mode": "cycle",
+  "exclude_ways": [
+   444205376
+  ],
+  "only_ways": [
+   1315957513,
+   1315957514,
+   1315957515,
+   444205375,
+   1315957511,
+   1315957512,
+   1315957513
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": -90.5
+ },
+ "notes": "Excludes OSM way 444205376 (back-straight chicane, not part of the INDYCAR 2.258-mile course)."
+}

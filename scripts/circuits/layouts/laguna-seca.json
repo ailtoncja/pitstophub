@@ -1,0 +1,54 @@
+{
+ "key": "laguna-seca",
+ "name": "WeatherTech Raceway Laguna Seca",
+ "layout": "Road course (2.238 mi, 11 turns)",
+ "status": "skipped",
+ "used_by": [
+  "indy / laguna-seca-indy (r18-laguna-seca) / 2026-09-06",
+  "imsa / lagunaseca (r04-laguna-seca) / 2026-05-03"
+ ],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Laguna-Seca",
+ "venue": {
+  "lat": 36.5843,
+  "lon": -121.7535,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3602,
+  "length_source": "https://www.indycar.com/Schedule/2026/Laguna-Seca (Track Length 2.238 Miles)",
+  "alt_lengths": [],
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackMaps/LagunaSeca_TrackMap.jpg",
+  "map_page": "https://www.indycar.com/Schedule/2026/Laguna-Seca",
+  "map_publisher": "INDYCAR (facility track map)",
+  "map_file": "laguna-seca.png",
+  "corners": 11,
+  "corners_source": "https://www.indycar.com/Schedule/2026/Laguna-Seca (\"11 turns\")"
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.25,
+  "crop": [
+   0.2,
+   0.27,
+   0.53,
+   0.63
+  ],
+  "erase": [
+   [
+    0.205,
+    0.455,
+    0.228,
+    0.478
+   ]
+  ],
+  "open": 3,
+  "close": 4
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "notes": "SKIPPED: OSM lap 3601 m (-0.03%), not mirrored (ratio 4.6), aniso 1.03, but the shape score is just above the 2.0% limit against both official maps: INDYCAR facility map 2.27% (bridge-marker dots painted over in the cached copy laguna-seca.png), INDYCAR outline 2.41%; the circuit shop decal is stylised (4.99%)."
+}

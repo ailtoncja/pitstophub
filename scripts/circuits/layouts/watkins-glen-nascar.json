@@ -1,0 +1,76 @@
+{
+ "key": "watkins-glen-nascar",
+ "name": "Watkins Glen International",
+ "layout": "Short course without the Boot (2.45 mi)",
+ "status": "published",
+ "used_by": [
+  "nascar / watkinsglen (r12-watkins-glen) / 2026-05-10"
+ ],
+ "layout_source": "https://www.jayski.com/nascar-cup-series/2026-nascar-cup-series-watkins-glen-race-page/ (Go Bowling at The Glen, 100 laps on the 2.45-mile course)",
+ "venue": {
+  "lat": 42.3369,
+  "lon": -76.9272,
+  "radius_m": 2000
+ },
+ "venue_key": "watkins-glen",
+ "official": {
+  "length_m": 3943,
+  "length_source": "https://www.theglen.com/wp-content/uploads/sites/1022/2026/01/30/Track-Rental-Guide-2026.pdf (Track Data Sheet: Short Course 2.45 mile)",
+  "direction": "clockwise",
+  "direction_source": "https://www.theglen.com/wp-content/uploads/sites/1022/2026/01/30/Track-Rental-Guide-2026.pdf",
+  "map_url": "https://www.theglen.com/wp-content/uploads/sites/1022/2026/01/30/Track-Rental-Guide-2026.pdf",
+  "map_page": "https://www.theglen.com/track-rental/",
+  "map_publisher": "Watkins Glen International (page 10 Track Data Sheet, rendered at 2400 px; the Boot erased)"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   293208070,
+   293208065,
+   293208075,
+   293208067,
+   20163576,
+   293208063,
+   293208062,
+   293208064,
+   293208074,
+   428026652,
+   293208056,
+   293208060
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "min_lum": 0.6,
+  "max_lum": 0.92,
+  "max_sat": 0.12,
+  "crop": [
+   0.04,
+   0.11,
+   0.6,
+   0.92
+  ],
+  "close": 7,
+  "open": 4,
+  "erase": [
+   [
+    0.1357,
+    0.585,
+    0.3371,
+    0.9272
+   ],
+   [
+    0.3371,
+    0.7119,
+    0.3571,
+    0.7572
+   ]
+  ],
+  "keep": "largest"
+ },
+ "render": {
+  "rotate_deg": -3.3
+ },
+ "notes": "Short course with the Inner Loop (bus stop), without the Boot."
+}
