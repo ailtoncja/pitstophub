@@ -1,0 +1,43 @@
+{
+ "key": "portimao",
+ "official_map": "https://media.formula1.com/image/upload/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Portugal_Circuit.png",
+ "official_map_page": "https://www.formula1.com/en/racing/2021/portugal",
+ "official_length_m": 4692,
+ "official_length_source": "https://www.gt-world-challenge-europe.com/event/255/portimao",
+ "alt_lengths": [
+  {
+   "length_m": 4653,
+   "source": "https://www.formula1.com/en/racing/2021/portugal"
+  }
+ ],
+ "osm_length_m": 4681.6,
+ "length_error_pct": -0.22,
+ "osm_chamfer_pct": 0.85,
+ "osm_chamfer_m": 3.2,
+ "osm_p95_m": 7.0,
+ "osm_mirror_pct": 8.24,
+ "osm_aniso": 1.015,
+ "osm_rot_deg": 73.9,
+ "extract": {
+  "mode": "f1",
+  "src": "colour",
+  "n": 22879
+ },
+ "png_chamfer_pct": 0.87,
+ "png_mirror_pct": 8.07,
+ "png_aniso": 1.017,
+ "png_rot_deg": 0.1,
+ "mirror_ratio": 9.69,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

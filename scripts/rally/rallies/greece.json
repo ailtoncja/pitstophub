@@ -1,0 +1,177 @@
+{
+ "id": "greece",
+ "out": "src/rally/greece-2026-map.ts",
+ "export": "GREECE_2026_MAP",
+ "viewBox": [
+  1000,
+  560
+ ],
+ "credits": [
+  "EKO Acropolis Rally Greece 2026 2026: largada/chegada das especiais de fontes oficiais (ver sources).",
+  "Costa: OpenStreetMap land polygons (osmdata.openstreetmap.de), (c) OpenStreetMap contributors, ODbL."
+ ],
+ "downloads": [],
+ "stages": [
+  {
+   "id": "ss2",
+   "km": 22.97,
+   "start": [
+    38.451527,
+    22.418624
+   ],
+   "finish": [
+    38.573433,
+    22.345483
+   ],
+   "source": "day1.kmz (1_FRIDAY_2026 Spectators.kmz) placemarks 'SS2_Start' / 'SS2_Finish'"
+  },
+  {
+   "id": "ss3",
+   "km": 22.28,
+   "start": [
+    38.568988,
+    22.43743
+   ],
+   "finish": [
+    38.574846,
+    22.499298
+   ],
+   "source": "day1.kmz placemarks 'SS3_Start' / 'SS3_Finish'"
+  },
+  {
+   "id": "ss4-6",
+   "km": 24.18,
+   "start": [
+    38.44555,
+    22.694967
+   ],
+   "finish": [
+    38.380433,
+    22.820133
+   ],
+   "source": "day1.kmz placemarks 'SS4-6_Start' / 'SS4-6_Finish'"
+  },
+  {
+   "id": "ss5",
+   "km": 17.8,
+   "start": [
+    38.351933,
+    22.956459
+   ],
+   "finish": [
+    38.353483,
+    22.846167
+   ],
+   "source": "day1.kmz placemarks 'SS5_Start' / 'SS5_Finish' (the stage LineString '09_SS5_Elikon' is digitised finish->start, but the liaison '08_RS_Elikon' ends at the east end, consistent with the placemarks)"
+  },
+  {
+   "id": "ss7",
+   "km": 17.81,
+   "start": [
+    38.310482,
+    23.406014
+   ],
+   "finish": [
+    38.29555,
+    23.376367
+   ],
+   "source": "day1.kmz placemarks 'SS7_Start' / 'SS7_Finish' (Thiva)"
+  },
+  {
+   "id": "ss8-12",
+   "km": 19.6,
+   "start": [
+    37.81155,
+    22.515617
+   ],
+   "finish": [
+    37.77278,
+    22.56752
+   ],
+   "source": "day2.kmz (2_SATURDAY_2026_Spectators.kmz) placemarks 'SS8-12_Start' / 'SS8-12_Finish' (Ghymno)"
+  },
+  {
+   "id": "ss9",
+   "km": 21.3,
+   "start": [
+    37.359217,
+    22.3797
+   ],
+   "finish": [
+    37.37895,
+    22.303117
+   ],
+   "source": "day2.kmz placemarks 'SS9_Start' / 'SS9_Finish' (Kolines)"
+  },
+  {
+   "id": "ss10-13",
+   "km": 14.78,
+   "start": [
+    37.688117,
+    22.210267
+   ],
+   "finish": [
+    37.674333,
+    22.23305
+   ],
+   "source": "day2.kmz placemarks 'SS10-13_Start' / 'SS10-13_Finish' (Menalo Mt; stage line '06_Menalo' is digitised finish->start, liaison '05_Kollines_Menalo' ends at the start placemark)"
+  },
+  {
+   "id": "ss11",
+   "km": 18.17,
+   "start": [
+    37.918983,
+    22.517467
+   ],
+   "finish": [
+    37.9751,
+    22.559883
+   ],
+   "source": "day2.kmz placemarks 'SS11_Start' / 'SS11_Finish' (Kefalari)"
+  },
+  {
+   "id": "ss14-16",
+   "km": 25.39,
+   "start": [
+    37.982461,
+    23.179219
+   ],
+   "finish": [
+    37.964892,
+    23.047879
+   ],
+   "source": "day3.kmz (3_SUNDAY_2026_Spectators.kmz) placemarks 'Start_SS14-16' / 'Finish_SS14-16' (Aghii Theodori)"
+  },
+  {
+   "id": "ss15-17",
+   "km": 16.61,
+   "start": [
+    38.018945,
+    22.989193
+   ],
+   "finish": [
+    37.98015,
+    23.034233
+   ],
+   "source": "day3.kmz placemarks 'Start_SS15-17' / 'Finish_SS15-17' (Loutraki, Power Stage on 2nd pass)"
+  }
+ ],
+ "servicePark": [
+  37.954117,
+  22.96425
+ ],
+ "towns": [],
+ "land": true,
+ "sources": {
+  "geometry": [
+   "https://www.acropolisrally.gr/2026/en/spectators/maps-sp",
+   "https://www.acropolisrally.gr/2026/el/theates/xartes",
+   "https://drive.google.com/uc?export=download&id=1hqkdqAgpBVRHqysD9oC_-ed7gFK5wZA5",
+   "https://drive.google.com/uc?export=download&id=1iuI-DgQ3KhoeItaeljGceEbl0eaCk7ax",
+   "https://drive.google.com/uc?export=download&id=1f3Kz-JvP4Z6hYCFBjD4Rj89jOckmZknI",
+   "https://drive.google.com/uc?export=download&id=1Pr2n-ftQKBaF3c_htyY39FXE8qXLiPIl"
+  ],
+  "servicePark": "https://app-cdn.sportity.com/2283ac67-c0b8-47bf-a309-e64159463299/2f6ae796-6389-4623-ad95-3e696122ac8a_Supplementary%20Regulations%20-%20EKO%20Acropolis%20Rally%202026.pdf (SR art. 2.8 'GPS: 37°57.247'N 22°57.855'E', converted to decimal; the organiser KMZ placemark 'Loutraki ServicePark' is 37.953355,22.964847)",
+  "notes": "Points taken from Start/Finish Point placemarks in the organiser's 'Download Google Earth Maps' KMZ files (Shakedown, Day 1-3) linked from the official maps page. Placemark labels carry the stage numbers, so matching is unambiguous; each placemark is within 1-24 m of the corresponding end of the stage LineString. Missing: SSS1 'EKO SSS' (1.86 km, The Ellinikon, Athens) - not in any KMZ and no official start/finish GPS found. Shakedown (not a stage): KMZ 'SD_Start' 37.959862,23.033962 / 'SD_Finish' 37.959938,23.007661; SR 12.2.2 gives start 37°57.595' 23°02.031' (= 37.959917,23.03385), consistent. KMZ also contains liaison lines, refuel zones and spectator access roads (ignored). Route lines exist but are not to be reused (see reuse)."
+ }
+}

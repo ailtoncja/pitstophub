@@ -1,0 +1,164 @@
+{
+ "id": "croatia",
+ "out": "src/rally/croatia-2026-map.ts",
+ "export": "CROATIA_2026_MAP",
+ "viewBox": [
+  1000,
+  560
+ ],
+ "credits": [
+  "Croatia Rally 2026: largada/chegada das especiais de fontes oficiais (ver sources).",
+  "Costa: OpenStreetMap land polygons (osmdata.openstreetmap.de), (c) OpenStreetMap contributors, ODbL."
+ ],
+ "downloads": [],
+ "stages": [
+  {
+   "id": "ss1-5",
+   "km": 14.12,
+   "start": [
+    45.480796,
+    14.056142
+   ],
+   "finish": [
+    45.44856,
+    13.98135
+   ],
+   "source": "basic.kmz -> doc.kml, folder 'Croatia Rally 2026 basic/Croatia Rally 2026 - Friday 10 April/Signs', Point placemarks 'SS 1/5 - Start' / 'SS 1/5 - Finish'"
+  },
+  {
+   "id": "ss2-6",
+   "km": 13.78,
+   "start": [
+    45.330478,
+    13.918841
+   ],
+   "finish": [
+    45.335262,
+    13.852893
+   ],
+   "source": "basic.kmz -> doc.kml, folder 'Croatia Rally 2026 basic/Croatia Rally 2026 - Friday 10 April/Signs', Point placemarks 'SS 2/6 - Start' / 'SS 2/6 - Finish'"
+  },
+  {
+   "id": "ss3-7",
+   "km": 23.78,
+   "start": [
+    45.272623,
+    13.907882
+   ],
+   "finish": [
+    45.279905,
+    14.004249
+   ],
+   "source": "basic.kmz -> doc.kml, folder 'Croatia Rally 2026 basic/Croatia Rally 2026 - Friday 10 April/Signs', Point placemarks 'SS 3/7 - Start' / 'SS 3/7 - Finish'"
+  },
+  {
+   "id": "ss4-8",
+   "km": 11.75,
+   "start": [
+    45.317014,
+    14.175833
+   ],
+   "finish": [
+    45.335752,
+    14.267879
+   ],
+   "source": "basic.kmz -> doc.kml, folder 'Croatia Rally 2026 basic/Croatia Rally 2026 - Friday 10 April/Signs', Point placemarks 'SS 4/8 - Start' / 'SS 4/8 - Finish'"
+  },
+  {
+   "id": "ss9-16",
+   "km": 16.26,
+   "start": [
+    45.369064,
+    14.616588
+   ],
+   "finish": [
+    45.386209,
+    14.563429
+   ],
+   "source": "basic.kmz -> doc.kml, folder 'Croatia Rally 2026 basic/Croatia Rally 2026 - Saturday 11 April/Signs', Point placemarks 'SS 9/16 - Start' / 'SS 9/16 - Finish'"
+  },
+  {
+   "id": "ss10-15",
+   "km": 10.13,
+   "start": [
+    45.376995,
+    14.923242
+   ],
+   "finish": [
+    45.431323,
+    14.911891
+   ],
+   "source": "basic.kmz -> doc.kml, folder 'Croatia Rally 2026 basic/Croatia Rally 2026 - Saturday 11 April/Signs', Point placemarks 'SS 10/15 - Start' / 'SS 10/15 - Finish'"
+  },
+  {
+   "id": "ss11-14",
+   "km": 22.48,
+   "start": [
+    45.347066,
+    15.359445
+   ],
+   "finish": [
+    45.404936,
+    15.221469
+   ],
+   "source": "basic.kmz -> doc.kml, folder 'Croatia Rally 2026 basic/Croatia Rally 2026 - Saturday 11 April/Signs', Point placemarks 'SS 11/14 - Start' / 'SS 11/14 - Finish'"
+  },
+  {
+   "id": "ss12-13",
+   "km": 9.11,
+   "start": [
+    45.431218,
+    15.534937
+   ],
+   "finish": [
+    45.39914,
+    15.488179
+   ],
+   "source": "basic.kmz -> doc.kml, folder 'Croatia Rally 2026 basic/Croatia Rally 2026 - Saturday 11 April/Signs', Point placemarks 'SS 12/13 - Start' / 'SS 12/13 - Finish'"
+  },
+  {
+   "id": "ss17-19",
+   "km": 14.17,
+   "start": [
+    45.213693,
+    14.809091
+   ],
+   "finish": [
+    45.150603,
+    14.791015
+   ],
+   "source": "basic.kmz -> doc.kml, folder 'Croatia Rally 2026 basic/Croatia Rally 2026 - Sunday 12 April/Signs', Point placemarks 'SS 17/19 - Start' / 'SS 17/19 - Finish'"
+  },
+  {
+   "id": "ss18-20",
+   "km": 14.56,
+   "start": [
+    45.073472,
+    14.931094
+   ],
+   "finish": [
+    44.993603,
+    14.907594
+   ],
+   "source": "basic.kmz -> doc.kml, folder 'Croatia Rally 2026 basic/Croatia Rally 2026 - Sunday 12 April/Signs', Point placemarks 'SS 18/20 - Start' / 'SS 18/20 - Finish'"
+  }
+ ],
+ "servicePark": [
+  45.382935,
+  14.507208
+ ],
+ "towns": [],
+ "land": true,
+ "sources": {
+  "geometry": [
+   "https://rally-croatia.com/en/spectators/special-stages-maps",
+   "https://rally-croatia.com/uploads/files/Croatia%20Rally%202026%20basic.kmz",
+   "https://www.google.com/maps/d/u/0/edit?mid=1S4Ocpb48O-XHf7J1R42APqtiqywgLgU (Thu)",
+   "https://www.google.com/maps/d/u/0/edit?mid=1W9Gn4CSQrfXHTzPQKUz3z8OyHgj-MMs (Fri)",
+   "https://www.google.com/maps/d/u/0/edit?mid=10FnxRsD6I5GjRAeN0coBsMOriVziCZE (Sat)",
+   "https://www.google.com/maps/d/u/0/edit?mid=1vOoo6HFUD3EI5z1pkY8OTOHmmdBP7Mk (Sun)"
+  ],
+  "servicePark": "basic.kmz -> doc.kml, Point placemark 'Service Park' (official organiser KMZ)",
+  "notes": "Official organiser KMZ contains full vector SS LineStrings for all 10 distinct stage roads (all 20 SS) plus explicit 'SS x/y - Start' and 'SS x/y - Finish' Point placemarks, so kind would be 'route' on data grounds; set to 'points' ONLY because the site Terms of Use forbid communicating/reproducing content to the public without written permission (same treatment as Greece). routeRef kept for reference if permission is obtained. Start/finish taken from the explicit Start/Finish placemarks (within 25 m of the line ends; max 25 m at SS10/15 finish, 13 m at SS3/7 finish, others <=2 m). Line length vs official: SS1/5 Vodice - Brest: line 14.25 km vs official 14.12 km (+0.9%); SS2/6 Lake Butoniga - Motovun: line 13.84 km vs official 13.78 km (+0.4%); SS3/7 Beram - Cerovlje: line 23.96 km vs official 23.78 km (+0.8%) [LineString drawn finish->start]; SS4/8 Učka: line 11.76 km vs official 11.75 km (+0.1%); SS9/16 Platak: line 16.08 km vs official 16.26 km (-1.1%) [LineString drawn finish->start]; SS10/15 Ravna Gora - Skrad: line 10.44 km vs official 10.13 km (+3.1%); SS11/14 Generalski Stol - Zdihovo: line 22.57 km vs official 22.48 km (+0.4%); SS12/13 Pećurkovo Brdo - Mrežnički Novaki: line 9.14 km vs official 9.11 km (+0.4%); SS17/19 Bribir - Novi Vinodolski: line 14.28 km vs official 14.17 km (+0.8%); SS18/20 Alan - Senj: line 14.62 km vs official 14.56 km (+0.4%). Shakedown LineString 'Shakedown' (folder Thursday 9 April/Signs) = 3.55 km vs official 3.44. Quirk: liaison 'SS 9 Finish - TC 10' begins at the SS 9/16 TC point rather than at the finish; the SS 9/16 Start/Finish placemarks are unambiguous, so not considered a problem. Name matching is exact (KMZ names carry the SS numbers); no uncertain matches."
+ }
+}

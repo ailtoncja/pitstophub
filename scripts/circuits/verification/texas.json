@@ -1,0 +1,37 @@
+{
+ "key": "texas",
+ "official_map": "https://www.texasmotorspeedway.com/documents/tms_2025seatingchart_nopricing_090924.pdf",
+ "official_map_page": "https://www.texasmotorspeedway.com/fans/facility-maps/",
+ "official_length_m": 2414,
+ "official_length_source": "https://www.texasmotorspeedway.com/media/track-facts/ (\"Racing Surface Oval: 1.5 miles\"; turns 750-foot radius; banking 20 deg T1-2, 24 deg T3-4)",
+ "alt_lengths": [],
+ "osm_length_m": 2382.4,
+ "length_error_pct": -1.31,
+ "osm_chamfer_pct": 0.95,
+ "osm_chamfer_m": 3.5,
+ "osm_p95_m": 10.2,
+ "osm_mirror_pct": 0.95,
+ "osm_aniso": 1.015,
+ "osm_rot_deg": -74.3,
+ "extract": {
+  "mode": "mask",
+  "n": 81828
+ },
+ "png_chamfer_pct": 0.95,
+ "png_mirror_pct": 0.95,
+ "png_aniso": 1.013,
+ "png_rot_deg": 0.0,
+ "mirror_ratio": 1.0,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

@@ -1,0 +1,29 @@
+{
+ "key": "laguna-seca",
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackMaps/LagunaSeca_TrackMap.jpg",
+ "official_map_page": "https://www.indycar.com/Schedule/2026/Laguna-Seca",
+ "official_length_m": 3602,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/Laguna-Seca (Track Length 2.238 Miles)",
+ "alt_lengths": [],
+ "osm_length_m": 3600.9,
+ "length_error_pct": -0.03,
+ "osm_chamfer_pct": 2.27,
+ "osm_chamfer_m": 8.6,
+ "osm_p95_m": 19.7,
+ "osm_mirror_pct": 10.43,
+ "osm_aniso": 1.029,
+ "osm_rot_deg": 89.6,
+ "extract": {
+  "mode": "mask",
+  "n": 15381
+ },
+ "mirror_ratio": 4.59,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": false,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true
+ },
+ "pass": false
+}

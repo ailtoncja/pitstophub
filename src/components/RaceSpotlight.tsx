@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { MapPin } from 'lucide-react';
 import { hasStartTime, racePlace, raceTitle, timeOf, timeZoneLabel, weekdayDayMonth } from '../lib/format';
 import { useT } from '../lib/i18n';
@@ -17,17 +18,21 @@ export function RaceSpotlight({
   categoryId,
   now,
   className,
+  cancelNote,
 }: {
   race: Race;
   categoryId: string;
   now: number;
   className?: string;
+  /** Complemento do "Etapa cancelada" (substituta ou "sem substituta"). Pode ter links: nao usar dentro de outro link. */
+  cancelNote?: ReactNode;
 }) {
   const { t, lang } = useT();
   const start = raceStartDate(race);
   const timed = hasStartTime(race);
   const completed = race.status === 'completed';
-  const phase = completed ? 'wrapped' : phaseOf(race, now);
+  const cancelled = race.status === 'cancelled';
+  const phase = completed || cancelled ? 'wrapped' : phaseOf(race, now);
   const place = race.circuit && race.circuit !== racePlace(race, lang) ? [race.circuit, racePlace(race, lang)].filter(Boolean).join(' · ') : racePlace(race, lang);
 
   return (
@@ -41,12 +46,17 @@ export function RaceSpotlight({
           ) : (
             <>
               {weekdayDayMonth(start, lang)}
-              {timed && <> · {timeOf(start, lang)} <span className="text-silver font-semibold">{timeZoneLabel(start)}</span></>}
+              {timed && !cancelled && <> · {timeOf(start, lang)} <span className="text-silver font-semibold">{timeZoneLabel(start)}</span></>}
             </>
           )}
         </p>
         <div className="min-h-[2.25rem] flex items-center">
-          {phase === 'live' ? (
+          {cancelled ? (
+            <p className="type-label-badge text-[1rem] text-silver leading-snug">
+              {t('cir.cancelled')}
+              {cancelNote && <> · {cancelNote}</>}
+            </p>
+          ) : phase === 'live' ? (
             <StatusTag live className="text-[1rem] text-white">{t('home.liveNow')}</StatusTag>
           ) : phase === 'awaiting' ? (
             <StatusTag className="text-[1rem]">{t('home.awaiting')}</StatusTag>

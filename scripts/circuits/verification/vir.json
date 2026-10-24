@@ -1,0 +1,37 @@
+{
+ "key": "vir",
+ "official_map": "https://virnow.com/wp-content/uploads/2014/05/VIR_Full-Course_2018-1-1582x2048.jpg",
+ "official_map_page": "https://virnow.com/track/configurations/",
+ "official_length_m": 5263,
+ "official_length_source": "https://virnow.com/track/configurations/ (Full Course 3.27 miles / 5.26 km)",
+ "alt_lengths": [],
+ "osm_length_m": 5261.9,
+ "length_error_pct": -0.02,
+ "osm_chamfer_pct": 0.48,
+ "osm_chamfer_m": 3.2,
+ "osm_p95_m": 7.1,
+ "osm_mirror_pct": 8.82,
+ "osm_aniso": 1.008,
+ "osm_rot_deg": 0.4,
+ "extract": {
+  "mode": "mask",
+  "n": 44404
+ },
+ "png_chamfer_pct": 0.51,
+ "png_mirror_pct": 8.8,
+ "png_aniso": 1.008,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 18.38,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

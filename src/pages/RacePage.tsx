@@ -1,24 +1,31 @@
-import { useMemo } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { lazy, Suspense, useMemo } from 'react';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, CalendarPlus, Cloud, CloudFog, CloudLightning, CloudRain, CloudSnow, MapPin, Share2, Sun, Timer } from 'lucide-react';
 import { paths } from '../app/paths';
+import { RaceChangeNote } from '../components/RaceChangeNote';
 import { RaceSpotlight } from '../components/RaceSpotlight';
 import { useToast } from '../components/Toast';
 import { Button, EmptyState, FactList, ListGroup, SectionTitle, Skeleton } from '../components/ui';
-import { getRaceCircuitInfo } from '../circuit-info';
-import { findCategoryDriver, raceKey } from '../lib/entities';
+import { getRaceCircuitInfo, type CircuitInfo } from '../circuit-info';
+import { rallyIdFor } from '../rally/dates';
+import { findCategoryDriver } from '../lib/entities';
 import { useRaceResults } from '../lib/f1-hooks';
 import { hasStartTime, raceTitle, timeOf, timeZoneLabel, weekdayShort } from '../lib/format';
 import { useAsync, useScrollTopOn } from '../lib/hooks';
 import { useT } from '../lib/i18n';
 import { buildIcs, downloadIcs } from '../lib/ics';
+import { raceChange } from '../lib/race-changes';
+import { resolveRaceRoute, type RaceRoute } from '../lib/race-route';
 import { raceHighlights, roundNumber } from '../lib/season';
 import { useNow } from '../lib/useNow';
 import { cn } from '../lib/utils';
 import { fetchRaceWeather, weatherWindowOpen, type RaceWeather } from '../lib/weather';
 import { raceStartDate } from '../race-time';
-import { useCategory } from '../state/live-data';
-import type { RaceSession, RaceSessionKind } from '../types';
+import { useCategory, useLiveData } from '../state/live-data';
+import { MOTORSPORT_DATA, type RaceSession, type RaceSessionKind } from '../types';
+
+// A ficha do rali (mapas + itinerarios do WRC) so carrega nas etapas do WRC.
+const RallySection = lazy(() => import('../components/RallySection'));
 
 const SESSION_LABEL: Record<RaceSessionKind, string> = {
   fp1: 'ses.fp1',
@@ -47,10 +54,22 @@ export default function RacePage() {
   const navigate = useNavigate();
   const toast = useToast();
   const now = useNow(30_000);
+  const { ready } = useLiveData();
   const category = useCategory(categoryId);
-  const race = category?.calendar.find((r) => raceKey(r) === raceId);
+  // O calendario ao vivo troca os ids do catalogo e nao lista etapas canceladas: o catalogo cobre esses links.
+  const catalog = useMemo(() => MOTORSPORT_DATA.find((item) => item.id === categoryId)?.calendar ?? [], [categoryId]);
+  const route = useMemo<RaceRoute>(() => {
+    if (!category || !raceId) return { kind: 'missing' };
+    return resolveRaceRoute(category.calendar, catalog, raceId);
+  }, [category, catalog, raceId]);
+  const race = route.kind === 'found' ? route.race : undefined;
+  // Etapa cancelada -> substituta(s); substituta -> cancelada(s). Os pares ficam no catalogo.
+  const change = useMemo(() => (race ? raceChange(catalog, race) : null), [catalog, race]);
 
-  const info = useMemo(() => (race ? getRaceCircuitInfo(race) : null), [race]);
+  // Com a categoria: o tracado certo do lugar (oval x misto) e os dados do GP so na F1.
+  const info = useMemo(() => (race ? getRaceCircuitInfo(race, category?.id) : null), [race, category?.id]);
+  // Rali nao tem circuito: no WRC a ficha do rali (mapa das especiais + itinerario) ocupa o lugar do tracado.
+  const rally = useMemo(() => (race && category?.id === 'wrc' && race.status !== 'cancelled' ? rallyIdFor(race) : null), [race, category?.id]);
   const results = useRaceResults(category, race);
   const highlights = useMemo(() => (results.data ? raceHighlights(results.data) : null), [results.data]);
 
@@ -58,7 +77,20 @@ export default function RacePage() {
   const weatherEnabled = Boolean(race && hasCoords && race.status === 'upcoming' && weatherWindowOpen(race.date));
   const weather = useAsync(() => fetchRaceWeather(race!.lat!, race!.lng!, race!.date), [race?.id, race?.date], weatherEnabled);
 
+  if (category && route.kind === 'redirect') {
+    return <Navigate to={paths.race(category.id, route.raceId)} replace />;
+  }
+
   if (!category || !race) {
+    // Um id da fonte ao vivo (ex.: "r01-melbourne") so existe depois da sincronizacao: espera antes de dizer que nao existe.
+    if (category && !ready) {
+      return (
+        <div className="px-margin lg:px-0 pt-6 space-y-4">
+          <Skeleton className="h-72 lg:h-96" />
+          <Skeleton className="h-40" />
+        </div>
+      );
+    }
     return (
       <div className="px-margin lg:px-0 pt-6">
         <EmptyState title={t('cir.notFound')} action={<Button to={categoryId ? paths.calendarOf(categoryId) : paths.agenda}>{t('common.back')}</Button>} />
@@ -71,7 +103,13 @@ export default function RacePage() {
   const round = race.round ?? roundNumber(category.calendar, race);
   const sessions = race.sessions ?? [];
   const upcoming = race.status === 'upcoming';
+  const cancelled = race.status === 'cancelled';
+  // Etapa cancelada nao tem numero de rodada (o aviso "Etapa cancelada" ja esta no destaque acima).
+  const stageLabel = !cancelled && round > 0 ? t('cir.stage', { n: round }) : null;
+  // Com a ficha do rali em largura total e sem tracado/clima, a coluna da esquerda ficaria vazia.
+  const leftEmpty = Boolean(rally) && !info && !weather.data && weather.status !== 'loading';
   const numberFormat = lang === 'pt' ? 'pt-BR' : 'en-US';
+  const facts = info ? circuitFacts(info, t, numberFormat) : [];
 
   const saveToCalendar = () => {
     downloadIcs(`pitstophub-${category.id}-${race.id}.ics`, buildIcs([{ category, race }], lang));
@@ -106,11 +144,22 @@ export default function RacePage() {
 
       <h1 className="sr-only">{raceTitle(race, lang)}</h1>
       <div className="mt-2 space-y-4">
-        <RaceSpotlight race={race} categoryId={category.id} now={now} />
+        <RaceSpotlight
+          race={race}
+          categoryId={category.id}
+          now={now}
+          cancelNote={cancelled && change && change.kind !== 'replaces' ? <RaceChangeNote change={change} categoryId={category.id} /> : undefined}
+        />
+
+        {!cancelled && change?.kind === 'replaces' && (
+          <p className="type-body-md text-silver">
+            <RaceChangeNote change={change} categoryId={category.id} />
+          </p>
+        )}
 
         <div className="flex items-center gap-x-4 gap-y-2 flex-wrap justify-between">
           <p className="type-body-md text-silver">
-            {[t('cir.stage', { n: round }), info ? t('cir.laps', { n: info.laps }) : null, info ? (info.direction === 'clockwise' ? t('cir.clockwise') : t('cir.counterclockwise')) : null].filter(Boolean).join(' · ')}
+            {[stageLabel, info?.laps != null ? t('cir.laps', { n: info.laps }) : null, info?.direction ? (info.direction === 'clockwise' ? t('cir.clockwise') : t('cir.counterclockwise')) : null].filter(Boolean).join(' · ')}
           </p>
           <div className="flex items-center gap-2">
             {upcoming && (
@@ -125,8 +174,16 @@ export default function RacePage() {
         </div>
       </div>
 
+      {rally && race && (
+        <div className="mt-10">
+          <Suspense fallback={<Skeleton className="h-[28rem]" />}>
+            <RallySection race={race} />
+          </Suspense>
+        </div>
+      )}
+
       <div className="mt-10 lg:grid lg:grid-cols-12 lg:gap-10 space-y-10 lg:space-y-0">
-        <div className="lg:col-span-7 space-y-10 min-w-0">
+        <div className={cn('lg:col-span-7 space-y-10 min-w-0', leftEmpty && 'hidden')}>
           {(weather.data || weather.status === 'loading') && (
             <section className="space-y-3">
               <SectionTitle>{t('cir.forecast')}</SectionTitle>
@@ -138,28 +195,26 @@ export default function RacePage() {
             <section className="space-y-3">
               <SectionTitle>{t('cir.layout')}</SectionTitle>
               {info.trackImage && (
-                <div className="relative rounded-2xl bg-asphalt border border-hairline overflow-hidden aspect-[16/10] flex items-center justify-center">
-                  <img src={info.trackImage} alt={race.circuit} className="w-full h-full object-contain p-4" loading="lazy" />
-                </div>
+                <figure className="space-y-2">
+                  <div className="relative rounded-2xl bg-asphalt border border-hairline overflow-hidden aspect-[16/10] flex items-center justify-center">
+                    <img src={info.trackImage} alt={race.circuit} className="w-full h-full object-contain p-4" loading="lazy" />
+                  </div>
+                  {info.osm && (
+                    <figcaption className="type-label-telemetry text-silver-dim text-right">
+                      <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer" className="hover:text-white underline-offset-2 hover:underline">
+                        {t('cir.osmCredit')}
+                      </a>
+                    </figcaption>
+                  )}
+                </figure>
               )}
-              <FactList
-                items={[
-                  { label: t('cir.length'), value: `${info.lengthKm.toLocaleString(numberFormat, { minimumFractionDigits: 3 })} km` },
-                  { label: t('cir.corners'), value: String(info.corners) },
-                  { label: t('cir.distance'), value: `${info.raceDistanceKm.toLocaleString(numberFormat, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} km` },
-                  {
-                    label: t('cir.record'),
-                    value: info.lapRecord ? `${info.lapRecord.time} · ${info.lapRecord.driver} (${info.lapRecord.year})` : t('cir.noRecord'),
-                  },
-                  { label: t('cir.firstGp'), value: String(info.firstGrandPrix) },
-                ]}
-              />
+              {facts.length > 0 && <FactList items={facts} />}
             </section>
           )}
 
-          {info && (
+          {info && (info.brakingZones?.length || info.tyreStrategyNote) && (
             <section className="space-y-4">
-              {info.brakingZones.length > 0 && (
+              {info.brakingZones && info.brakingZones.length > 0 && (
                 <>
                   <SectionTitle>{t('cir.braking')}</SectionTitle>
                   <ListGroup>
@@ -175,27 +230,19 @@ export default function RacePage() {
                   </ListGroup>
                 </>
               )}
-              {info.drsZones.length > 0 && (
+              {info.tyreStrategyNote && (
                 <div className="space-y-2">
-                  <h3 className="type-headline-sm text-white">{t('cir.drs')}</h3>
-                  <ul className="space-y-1">
-                    {info.drsZones.map((zone, i) => (
-                      <li key={i} className="type-body-md text-silver">{lang === 'en' ? zone.en : zone.pt}</li>
-                    ))}
-                  </ul>
+                  <h3 className="type-headline-sm text-white">{t('cir.tyres')}</h3>
+                  <p className="type-body-md text-silver max-w-[68ch]">{lang === 'en' ? info.tyreStrategyNote.en : info.tyreStrategyNote.pt}</p>
                 </div>
               )}
-              <div className="space-y-2">
-                <h3 className="type-headline-sm text-white">{t('cir.tyres')}</h3>
-                <p className="type-body-md text-silver max-w-[68ch]">{lang === 'en' ? info.tyreStrategyNote.en : info.tyreStrategyNote.pt}</p>
-              </div>
             </section>
           )}
 
-          {!info && <EmptyState icon={MapPin} title={t('cir.noInfo')} hint={t('cir.noInfoHint')} />}
+          {!info && !rally && <EmptyState icon={MapPin} title={t('cir.noInfo')} hint={t('cir.noInfoHint')} />}
         </div>
 
-        <div className="lg:col-span-5 space-y-10 min-w-0">
+        <div className={cn('space-y-10 min-w-0', leftEmpty ? 'lg:col-span-12 lg:grid lg:grid-cols-2 lg:gap-10 lg:space-y-0 lg:items-start' : 'lg:col-span-5')}>
           <section className="space-y-3">
             <div className="flex items-baseline justify-between gap-2">
               <SectionTitle>{t('cir.schedule')}</SectionTitle>
@@ -203,7 +250,7 @@ export default function RacePage() {
             </div>
             {sessions.length > 0 ? (
               <ListGroup>
-                {sessions.map((session) => <SessionRow key={session.kind} session={session} lang={lang} label={t(SESSION_LABEL[session.kind])} />)}
+                {sessions.map((session) => <SessionRow key={session.kind} session={session} lang={lang} label={t(SESSION_LABEL[session.kind])} cancelled={cancelled} />)}
               </ListGroup>
             ) : (
               <ListGroup>
@@ -212,6 +259,7 @@ export default function RacePage() {
                   lang={lang}
                   label={t('ses.race')}
                   dateOnly={!timed}
+                  cancelled={cancelled}
                 />
               </ListGroup>
             )}
@@ -265,6 +313,23 @@ export default function RacePage() {
   );
 }
 
+// So os dados que a ficha tem: fora da F1 (e nos circuitos desenhados) nao ha voltas, recorde etc.
+function circuitFacts(info: CircuitInfo, t: ReturnType<typeof useT>['t'], numberFormat: string) {
+  const items: { label: string; value: string }[] = [];
+  if (info.lengthKm != null) items.push({ label: t('cir.length'), value: `${info.lengthKm.toLocaleString(numberFormat, { minimumFractionDigits: 3 })} km` });
+  if (info.corners != null) items.push({ label: t('cir.corners'), value: String(info.corners) });
+  if (info.raceDistanceKm != null) {
+    items.push({ label: t('cir.distance'), value: `${info.raceDistanceKm.toLocaleString(numberFormat, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} km` });
+  }
+  // A ficha do GP sempre diz o recorde (ou que a pista ainda nao tem um).
+  if (info.laps != null) {
+    items.push({ label: t('cir.record'), value: info.lapRecord ? `${info.lapRecord.time} · ${info.lapRecord.driver} (${info.lapRecord.year})` : t('cir.noRecord') });
+  }
+  if (info.firstGrandPrix != null) items.push({ label: t('cir.firstGp'), value: String(info.firstGrandPrix) });
+  if (info.straightModeZones != null) items.push({ label: t('cir.straightMode'), value: String(info.straightModeZones) });
+  return items;
+}
+
 function WeatherList({ weather }: { weather: RaceWeather }) {
   const { t } = useT();
   const Icon = WEATHER_ICON[weather.condition];
@@ -288,10 +353,23 @@ function WeatherList({ weather }: { weather: RaceWeather }) {
   );
 }
 
-function SessionRow({ session, lang, label, dateOnly = false }: { session: RaceSession; lang: 'pt' | 'en'; label: string; dateOnly?: boolean }) {
+function SessionRow({
+  session,
+  lang,
+  label,
+  dateOnly = false,
+  cancelled = false,
+}: {
+  session: RaceSession;
+  lang: 'pt' | 'en';
+  label: string;
+  dateOnly?: boolean;
+  cancelled?: boolean;
+}) {
   const date = new Date(session.startsAt);
   const isRace = session.kind === 'race';
-  const past = date.getTime() < Date.now();
+  // Sessao de etapa cancelada nao vai acontecer: aparece apagada e sem o marcador de proxima largada.
+  const past = cancelled || date.getTime() < Date.now();
   return (
     <div className={cn('flex items-center gap-4 px-4 py-3', past && 'opacity-60')}>
       <div className="w-12 shrink-0 text-center leading-none">

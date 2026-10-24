@@ -1,0 +1,45 @@
+{
+ "key": "darlington",
+ "name": "Darlington Raceway",
+ "layout": "Oval (egg-shaped, 1.366 mi)",
+ "used_by": [
+  "nascar / darlington1 / 2026-03-22",
+  "nascar / darlington2 / 2026-09-06"
+ ],
+ "status": "skipped",
+ "notes": "Shape matches the official map well (0.61%, 2.0 m mean, aniso 1.013), but the OSM lap (one way) is 2103 m, -4.33% vs 1.366 mi, so it fails the length rule; the mirror check is also non-discriminating (0.62%). Not published.",
+ "venue": {
+  "lat": 34.2955,
+  "lon": -79.9055,
+  "radius_m": 900
+ },
+ "official": {
+  "length_m": 2198,
+  "length_source": "1.366 mi (nominal; darlingtonraceway.com track facts not readable by script)",
+  "map_url": "https://www.darlingtonraceway.com/wp-content/uploads/sites/1026/2026/08/27/DAR-26-2328026-TC-5K-Map-Update_8_5x11_v1.pdf",
+  "map_publisher": "Darlington Raceway",
+  "map_file_note": "official/darlington.png = vector path #87 (outer wall contour) of the official 5K-map PDF"
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "keep": "largest"
+ },
+ "verify": {
+  "scores": {
+   "osm_chamfer_pct": 0.61,
+   "osm_mirror_pct": 0.62,
+   "osm_aniso": 1.013,
+   "length_error_pct": -4.33,
+   "png_chamfer_pct": null,
+   "png_rot_deg": null,
+   "pass": false
+  }
+ },
+ "render": {
+  "rotate_deg": 0
+ }
+}

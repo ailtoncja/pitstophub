@@ -1,0 +1,79 @@
+{
+ "key": "sebring",
+ "name": "Sebring International Raceway",
+ "layout": "Full course (3.74 mi)",
+ "status": "published",
+ "used_by": [
+  "imsa / sebring (r02-sebring) / 2026-03-21 (Twelve Hours of Sebring, full course)",
+  "gtwc-america / sebring-international-raceway / 2026-05-09 (weekend May 8-10, full course 3.74 mi per the SRO event page)"
+ ],
+ "layout_source": "https://www.sebringraceway.com/wp-content/uploads/sites/1040/2026/04/07/2026-EVENT-MAP_8.5X11.pdf (2026 12 Hours event map, turns 1-17); https://www.gt-world-challenge-america.com/event/113/sebring-international-raceway (3.74, 17 turns)",
+ "venue": {
+  "lat": 27.4545,
+  "lon": -81.3484,
+  "radius_m": 2000
+ },
+ "official": {
+  "length_m": 6019,
+  "length_source": "https://www.gt-world-challenge-america.com/event/113/sebring-international-raceway (Circuit Length 3.74 mi)",
+  "corners": 17,
+  "corners_source": "https://www.gt-world-challenge-america.com/event/113/sebring-international-raceway",
+  "map_url": "https://www.sebringraceway.com/wp-content/uploads/sites/1040/2026/04/07/2026-EVENT-MAP_8.5X11.pdf",
+  "map_page": "https://www.sebringraceway.com/track-maps/",
+  "map_publisher": "Sebring International Raceway (2026 12 Hours event map, rendered at 2400 px)"
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.47,
+  "max_sat": 0.12,
+  "crop": [
+   0.2143,
+   0.1642,
+   0.7929,
+   0.8029
+  ],
+  "erase": [
+   [
+    0.3357,
+    0.3786,
+    0.4143,
+    0.4243
+   ],
+   [
+    0.6071,
+    0.2263,
+    0.7,
+    0.26
+   ],
+   [
+    0.6857,
+    0.6296,
+    0.7714,
+    0.6661
+   ],
+   [
+    0.3714,
+    0.5292,
+    0.4357,
+    0.552
+   ],
+   [
+    0.4071,
+    0.7719,
+    0.5571,
+    0.7938
+   ]
+  ],
+  "close": 4,
+  "open": 1,
+  "keep": "all",
+  "min_size": 1500
+ },
+ "render": {
+  "rotate_deg": 0.4
+ },
+ "notes": "Published in PR #12 under the 3% length rule approved by the owner (was skipped in PR #9 only because the OSM lap was just over 2%). OSM lap 5866 m vs official 6019 m (-2.55%). PR #9 note: shape matches the official 2026 map (1.26 %, mirrored 7.38 %, aniso 1.012) but the OSM lap is 5866 m, 2.55 % shorter than the official 3.74 mi (6019 m), over the 2 % limit."
+}

@@ -1,0 +1,60 @@
+{
+ "key": "indianapolis-road",
+ "name": "Indianapolis Motor Speedway",
+ "layout": "Road course (2.439 mi, 14 turns)",
+ "status": "published",
+ "used_by": [
+  "indy / indy-road (r06-indianapolis-misto) / 2026-05-09",
+  "imsa / indianapolis (r10-indianapolis) / 2026-09-20",
+  "gtwc-america / indianpolis-8-hour / 2026-10-11"
+ ],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Indianapolis",
+ "venue": {
+  "lat": 39.795,
+  "lon": -86.2347,
+  "radius_m": 1800
+ },
+ "venue_key": "indianapolis",
+ "official": {
+  "length_m": 3925,
+  "length_source": "https://www.indycar.com/Schedule/2026/Indianapolis (Track Length 2.439 Miles)",
+  "alt_lengths": [
+   {
+    "length_m": 3925,
+    "source": "https://www.imsa.com/tracks/indianapolis-motor-speedway/ (Track Length: 2.439)"
+   },
+   {
+    "length_m": 3925,
+    "source": "https://www.gt-world-challenge-america.com/event/117/indianpolis-8-hour (Circuit Length 2.439 Miles, 14 turns)"
+   }
+  ],
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/Indianapolis-RC.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/Indianapolis",
+  "map_publisher": "INDYCAR",
+  "corners": 14,
+  "corners_source": "https://www.indycar.com/Schedule/2026/Indianapolis (\"14 turns\")"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   588780271,
+   992135043,
+   588780307,
+   297115178,
+   1213055864,
+   1213055866,
+   588780271
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": 89.2
+ },
+ "notes": "Ways of OSM relation 20573734 \"Indianapolis RC 2026\". IMSA (2.439 mi) and GTWC America Indianapolis 8 Hour (2.439 mi, 14 turns) state the same course as INDYCAR."
+}

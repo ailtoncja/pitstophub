@@ -1,0 +1,157 @@
+{
+ "id": "canarias",
+ "out": "src/rally/canarias-2026-map.ts",
+ "export": "CANARIAS_2026_MAP",
+ "viewBox": [
+  1000,
+  560
+ ],
+ "credits": [
+  "Rally Islas Canarias 2026: largada/chegada das especiais de fontes oficiais (ver sources).",
+  "Costa: OpenStreetMap land polygons (osmdata.openstreetmap.de), (c) OpenStreetMap contributors, ODbL."
+ ],
+ "downloads": [],
+ "stages": [
+  {
+   "id": "ss1-8",
+   "km": 1.89,
+   "start": [
+    28.100425,
+    -15.457098
+   ],
+   "finish": [
+    28.100315,
+    -15.456363
+   ],
+   "source": "Organiser Google My Maps https://www.google.com/maps/d/kml?mid=1XUhm6LBx9XDqQqWUjmainohztF6cP74&forcekml=1, Point placemarks 'Start - Start' / 'Flying Finish Red - Flying Finish Red'"
+  },
+  {
+   "id": "ss2-5",
+   "km": 13.13,
+   "start": [
+    28.024268,
+    -15.588374
+   ],
+   "finish": [
+    28.020946,
+    -15.642929
+   ],
+   "source": "Organiser Google My Maps https://www.google.com/maps/d/kml?mid=1B-kj-nnw11XbznuNnymX_BvSfAUGYto&forcekml=1, Point placemarks 'Start - Start' / 'Flying Finish Red - Flying Finish Red'"
+  },
+  {
+   "id": "ss3-6",
+   "km": 18.62,
+   "start": [
+    27.964708,
+    -15.607779
+   ],
+   "finish": [
+    28.008864,
+    -15.535591
+   ],
+   "source": "Organiser Google My Maps https://www.google.com/maps/d/kml?mid=1KMJEeGBR9mKQxvTfY8GdrH0HXabIJ_w&forcekml=1, Point placemarks 'Start - Start' / 'Flying Finish Red - Flying Finish Red'"
+  },
+  {
+   "id": "ss4-7",
+   "km": 21.7,
+   "start": [
+    27.901482,
+    -15.708924
+   ],
+   "finish": [
+    27.982648,
+    -15.782131
+   ],
+   "source": "Organiser Google My Maps https://www.google.com/maps/d/kml?mid=1LIX90DC0kjOr5AqSAdnC9S236Non1Eg&forcekml=1, Point placemarks 'Start - Start' / 'Flying Finish Red - Flying Finish Red'"
+  },
+  {
+   "id": "ss9-12",
+   "km": 13.47,
+   "start": [
+    27.885921,
+    -15.563403
+   ],
+   "finish": [
+    27.787489,
+    -15.580064
+   ],
+   "source": "Organiser Google My Maps https://www.google.com/maps/d/kml?mid=1EgLOJPj-dIxABZdepl3x7TQsH_6Cfcw&forcekml=1, Point placemarks 'Start - Start SS15-18' / 'Flying Finish Red - Finish SS15-18'"
+  },
+  {
+   "id": "ss10-13",
+   "km": 13.74,
+   "start": [
+    28.087273,
+    -15.537095
+   ],
+   "finish": [
+    28.060698,
+    -15.556982
+   ],
+   "source": "Organiser Google My Maps https://www.google.com/maps/d/kml?mid=1AYH4RURLS1hdEF_7LCBwOyiOFMbfkE0&forcekml=1, Point placemarks 'Start - Start' / 'Flying Finish Red - Finish SS8-11'"
+  },
+  {
+   "id": "ss11-14",
+   "km": 28.9,
+   "start": [
+    28.111921,
+    -15.58246
+   ],
+   "finish": [
+    28.107585,
+    -15.639134
+   ],
+   "source": "Organiser Google My Maps https://www.google.com/maps/d/kml?mid=1hBVLhCiibYdlNrr3gcQ6jovUsAZA1Bc&forcekml=1, Point placemarks 'Start - Start SS7-10' / 'Flying Finish Red - Flying Finish Red'"
+  },
+  {
+   "id": "ss15-17",
+   "km": 25.93,
+   "start": [
+    27.936518,
+    -15.460081
+   ],
+   "finish": [
+    27.991041,
+    -15.502788
+   ],
+   "source": "Organiser Google My Maps https://www.google.com/maps/d/kml?mid=1PF-TXHu9T9a4H3Xtb5GJEM6EbGvgXdQ&forcekml=1, Point placemarks 'Start - Start' / 'Flying Finish Red - Flying Finish Red'"
+  },
+  {
+   "id": "ss16-18",
+   "km": 13.27,
+   "start": [
+    27.856149,
+    -15.480409
+   ],
+   "finish": [
+    27.903507,
+    -15.450737
+   ],
+   "source": "Organiser Google My Maps https://www.google.com/maps/d/kml?mid=1Kiyl_H80t-FmMa3KHW8O52kU3YdsABI&forcekml=1, Point placemarks 'Start - Start' / 'Flying Finish Red - Flying Finish Red'"
+  }
+ ],
+ "servicePark": [
+  28.098,
+  -15.457833
+ ],
+ "towns": [],
+ "land": true,
+ "sources": {
+  "geometry": [
+   "https://rallyislascanarias.com/es/participantes/",
+   "https://rallyislascanarias.com/es/pdf2026/50RICv2.kmz",
+   "https://rallyislascanarias.com/es/zonas-de-publico/ (per-stage My Maps)",
+   "https://www.google.com/maps/d/kml?mid=1XUhm6LBx9XDqQqWUjmainohztF6cP74&forcekml=1",
+   "https://www.google.com/maps/d/kml?mid=1B-kj-nnw11XbznuNnymX_BvSfAUGYto&forcekml=1",
+   "https://www.google.com/maps/d/kml?mid=1KMJEeGBR9mKQxvTfY8GdrH0HXabIJ_w&forcekml=1",
+   "https://www.google.com/maps/d/kml?mid=1LIX90DC0kjOr5AqSAdnC9S236Non1Eg&forcekml=1",
+   "https://www.google.com/maps/d/kml?mid=1EgLOJPj-dIxABZdepl3x7TQsH_6Cfcw&forcekml=1",
+   "https://www.google.com/maps/d/kml?mid=1AYH4RURLS1hdEF_7LCBwOyiOFMbfkE0&forcekml=1",
+   "https://www.google.com/maps/d/kml?mid=1hBVLhCiibYdlNrr3gcQ6jovUsAZA1Bc&forcekml=1",
+   "https://www.google.com/maps/d/kml?mid=1PF-TXHu9T9a4H3Xtb5GJEM6EbGvgXdQ&forcekml=1",
+   "https://www.google.com/maps/d/kml?mid=1Kiyl_H80t-FmMa3KHW8O52kU3YdsABI&forcekml=1"
+  ],
+  "servicePark": "https://rallyislascanarias.com/es/wp-content/uploads/2026/01/RALLY-GUIDE-1-1.pdf (5.1: GPS: N 28° 05,88' W 15° 27,47', converted to decimal)",
+  "notes": "Official competitor KMZ '50RICv2.kmz' (linked on the participants page) has vector SS LineStrings for all 9 distinct stage roads + shakedown, and the organiser's per-stage My Maps (linked on zonas-de-publico) repeat the same lines with explicit 'Start' and 'Flying Finish' placemarks; start/finish taken from those (within 4 m of the KMZ line ends, except SSS1/8 whose loop line has no distinct ends: markers 57-91 m from the loop's first vertex). kind set to 'points' only because the site legal notice requires prior written authorisation for any reproduction; vector data exists (routeRef kept). Placemark naming quirks (geometry confirmed by position/length): KMZ line for SS3/6 is named 'SS 4/7 Tejeda - San Mateo' inside folder 'SS 3/6 Tejeda San Mateo'; SS4/7 line is named 'La Aldea - Mogán' but runs Mogán->La Aldea (finish placemark at La Aldea end), consistent with itinerary 'Mogán - La Aldea'; My Maps start/finish labels carry stale numbers ('Start SS15-18' on Maspalomas, 'Finish SS8-11' on Arucas, 'Start SS7-10' on Moya). SSS1/8 is a closed loop drawn once (0.63 km) vs 1.89 km official (presumably ~3 laps; not stated); My Map has two Start and two Finish markers (parallel lanes) - first of each used. Lengths: SSS1/8 BP Ultimate - Las Palmas de Gran Canaria: KMZ line 0.63 km vs official 1.89; SS2/5 Valleseco - Artenara: KMZ line 13.12 km vs official 13.13; SS3/6 Tejeda - San Mateo: KMZ line 18.60 km vs official 18.62; SS4/7 Mogán - La Aldea: KMZ line 21.67 km vs official 21.70; SS9/12 Maspalomas: KMZ line 13.45 km vs official 13.47; SS10/13 Arucas - Firgas - Teror: KMZ line 13.73 km vs official 13.74; SS11/14 Moya - Gáldar: KMZ line 28.87 km vs official 28.90; SS15/17 Ingenio - Telde - Valsequillo: KMZ line 25.55 km vs official 25.93; SS16/18 Santa Lucía - Agüimes: KMZ line 13.25 km vs official 13.27. Shakedown Santa Brígida KMZ line 6.25 km vs 6.26."
+ }
+}

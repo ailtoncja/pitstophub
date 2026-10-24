@@ -1,0 +1,37 @@
+{
+ "key": "san-diego",
+ "name": "San Diego Street Course",
+ "layout": "Street circuit (Naval Base Coronado)",
+ "status": "skipped",
+ "used_by": [
+  "nascar / sandiego (live r17-san-diego) / 2026-06-21"
+ ],
+ "layout_source": "https://performanceracing.com/magazine/industry-news/10-21-2025/nascar-san-diego-reveals-naval-base-coronado-street-course",
+ "venue": {
+  "lat": 32.699,
+  "lon": -117.21,
+  "radius_m": 2500
+ },
+ "official": {
+  "length_m": 5472,
+  "length_source": "https://www.si.com/onsi/racing-america/news/nascar-unveils-16-turn-3-4-mile-san-diego-street-course-layout (3.4-mile, NASCAR announcement)",
+  "corners": 16,
+  "map_url": "https://ewscripps.brightspotcdn.com/02/cf/d75d1606450daa6315bfdeec4665/nascar-naval-base-coronado-course-map-2026.jpg",
+  "map_page": "https://www.10news.com/sports/nascar-unveils-course-map-for-2026-san-diego-weekend-at-naval-base-coronado",
+  "map_publisher": "NASCAR (course rendering, republished by KGTV)"
+ },
+ "select": {
+  "mode": "cycle",
+  "streets": true
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "notes": "SKIPPED: temporary course inside Naval Air Station North Island; no raceway/relation in OSM, and the course runs along quay aprons and the runway edge (\"Runway Road\") that are not mapped as continuous roads. The only official map is an oblique 3D rendering, not a plan."
+}

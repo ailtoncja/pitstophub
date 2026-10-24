@@ -1,0 +1,37 @@
+{
+ "key": "iowa",
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/IowaSpeedway.png",
+ "official_map_page": "https://www.indycar.com/",
+ "official_length_m": 1408,
+ "official_length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf",
+ "alt_lengths": [],
+ "osm_length_m": 1430.7,
+ "length_error_pct": 1.61,
+ "osm_chamfer_pct": 0.51,
+ "osm_chamfer_m": 1.1,
+ "osm_p95_m": 2.3,
+ "osm_mirror_pct": 0.56,
+ "osm_aniso": 1.007,
+ "osm_rot_deg": -128.1,
+ "extract": {
+  "mode": "mask",
+  "n": 85348
+ },
+ "png_chamfer_pct": 0.53,
+ "png_mirror_pct": 0.57,
+ "png_aniso": 1.007,
+ "png_rot_deg": 0.1,
+ "mirror_ratio": 1.1,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

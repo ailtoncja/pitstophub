@@ -1,0 +1,29 @@
+{
+ "key": "mosport",
+ "official_map": null,
+ "official_map_page": null,
+ "official_length_m": 3957,
+ "official_length_source": null,
+ "alt_lengths": [],
+ "osm_length_m": 3943.3,
+ "length_error_pct": -0.35,
+ "osm_chamfer_pct": 7.17,
+ "osm_chamfer_m": 35.8,
+ "osm_p95_m": 145.8,
+ "osm_mirror_pct": 10.72,
+ "osm_aniso": 1.143,
+ "osm_rot_deg": -18.1,
+ "extract": {
+  "mode": "mask",
+  "n": 56185
+ },
+ "mirror_ratio": 1.5,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": false,
+  "not_mirrored": false,
+  "not_distorted": false,
+  "length": true
+ },
+ "pass": false
+}

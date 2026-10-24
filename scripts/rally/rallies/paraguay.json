@@ -1,0 +1,240 @@
+{
+ "id": "paraguay",
+ "out": "src/rally/paraguay-2026-map.ts",
+ "export": "PARAGUAY_2026_MAP",
+ "viewBox": [
+  1000,
+  560
+ ],
+ "credits": [
+  "Rally del Paraguay 2026: tracado das especiais do Google My Maps oficial \"Rally 2026\" embutido em https://rallydelparaguay.com/tramos-de-carrera/",
+  "(linhas desenhadas a mao pelo organizador; Trinidad e Artigas Este estao digitalizadas ao contrario e sao invertidas).",
+  "Costa: OpenStreetMap land polygons (osmdata.openstreetmap.de), (c) OpenStreetMap contributors, ODbL."
+ ],
+ "downloads": [
+  {
+   "url": "https://www.google.com/maps/d/kml?mid=1hu76Ti74rUnxnMwrk5CnoJQC0RjCmj8&forcekml=1",
+   "file": "paraguay/mymap.kml"
+  }
+ ],
+ "stages": [
+  {
+   "id": "ss1-5",
+   "km": 24.65,
+   "start": [
+    -27.394344,
+    -55.735241
+   ],
+   "finish": [
+    -27.352723,
+    -55.646459
+   ],
+   "source": "paraguay/mymap.kml My Maps placemarks 'SS(S)1/5' / 'FSS1/5'",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS1/5 CAMBYRETA",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss2-6",
+   "km": 15.66,
+   "start": [
+    -27.332382,
+    -55.61597
+   ],
+   "finish": [
+    -27.265496,
+    -55.624217
+   ],
+   "source": "paraguay/mymap.kml My Maps placemarks 'SS(S)2/6' / 'FSS2/6'",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS2/6 NUEVA ALBORADA",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss3-7",
+   "km": 33.88,
+   "start": [
+    -27.256431,
+    -55.610659
+   ],
+   "finish": [
+    -27.258452,
+    -55.669181
+   ],
+   "source": "paraguay/mymap.kml My Maps placemarks 'SS(S)3/7' / 'FSS3/7'",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS3/7 YERBATERAS",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss4-8",
+   "km": 2.5,
+   "start": [
+    -27.214552,
+    -55.818646
+   ],
+   "finish": [
+    -27.210933,
+    -55.814491
+   ],
+   "source": "paraguay/mymap.kml My Maps placemarks 'SS(S)4/8' / 'FSS4/8'. Route NOT drawn (start/finish only): organiser My Maps line 2.57 km vs 2.50 km official (+2.7%), more than the 2% tolerance."
+  },
+  {
+   "id": "ss9-13",
+   "km": 21.15,
+   "start": [
+    -26.984272,
+    -55.466727
+   ],
+   "finish": [
+    -27.062884,
+    -55.482898
+   ],
+   "source": "paraguay/mymap.kml My Maps placemarks 'SS(S)9/13' / 'FSS9/13'",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS9/13 BELLA VISTA",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss10-14",
+   "km": 11.57,
+   "start": [
+    -27.073512,
+    -55.513417
+   ],
+   "finish": [
+    -27.089907,
+    -55.525489
+   ],
+   "source": "paraguay/mymap.kml My Maps placemarks 'SS(S)10/14' / 'FSS10/14'. Route NOT drawn (start/finish only): organiser My Maps line 11.90 km vs 11.57 km official (+2.8%), more than the 2% tolerance."
+  },
+  {
+   "id": "ss11-15",
+   "km": 19.4,
+   "start": [
+    -27.120804,
+    -55.61619
+   ],
+   "finish": [
+    -27.134767,
+    -55.696414
+   ],
+   "source": "paraguay/mymap.kml My Maps placemarks 'SS(S)11/15' / 'FSS11/15'",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS11/15 HOHENAU",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss12-16",
+   "km": 15.0,
+   "start": [
+    -27.163793,
+    -55.74754
+   ],
+   "finish": [
+    -27.225679,
+    -55.726917
+   ],
+   "source": "paraguay/mymap.kml My Maps placemarks 'SS(S)12/16' / 'FSS12/16'",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS12/16 TRINIDAD",
+    "match": "exact",
+    "reverse": true
+   }
+  },
+  {
+   "id": "ss17",
+   "km": 3.1,
+   "start": [
+    -27.346844,
+    -55.862468
+   ],
+   "finish": [
+    -27.339641,
+    -55.87207
+   ],
+   "source": "paraguay/mymap.kml My Maps placemarks 'SS(S)17' / 'FSS17'",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS 17 COSTANERA",
+    "match": "exact"
+   }
+  },
+  {
+   "id": "ss18-22",
+   "km": 10.26,
+   "start": [
+    -27.276941,
+    -55.890848
+   ],
+   "finish": [
+    -27.30072,
+    -55.893718
+   ],
+   "source": "paraguay/mymap.kml My Maps placemarks 'SS(S)18/22' / 'FSS18/22'. Route NOT drawn (start/finish only): organiser My Maps line 9.57 km vs 10.26 km official (-6.7%), more than the 2% tolerance."
+  },
+  {
+   "id": "ss19-21",
+   "km": 19.6,
+   "start": [
+    -27.021997,
+    -56.201318
+   ],
+   "finish": [
+    -27.006962,
+    -56.118054
+   ],
+   "source": "paraguay/mymap.kml My Maps placemarks 'SS(S)19/21' / 'FSS19/21'",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS19/21 ARTIGAS ESTE",
+    "match": "exact",
+    "reverse": true
+   }
+  },
+  {
+   "id": "ss20",
+   "km": 8.44,
+   "start": [
+    -27.003237,
+    -56.220507
+   ],
+   "finish": [
+    -27.01005,
+    -56.22306
+   ],
+   "source": "paraguay/mymap.kml My Maps placemarks 'SS(S)20' / 'FSS20'",
+   "route": {
+    "file": "paraguay/mymap.kml",
+    "name": "SS20 ARTIGAS OESTE",
+    "match": "exact"
+   }
+  }
+ ],
+ "servicePark": [
+  -27.32915,
+  -55.875317
+ ],
+ "towns": [],
+ "land": true,
+ "sources": {
+  "geometry": [
+   "https://rallydelparaguay.com/tramos-de-carrera/ (embeds Google My Maps mid=1hu76Ti74rUnxnMwrk5CnoJQC0RjCmj8, title 'Rally 2026')",
+   "https://www.google.com/maps/d/kml?mid=1hu76Ti74rUnxnMwrk5CnoJQC0RjCmj8&forcekml=1"
+  ],
+  "servicePark": "https://rallydelparaguay.com/wp-content/uploads/rally-Guide-2_WRCpy2026-copy.pdf (9.1 'GPS Coordinates: S27°19.749' W55°52.519''), converted from degrees and decimal minutes; organiser My Map placemark 'SERVICE' is at -27.329110, -55.874869",
+  "notes": "The organiser's own 'Tramos de Carrera' page embeds a Google My Map titled 'Rally 2026', with folders SHAKEDOWN/FRIDAY/SATURDAY/SUNDAY. Each stage has a LineString plus start (SS/SSS) and finish (FSS) placemarks; there are also liaison lines, TC, STOP, refuel and service points. All 12 distinct stage roads (22 SS) are covered. Start/finish above are from the placemarks. The Trinidad and Artigas Este lines are digitised in reverse (first vertex = FSS); this was checked against the liaison lines, which end at SSS12/16 and SSS19/21. Matching to SS numbers is by the placemark labels (e.g. 'SS1/5'). Stage names match the itinerary except 'ARTIGAS ESTE' = itinerary 'Artigas 1/2'; RG recce table also calls SS19/21 'Artigas Este'. This match is confident. Haversine lengths of the lines vs v.1 km: Cambyreta 24.61/24.65, Nueva Alborada 15.78/15.66, Yerbateras 34.00/33.88, Autodromo 2.57/2.50, Bella Vista 21.25/21.15, Bella Vista Sur 11.90/11.57, Hohenau 19.54/19.40, Trinidad 14.95/15.00, Costanera 3.13/3.10, Encarnacion 9.59/10.26, Artigas Este 19.85/19.60, Artigas Oeste 8.58/8.44. These are hand-digitised lines, roughly accurate. Encarnacion is notably short (9.59 vs 10.26/10.21). The text on the same page describes 2025 stages, but the embedded map itself is the 2026 route.",
+  "verification": "Re-checked 2026-10-21 against itinerary v.1 (Rally Guide 1 pp. 54-56): line lengths on WGS84 vs official km within 2% except SS4/8 Autodromo (2.57 vs 2.50, +2.7%), SS10/14 Bella Vista Sur (11.90 vs 11.57, +2.8%) and SS18/22 Encarnacion (9.57 vs 10.26, -6.7%), which are shown as start/finish only (organiser SS/FSS placemarks). Press figures from a later, unpublished itinerary version (e.g. Encarnacion 10.21, Bella Vista Sur 10.95) are not used."
+ }
+}

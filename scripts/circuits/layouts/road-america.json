@@ -1,0 +1,75 @@
+{
+ "key": "road-america",
+ "name": "Road America",
+ "layout": "Road course (4.014 mi, 14 turns)",
+ "status": "published",
+ "used_by": [
+  "indy / road-america-indy (r10-road-america) / 2026-06-21",
+  "imsa / roadamerica (r08-road-america) / 2026-08-02",
+  "gtwc-america / road-america / 2026-08-30"
+ ],
+ "layout_source": "https://www.indycar.com/Schedule/2026/Road-America",
+ "venue": {
+  "lat": 43.7975,
+  "lon": -87.9897,
+  "radius_m": 2500
+ },
+ "official": {
+  "length_m": 6460,
+  "length_source": "https://www.indycar.com/Schedule/2026/Road-America (Track Length 4.014 Miles)",
+  "alt_lengths": [
+   {
+    "length_m": 6477,
+    "source": "https://www.gt-world-challenge-america.com/event/115/road-america (6.477 km, 14 turns)"
+   }
+  ],
+  "map_url": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/RoadAmerica.png",
+  "map_page": "https://www.indycar.com/Schedule/2026/Road-America",
+  "map_publisher": "INDYCAR",
+  "corners": 14,
+  "corners_source": "https://www.indycar.com/Schedule/2026/Road-America (\"14 turns\")"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   122090243,
+   122090251,
+   122090282,
+   122090297,
+   122090270,
+   122090263,
+   122090289,
+   122090268,
+   122090299,
+   122090258,
+   122090260,
+   122090240,
+   122090275,
+   122090272,
+   122090284,
+   122090298,
+   110527567,
+   122090265,
+   122090279,
+   122090248,
+   122090267,
+   122090239,
+   122090291,
+   122090276,
+   122090286,
+   122090295,
+   122090252
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.5,
+  "min_alpha": 0.5,
+  "close": 3
+ },
+ "render": {
+  "rotate_deg": -91.4
+ },
+ "notes": "Road America has a single 4-mile course used by all three series."
+}

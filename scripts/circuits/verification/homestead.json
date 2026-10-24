@@ -1,0 +1,37 @@
+{
+ "key": "homestead",
+ "official_map": "https://www.homesteadmiamispeedway.com/wp-content/uploads/sites/1038/2026/09/22/HMS-26-2387403-HMS-Map-Update-Tram-Route-1.pdf",
+ "official_map_page": "https://www.homesteadmiamispeedway.com/maps/",
+ "official_length_m": 2414,
+ "official_length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf",
+ "alt_lengths": [],
+ "osm_length_m": 2417.2,
+ "length_error_pct": 0.13,
+ "osm_chamfer_pct": 0.85,
+ "osm_chamfer_m": 3.1,
+ "osm_p95_m": 9.5,
+ "osm_mirror_pct": 0.86,
+ "osm_aniso": 1.018,
+ "osm_rot_deg": -179.9,
+ "extract": {
+  "mode": "mask",
+  "n": 36193
+ },
+ "png_chamfer_pct": 0.85,
+ "png_mirror_pct": 0.85,
+ "png_aniso": 1.017,
+ "png_rot_deg": 0.1,
+ "mirror_ratio": 1.01,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

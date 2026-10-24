@@ -1,0 +1,75 @@
+{
+ "key": "lausitzring",
+ "name": "DEKRA Lausitzring",
+ "layout": "Circuito Sprint (3,478 km)",
+ "used_by": [
+  "dtm / lausitzring (r03-lausitzring) / 2026-06-21"
+ ],
+ "layout_source": "https://racing.porsche.com/events/pccd-05-lausitzring-2026",
+ "venue": {
+  "lat": 51.534,
+  "lon": 13.923,
+  "radius_m": 1500
+ },
+ "official": {
+  "length_m": 3478,
+  "length_source": "https://racing.porsche.com/events/pccd-05-lausitzring-2026 (Porsche Carrera Cup Deutschland 2026 track map, DTM support race: Length 3,478 m)",
+  "alt_lengths": [
+   {
+    "length_m": 3442,
+    "source": "https://dekra-lausitzring.de/wp-content/uploads/2026/10/Site-Presentation-of-the-DEKRA-Lausitzring.pdf (p. 8, Grand Prix Circuit: 3,442 m or 4,500 m configurable)"
+   }
+  ],
+  "corners": 12,
+  "corners_source": "https://racing.porsche.com/events/pccd-05-lausitzring-2026 (Turns: 12); DEKRA site presentation p. 8 (12 corners)",
+  "direction": "counterclockwise",
+  "direction_source": "https://dekra-lausitzring.de/wp-content/uploads/2026/10/Site-Presentation-of-the-DEKRA-Lausitzring.pdf (p. 8, direction of travel: anticlockwise)",
+  "map_url": "https://res.cloudinary.com/dmwcbhehi/image/upload/v1779878619/05_Lausitzring_Track_Map_ENG_t3m2bh.webp",
+  "map_page": "https://racing.porsche.com/events/pccd-05-lausitzring-2026",
+  "map_publisher": "Porsche Motorsport (Porsche Carrera Cup Deutschland 2026)",
+  "map_file": "lausitzring.png"
+ },
+ "select": {
+  "mode": "cycle",
+  "only_ways": [
+   470914466,
+   115077605,
+   470915848,
+   864182816,
+   115077605,
+   766115999
+  ],
+  "require_ways": [
+   115077605,
+   470914466,
+   470915848,
+   766115999,
+   864182816
+  ],
+  "only_ways_note": "Pinned to the ways of the verified lap so the drawing regenerates identically."
+ },
+ "extract": {
+  "mode": "mask",
+  "rgb": [
+   175,
+   175,
+   175
+  ],
+  "tol": 45,
+  "crop": [
+   0.33,
+   0.05,
+   1,
+   0.95
+  ],
+  "close": 2
+ },
+ "verify": {
+  "notes": "Official map cleaned for extraction: the red corner-number boxes and the white start/finish mark that sit on the track were painted track grey (scratch clean_pccd.py); nothing else changed. The OSM lap is 2.7% shorter than the series figure (3,478 m) and 1.7% shorter than the circuit's own figure (3,442 m); the shape matches within 3 m on average."
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "status": "published",
+ "notes": "Lap = the closest-matching closed loop of the raceway ways (scored against the official map among all 248 loops of 3.2-3.8 km)."
+}

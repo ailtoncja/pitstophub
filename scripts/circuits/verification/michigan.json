@@ -1,0 +1,37 @@
+{
+ "key": "michigan",
+ "official_map": "https://www.mispeedway.com/wp-content/uploads/sites/1037/2024/08/19/MIS-23-543779-2023-Grandstand-Map-web.pdf",
+ "official_map_page": "https://www.mispeedway.com/maps/",
+ "official_length_m": 3219,
+ "official_length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf",
+ "alt_lengths": [],
+ "osm_length_m": 3236.2,
+ "length_error_pct": 0.53,
+ "osm_chamfer_pct": 0.67,
+ "osm_chamfer_m": 3.3,
+ "osm_p95_m": 6.5,
+ "osm_mirror_pct": 0.68,
+ "osm_aniso": 1.018,
+ "osm_rot_deg": -75.9,
+ "extract": {
+  "mode": "mask",
+  "n": 91450
+ },
+ "png_chamfer_pct": 0.67,
+ "png_mirror_pct": 0.7,
+ "png_aniso": 1.02,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 1.01,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

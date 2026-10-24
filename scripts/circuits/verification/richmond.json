@@ -1,0 +1,29 @@
+{
+ "key": "richmond",
+ "official_map": "https://www.richmondraceway.com/wp-content/uploads/sites/1028/2026/06/10/RR-26-1752331-SUM-26-Parking-Map-Update-v2-1.pdf",
+ "official_map_page": "https://www.richmondraceway.com/maps/",
+ "official_length_m": 1207,
+ "official_length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf (NASCAR 2026 Cup Series racetrack specifications Rev B, Jayski-hosted copy; figure read from a search excerpt, the PDF itself returned 403) 0.75 mi",
+ "alt_lengths": [],
+ "osm_length_m": 1178.4,
+ "length_error_pct": -2.37,
+ "osm_chamfer_pct": 5.77,
+ "osm_chamfer_m": 10.5,
+ "osm_p95_m": 23.2,
+ "osm_mirror_pct": 5.77,
+ "osm_aniso": 1.198,
+ "osm_rot_deg": -3.8,
+ "extract": {
+  "mode": "mask",
+  "n": 22732
+ },
+ "mirror_ratio": 1.0,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": false,
+  "not_mirrored": true,
+  "not_distorted": false,
+  "length": true
+ },
+ "pass": false
+}

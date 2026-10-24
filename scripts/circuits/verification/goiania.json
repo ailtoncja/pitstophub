@@ -1,0 +1,37 @@
+{
+ "key": "goiania",
+ "official_map": "https://photos.motogp.com/events-admin/5/0/50941f7f-e112-4404-8dcf-5fb2c47e9617/info/bra2-info.svg",
+ "official_map_page": "https://www.motogp.com/en/calendar/2026/event/brazil/11588b5a-f76c-4c8e-ae06-acba82ff1303",
+ "official_length_m": 3835,
+ "official_length_source": "https://www.motogp.com/en/calendar/2026/event/brazil/11588b5a-f76c-4c8e-ae06-acba82ff1303",
+ "alt_lengths": [],
+ "osm_length_m": 3828.5,
+ "length_error_pct": -0.17,
+ "osm_chamfer_pct": 0.82,
+ "osm_chamfer_m": 2.9,
+ "osm_p95_m": 10.0,
+ "osm_mirror_pct": 8.29,
+ "osm_aniso": 1.013,
+ "osm_rot_deg": 46.0,
+ "extract": {
+  "mode": "mask",
+  "n": 46231
+ },
+ "png_chamfer_pct": 0.89,
+ "png_mirror_pct": 8.18,
+ "png_aniso": 1.014,
+ "png_rot_deg": -0.0,
+ "mirror_ratio": 10.11,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

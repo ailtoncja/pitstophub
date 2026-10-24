@@ -1,0 +1,29 @@
+{
+ "key": "gateway",
+ "official_map": "https://www.indycar.com/-/media/IndyCar/Schedules/TrackOutlines/Black/GatewayMotorsportsPark.png",
+ "official_map_page": "https://www.indycar.com/Schedule/2026/WWTR",
+ "official_length_m": 2012,
+ "official_length_source": "https://www.indycar.com/Schedule/2026/WWTR (Track Length 1.25 Miles)",
+ "alt_lengths": [],
+ "osm_length_m": 2042.8,
+ "length_error_pct": 1.53,
+ "osm_chamfer_pct": 3.38,
+ "osm_chamfer_m": 10.4,
+ "osm_p95_m": 21.1,
+ "osm_mirror_pct": 3.44,
+ "osm_aniso": 1.125,
+ "osm_rot_deg": 54.1,
+ "extract": {
+  "mode": "mask",
+  "n": 87881
+ },
+ "mirror_ratio": 1.02,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": false,
+  "not_mirrored": false,
+  "not_distorted": false,
+  "length": true
+ },
+ "pass": false
+}

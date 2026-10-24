@@ -1,0 +1,37 @@
+{
+ "key": "le-mans",
+ "official_map": "https://www.fiawec.com/uploads/2024-tracks-rvb-lemans-b-976827-697a1dbfdd5da760499701.png",
+ "official_map_page": "https://www.fiawec.com/en/race/24-hours-of-le-mans-2026",
+ "official_length_m": 13626,
+ "official_length_source": "https://www.fiawec.com/en/race/24-hours-of-le-mans-2026",
+ "alt_lengths": [],
+ "osm_length_m": 13611.8,
+ "length_error_pct": -0.1,
+ "osm_chamfer_pct": 0.9,
+ "osm_chamfer_m": 17.3,
+ "osm_p95_m": 60.9,
+ "osm_mirror_pct": 4.74,
+ "osm_aniso": 1.01,
+ "osm_rot_deg": 94.8,
+ "extract": {
+  "mode": "mask",
+  "n": 237711
+ },
+ "png_chamfer_pct": 0.94,
+ "png_mirror_pct": 4.8,
+ "png_aniso": 1.01,
+ "png_rot_deg": 0.0,
+ "mirror_ratio": 5.27,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

@@ -1,0 +1,85 @@
+{
+ "key": "mosport",
+ "name": "Canadian Tire Motorsport Park",
+ "layout": "Grand Prix circuit (2.459 mi)",
+ "status": "skipped",
+ "used_by": [
+  "imsa / mosport (r07-mosport) / 2026-07-12"
+ ],
+ "layout_source": "https://www.imsa.com/events/2026-canadian-tire-motorsport-park/",
+ "venue": {
+  "lat": 44.0533,
+  "lon": -78.6756,
+  "radius_m": 1800
+ },
+ "official": {
+  "length_m": 3957
+ },
+ "select": {
+  "mode": "cycle"
+ },
+ "extract": {
+  "mode": "mask",
+  "min_lum": 0.5,
+  "max_lum": 0.85,
+  "max_sat": 0.1,
+  "min_alpha": 0.5,
+  "crop": [
+   0.5357,
+   0.0967,
+   0.9286,
+   0.7942
+  ],
+  "erase": [
+   [
+    0.7143,
+    0.1485,
+    0.875,
+    0.297
+   ],
+   [
+    0.7714,
+    0.0622,
+    0.9286,
+    0.114
+   ],
+   [
+    0.5929,
+    0.3315,
+    0.7357,
+    0.442
+   ],
+   [
+    0.7857,
+    0.3453,
+    0.9214,
+    0.4834
+   ],
+   [
+    0.7857,
+    0.5525,
+    0.9,
+    0.6146
+   ],
+   [
+    0.7143,
+    0.6077,
+    0.7714,
+    0.6975
+   ],
+   [
+    0.7286,
+    0.3039,
+    0.8,
+    0.3453
+   ]
+  ],
+  "close": 3,
+  "keep": "all",
+  "min_size": 300
+ },
+ "render": {
+  "rotate_deg": 0
+ },
+ "notes": "SKIPPED (no usable official map): the CTMP facility map (cdn.shopify.com/s/files/1/1566/0845/files/CTMP_Map.png) is an aerial photo where the track cannot be separated from roads and paddocks (7.17 %); no map on the IMSA event page. OSM lap 3943 m vs 3957 m (-0.35 %)."
+}

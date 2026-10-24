@@ -1,0 +1,29 @@
+{
+ "key": "watkins-glen",
+ "official_map": "https://www.theglen.com/wp-content/uploads/sites/1022/2026/01/30/Track-Rental-Guide-2026.pdf",
+ "official_map_page": "https://www.theglen.com/track-rental/",
+ "official_length_m": 5552,
+ "official_length_source": "https://www.theglen.com/wp-content/uploads/sites/1022/2026/01/30/Track-Rental-Guide-2026.pdf (Long Course 3.40 mile)",
+ "alt_lengths": [],
+ "osm_length_m": 5472.8,
+ "length_error_pct": -1.43,
+ "osm_chamfer_pct": 2.29,
+ "osm_chamfer_m": 13.1,
+ "osm_p95_m": 35.5,
+ "osm_mirror_pct": 10.59,
+ "osm_aniso": 1.055,
+ "osm_rot_deg": -4.5,
+ "extract": {
+  "mode": "mask",
+  "n": 80106
+ },
+ "mirror_ratio": 4.62,
+ "symmetric_shape": false,
+ "checks": {
+  "shape": false,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true
+ },
+ "pass": false
+}

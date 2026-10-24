@@ -1,21 +1,38 @@
+import { DRAWN_CIRCUITS } from './circuit-drawings';
 import type { Category, Race } from './types';
 
-// Dados de circuitos (extensao, curvas, recorde, DRS, frenagem, estrategia de pneus).
-// Extraido do antigo App.tsx sem alteracao de conteudo.
+// Dados de circuitos (extensao, curvas, recorde, zonas de Straight Mode, frenagem, estrategia de pneus).
+//
+// Mapas (public/circuits/*.png): mapas oficiais de 2026 do formula1.com
+// (media.formula1.com/.../common/f1/2026/track/2026track<pista>detailed.png), quadro 16:9
+// inteiro reduzido para 1252x704, fundo transparente, sem os baloes de Speed Trap /
+// Overtake e sem a legenda "STRAIGHT MODE ZONE" (as hachuras vermelhas das zonas ficam).
+//
+// Extensao, voltas, recorde, primeiro GP e distancia de prova: paginas de circuito do
+// formula1.com (formula1.com/en/racing/2026/<gp>); a distancia e a oficial da F1, nao
+// voltas x extensao.
 
 export type CircuitInfo = {
   trackImage?: string;
-  lengthKm: number;
-  raceDistanceKm: number;
-  laps: number;
-  corners: number;
-  direction: 'clockwise' | 'counterclockwise';
-  // Ausente para pistas novas que ainda nao sediaram corrida (ex.: Madrid em 2026).
+  // Desenho feito a partir do OpenStreetMap (src/circuit-drawings.ts): exige o credito
+  // "© OpenStreetMap" onde o desenho aparece (licenca ODbL).
+  osm?: boolean;
+  // Os campos abaixo so existem quando ha fonte. Voltas, distancia, recorde, primeira corrida,
+  // Straight Mode, frenagens e pneus sao dados do GP de F1 e so valem na pagina da F1.
+  lengthKm?: number;
+  raceDistanceKm?: number;
+  laps?: number;
+  corners?: number;
+  direction?: 'clockwise' | 'counterclockwise';
+  // Ausente quando a pista ainda nao tem recorde de corrida.
   lapRecord?: { time: string; driver: string; year: number };
-  firstGrandPrix: number;
-  drsZones: { pt: string; en: string }[];
-  brakingZones: { turn: string; name: string; pt: string; en: string }[];
-  tyreStrategyNote: { pt: string; en: string };
+  firstGrandPrix?: number;
+  // O DRS deixou de existir na F1 em 2026; os mapas oficiais de 2026 marcam as zonas de
+  // Straight Mode (aero ativa) com hachuras vermelhas. Numero de zonas contado nesses mapas;
+  // ausente quando o mapa da F1 ainda nao traz as zonas (mapa antigo ou sem hachura).
+  straightModeZones?: number;
+  brakingZones?: { turn: string; name: string; pt: string; en: string }[];
+  tyreStrategyNote?: { pt: string; en: string };
 };
 
 // Dados reais do Autódromo José Carlos Pace (Interlagos), usados só na página de teste do GP de São Paulo.
@@ -29,10 +46,6 @@ const INTERLAGOS_CIRCUIT_INFO: CircuitInfo = {
   direction: 'counterclockwise',
   lapRecord: { time: '1:10.540', driver: 'V. Bottas (Mercedes)', year: 2018 },
   firstGrandPrix: 1973,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-    { pt: 'Reta oposta, da Curva 12 até a Curva 13', en: 'Back straight, from Turn 12 into Turn 13' },
-  ],
   brakingZones: [
     {
       turn: 'C1-C2',
@@ -63,10 +76,7 @@ const SILVERSTONE_CIRCUIT_INFO: CircuitInfo = {
   direction: 'clockwise',
   lapRecord: { time: '1:27.097', driver: 'M. Verstappen (Red Bull)', year: 2020 },
   firstGrandPrix: 1950,
-  drsZones: [
-    { pt: 'Reta Wellington, de Aintree até Brooklands', en: 'Wellington Straight, from Aintree into Brooklands' },
-    { pt: 'Reta Hangar, de Chapel até Stowe', en: 'Hangar Straight, from Chapel into Stowe' },
-  ],
+  straightModeZones: 4,
   brakingZones: [
     {
       turn: 'C6',
@@ -91,16 +101,13 @@ const SILVERSTONE_CIRCUIT_INFO: CircuitInfo = {
 const SPA_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/spa.png',
   lengthKm: 7.004,
-  raceDistanceKm: 308.052,
+  raceDistanceKm: 308.054,
   laps: 44,
   corners: 19,
   direction: 'clockwise',
   lapRecord: { time: '1:44.701', driver: 'S. Pérez (Red Bull)', year: 2024 },
   firstGrandPrix: 1950,
-  drsZones: [
-    { pt: 'Reta Kemmel, de Raidillon até Les Combes', en: 'Kemmel Straight, from Raidillon into Les Combes' },
-    { pt: 'Reta dos boxes, entrando na Curva 1 (La Source)', en: 'Pit straight, into Turn 1 (La Source)' },
-  ],
+  straightModeZones: 5,
   brakingZones: [
     {
       turn: 'C5',
@@ -131,10 +138,7 @@ const ALBERT_PARK_CIRCUIT_INFO: CircuitInfo = {
   direction: 'clockwise',
   lapRecord: { time: '1:19.813', driver: 'C. Leclerc (Ferrari)', year: 2024 },
   firstGrandPrix: 1996,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-    { pt: 'Da Curva 6 até a Curva 9', en: 'From Turn 6 into Turn 9' },
-  ],
+  straightModeZones: 5,
   brakingZones: [
     {
       turn: 'C1',
@@ -159,16 +163,13 @@ const ALBERT_PARK_CIRCUIT_INFO: CircuitInfo = {
 const SHANGHAI_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/china.png',
   lengthKm: 5.451,
-  raceDistanceKm: 305.256,
+  raceDistanceKm: 305.066,
   laps: 56,
   corners: 16,
   direction: 'clockwise',
   lapRecord: { time: '1:32.238', driver: 'M. Schumacher (Ferrari)', year: 2004 },
   firstGrandPrix: 2004,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-    { pt: 'Reta oposta, entrando na Curva 14', en: 'Back straight, into Turn 14' },
-  ],
+  straightModeZones: 4,
   brakingZones: [
     {
       turn: 'C1-C2',
@@ -193,15 +194,13 @@ const SHANGHAI_CIRCUIT_INFO: CircuitInfo = {
 const SUZUKA_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/japan.png',
   lengthKm: 5.807,
-  raceDistanceKm: 307.771,
+  raceDistanceKm: 307.471,
   laps: 53,
   corners: 18,
   direction: 'clockwise',
   lapRecord: { time: '1:30.965', driver: 'K. Antonelli (Mercedes)', year: 2025 },
   firstGrandPrix: 1987,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-  ],
+  straightModeZones: 2,
   brakingZones: [
     {
       turn: 'C1',
@@ -222,20 +221,19 @@ const SUZUKA_CIRCUIT_INFO: CircuitInfo = {
   },
 };
 
-// Dados reais do Bahrain International Circuit, usados só na página de teste do GP do Bahrein. Fonte: Wikipedia.
-const BAHRAIN_CIRCUIT_INFO: CircuitInfo = {
-  trackImage: '/circuits/bahrain.png',
+// Bahrain International Circuit (Sakhir), para provas realmente disputadas em Sakhir (GP do
+// Bahrein de abril, cancelado em 2026; etapas de F2/F3; 8 Horas do Bahrein da WEC).
+// Fontes: Wikipedia; dados de prova em formula1.com/en/racing/2025/bahrain.
+const SAKHIR_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/sakhir.png',
   lengthKm: 5.412,
-  raceDistanceKm: 308.484,
+  raceDistanceKm: 308.238,
   laps: 57,
   corners: 15,
   direction: 'clockwise',
   lapRecord: { time: '1:31.447', driver: 'P. de la Rosa (McLaren)', year: 2005 },
   firstGrandPrix: 2004,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-    { pt: 'Da Curva 3 até a Curva 4', en: 'From Turn 3 into Turn 4' },
-  ],
+  straightModeZones: 4,
   brakingZones: [
     {
       turn: 'C1',
@@ -256,6 +254,39 @@ const BAHRAIN_CIRCUIT_INFO: CircuitInfo = {
   },
 };
 
+// Sepang International Circuit (Malasia). Em 2026 o GP do Bahrein foi transferido para Sepang
+// ("Bahrain Grand Prix in Malaysia", 2-4 de outubro). Fonte: formula1.com/en/racing/2026/bahrain
+// (extensao, voltas, distancia, recorde, primeiro GP) e o mapa oficial 2026trackkualalumpurdetailed.png.
+const SEPANG_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/sepang.png',
+  lengthKm: 5.543,
+  raceDistanceKm: 310.417,
+  laps: 56,
+  corners: 15,
+  direction: 'clockwise',
+  lapRecord: { time: '1:34.080', driver: 'S. Vettel (Ferrari)', year: 2017 },
+  firstGrandPrix: 1999,
+  straightModeZones: 4,
+  brakingZones: [
+    {
+      turn: 'C1',
+      name: 'Turn 1',
+      pt: 'Frenada forte no fim da reta principal, entrando num grampo à direita que emenda na Curva 2; o primeiro grande ponto de ultrapassagem da volta.',
+      en: 'Hard braking at the end of the main straight into a right-hand hairpin that links into Turn 2; the first big overtaking point of the lap.',
+    },
+    {
+      turn: 'C15',
+      name: 'Turn 15',
+      pt: 'Grampo final à esquerda, no fim da longa reta oposta; principal ponto de ultrapassagem de Sepang.',
+      en: "The final left-hand hairpin at the end of the long back straight; Sepang's main overtaking point.",
+    },
+  ],
+  tyreStrategyNote: {
+    pt: 'Calor e umidade tropicais elevam a temperatura do asfalto e o desgaste térmico dos pneus, e as pancadas de chuva da tarde podem mudar a corrida de repente; na era em que a F1 corria aqui, as estratégias de duas ou mais paradas eram comuns.',
+    en: 'Tropical heat and humidity push up track temperature and thermal tyre wear, and afternoon downpours can change a race in an instant; in the era when F1 raced here, strategies of two or more stops were common.',
+  },
+};
+
 // Dados reais do Miami International Autodrome, usados só na página de teste do GP de Miami. Fonte: Wikipedia.
 const MIAMI_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/miami.png',
@@ -266,10 +297,7 @@ const MIAMI_CIRCUIT_INFO: CircuitInfo = {
   direction: 'counterclockwise',
   lapRecord: { time: '1:29.708', driver: 'M. Verstappen (Red Bull)', year: 2023 },
   firstGrandPrix: 2022,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-    { pt: 'Da Curva 16 até a Curva 17', en: 'From Turn 16 into Turn 17' },
-  ],
+  straightModeZones: 3,
   brakingZones: [
     {
       turn: 'C1',
@@ -300,10 +328,7 @@ const CANADA_CIRCUIT_INFO: CircuitInfo = {
   direction: 'counterclockwise',
   lapRecord: { time: '1:13.078', driver: 'V. Bottas (Mercedes)', year: 2019 },
   firstGrandPrix: 1978,
-  drsZones: [
-    { pt: 'Reta dos boxes, entrando na Curva 1', en: 'Pit straight, into Turn 1' },
-    { pt: 'Reta oposta, entrando no Muro dos Campeões', en: 'Back straight, into the Wall of Champions' },
-  ],
+  straightModeZones: 3,
   brakingZones: [
     {
       turn: 'C1-C2',
@@ -334,9 +359,6 @@ const MONACO_CIRCUIT_INFO: CircuitInfo = {
   direction: 'clockwise',
   lapRecord: { time: '1:12.909', driver: 'L. Hamilton (Mercedes)', year: 2021 },
   firstGrandPrix: 1950,
-  drsZones: [
-    { pt: 'Reta dos boxes, entrando na Curva 1 (Sainte Dévote)', en: 'Pit straight, into Turn 1 (Sainte Dévote)' },
-  ],
   brakingZones: [
     {
       turn: 'C1',
@@ -361,16 +383,13 @@ const MONACO_CIRCUIT_INFO: CircuitInfo = {
 const SPAIN_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/spain.png',
   lengthKm: 4.657,
-  raceDistanceKm: 307.362,
+  raceDistanceKm: 307.236,
   laps: 66,
   corners: 14,
   direction: 'clockwise',
   lapRecord: { time: '1:15.743', driver: 'O. Piastri (McLaren)', year: 2025 },
   firstGrandPrix: 1991,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-    { pt: 'Da Curva 10 até a Curva 11', en: 'From Turn 10 into Turn 11' },
-  ],
+  straightModeZones: 4,
   brakingZones: [
     {
       turn: 'C1',
@@ -395,16 +414,13 @@ const SPAIN_CIRCUIT_INFO: CircuitInfo = {
 const AUSTRIA_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/austria.png',
   lengthKm: 4.326,
-  raceDistanceKm: 307.146,
+  raceDistanceKm: 307.026,
   laps: 71,
   corners: 10,
   direction: 'clockwise',
   lapRecord: { time: '1:07.924', driver: 'O. Piastri (McLaren)', year: 2025 },
   firstGrandPrix: 1970,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-    { pt: 'Da Curva 2 até a Curva 3', en: 'From Turn 2 into Turn 3' },
-  ],
+  straightModeZones: 4,
   brakingZones: [
     {
       turn: 'C1',
@@ -429,15 +445,13 @@ const AUSTRIA_CIRCUIT_INFO: CircuitInfo = {
 const HUNGARY_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/hungary.png',
   lengthKm: 4.381,
-  raceDistanceKm: 306.670,
+  raceDistanceKm: 306.630,
   laps: 70,
   corners: 14,
   direction: 'clockwise',
   lapRecord: { time: '1:16.627', driver: 'L. Hamilton (Mercedes)', year: 2020 },
   firstGrandPrix: 1986,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-  ],
+  straightModeZones: 4,
   brakingZones: [
     {
       turn: 'C1',
@@ -462,15 +476,13 @@ const HUNGARY_CIRCUIT_INFO: CircuitInfo = {
 const NETHERLANDS_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/netherlands.png',
   lengthKm: 4.259,
-  raceDistanceKm: 306.648,
+  raceDistanceKm: 306.592,
   laps: 72,
   corners: 14,
   direction: 'clockwise',
   lapRecord: { time: '1:11.097', driver: 'L. Hamilton (Mercedes)', year: 2021 },
   firstGrandPrix: 1952,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1 (Tarzan)', en: 'Main straight, into Turn 1 (Tarzan)' },
-  ],
+  straightModeZones: 2,
   brakingZones: [
     {
       turn: 'C1',
@@ -495,16 +507,13 @@ const NETHERLANDS_CIRCUIT_INFO: CircuitInfo = {
 const ITALY_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/italy.png',
   lengthKm: 5.793,
-  raceDistanceKm: 307.029,
+  raceDistanceKm: 306.720,
   laps: 53,
   corners: 11,
   direction: 'clockwise',
   lapRecord: { time: '1:20.901', driver: 'L. Norris (McLaren)', year: 2025 },
   firstGrandPrix: 1950,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1 (Rettifilo)', en: 'Main straight, into Turn 1 (Rettifilo)' },
-    { pt: 'Reta de Curva Grande, entrando na chicane della Roggia', en: 'Curva Grande straight, into the Roggia chicane' },
-  ],
+  straightModeZones: 4,
   brakingZones: [
     {
       turn: 'C1',
@@ -525,19 +534,18 @@ const ITALY_CIRCUIT_INFO: CircuitInfo = {
   },
 };
 
-// Dados do Madring (Madrid Street Circuit), estreante no calendário em 2026 -- ainda sem
-// corrida disputada, entao sem recorde de volta. Fonte: The Race, Motorsport.com.
+// Dados do Madring (Madrid), estreante no calendario em 2026. Extensao, voltas, distancia e
+// recorde: formula1.com/en/racing/2026/spain. Frenagens e curva inclinada: The Race, Motorsport.com.
 const MADRID_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/madrid.png',
-  lengthKm: 5.474,
-  raceDistanceKm: 308.0,
+  lengthKm: 5.414,
+  raceDistanceKm: 308.399,
   laps: 57,
   corners: 22,
   direction: 'clockwise',
+  lapRecord: { time: '1:35.587', driver: 'G. Russell (Mercedes)', year: 2026 },
   firstGrandPrix: 2026,
-  drsZones: [
-    { pt: 'Reta dos boxes, entrando na chicane das Curvas 1-2', en: 'Pit straight, into the Turn 1-2 chicane' },
-  ],
+  straightModeZones: 2,
   brakingZones: [
     {
       turn: 'C1-C2',
@@ -553,8 +561,8 @@ const MADRID_CIRCUIT_INFO: CircuitInfo = {
     },
   ],
   tyreStrategyNote: {
-    pt: 'Traçado inédito com uma curva banked (inclinada a 24°) de 500 metros batizada de "La Monumental", inspirada na Arena de Las Ventas e na curva de Zandvoort; sem histórico de corridas, a estratégia ideal de pneus ainda é uma incógnita para todas as equipes.',
-    en: 'A brand-new layout featuring a 500-metre, 24-degree banked corner nicknamed "La Monumental", inspired by the Las Ventas bullring and Zandvoort\'s banked turn; with no race history, the ideal tyre strategy remains an unknown for every team.',
+    pt: 'Traçado estreado em 2026, com uma curva banked (inclinada a 24°) de 500 metros batizada de "La Monumental", inspirada na Arena de Las Ventas e na curva de Zandvoort; com apenas uma edição disputada, ainda há pouco histórico para definir a estratégia ideal de pneus.',
+    en: 'A layout that debuted in 2026, featuring a 500-metre, 24-degree banked corner nicknamed "La Monumental", inspired by the Las Ventas bullring and Zandvoort\'s banked turn; with only one race held so far, there is still little history to settle the ideal tyre strategy.',
   },
 };
 
@@ -562,16 +570,13 @@ const MADRID_CIRCUIT_INFO: CircuitInfo = {
 const AZERBAIJAN_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/azerbaijan.png',
   lengthKm: 6.003,
-  raceDistanceKm: 306.153,
+  raceDistanceKm: 306.049,
   laps: 51,
   corners: 20,
   direction: 'counterclockwise',
   lapRecord: { time: '1:43.009', driver: 'C. Leclerc (Ferrari)', year: 2019 },
   firstGrandPrix: 2016,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-    { pt: 'Reta ao lado do Mar Cáspio, entrando na Curva 16', en: 'Straight alongside the Caspian Sea, into Turn 16' },
-  ],
+  straightModeZones: 2,
   brakingZones: [
     {
       turn: 'C1-C2',
@@ -596,16 +601,13 @@ const AZERBAIJAN_CIRCUIT_INFO: CircuitInfo = {
 const SINGAPORE_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/singapore.png',
   lengthKm: 4.927,
-  raceDistanceKm: 305.474,
+  raceDistanceKm: 305.337,
   laps: 62,
   corners: 19,
   direction: 'counterclockwise',
   lapRecord: { time: '1:33.808', driver: 'L. Hamilton (Ferrari)', year: 2025 },
   firstGrandPrix: 2008,
-  drsZones: [
-    { pt: 'Reta dos boxes, entrando na Curva 1', en: 'Pit straight, into Turn 1' },
-    { pt: 'Da Curva 5 até a Curva 7', en: 'From Turn 5 into Turn 7' },
-  ],
+  straightModeZones: 5,
   brakingZones: [
     {
       turn: 'C7',
@@ -630,16 +632,13 @@ const SINGAPORE_CIRCUIT_INFO: CircuitInfo = {
 const USA_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/usa.png',
   lengthKm: 5.513,
-  raceDistanceKm: 308.728,
+  raceDistanceKm: 308.405,
   laps: 56,
   corners: 20,
   direction: 'counterclockwise',
   lapRecord: { time: '1:36.169', driver: 'C. Leclerc (Ferrari)', year: 2019 },
   firstGrandPrix: 2012,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 12', en: 'Main straight, into Turn 12' },
-    { pt: 'Da Curva 11 até a Curva 12', en: 'From Turn 11 into Turn 12' },
-  ],
+  straightModeZones: 2,
   brakingZones: [
     {
       turn: 'C1',
@@ -664,16 +663,12 @@ const USA_CIRCUIT_INFO: CircuitInfo = {
 const MEXICO_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/mexico.png',
   lengthKm: 4.304,
-  raceDistanceKm: 305.584,
+  raceDistanceKm: 305.354,
   laps: 71,
   corners: 17,
   direction: 'clockwise',
   lapRecord: { time: '1:17.774', driver: 'V. Bottas (Mercedes)', year: 2021 },
   firstGrandPrix: 1963,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-    { pt: 'Reta oposta, entrando na Curva 4', en: 'Back straight, into Turn 4' },
-  ],
   brakingZones: [
     {
       turn: 'C1',
@@ -698,16 +693,12 @@ const MEXICO_CIRCUIT_INFO: CircuitInfo = {
 const VEGAS_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/vegas.png',
   lengthKm: 6.201,
-  raceDistanceKm: 310.050,
+  raceDistanceKm: 309.958,
   laps: 50,
   corners: 17,
   direction: 'counterclockwise',
   lapRecord: { time: '1:33.365', driver: 'M. Verstappen (Red Bull)', year: 2025 },
   firstGrandPrix: 2023,
-  drsZones: [
-    { pt: 'Reta da Las Vegas Boulevard, entrando na Curva 14', en: 'Las Vegas Boulevard straight, into Turn 14' },
-    { pt: 'Reta dos boxes, entrando na Curva 1', en: 'Pit straight, into Turn 1' },
-  ],
   brakingZones: [
     {
       turn: 'C1',
@@ -732,15 +723,12 @@ const VEGAS_CIRCUIT_INFO: CircuitInfo = {
 const QATAR_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/qatar.png',
   lengthKm: 5.419,
-  raceDistanceKm: 308.883,
+  raceDistanceKm: 308.611,
   laps: 57,
   corners: 16,
   direction: 'clockwise',
   lapRecord: { time: '1:22.384', driver: 'L. Norris (McLaren)', year: 2024 },
   firstGrandPrix: 2021,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-  ],
   brakingZones: [
     {
       turn: 'C1',
@@ -765,16 +753,12 @@ const QATAR_CIRCUIT_INFO: CircuitInfo = {
 const ABUDHABI_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/abudhabi.png',
   lengthKm: 5.281,
-  raceDistanceKm: 306.298,
+  raceDistanceKm: 306.188,
   laps: 58,
   corners: 16,
   direction: 'counterclockwise',
   lapRecord: { time: '1:25.637', driver: 'K. Magnussen (Haas)', year: 2024 },
   firstGrandPrix: 2009,
-  drsZones: [
-    { pt: 'Reta principal, entrando na Curva 1', en: 'Main straight, into Turn 1' },
-    { pt: 'Da Curva 6 até a Curva 7', en: 'From Turn 6 into Turn 7' },
-  ],
   brakingZones: [
     {
       turn: 'C1',
@@ -797,9 +781,9 @@ const ABUDHABI_CIRCUIT_INFO: CircuitInfo = {
 
 // Dados reais do Autodromo Enzo e Dino Ferrari (Imola), usados na pagina de teste
 // das etapas de Imola da F3 e da WEC -- a F1 nao corre la em 2026, entao os dados
-// de prova (recorde de volta, distancia, DRS) sao da ultima vez que a F1 esteve
-// la, o GP da Emilia-Romagna de 2020-2022. Fontes: Wikipedia (Imola Circuit,
-// 2022 Emilia Romagna Grand Prix) e Motorsport Week (zonas de DRS de 2022).
+// de prova (recorde de volta, distancia) sao os do GP da Emilia-Romagna de 2025
+// (formula1.com/en/racing/2025/emiliaromagna). O mapa 2026 da F1 para Imola ainda e o
+// do estilo antigo, sem zonas de Straight Mode, por isso nao ha contagem de zonas.
 const IMOLA_CIRCUIT_INFO: CircuitInfo = {
   trackImage: '/circuits/imola.png',
   lengthKm: 4.909,
@@ -809,27 +793,38 @@ const IMOLA_CIRCUIT_INFO: CircuitInfo = {
   direction: 'counterclockwise',
   lapRecord: { time: '1:15.484', driver: 'L. Hamilton (Mercedes)', year: 2020 },
   firstGrandPrix: 1980,
-  drsZones: [
-    { pt: 'Reta principal, da saída da Curva 19 até a Curva 2 (Tamburello)', en: 'Main straight, from the exit of Turn 19 into Turn 2 (Tamburello)' },
-  ],
   brakingZones: [
     {
       turn: 'C2',
       name: 'Tamburello',
-      pt: 'Frenada pesada logo após a reta principal e a única zona de DRS da pista; ponto mais provável de ultrapassagem em Ímola.',
-      en: "Heavy braking right after the main straight and the track's only DRS zone; the most likely overtaking point at Imola.",
+      pt: 'Frenada pesada logo após a reta principal, a reta mais longa da pista; ponto mais provável de ultrapassagem em Ímola.',
+      en: "Heavy braking right after the main straight, the track's longest; the most likely overtaking point at Imola.",
     },
     {
       turn: 'C17',
       name: 'Rivazza',
-      pt: 'Curva dupla à esquerda no fim da volta, estreita e apertada; tentativas de frenada tardia aqui são o principal plano B quando o DRS na reta principal não é suficiente.',
-      en: 'A tight, narrow double-left near the end of the lap; late-braking lunges here are the main backup plan when the main-straight DRS zone alone is not enough.',
+      pt: 'Curva dupla à esquerda no fim da volta, estreita e apertada; tentativas de frenada tardia aqui são o principal plano B quando o ataque na reta principal não é suficiente.',
+      en: 'A tight, narrow double-left near the end of the lap; late-braking lunges here are the main backup plan when an attack on the main straight is not enough.',
     },
   ],
   tyreStrategyNote: {
     pt: 'Traçado estreito e técnico, historicamente um dos mais difíceis do calendário para ultrapassar — a posição no grid pesa mais do que o ritmo de corrida, o que empurra as equipes para estratégias de um só pit stop e disputas decididas nos boxes (undercut) em vez de na pista.',
     en: 'A narrow, technical layout that is historically one of the hardest on the calendar to overtake on -- grid position matters more than race pace, which pushes teams toward one-stop strategies and battles decided in the pits (the undercut) rather than on track.',
   },
+};
+
+// Jeddah Corniche Circuit (GP da Arabia Saudita; cancelado em 2026, como as etapas de F2 e F1
+// Academy). A F1 nao publicou mapa novo: o desenho e do OpenStreetMap, conferido com o mapa oficial
+// 2026trackjeddahdetailed.png (scripts/circuits/verification/jeddah.json). Extensao, voltas,
+// distancia, primeiro GP e recorde: formula1.com/en/racing/2025/saudi-arabia.
+const JEDDAH_CIRCUIT_INFO: CircuitInfo = {
+  trackImage: '/circuits/jeddah.png',
+  osm: true,
+  lengthKm: 6.174,
+  raceDistanceKm: 308.45,
+  laps: 50,
+  lapRecord: { time: '1:30.734', driver: 'L. Hamilton (Mercedes)', year: 2021 },
+  firstGrandPrix: 2021,
 };
 
 // Identifica GPs por texto (circuito/local/nome), nao pelo id estatico: o calendario de F1
@@ -863,7 +858,8 @@ function isAlbertParkRace(race: Race): boolean {
 
 function isSpaRace(race: Race): boolean {
   const haystack = raceHaystack(race);
-  return haystack.includes('francorchamps') || haystack.includes('belgian grand prix');
+  // A GTWC chama a prova de "CrowdStrike 24 Hours of Spa" (local: Belgium/Stavelot).
+  return haystack.includes('francorchamps') || haystack.includes('belgian grand prix') || /\bspa\b/.test(haystack) || haystack.includes('stavelot');
 }
 
 function isChinaRace(race: Race): boolean {
@@ -876,14 +872,35 @@ function isJapanRace(race: Race): boolean {
   return haystack.includes('suzuka') || haystack.includes('japanese grand prix');
 }
 
-function isBahrainRace(race: Race): boolean {
+// O nome do evento nao diz onde ele acontece: em 2026 o "Bahrain Grand Prix in Malaysia"
+// foi disputado em Sepang. Por isso o local (circuito/cidade/pais) decide antes do nome.
+function isSepangRace(race: Race): boolean {
+  // inclui o pais (vem da Jolpica), normalizado do mesmo jeito que o resto
+  const haystack = raceHaystack({ ...race, enName: `${race.enName ?? ''} ${race.country ?? ''}` });
+  return (
+    haystack.includes('sepang') ||
+    haystack.includes('kuala lumpur') ||
+    haystack.includes('malaysia') ||
+    haystack.includes('malasia')
+  );
+}
+
+function isSakhirRace(race: Race): boolean {
+  if (isSepangRace(race)) return false;
   const haystack = raceHaystack(race);
-  return haystack.includes('bahrain') || haystack.includes('sakhir');
+  return (
+    haystack.includes('sakhir') ||
+    haystack.includes('bahrain international circuit') ||
+    // sem local informado, o nome "Bahrein/Bahrain" ainda indica Sakhir
+    haystack.includes('bahrain') ||
+    haystack.includes('bahrein')
+  );
 }
 
 function isMiamiRace(race: Race): boolean {
   const haystack = raceHaystack(race);
-  return haystack.includes('miami');
+  // Homestead-Miami Speedway (NASCAR) e outro circuito, fora de Miami.
+  return haystack.includes('miami') && !haystack.includes('homestead');
 }
 
 function isCanadaRace(race: Race): boolean {
@@ -963,14 +980,20 @@ function isAbuDhabiRace(race: Race): boolean {
   return haystack.includes('yas marina') || haystack.includes('abu dhabi');
 }
 
+function isJeddahRace(race: Race): boolean {
+  const haystack = raceHaystack(race);
+  return haystack.includes('jeddah') || haystack.includes('saudi arabian grand prix') || haystack.includes('arabia saudita');
+}
+
 function isImolaRace(race: Race): boolean {
   const haystack = raceHaystack(race);
   return haystack.includes('imola') || haystack.includes('enzo e dino ferrari') || haystack.includes('emilia');
 }
 
-// Paginas de teste habilitadas ate agora: as 23 pistas do calendario de F1 2026 (exceto a
-// Arabia Saudita/Jeddah Corniche, que segue sem pagina dedicada), mais Imola -- fora do
-// calendario da F1 em 2026, mas onde F3 e WEC ainda correm.
+// Paginas de teste habilitadas ate agora: as pistas do calendario de F1 2026 (incluindo
+// Sepang, que recebeu o GP do Bahrein, e Jeddah, cancelado em 2026), Sakhir
+// (F2/F3/WEC e o GP de abril cancelado) e Imola -- fora do calendario da F1 em 2026, mas
+// onde F3 e WEC ainda correm.
 const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[] = [
   { match: isInterlagosRace, info: INTERLAGOS_CIRCUIT_INFO },
   { match: isSilverstoneRace, info: SILVERSTONE_CIRCUIT_INFO },
@@ -978,16 +1001,19 @@ const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[
   { match: isSpaRace, info: SPA_CIRCUIT_INFO },
   { match: isChinaRace, info: SHANGHAI_CIRCUIT_INFO },
   { match: isJapanRace, info: SUZUKA_CIRCUIT_INFO },
-  { match: isBahrainRace, info: BAHRAIN_CIRCUIT_INFO },
+  // Sepang antes de Sakhir: o GP "do Bahrein" de 2026 foi em Sepang (o local decide, nao o nome).
+  { match: isSepangRace, info: SEPANG_CIRCUIT_INFO },
+  { match: isSakhirRace, info: SAKHIR_CIRCUIT_INFO },
   { match: isMiamiRace, info: MIAMI_CIRCUIT_INFO },
   { match: isCanadaRace, info: CANADA_CIRCUIT_INFO },
   { match: isMonacoRace, info: MONACO_CIRCUIT_INFO },
+  // Madrid antes de Barcelona: na Jolpica a prova do Madring se chama "Spanish Grand Prix".
+  { match: isMadridRace, info: MADRID_CIRCUIT_INFO },
   { match: isSpainRace, info: SPAIN_CIRCUIT_INFO },
   { match: isAustriaRace, info: AUSTRIA_CIRCUIT_INFO },
   { match: isHungaryRace, info: HUNGARY_CIRCUIT_INFO },
   { match: isNetherlandsRace, info: NETHERLANDS_CIRCUIT_INFO },
   { match: isItalyRace, info: ITALY_CIRCUIT_INFO },
-  { match: isMadridRace, info: MADRID_CIRCUIT_INFO },
   { match: isAzerbaijanRace, info: AZERBAIJAN_CIRCUIT_INFO },
   { match: isSingaporeRace, info: SINGAPORE_CIRCUIT_INFO },
   { match: isUsaRace, info: USA_CIRCUIT_INFO },
@@ -996,23 +1022,193 @@ const RACE_TEST_CIRCUITS: { match: (race: Race) => boolean; info: CircuitInfo }[
   { match: isQatarRace, info: QATAR_CIRCUIT_INFO },
   { match: isAbuDhabiRace, info: ABUDHABI_CIRCUIT_INFO },
   { match: isImolaRace, info: IMOLA_CIRCUIT_INFO },
+  { match: isJeddahRace, info: JEDDAH_CIRCUIT_INFO },
 ];
 
-export function getRaceCircuitInfo(race: Race): CircuitInfo | null {
-  return RACE_TEST_CIRCUITS.find(({ match }) => match(race))?.info ?? null;
+// ---------------------------------------------------------------------------------------------
+// Circuitos desenhados a partir do OpenStreetMap (src/circuit-drawings.ts). Um lugar pode ter
+// mais de um tracado (oval e misto de Daytona e Indianapolis, Watkins Glen com e sem o Boot...):
+// o tracado sai da prova (categoria + data), do texto (ex.: "misto", "Road Course") ou da categoria.
+
+type Venue = {
+  // Termos (sem acento, minusculos) que identificam o lugar; basta um.
+  terms: (string | RegExp)[];
+  // Termos que descartam o lugar mesmo quando um dos termos aparece.
+  not?: string[];
+  // So nestas categorias (ex.: "Las Vegas" sozinho so e o oval na NASCAR).
+  categories?: string[];
+  // Desenho padrao do lugar.
+  layout: string;
+  // Tracado por categoria, quando o lugar tem mais de um.
+  byCategory?: Record<string, string>;
+  // Tracado pelo texto da prova (vence a categoria).
+  byText?: { terms: (string | RegExp)[]; layout: string }[];
+  // Tracado de uma prova especifica (categoria + data da etapa, +-2 dias; vence o resto).
+  byEvent?: { categoryId: string; date: string; layout: string }[];
+};
+
+function hasTerm(haystack: string, term: string | RegExp): boolean {
+  return typeof term === 'string' ? haystack.includes(term) : term.test(haystack);
 }
 
-// Categorias que, em pesquisa, realmente correm em algum dos 24 circuitos acima
-// (mesmo tracado fisico, nao so a mesma cidade). F2/F3/F1 Academy dividem varios
-// finais de semana com a F1; WEC, DTM e NASCAR passam por algumas dessas pistas
-// em seus proprios calendarios. IMSA e IndyCar, nos calendarios atuais do site,
-// nao tocam nenhuma delas. WRC fica de fora de proposito: mesmo quando o nome
-// da etapa cita a mesma cidade (ex.: Rallye Monte-Carlo), a prova roda em
-// estradas de montanha, nao no circuito de verdade.
-const CIRCUIT_PAGE_CATEGORY_IDS = new Set([
-  'f1', 'f2', 'f3', 'f1-academy', 'wec', 'dtm', 'nascar',
-]);
+const VENUES: Venue[] = [
+  // NASCAR / IndyCar / IMSA / GTWC America
+  { terms: ['bowman gray', 'winston-salem'], layout: 'bowman-gray' },
+  {
+    terms: ['daytona'],
+    layout: 'daytona-oval',
+    byCategory: { imsa: 'daytona-road' },
+    byText: [{ terms: ['rolex 24', 'road course'], layout: 'daytona-road' }],
+  },
+  { terms: ['road atlanta', 'braselton', 'petit le mans'], layout: 'road-atlanta' },
+  { terms: ['echopark', 'atlanta motor speedway', 'hampton'], layout: 'atlanta' },
+  { terms: ['circuit of the americas', 'austin', /\bcota\b/], categories: ['nascar'], layout: 'cota-national' },
+  { terms: ['phoenix', 'avondale'], layout: 'phoenix' },
+  { terms: ['las vegas motor speedway'], layout: 'las-vegas-motor-speedway' },
+  { terms: ['las vegas'], categories: ['nascar'], layout: 'las-vegas-motor-speedway' },
+  { terms: ['darlington'], layout: 'darlington' },
+  { terms: ['martinsville'], layout: 'martinsville' },
+  { terms: ['bristol'], layout: 'bristol' },
+  { terms: ['kansas'], layout: 'kansas' },
+  { terms: ['talladega'], layout: 'talladega' },
+  { terms: ['texas motor speedway', 'fort worth'], layout: 'texas' },
+  { terms: ['watkins glen'], layout: 'watkins-glen', byCategory: { nascar: 'watkins-glen-nascar' } },
+  { terms: ['dover'], layout: 'dover' },
+  {
+    terms: ['charlotte', 'concord'],
+    layout: 'charlotte-oval',
+    // Em 2026 a corrida de outubro (Bank of America 400) voltou do Roval para o oval: a data
+    // vence o texto, para um nome antigo com "Roval" nao tirar o desenho. Fora disso, o Roval so
+    // quando a prova disser.
+    byEvent: [{ categoryId: 'nascar', date: '2026-10-11', layout: 'charlotte-oval' }],
+    byText: [{ terms: ['roval'], layout: 'charlotte-roval' }],
+  },
+  { terms: ['nashville', 'lebanon'], layout: 'nashville-superspeedway' },
+  { terms: ['michigan international', 'brooklyn'], layout: 'michigan' },
+  { terms: [/\bmichigan\b/], categories: ['nascar'], layout: 'michigan' },
+  { terms: ['pocono', 'long pond'], layout: 'pocono' },
+  { terms: ['san diego', 'coronado'], layout: 'san-diego' },
+  { terms: ['sonoma'], layout: 'sonoma', byCategory: { 'gtwc-america': 'sonoma-gtwc' } },
+  { terms: ['chicagoland', 'joliet'], layout: 'chicagoland' },
+  { terms: ['north wilkesboro'], layout: 'north-wilkesboro' },
+  {
+    terms: ['indianapolis', 'indy 500', 'brickyard'],
+    layout: 'indianapolis-oval',
+    byCategory: { imsa: 'indianapolis-road', 'gtwc-america': 'indianapolis-road' },
+    byText: [
+      { terms: [/\b500\b/, 'brickyard'], layout: 'indianapolis-oval' },
+      { terms: ['misto', 'road course', 'ims road', /\brc\b/, 'gp de indianapolis'], layout: 'indianapolis-road' },
+    ],
+  },
+  { terms: [/\biowa\b/, 'newton'], layout: 'iowa' },
+  { terms: ['richmond'], layout: 'richmond' },
+  { terms: ['new hampshire', 'loudon'], layout: 'new-hampshire' },
+  { terms: ['gateway', 'world wide technology', 'wwtr', 'madison'], layout: 'gateway' },
+  { terms: ['homestead'], layout: 'homestead' },
+  { terms: ['petersburg'], layout: 'st-petersburg' },
+  { terms: ['arlington'], layout: 'arlington' },
+  { terms: ['barber'], layout: 'barber' },
+  { terms: ['long beach'], layout: 'long-beach' },
+  { terms: ['detroit'], layout: 'detroit' },
+  { terms: ['road america', 'elkhart lake'], layout: 'road-america' },
+  { terms: ['mid-ohio', 'mid ohio'], layout: 'mid-ohio' },
+  { terms: ['portland'], layout: 'portland' },
+  { terms: ['markham'], layout: 'markham' },
+  // So o circuito de rua de Washington, D.C. (IndyCar 2026), nao qualquer "Washington".
+  { terms: ['washington, d.c', 'washington d.c', 'washington dc', 'streets of washington', 'freedom 250'], layout: 'washington-dc' },
+  { terms: ['milwaukee', 'west allis'], layout: 'milwaukee' },
+  { terms: ['laguna seca', 'monterey'], layout: 'laguna-seca' },
+  { terms: ['sebring'], layout: 'sebring' },
+  { terms: ['mosport', 'canadian tire', 'bowmanville'], layout: 'mosport' },
+  { terms: ['virginia international', /\bvir\b/, /\balton\b/], layout: 'vir' },
+  // Europa e Asia (DTM, WEC, GTWC)
+  { terms: ['lausitz'], layout: 'lausitzring' },
+  { terms: ['norisring'], layout: 'norisring' },
+  { terms: ['oschersleben'], layout: 'oschersleben' },
+  {
+    terms: ['nurburg'],
+    not: ['nordschleife'],
+    layout: 'nurburgring-gp',
+    byCategory: { dtm: 'nurburgring-sprint' },
+    byText: [{ terms: ['sprint'], layout: 'nurburgring-sprint' }],
+  },
+  { terms: ['sachsenring'], layout: 'sachsenring' },
+  { terms: ['hockenheim'], layout: 'hockenheim' },
+  // "Petit Le Mans" (Road Atlanta, acima) e "Lone Star Le Mans" (COTA) nao sao em Le Mans.
+  { terms: ['sarthe', /\ble mans\b/], not: ['petit le mans', 'lone star'], layout: 'le-mans' },
+  { terms: ['fuji'], layout: 'fuji' },
+  { terms: ['paul ricard', 'le castellet'], layout: 'paul-ricard' },
+  { terms: ['brands hatch'], layout: 'brands-hatch' },
+  { terms: ['misano'], layout: 'misano' },
+  { terms: ['magny'], layout: 'magny-cours' },
+  { terms: ['portimao', 'algarve'], layout: 'portimao' },
+  { terms: ['mandalika'], layout: 'mandalika' },
+  { terms: ['okayama'], layout: 'okayama' },
+  { terms: ['beijing', 'pequim'], layout: 'beijing-street' },
+  // Brasil
+  { terms: ['velocitta', 'velo citta', 'mogi guacu'], layout: 'velocitta' },
+  { terms: ['brasilia', 'nelson piquet'], layout: 'brasilia' },
+  { terms: ['velopark', 'nova santa rita'], layout: 'velopark' },
+  { terms: ['santa cruz'], layout: 'santa-cruz-do-sul' },
+  { terms: ['goiania'], layout: 'goiania' },
+  { terms: ['cascavel'], layout: 'cascavel' },
+  { terms: ['cuiaba', 'mato grosso'], layout: 'cuiaba' },
+  { terms: ['londrina'], layout: 'londrina' },
+  { terms: ['curvelo', 'cristais'], layout: 'curvelo' },
+  { terms: ['chapeco'], layout: 'chapeco' },
+];
+
+const DAY_MS = 86_400_000;
+
+function sameWeekend(a: string, b: string): boolean {
+  const gap = Math.abs(Date.parse(`${a.slice(0, 10)}T00:00:00Z`) - Date.parse(`${b.slice(0, 10)}T00:00:00Z`)) / DAY_MS;
+  return Number.isFinite(gap) && gap <= 2;
+}
+
+function venueLayout(venue: Venue, race: Race, haystack: string, categoryId?: string): string {
+  const event = venue.byEvent?.find((e) => e.categoryId === categoryId && sameWeekend(e.date, race.date));
+  if (event) return event.layout;
+  const text = venue.byText?.find((option) => option.terms.some((term) => hasTerm(haystack, term)));
+  if (text) return text.layout;
+  return (categoryId && venue.byCategory?.[categoryId]) || venue.layout;
+}
+
+/** undefined: nenhum lugar desenhado reconhecido; null: lugar reconhecido, mas sem desenho verificado do tracado. */
+function findDrawnCircuit(race: Race, categoryId?: string): CircuitInfo | null | undefined {
+  const haystack = raceHaystack({ ...race, enName: `${race.enName ?? ''} ${race.country ?? ''}` });
+  for (const venue of VENUES) {
+    if (venue.categories && !(categoryId && venue.categories.includes(categoryId))) continue;
+    if (!venue.terms.some((term) => hasTerm(haystack, term))) continue;
+    if (venue.not?.some((term) => haystack.includes(term))) continue;
+    const drawn = DRAWN_CIRCUITS[venueLayout(venue, race, haystack, categoryId)];
+    // Sem desenho verificado desse tracado: nenhum mapa, em vez do mapa de outro tracado (ex.: a
+    // NASCAR em COTA usa o National Course de 2,4 milhas, nao o tracado da F1).
+    if (!drawn) return null;
+    return { trackImage: drawn.trackImage, osm: true, lengthKm: drawn.lengthKm, corners: drawn.corners, direction: drawn.direction };
+  }
+  return undefined;
+}
+
+// Voltas, distancia, recorde, primeiro GP, Straight Mode, frenagens e pneus sao dados do GP de F1:
+// nas outras categorias fica so o que e do circuito.
+function circuitOnly(info: CircuitInfo): CircuitInfo {
+  return { trackImage: info.trackImage, osm: info.osm, lengthKm: info.lengthKm, corners: info.corners, direction: info.direction };
+}
+
+/**
+ * Ficha do circuito de uma etapa. Com a categoria, escolhe o tracado certo do lugar (ex.: Daytona
+ * oval na NASCAR, misto na IMSA) e deixa os dados do GP de F1 so na F1. O WRC nao tem ficha: o nome
+ * da etapa cita cidades (Monte-Carlo...), mas o rali roda em estradas, nao num circuito.
+ */
+export function getRaceCircuitInfo(race: Race, categoryId?: string): CircuitInfo | null {
+  if (categoryId === 'wrc') return null;
+  const drawn = findDrawnCircuit(race, categoryId);
+  if (drawn !== undefined) return drawn;
+  const info = RACE_TEST_CIRCUITS.find(({ match }) => match(race))?.info ?? null;
+  if (!info || !categoryId || categoryId === 'f1') return info;
+  return circuitOnly(info);
+}
 
 export function hasCircuitPage(category: Category, race: Race): boolean {
-  return CIRCUIT_PAGE_CATEGORY_IDS.has(category.id) && getRaceCircuitInfo(race) != null;
+  return getRaceCircuitInfo(race, category.id) != null;
 }

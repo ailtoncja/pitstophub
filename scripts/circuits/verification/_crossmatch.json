@@ -1,0 +1,1191 @@
+{
+ "atlanta": {
+  "own_pct": 0.61,
+  "best_other": "texas",
+  "best_other_pct": 0.85,
+  "margin": 1.39,
+  "own_is_best": true,
+  "top5": [
+   [
+    "atlanta",
+    0.61
+   ],
+   [
+    "texas",
+    0.85
+   ],
+   [
+    "iowa",
+    1.22
+   ],
+   [
+    "richmond",
+    2.01
+   ],
+   [
+    "phoenix",
+    2.46
+   ]
+  ]
+ },
+ "barber": {
+  "own_pct": 1.13,
+  "best_other": "f1:usa",
+  "best_other_pct": 8.05,
+  "margin": 7.12,
+  "own_is_best": true,
+  "top5": [
+   [
+    "barber",
+    1.13
+   ],
+   [
+    "f1:usa",
+    8.05
+   ],
+   [
+    "oschersleben",
+    8.28
+   ],
+   [
+    "f1:spain",
+    9.56
+   ],
+   [
+    "chapeco",
+    9.89
+   ]
+  ]
+ },
+ "brands-hatch": {
+  "own_pct": 0.99,
+  "best_other": "sachsenring",
+  "best_other_pct": 10.45,
+  "margin": 10.56,
+  "own_is_best": true,
+  "top5": [
+   [
+    "brands-hatch",
+    0.99
+   ],
+   [
+    "sachsenring",
+    10.45
+   ],
+   [
+    "santa-cruz-do-sul",
+    10.93
+   ],
+   [
+    "f1:silverstone",
+    11.46
+   ],
+   [
+    "indianapolis-road",
+    11.54
+   ]
+  ]
+ },
+ "charlotte-oval": {
+  "own_pct": 0.58,
+  "best_other": "nashville-superspeedway",
+  "best_other_pct": 1.15,
+  "margin": 1.98,
+  "own_is_best": true,
+  "top5": [
+   [
+    "charlotte-oval",
+    0.58
+   ],
+   [
+    "nashville-superspeedway",
+    1.15
+   ],
+   [
+    "michigan",
+    1.35
+   ],
+   [
+    "richmond",
+    1.64
+   ],
+   [
+    "talladega",
+    2.39
+   ]
+  ]
+ },
+ "chicagoland": {
+  "own_pct": 0.6,
+  "best_other": "kansas",
+  "best_other_pct": 1.36,
+  "margin": 2.27,
+  "own_is_best": true,
+  "top5": [
+   [
+    "chicagoland",
+    0.6
+   ],
+   [
+    "kansas",
+    1.36
+   ],
+   [
+    "las-vegas-motor-speedway",
+    1.41
+   ],
+   [
+    "iowa",
+    3.44
+   ],
+   [
+    "texas",
+    3.59
+   ]
+  ]
+ },
+ "daytona-oval": {
+  "own_pct": 0.6,
+  "best_other": "talladega",
+  "best_other_pct": 0.87,
+  "margin": 1.45,
+  "own_is_best": true,
+  "top5": [
+   [
+    "daytona-oval",
+    0.6
+   ],
+   [
+    "talladega",
+    0.87
+   ],
+   [
+    "nashville-superspeedway",
+    1.97
+   ],
+   [
+    "michigan",
+    2.31
+   ],
+   [
+    "charlotte-oval",
+    2.59
+   ]
+  ]
+ },
+ "detroit": {
+  "own_pct": 0.66,
+  "best_other": "f1:canada",
+  "best_other_pct": 5.91,
+  "margin": 8.95,
+  "own_is_best": true,
+  "top5": [
+   [
+    "detroit",
+    0.66
+   ],
+   [
+    "f1:canada",
+    5.91
+   ],
+   [
+    "velopark",
+    8.19
+   ],
+   [
+    "vir",
+    8.74
+   ],
+   [
+    "sonoma",
+    8.89
+   ]
+  ]
+ },
+ "fuji": {
+  "own_pct": 0.8,
+  "best_other": "vir",
+  "best_other_pct": 8.14,
+  "margin": 10.18,
+  "own_is_best": true,
+  "top5": [
+   [
+    "fuji",
+    0.8
+   ],
+   [
+    "vir",
+    8.14
+   ],
+   [
+    "detroit",
+    8.56
+   ],
+   [
+    "gateway",
+    9.92
+   ],
+   [
+    "f1:spain",
+    9.93
+   ]
+  ]
+ },
+ "goiania": {
+  "own_pct": 0.98,
+  "best_other": "oschersleben",
+  "best_other_pct": 6.82,
+  "margin": 6.96,
+  "own_is_best": true,
+  "top5": [
+   [
+    "goiania",
+    0.98
+   ],
+   [
+    "oschersleben",
+    6.82
+   ],
+   [
+    "nurburgring-sprint",
+    7.28
+   ],
+   [
+    "portland",
+    7.64
+   ],
+   [
+    "f1:spain",
+    7.94
+   ]
+  ]
+ },
+ "hockenheim": {
+  "own_pct": 0.85,
+  "best_other": "road-atlanta",
+  "best_other_pct": 8.65,
+  "margin": 10.18,
+  "own_is_best": true,
+  "top5": [
+   [
+    "hockenheim",
+    0.85
+   ],
+   [
+    "road-atlanta",
+    8.65
+   ],
+   [
+    "mid-ohio",
+    10.89
+   ],
+   [
+    "long-beach",
+    11.04
+   ],
+   [
+    "f1:madrid",
+    11.09
+   ]
+  ]
+ },
+ "homestead": {
+  "own_pct": 0.61,
+  "best_other": "bowman-gray",
+  "best_other_pct": 0.8,
+  "margin": 1.31,
+  "own_is_best": true,
+  "top5": [
+   [
+    "homestead",
+    0.61
+   ],
+   [
+    "bowman-gray",
+    0.8
+   ],
+   [
+    "milwaukee",
+    0.92
+   ],
+   [
+    "darlington",
+    2.11
+   ],
+   [
+    "indianapolis-oval",
+    2.71
+   ]
+  ]
+ },
+ "indianapolis-oval": {
+  "own_pct": 0.58,
+  "best_other": "homestead",
+  "best_other_pct": 2.64,
+  "margin": 4.55,
+  "own_is_best": true,
+  "top5": [
+   [
+    "indianapolis-oval",
+    0.58
+   ],
+   [
+    "homestead",
+    2.64
+   ],
+   [
+    "dover",
+    2.66
+   ],
+   [
+    "bowman-gray",
+    2.82
+   ],
+   [
+    "milwaukee",
+    2.89
+   ]
+  ]
+ },
+ "indianapolis-road": {
+  "own_pct": 0.69,
+  "best_other": "f1:imola",
+  "best_other_pct": 7.54,
+  "margin": 10.93,
+  "own_is_best": true,
+  "top5": [
+   [
+    "indianapolis-road",
+    0.69
+   ],
+   [
+    "f1:imola",
+    7.54
+   ],
+   [
+    "portland",
+    9.14
+   ],
+   [
+    "watkins-glen-nascar",
+    9.8
+   ],
+   [
+    "f1:madrid",
+    9.83
+   ]
+  ]
+ },
+ "iowa": {
+  "own_pct": 0.64,
+  "best_other": "texas",
+  "best_other_pct": 1.01,
+  "margin": 1.58,
+  "own_is_best": true,
+  "top5": [
+   [
+    "iowa",
+    0.64
+   ],
+   [
+    "texas",
+    1.01
+   ],
+   [
+    "atlanta",
+    1.19
+   ],
+   [
+    "richmond",
+    2.74
+   ],
+   [
+    "phoenix",
+    2.77
+   ]
+  ]
+ },
+ "jeddah": {
+  "own_pct": 0.7,
+  "best_other": "londrina",
+  "best_other_pct": 7.81,
+  "margin": 11.16,
+  "own_is_best": true,
+  "top5": [
+   [
+    "jeddah",
+    0.7
+   ],
+   [
+    "londrina",
+    7.81
+   ],
+   [
+    "norisring",
+    8.11
+   ],
+   [
+    "f1:japan",
+    10.08
+   ],
+   [
+    "f1:azerbaijan",
+    11.08
+   ]
+  ]
+ },
+ "lausitzring": {
+  "own_pct": 0.81,
+  "best_other": "f1:vegas",
+  "best_other_pct": 7.63,
+  "margin": 9.42,
+  "own_is_best": true,
+  "top5": [
+   [
+    "lausitzring",
+    0.81
+   ],
+   [
+    "f1:vegas",
+    7.63
+   ],
+   [
+    "mosport",
+    9.49
+   ],
+   [
+    "indianapolis-oval",
+    10.63
+   ],
+   [
+    "darlington",
+    10.87
+   ]
+  ]
+ },
+ "le-mans": {
+  "own_pct": 0.64,
+  "best_other": "martinsville",
+  "best_other_pct": 5.8,
+  "margin": 9.06,
+  "own_is_best": true,
+  "top5": [
+   [
+    "le-mans",
+    0.64
+   ],
+   [
+    "martinsville",
+    5.8
+   ],
+   [
+    "gateway",
+    6.18
+   ],
+   [
+    "new-hampshire",
+    6.4
+   ],
+   [
+    "portland",
+    7.31
+   ]
+  ]
+ },
+ "londrina": {
+  "own_pct": 0.75,
+  "best_other": "jeddah",
+  "best_other_pct": 8.45,
+  "margin": 11.27,
+  "own_is_best": true,
+  "top5": [
+   [
+    "londrina",
+    0.75
+   ],
+   [
+    "jeddah",
+    8.45
+   ],
+   [
+    "norisring",
+    10.12
+   ],
+   [
+    "nurburgring-gp",
+    10.46
+   ],
+   [
+    "f1:japan",
+    10.57
+   ]
+  ]
+ },
+ "markham": {
+  "own_pct": 1.02,
+  "best_other": "watkins-glen",
+  "best_other_pct": 10.02,
+  "margin": 9.82,
+  "own_is_best": true,
+  "top5": [
+   [
+    "markham",
+    1.02
+   ],
+   [
+    "watkins-glen",
+    10.02
+   ],
+   [
+    "sonoma-gtwc",
+    10.32
+   ],
+   [
+    "vir",
+    10.62
+   ],
+   [
+    "portimao",
+    10.72
+   ]
+  ]
+ },
+ "michigan": {
+  "own_pct": 0.59,
+  "best_other": "charlotte-oval",
+  "best_other_pct": 1.35,
+  "margin": 2.29,
+  "own_is_best": true,
+  "top5": [
+   [
+    "michigan",
+    0.59
+   ],
+   [
+    "charlotte-oval",
+    1.35
+   ],
+   [
+    "nashville-superspeedway",
+    1.75
+   ],
+   [
+    "daytona-oval",
+    2.27
+   ],
+   [
+    "talladega",
+    2.28
+   ]
+  ]
+ },
+ "mid-ohio": {
+  "own_pct": 0.76,
+  "best_other": "f1:abudhabi",
+  "best_other_pct": 10.59,
+  "margin": 13.93,
+  "own_is_best": true,
+  "top5": [
+   [
+    "mid-ohio",
+    0.76
+   ],
+   [
+    "f1:abudhabi",
+    10.59
+   ],
+   [
+    "hockenheim",
+    11.15
+   ],
+   [
+    "okayama",
+    11.16
+   ],
+   [
+    "fuji",
+    11.27
+   ]
+  ]
+ },
+ "milwaukee": {
+  "own_pct": 0.61,
+  "best_other": "bowman-gray",
+  "best_other_pct": 0.78,
+  "margin": 1.28,
+  "own_is_best": true,
+  "top5": [
+   [
+    "milwaukee",
+    0.61
+   ],
+   [
+    "bowman-gray",
+    0.78
+   ],
+   [
+    "homestead",
+    0.94
+   ],
+   [
+    "darlington",
+    2.32
+   ],
+   [
+    "michigan",
+    2.8
+   ]
+  ]
+ },
+ "misano": {
+  "own_pct": 1.03,
+  "best_other": "f1:madrid",
+  "best_other_pct": 10.14,
+  "margin": 9.84,
+  "own_is_best": true,
+  "top5": [
+   [
+    "misano",
+    1.03
+   ],
+   [
+    "f1:madrid",
+    10.14
+   ],
+   [
+    "nurburgring-gp",
+    10.64
+   ],
+   [
+    "indianapolis-road",
+    11.53
+   ],
+   [
+    "sonoma",
+    11.54
+   ]
+  ]
+ },
+ "nashville-superspeedway": {
+  "own_pct": 0.59,
+  "best_other": "charlotte-oval",
+  "best_other_pct": 1.17,
+  "margin": 1.98,
+  "own_is_best": true,
+  "top5": [
+   [
+    "nashville-superspeedway",
+    0.59
+   ],
+   [
+    "charlotte-oval",
+    1.17
+   ],
+   [
+    "michigan",
+    1.75
+   ],
+   [
+    "talladega",
+    1.77
+   ],
+   [
+    "richmond",
+    1.78
+   ]
+  ]
+ },
+ "new-hampshire": {
+  "own_pct": 0.6,
+  "best_other": "milwaukee",
+  "best_other_pct": 4.32,
+  "margin": 7.2,
+  "own_is_best": true,
+  "top5": [
+   [
+    "new-hampshire",
+    0.6
+   ],
+   [
+    "milwaukee",
+    4.32
+   ],
+   [
+    "bowman-gray",
+    4.52
+   ],
+   [
+    "darlington",
+    4.75
+   ],
+   [
+    "homestead",
+    4.82
+   ]
+  ]
+ },
+ "nurburgring-gp": {
+  "own_pct": 0.92,
+  "best_other": "f1:japan",
+  "best_other_pct": 7.93,
+  "margin": 8.62,
+  "own_is_best": true,
+  "top5": [
+   [
+    "nurburgring-gp",
+    0.92
+   ],
+   [
+    "f1:japan",
+    7.93
+   ],
+   [
+    "f1:italy",
+    9.33
+   ],
+   [
+    "sonoma-gtwc",
+    9.38
+   ],
+   [
+    "londrina",
+    10.13
+   ]
+  ]
+ },
+ "nurburgring-sprint": {
+  "own_pct": 0.84,
+  "best_other": "portland",
+  "best_other_pct": 6.8,
+  "margin": 8.1,
+  "own_is_best": true,
+  "top5": [
+   [
+    "nurburgring-sprint",
+    0.84
+   ],
+   [
+    "portland",
+    6.8
+   ],
+   [
+    "goiania",
+    8.32
+   ],
+   [
+    "f1:canada",
+    8.58
+   ],
+   [
+    "f1:abudhabi",
+    8.74
+   ]
+  ]
+ },
+ "okayama": {
+  "own_pct": 0.94,
+  "best_other": "f1:canada",
+  "best_other_pct": 8.22,
+  "margin": 8.74,
+  "own_is_best": true,
+  "top5": [
+   [
+    "okayama",
+    0.94
+   ],
+   [
+    "f1:canada",
+    8.22
+   ],
+   [
+    "norisring",
+    9.3
+   ],
+   [
+    "goiania",
+    9.56
+   ],
+   [
+    "detroit",
+    9.74
+   ]
+  ]
+ },
+ "oschersleben": {
+  "own_pct": 1.0,
+  "best_other": "goiania",
+  "best_other_pct": 7.31,
+  "margin": 7.31,
+  "own_is_best": true,
+  "top5": [
+   [
+    "oschersleben",
+    1.0
+   ],
+   [
+    "goiania",
+    7.31
+   ],
+   [
+    "velopark",
+    7.92
+   ],
+   [
+    "barber",
+    7.97
+   ],
+   [
+    "f1:spain",
+    8.71
+   ]
+  ]
+ },
+ "phoenix": {
+  "own_pct": 0.57,
+  "best_other": "richmond",
+  "best_other_pct": 2.25,
+  "margin": 3.95,
+  "own_is_best": true,
+  "top5": [
+   [
+    "phoenix",
+    0.57
+   ],
+   [
+    "richmond",
+    2.25
+   ],
+   [
+    "texas",
+    2.53
+   ],
+   [
+    "atlanta",
+    2.55
+   ],
+   [
+    "iowa",
+    2.89
+   ]
+  ]
+ },
+ "pocono": {
+  "own_pct": 0.64,
+  "best_other": "talladega",
+  "best_other_pct": 6.81,
+  "margin": 10.64,
+  "own_is_best": true,
+  "top5": [
+   [
+    "pocono",
+    0.64
+   ],
+   [
+    "talladega",
+    6.81
+   ],
+   [
+    "daytona-oval",
+    6.82
+   ],
+   [
+    "nashville-superspeedway",
+    7.59
+   ],
+   [
+    "charlotte-oval",
+    7.78
+   ]
+  ]
+ },
+ "portimao": {
+  "own_pct": 1.12,
+  "best_other": "chapeco",
+  "best_other_pct": 7.33,
+  "margin": 6.54,
+  "own_is_best": true,
+  "top5": [
+   [
+    "portimao",
+    1.12
+   ],
+   [
+    "chapeco",
+    7.33
+   ],
+   [
+    "f1:spain",
+    8.84
+   ],
+   [
+    "fuji",
+    8.86
+   ],
+   [
+    "goiania",
+    9.35
+   ]
+  ]
+ },
+ "road-america": {
+  "own_pct": 1.07,
+  "best_other": "brasilia",
+  "best_other_pct": 10.61,
+  "margin": 9.92,
+  "own_is_best": true,
+  "top5": [
+   [
+    "road-america",
+    1.07
+   ],
+   [
+    "brasilia",
+    10.61
+   ],
+   [
+    "cuiaba",
+    10.94
+   ],
+   [
+    "f1:bahrain",
+    11.2
+   ],
+   [
+    "sebring",
+    11.38
+   ]
+  ]
+ },
+ "sachsenring": {
+  "own_pct": 1.04,
+  "best_other": "brands-hatch",
+  "best_other_pct": 10.08,
+  "margin": 9.69,
+  "own_is_best": true,
+  "top5": [
+   [
+    "sachsenring",
+    1.04
+   ],
+   [
+    "brands-hatch",
+    10.08
+   ],
+   [
+    "indianapolis-road",
+    10.37
+   ],
+   [
+    "f1:spain",
+    10.44
+   ],
+   [
+    "goiania",
+    10.58
+   ]
+  ]
+ },
+ "sebring": {
+  "own_pct": 1.11,
+  "best_other": "road-america",
+  "best_other_pct": 10.37,
+  "margin": 9.34,
+  "own_is_best": true,
+  "top5": [
+   [
+    "sebring",
+    1.11
+   ],
+   [
+    "road-america",
+    10.37
+   ],
+   [
+    "brasilia",
+    10.8
+   ],
+   [
+    "cuiaba",
+    11.26
+   ],
+   [
+    "f1:qatar",
+    11.88
+   ]
+  ]
+ },
+ "st-petersburg": {
+  "own_pct": 0.79,
+  "best_other": "velocitta",
+  "best_other_pct": 13.14,
+  "margin": 16.63,
+  "own_is_best": true,
+  "top5": [
+   [
+    "st-petersburg",
+    0.79
+   ],
+   [
+    "velocitta",
+    13.14
+   ],
+   [
+    "f1:netherlands",
+    13.34
+   ],
+   [
+    "f1:mexico",
+    13.67
+   ],
+   [
+    "f1:hungary",
+    13.86
+   ]
+  ]
+ },
+ "talladega": {
+  "own_pct": 0.59,
+  "best_other": "daytona-oval",
+  "best_other_pct": 0.83,
+  "margin": 1.41,
+  "own_is_best": true,
+  "top5": [
+   [
+    "talladega",
+    0.59
+   ],
+   [
+    "daytona-oval",
+    0.83
+   ],
+   [
+    "nashville-superspeedway",
+    1.83
+   ],
+   [
+    "michigan",
+    2.32
+   ],
+   [
+    "charlotte-oval",
+    2.45
+   ]
+  ]
+ },
+ "texas": {
+  "own_pct": 0.6,
+  "best_other": "atlanta",
+  "best_other_pct": 0.91,
+  "margin": 1.52,
+  "own_is_best": true,
+  "top5": [
+   [
+    "texas",
+    0.6
+   ],
+   [
+    "atlanta",
+    0.91
+   ],
+   [
+    "iowa",
+    1.04
+   ],
+   [
+    "richmond",
+    2.35
+   ],
+   [
+    "phoenix",
+    2.41
+   ]
+  ]
+ },
+ "vir": {
+  "own_pct": 0.74,
+  "best_other": "f1:mexico",
+  "best_other_pct": 6.28,
+  "margin": 8.49,
+  "own_is_best": true,
+  "top5": [
+   [
+    "vir",
+    0.74
+   ],
+   [
+    "f1:mexico",
+    6.28
+   ],
+   [
+    "road-atlanta",
+    6.93
+   ],
+   [
+    "fuji",
+    8.51
+   ],
+   [
+    "detroit",
+    8.54
+   ]
+  ]
+ },
+ "washington-dc": {
+  "own_pct": 0.65,
+  "best_other": "pocono",
+  "best_other_pct": 9.84,
+  "margin": 15.14,
+  "own_is_best": true,
+  "top5": [
+   [
+    "washington-dc",
+    0.65
+   ],
+   [
+    "pocono",
+    9.84
+   ],
+   [
+    "f1:hungary",
+    10.53
+   ],
+   [
+    "hockenheim",
+    10.91
+   ],
+   [
+    "road-atlanta",
+    11.44
+   ]
+  ]
+ },
+ "watkins-glen-nascar": {
+  "own_pct": 0.66,
+  "best_other": "velopark",
+  "best_other_pct": 7.7,
+  "margin": 11.67,
+  "own_is_best": true,
+  "top5": [
+   [
+    "watkins-glen-nascar",
+    0.66
+   ],
+   [
+    "velopark",
+    7.7
+   ],
+   [
+    "f1:canada",
+    8.43
+   ],
+   [
+    "detroit",
+    8.6
+   ],
+   [
+    "portland",
+    8.69
+   ]
+  ]
+ }
+}
