@@ -6,7 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
-.claude/
 .vercel/
 supabase/.temp/
 
