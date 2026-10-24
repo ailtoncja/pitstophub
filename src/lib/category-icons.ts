@@ -15,6 +15,8 @@ const ICONS: Record<string, LucideIcon> = {
   'gtwc-america': CarFront,
   'gtwc-asia': CarFront,
   'endurance-brasil': Shield,
+  'nascar-brasil': CarFront,
+  'porsche-cup': CarFront,
   wrc: Mountain,
 };
 
