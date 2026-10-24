@@ -1,9 +1,28 @@
 import { describe, expect, it } from 'vitest';
 import type { Category, Race } from './types';
-import { mergeCategoryWithSyncedCalendar, nameFromCatalog } from './synced-races';
+import { mergeCategoryWithSyncedCalendar, mergeCategoryWithSyncedStandings, nameFromCatalog } from './synced-races';
 
 const race = (over: Partial<Race>): Race => ({ id: 'r', name: 'Rodada 1', location: '', circuit: '', date: '2026-10-18', status: 'upcoming', ...over });
 const category = (calendar: Race[]) => ({ id: 'nascar', name: 'NASCAR', calendar, teams: [], drivers: [] }) as unknown as Category;
+
+describe('virada de temporada', () => {
+  const old = { position: 1, name: 'Piloto', points: 100, season: 2026 };
+  it('remove pontuacao de reserva e rejeita a classificacao anterior', () => {
+    const base = { ...category([race({})]), standings: { drivers: [old], constructors: [old] } };
+    const next = mergeCategoryWithSyncedCalendar(base, [race({ date: '2027-04-01' })]);
+    expect(next.standings).toBeUndefined();
+    expect(mergeCategoryWithSyncedStandings(next, [old]).standings).toBeUndefined();
+    expect(mergeCategoryWithSyncedStandings(next, null).standings).toBeUndefined();
+    expect(mergeCategoryWithSyncedStandings(next, [{ ...old, season: 2027 }]).standings?.drivers).toHaveLength(1);
+    expect(mergeCategoryWithSyncedStandings(next, [{ ...old, season: null }]).standings).toBeUndefined();
+  });
+  it('nao injeta etapas ou vencedores de 2026 no WEC de 2027', () => {
+    const base = { ...category([race({ name: 'Spa', winner: 'Antigo' }), race({ id: 'lemans', name: 'Le Mans' })]), id: 'wec' };
+    const next = mergeCategoryWithSyncedCalendar(base, [race({ name: 'Spa', date: '2027-05-01', winner: 'Novo' })]);
+    expect(next.calendar).toHaveLength(1);
+    expect(next.calendar[0].winner).toBe('Novo');
+  });
+});
 
 describe('nomes de etapas sincronizadas', () => {
   it('troca "Rodada N" pelo nome do catalogo na mesma data', () => {

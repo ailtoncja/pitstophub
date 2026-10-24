@@ -25,6 +25,7 @@ type SyncedRaceRow = {
 };
 
 type SyncedStandingRow = {
+  season: number | null;
   position: number;
   name: string;
   team: string | null;
@@ -63,6 +64,10 @@ export async function fetchSyncedCalendar(categoryId: string, force = false): Pr
 
 export function mergeCategoryWithSyncedCalendar(category: Category, calendar: Race[] | null): Category {
   if (!calendar || calendar.length === 0) return category;
+  const years = new Set(calendar.map((race) => race.date.slice(0, 4)));
+  if (category.calendar.some((race) => !years.has(race.date.slice(0, 4)))) {
+    category = { ...category, standings: undefined };
+  }
   const synced = calendar.map((race) =>
     normalizeRaceWinner(preferOfficialWinner(category, nameFromCatalog(category, race)), category)
   );
@@ -116,13 +121,14 @@ function dropNonChampionshipImsaRaces(category: Category, races: Race[]): Race[]
 function fillMissingOfficialRaces(category: Category, synced: Race[]): Race[] {
   if (category.id !== 'wec' && category.id !== 'imsa') return synced;
   const missing = category.calendar.filter(
-    (base) => !synced.some((race) => isSameEnduranceRace(base, race))
+    (base) => synced.some((race) => race.date.slice(0, 4) === base.date.slice(0, 4)) && !synced.some((race) => isSameEnduranceRace(base, race))
   );
   if (missing.length === 0) return synced;
   return [...synced, ...missing].sort((a, b) => a.date.localeCompare(b.date));
 }
 
 function isSameEnduranceRace(a: Race, b: Race): boolean {
+  if (a.date.slice(0, 4) !== b.date.slice(0, 4)) return false;
   if (a.date && a.date === b.date) return true;
   if (isWecLeMans(a) && isWecLeMans(b)) return true;
   if (isLongBeach(a) && isLongBeach(b)) return true;
@@ -187,7 +193,10 @@ export async function fetchSyncedStandings(categoryId: string, force = false): P
 
 export function mergeCategoryWithSyncedStandings(category: Category, standings: StandingItem[] | null): Category {
   if (!standings || standings.length === 0) return category;
-  return { ...category, standings: { ...category.standings, drivers: standings } };
+  const years = new Set(category.calendar.map((race) => Number(race.date.slice(0, 4))));
+  const matching = standings.filter((item) => item.season != null && years.size === 1 && years.has(item.season));
+  if (!matching.length) return { ...category, standings: undefined };
+  return { ...category, standings: { ...category.standings, drivers: matching } };
 }
 
 async function loadCalendar(categoryId: string): Promise<Race[] | null> {
@@ -235,7 +244,7 @@ async function loadStandings(categoryId: string): Promise<StandingItem[] | null>
 
   const { data, error } = await supabase
     .from('synced_standings')
-    .select('position, name, team, points')
+    .select('position, name, team, points, season')
     .eq('category_id', categoryId)
     .order('position', { ascending: true });
 
@@ -243,6 +252,7 @@ async function loadStandings(categoryId: string): Promise<StandingItem[] | null>
   if (!data || data.length === 0) return null;
 
   return (data as SyncedStandingRow[]).map((row) => ({
+    season: row.season,
     position: row.position,
     name: row.name,
     points: row.points,

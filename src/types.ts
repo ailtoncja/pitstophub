@@ -55,6 +55,7 @@ export interface Race {
 }
 
 export interface StandingItem {
+  season?: number | null;
   position: number;
   name: string;
   points: number;
