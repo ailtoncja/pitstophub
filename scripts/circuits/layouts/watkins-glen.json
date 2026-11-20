@@ -49,7 +49,7 @@
   "keep": "largest"
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": -4.5
  },
  "notes": "SKIPPED: the only flat official map (Track Data Sheet) is schematic in the Boot: OSM vs map 2.27 % (> 2.0 %); the same sheet matches the short course at 1.12 %. IMSA and event maps are 3D/oblique. OSM lap 5473 m (-1.43 %)."
 }

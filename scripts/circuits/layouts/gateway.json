@@ -34,7 +34,7 @@
   "close": 3
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": 54.1
  },
  "notes": "SKIPPED: OSM oval (relation 20448916, 2043 m, +1.5%) fails against the only clean official map, the stylised INDYCAR outline (3.38%, stretch 1.125, mirror ratio 1.0). The INDYCAR spectator map (Gateway_TrackMap.jpg) draws the track light grey on grey and cannot be extracted reliably; wwtraceway.com has no track map."
 }

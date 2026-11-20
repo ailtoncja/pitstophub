@@ -79,7 +79,7 @@
   "min_size": 300
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": -90.0
  },
  "notes": "SKIPPED (no usable official map): the CTMP facility map (cdn.shopify.com/s/files/1/1566/0845/files/CTMP_Map.png) is an aerial photo where the track cannot be separated from roads and paddocks (7.17 %); no map on the IMSA event page. OSM lap 3943 m vs 3957 m (-0.35 %)."
 }

@@ -1189,6 +1189,13 @@ const EXTRA_OSM_CIRCUITS: Record<string, Omit<CircuitInfo, 'osm'>> = {
   'laguna-seca': { trackImage: '/circuits/laguna-seca.png', lengthKm: 3.602, corners: 11 },
   sonoma: { trackImage: '/circuits/sonoma.png', lengthKm: 3.203, corners: 12, direction: 'clockwise' },
   'road-atlanta': { trackImage: '/circuits/road-atlanta.png', lengthKm: 4.088 },
+  portland: { trackImage: '/circuits/portland.png', lengthKm: 3.166, corners: 12 },
+  'cota-national': { trackImage: '/circuits/cota-national.png', lengthKm: 3.862, corners: 17 },
+  'bowman-gray': { trackImage: '/circuits/bowman-gray.png', lengthKm: 0.402 },
+  mosport: { trackImage: '/circuits/mosport.png', lengthKm: 3.957 },
+  bristol: { trackImage: '/circuits/bristol.png', lengthKm: 0.858 },
+  'watkins-glen': { trackImage: '/circuits/watkins-glen.png', lengthKm: 5.552, direction: 'clockwise' },
+  gateway: { trackImage: '/circuits/gateway.png', lengthKm: 2.012 },
 };
 
 /** undefined: nenhum lugar desenhado reconhecido; null: lugar reconhecido, mas sem desenho verificado do tracado. */

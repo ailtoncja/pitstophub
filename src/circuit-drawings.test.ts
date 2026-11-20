@@ -128,8 +128,11 @@ describe('tracado certo por categoria', () => {
     ['nascar', 'Nashville', staticRace('nascar', 'nashville-nascar'), 'nashville-superspeedway'],
     ['nascar', 'Homestead', staticRace('nascar', 'homestead'), 'homestead'],
     ['nascar', 'Sonoma', staticRace('nascar', 'sonoma'), 'sonoma'],
-    // NASCAR em COTA usa o National Course (sem desenho verificado): nenhum mapa, nao o da F1.
-    ['nascar', 'COTA', staticRace('nascar', 'cota-nascar'), null],
+    ['nascar', 'Bowman Gray (Clash)', staticRace('nascar', 'clash'), 'bowman-gray'],
+    ['nascar', 'Bristol', staticRace('nascar', 'bristol1'), 'bristol'],
+    ['nascar', 'Gateway', staticRace('nascar', 'gateway-nascar'), 'gateway'],
+    // NASCAR em COTA usa o National Course, nao o tracado completo da F1.
+    ['nascar', 'COTA (National)', staticRace('nascar', 'cota-nascar'), 'cota-national'],
     // Tolerancia de extensao de 3% (antes 2%): Charlotte, New Hampshire, Chicagoland e Atlanta.
     ['nascar', 'Coca-Cola 600', staticRace('nascar', 'charlotte600'), 'charlotte-oval'],
     ['nascar', 'Coca-Cola 600 (ao vivo)', live('Coca-Cola 600', 'Charlotte Motor Speedway', '', '2026-05-24'), 'charlotte-oval'],
@@ -162,6 +165,8 @@ describe('tracado certo por categoria', () => {
     ['indy', 'Washington, D.C.', staticRace('indy', 'washington'), 'washington-dc'],
     ['indy', 'Washington, D.C. (ao vivo)', live('Freedom 250 Grand Prix of Washington DC', 'Streets of Washington', '', '2026-08-23'), 'washington-dc'],
     ['indy', 'Laguna Seca', staticRace('indy', 'laguna-seca-indy'), 'laguna-seca'],
+    ['indy', 'Portland', staticRace('indy', 'portland'), 'portland'],
+    ['indy', 'Gateway', staticRace('indy', 'gateway'), 'gateway'],
     // IMSA
     ['imsa', 'Rolex 24 (Daytona misto)', staticRace('imsa', 'daytona'), 'daytona-road'],
     ['imsa', 'Indianapolis', staticRace('imsa', 'indianapolis'), 'indianapolis-road'],
@@ -169,9 +174,10 @@ describe('tracado certo por categoria', () => {
     ['imsa', 'Detroit', staticRace('imsa', 'detroit'), 'detroit'],
     ['imsa', 'Laguna Seca', staticRace('imsa', 'lagunaseca'), 'laguna-seca'],
     ['imsa', 'Road America', staticRace('imsa', 'roadamerica'), 'road-america'],
+    ['imsa', 'Mosport', staticRace('imsa', 'mosport'), 'mosport'],
     ['imsa', 'Road Atlanta (Petit Le Mans)', staticRace('imsa', 'roadatlanta'), 'road-atlanta'],
     ['imsa', 'VIR', live('VIR', 'VIRginia International Raceway'), 'vir'],
-    ['imsa', 'Six Hours of The Glen (com o Boot, sem desenho verificado)', staticRace('imsa', 'watkins'), null],
+    ['imsa', 'Six Hours of The Glen (com o Boot)', staticRace('imsa', 'watkins'), 'watkins-glen'],
     ['imsa', '12 Horas de Sebring', staticRace('imsa', 'sebring'), 'sebring'],
     ['imsa', 'Twelve Hours of Sebring (ao vivo)', live('74th Annual Mobil 1 Twelve Hours of Sebring', 'Sebring International Raceway', '', '2026-03-21'), 'sebring'],
     // DTM
