@@ -17,7 +17,7 @@
   "mode": "cycle"
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": 48.0
  },
  "status": "skipped",
  "used_by": [

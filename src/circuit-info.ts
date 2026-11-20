@@ -1182,6 +1182,8 @@ const EXTRA_OSM_CIRCUITS: Record<string, Omit<CircuitInfo, 'osm'>> = {
   velopark: { trackImage: '/circuits/velopark.png', lengthKm: 2.278, corners: 11 },
   brasilia: { trackImage: '/circuits/brasilia.png', lengthKm: 5.384, direction: 'clockwise' },
   cascavel: { trackImage: '/circuits/cascavel.png', lengthKm: 3.032, direction: 'counterclockwise' },
+  'santa-cruz-do-sul': { trackImage: '/circuits/santa-cruz-do-sul.png', lengthKm: 3.53, direction: 'counterclockwise' },
+  curvelo: { trackImage: '/circuits/curvelo.png', lengthKm: 1.25 },
 };
 
 /** undefined: nenhum lugar desenhado reconhecido; null: lugar reconhecido, mas sem desenho verificado do tracado. */

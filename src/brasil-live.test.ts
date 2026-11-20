@@ -67,19 +67,14 @@ describe('circuitos das categorias brasileiras', () => {
     ['nascar-brasil', 'Cascavel', '/circuits/cascavel.png'],
     ['nascar-brasil', 'Cuiaba', '/circuits/cuiaba.png'],
     ['nascar-brasil', 'Chapeco', '/circuits/chapeco.png'],
+    ['nascar-brasil', 'Santa Cruz', '/circuits/santa-cruz-do-sul.png'],
+    ['nascar-brasil', 'Curvelo', '/circuits/curvelo.png'],
   ];
 
   it.each(withMap)('%s em %s usa o desenho que ja temos', (categoryId, name, image) => {
     const info = getRaceCircuitInfo(race({ name, location: name, circuit: name }), categoryId);
     expect(info?.trackImage).toBe(image);
   });
-
-  it.each(['Santa Cruz', 'Curvelo'])(
-    '%s fica sem mapa enquanto nao houver desenho conferido',
-    (name) => {
-      expect(getRaceCircuitInfo(race({ name, location: name, circuit: name }), 'nascar-brasil')).toBeNull();
-    },
-  );
 
   it('fora da F1, a ficha nao leva voltas nem recorde do GP', () => {
     const info = getRaceCircuitInfo(race({ name: 'Interlagos' }), 'porsche-cup');

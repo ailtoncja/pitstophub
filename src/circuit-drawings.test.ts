@@ -193,7 +193,7 @@ describe('tracado certo por categoria', () => {
     ['gtwc-asia', 'Okayama', live('Okayama International Circuit (SRO GT PowerTour)', 'Okayama International Circuit (SRO GT PowerTour)', 'Japão'), 'okayama'],
     // Brasil (Endurance Brasil ao vivo; NASCAR Brasil e Porsche Cup em synced_races)
     ['endurance-brasil', 'Goiania', live('Etapa 8 - Três Horas de Goiânia', 'Autódromo Internacional de Goiânia', 'Autódromo Internacional de Goiânia'), 'goiania'],
-    ['endurance-brasil', 'etapa 5 (nome Goiania, local Santa Cruz)', live('Etapa 5 - Três Horas de Goiânia', 'Autódromo Internacional de Santa Cruz do Sul', 'Autódromo Internacional de Santa Cruz do Sul'), null],
+    ['endurance-brasil', 'etapa 5 (nome Goiania, local Santa Cruz)', live('Etapa 5 - Três Horas de Goiânia', 'Autódromo Internacional de Santa Cruz do Sul', 'Autódromo Internacional de Santa Cruz do Sul'), 'santa-cruz-do-sul'],
     ['endurance-brasil', 'Brasilia', live('Etapa 1 - Quatro Horas de Brasília', '', 'Autódromo Internacional de Brasília'), 'brasilia'],
     ['endurance-brasil', 'Velopark', live('Etapa 4 - Três Horas do Velopark', '', 'Autódromo Fuel Tech Velopark'), 'velopark'],
     ['nascar-brasil', 'Londrina', live('Londrina', '', 'Londrina'), 'londrina'],
@@ -202,6 +202,8 @@ describe('tracado certo por categoria', () => {
     ['nascar-brasil', 'Cuiaba', live('Cuiabá', '', 'Cuiabá'), 'cuiaba'],
     ['nascar-brasil', 'Chapeco', live('Chapecó', '', 'Chapecó'), 'chapeco'],
     ['nascar-brasil', 'Brasilia', live('Brasília', '', 'Brasília'), 'brasilia'],
+    ['nascar-brasil', 'Santa Cruz', live('Santa Cruz', '', 'Santa Cruz'), 'santa-cruz-do-sul'],
+    ['nascar-brasil', 'Curvelo', live('Curvelo', '', 'Curvelo'), 'curvelo'],
     ['porsche-cup', 'Velocitta', live('Velocitta', '', 'Velocitta'), 'velocitta'],
     ['porsche-cup', 'Brasilia', live('Brasília', '', 'Brasília'), 'brasilia'],
     ['porsche-cup', 'Le Mans', live('Le Mans', '', 'Le Mans'), 'le-mans'],
