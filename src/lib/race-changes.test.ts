@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildCalendar, type JolpicaRace } from '../jolpica';
+import { buildCalendar, mergeCategoryWithLiveData, type JolpicaRace } from '../jolpica';
+import { mergeCategoryWithGtwcCalendar, seedGtwcFromBootstrap, fetchGtwcCalendar } from '../gtwc-live';
 import { mergeCategoryWithSyncedCalendar } from '../synced-races';
 import { MOTORSPORT_DATA, type Race } from '../types';
 import { totalRounds } from './categories-meta';
@@ -169,5 +170,51 @@ describe('joinNames', () => {
     expect(joinNames(['A'], 'e')).toBe('A');
     expect(joinNames(['A', 'B'], 'e')).toBe('A e B');
     expect(joinNames(['A', 'B', 'C'], 'and')).toBe('A, B and C');
+  });
+});
+
+describe('virada automatica para 2027 e anos seguintes', () => {
+  it('nao injeta etapas canceladas nem avisos de substituicao de 2026 no calendario de 2027', () => {
+    const f22027 = [synced('r01-melbourne', 'Melbourne', '2027-03-07', 'upcoming')];
+    expect(ids(calendarWithCancelled(f22027, catalog('f2')))).toEqual(['r01-melbourne']);
+
+    const jolpica2027: JolpicaRace = {
+      round: '4',
+      raceName: 'Bahrain Grand Prix',
+      Circuit: { circuitId: 'bahrain', circuitName: 'Bahrain International Circuit', Location: { locality: 'Sakhir', country: 'Bahrain' } },
+      date: '2027-04-11',
+      time: '15:00:00Z',
+    };
+    const [bahrain2027] = buildCalendar(category('f1'), [jolpica2027], new Map());
+    expect(bahrain2027.winner).toBeUndefined();
+    expect(raceChange(catalog('f1'), bahrain2027)).toBeNull();
+
+    const f1Merged = mergeCategoryWithLiveData(category('f1'), { currentSeason: '2027', calendar: [bahrain2027] });
+    expect(f1Merged.standings).toBeUndefined();
+  });
+
+  it('GTWC limpa classificacao de 2026 e nao aplica vencedores de 2026 nas corridas de 2027', async () => {
+    seedGtwcFromBootstrap({
+      europe: {
+        races: [
+          {
+            seriesId: 'europe',
+            raceId: 'monza',
+            round: 1,
+            name: 'Monza',
+            location: 'Italy',
+            date: '2027-04-18',
+            sourceUrl: null,
+            winner: null,
+          },
+        ],
+        teams: [],
+        standings: { drivers: null, teams: null },
+      },
+    });
+    const cal2027 = await fetchGtwcCalendar('gtwc-europe');
+    expect(cal2027?.[0].winner).toBeUndefined();
+    const merged = mergeCategoryWithGtwcCalendar(category('gtwc-europe'), cal2027);
+    expect(merged.standings).toBeUndefined();
   });
 });

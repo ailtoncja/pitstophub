@@ -78,7 +78,9 @@ export async function fetchGtwcCalendar(categoryId: string, force = false): Prom
 
 export function mergeCategoryWithGtwcCalendar(category: Category, calendar: Race[] | null): Category {
   if (!calendar || calendar.length === 0) return category;
-  return { ...category, calendar };
+  const years = new Set(calendar.map((race) => race.date.slice(0, 4)));
+  const seasonChanged = category.calendar.some((race) => !years.has(race.date.slice(0, 4)));
+  return { ...category, calendar, standings: seasonChanged ? undefined : category.standings };
 }
 
 export async function fetchGtwcRoster(categoryId: string, force = false): Promise<GtwcRoster | null> {
@@ -302,7 +304,8 @@ const GTWC_OFFICIAL_WINNERS: Record<string, Record<string, string>> = {
 };
 
 function preferOfficialWinner(race: ApiRace): string | null {
-  const official = GTWC_OFFICIAL_WINNERS[race.seriesId]?.[race.raceId];
+  // GTWC_OFFICIAL_WINNERS mapeia apenas os pilotos das etapas de 2026; de 2027 em diante usa o vencedor da API.
+  const official = race.date.startsWith('2026-') ? GTWC_OFFICIAL_WINNERS[race.seriesId]?.[race.raceId] : undefined;
   if (!official) return race.winner;
   return official
     .split(/\s*\/\s*/)

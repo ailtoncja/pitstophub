@@ -17,9 +17,9 @@ export type RaceChange =
   /** Etapa que entrou no lugar de etapa(s) cancelada(s). */
   | { kind: 'replaces'; races: Race[]; relocated: boolean; source?: string };
 
-/** A entrada do catalogo que corresponde a uma etapa exibida (pelo id; para ids ao vivo, a mesma etapa no fim de semana). */
+/** A entrada do catalogo que corresponde a uma etapa exibida (pelo id na mesma temporada; para ids ao vivo, a mesma etapa no fim de semana). */
 export function catalogEntryFor(catalog: Race[], race: Race): Race | null {
-  const same = catalog.find((item) => item.id === race.id);
+  const same = catalog.find((item) => item.id === race.id && item.date.slice(0, 4) === race.date.slice(0, 4));
   if (same) return same;
   if (race.status === 'cancelled') return catalog.find((item) => item.status === 'cancelled' && sameEventAndPlace(item, race)) ?? null;
   return catalog.find((item) => item.replaces?.length && findLiveTwin([race], item)) ?? null;
@@ -50,9 +50,11 @@ const AHEAD_GRACE_MS = 36 * 3600_000;
  * As canceladas so aparecem aqui: contagem, numero de rodada e "proxima etapa" continuam ignorando-as.
  */
 export function calendarWithCancelled(calendar: Race[], catalog: Race[]): Race[] {
+  const years = new Set(calendar.map((race) => race.date.slice(0, 4)));
   const missing = catalog.filter(
     (base) =>
       base.status === 'cancelled' &&
+      (years.size === 0 || years.has(base.date.slice(0, 4))) &&
       !calendar.some((race) => race.id === base.id || (race.status === 'cancelled' && sameEventAndPlace(race, base))),
   );
   return [...calendar, ...missing].sort(byStart);

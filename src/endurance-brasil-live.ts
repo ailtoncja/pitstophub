@@ -71,7 +71,9 @@ export async function fetchEbCalendar(categoryId: string, force = false): Promis
 
 export function mergeCategoryWithEbCalendar(category: Category, calendar: Race[] | null): Category {
   if (!isEnduranceBrasilCategory(category.id) || !calendar || calendar.length === 0) return category;
-  return { ...category, calendar };
+  const years = new Set(calendar.map((race) => race.date.slice(0, 4)));
+  const seasonChanged = category.calendar.some((race) => !years.has(race.date.slice(0, 4)));
+  return { ...category, calendar, standings: seasonChanged ? undefined : category.standings };
 }
 
 export async function fetchEbRoster(categoryId: string, force = false): Promise<EbRoster | null> {

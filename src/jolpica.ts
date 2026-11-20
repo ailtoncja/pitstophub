@@ -214,11 +214,15 @@ export function mergeCategoryWithLiveData(
     ? mergeDriversByName(category.drivers, liveData.drivers)
     : category.drivers;
 
+  const calendar = liveData.calendar?.length ? liveData.calendar : category.calendar;
+  const liveYears = new Set(calendar.map((r) => r.date.slice(0, 4)));
+  const seasonChanged = category.calendar.some((r) => !liveYears.has(r.date.slice(0, 4)));
+
   return {
     ...category,
     drivers: mergedDrivers,
-    calendar: liveData.calendar?.length ? liveData.calendar : category.calendar,
-    standings: liveData.standings ?? category.standings,
+    calendar,
+    standings: liveData.standings ?? (seasonChanged ? undefined : category.standings),
   };
 }
 
@@ -229,9 +233,8 @@ export async function fetchCategoryLiveSummary(
   return getCached(summaryCache, `${category.id}:summary`, SUMMARY_TTL_MS, force, async () => {
     if (category.id !== 'f1') return null;
 
-    const year = getCategoryYear(category);
-    const [races, winnerMap, driverStandings, constructorStandings] = await Promise.all([
-      fetchRaces(year),
+    const { year, races } = await resolveSeasonAndRaces(category);
+    const [winnerMap, driverStandings, constructorStandings] = await Promise.all([
       fetchWinners(year),
       fetchDriverStandings(year).catch((): JolpicaDriverStanding[] => []),
       fetchConstructorStandings(year).catch((): JolpicaConstructorStanding[] => []),
@@ -259,9 +262,8 @@ export async function fetchCategoryLiveData(
   return getCached(detailCache, `${category.id}:detail`, DETAIL_TTL_MS, force, async () => {
     if (category.id !== 'f1') return null;
 
-    const year = getCategoryYear(category);
-    const [races, winnerMap, driverStandings, constructorStandings] = await Promise.all([
-      fetchRaces(year),
+    const { year, races } = await resolveSeasonAndRaces(category);
+    const [winnerMap, driverStandings, constructorStandings] = await Promise.all([
       fetchWinners(year),
       fetchDriverStandings(year).catch((): JolpicaDriverStanding[] => []),
       fetchConstructorStandings(year).catch((): JolpicaConstructorStanding[] => []),
@@ -458,6 +460,7 @@ export function buildCalendar(
     // "Bahrain Grand Prix in Malaysia" de 2026 casa com o GP do Bahrein de Sakhir. Nesse
     // caso o local (pista/cidade) vem da Jolpica, que sabe onde a prova acontece.
     const baseVenue = base && (base.date === race.date || sameVenue(base, race)) ? base : null;
+    const sameYearBase = base && base.date.slice(0, 4) === race.date.slice(0, 4) ? base : null;
     const status = getRaceStatus(race, winnerMap.has(race.round));
     const lat = Number(race.Circuit.Location.lat);
     const lng = Number(race.Circuit.Location.long);
@@ -471,7 +474,7 @@ export function buildCalendar(
       startsAt: jolpicaStartsAt(race.date, race.time),
       circuit: baseVenue?.circuit ?? race.Circuit.circuitName,
       status,
-      winner: winnerMap.get(race.round) ?? (status === 'completed' ? base?.winner : undefined),
+      winner: winnerMap.get(race.round) ?? (status === 'completed' ? sameYearBase?.winner : undefined),
       round: Number.parseInt(race.round, 10) || undefined,
       country: race.Circuit.Location.country,
       lat: Number.isFinite(lat) && race.Circuit.Location.lat ? lat : undefined,
@@ -707,8 +710,40 @@ function mergeDriversByName(base: Driver[], live: Driver[]): Driver[] {
   return [...merged.values()];
 }
 
-function getCategoryYear(category: Category): string {
-  return category.calendar[0]?.date.slice(0, 4) ?? String(new Date().getFullYear());
+// Descobre a temporada atual da F1 na Jolpica sem depender de editar types.ts a cada ano (2027, 2028...).
+// 1. Parte do maior ano entre o relogio atual e o catalogo.
+// 2. Se todas as etapas desse ano ja terminaram ha mais de 3 dias e a Jolpica ja publicou o ano seguinte,
+//    vira automaticamente para a nova temporada (mesma regra de 3 dias do pitstophub-data).
+// 3. Se o ano novo (ex.: 1o de janeiro) ainda nao tiver calendario publicado na Jolpica, cai para o ano anterior.
+const ROLLOVER_GRACE_MS = 3 * 24 * 3600 * 1000;
+
+async function resolveSeasonAndRaces(
+  category: Category,
+  now = new Date(),
+): Promise<{ year: string; races: JolpicaRace[] }> {
+  const catalogYear = Number(category.calendar[0]?.date.slice(0, 4)) || now.getUTCFullYear();
+  const targetYear = Math.max(now.getUTCFullYear(), catalogYear);
+  let year = String(targetYear);
+  let races = await fetchRaces(year).catch((): JolpicaRace[] => []);
+
+  if (races.length === 0 && targetYear > catalogYear) {
+    year = String(targetYear - 1);
+    races = await fetchRaces(year);
+  }
+
+  if (races.length > 0) {
+    const lastDate = races.reduce((max, r) => (r.date > max ? r.date : max), races[0].date);
+    const seasonFinished = now.getTime() - new Date(`${lastDate}T23:59:59Z`).getTime() > ROLLOVER_GRACE_MS;
+    if (seasonFinished) {
+      const nextYear = String(Number(year) + 1);
+      const nextRaces = await fetchRaces(nextYear).catch((): JolpicaRace[] => []);
+      if (nextRaces.length > 0) {
+        return { year: nextYear, races: nextRaces };
+      }
+    }
+  }
+
+  return { year, races };
 }
 
 // ─── HTTP / Cache ─────────────────────────────────────────────────────────────

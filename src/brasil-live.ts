@@ -54,7 +54,9 @@ export async function fetchBrasilCalendar(categoryId: string, force = false): Pr
 
 export function mergeCategoryWithBrasilCalendar(category: Category, calendar: Race[] | null): Category {
   if (!isBrasilCategory(category.id) || !calendar || calendar.length === 0) return category;
-  return { ...category, calendar };
+  const years = new Set(calendar.map((race) => race.date.slice(0, 4)));
+  const seasonChanged = category.calendar.some((race) => !years.has(race.date.slice(0, 4)));
+  return { ...category, calendar, standings: seasonChanged ? undefined : category.standings };
 }
 
 export async function fetchBrasilStandings(categoryId: string, force = false): Promise<CategoryStandings | null> {
