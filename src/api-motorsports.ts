@@ -178,9 +178,11 @@ function pickMainSession(sessions: EngineRaceDetailResponse['sessions']) {
   if (!sessions || sessions.length === 0) return null;
   const withRows = sessions.filter((s) => Array.isArray(s.rows) && s.rows.length > 0);
   if (withRows.length === 0) return null;
-  const feature = withRows.find((s) => /^(race|feature|main|race1|corrida\s*1?)$/i.test(s.session));
-  if (feature) return feature;
-  const nonBonus = withRows.filter((s) => !/bonus|qualifying|practice/i.test(s.session));
+  for (const preferred of ['feature', 'feature2', 'feature1', 'race', 'main', 'race2', 'race1']) {
+    const hit = withRows.find((s) => s.session.toLowerCase() === preferred);
+    if (hit) return hit;
+  }
+  const nonBonus = withRows.filter((s) => !/^(bonus|qualifying\d*|practice\d*|pole(-le-mans)?|supersunday|powerstage)$/i.test(s.session));
   return nonBonus[0] ?? withRows[0];
 }
 
