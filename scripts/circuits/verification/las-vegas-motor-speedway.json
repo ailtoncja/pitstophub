@@ -1,0 +1,37 @@
+{
+ "key": "las-vegas-motor-speedway",
+ "official_map": "https://www.lvms.com/wp-content/uploads/sites/1033/2025/09/17/LVMS-Facility-Map.pdf",
+ "official_map_page": "https://www.lvms.com/fans/facility-map/",
+ "official_length_m": 2414,
+ "official_length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf",
+ "alt_lengths": [],
+ "osm_length_m": 2476.9,
+ "length_error_pct": 2.61,
+ "osm_chamfer_pct": 0.84,
+ "osm_chamfer_m": 3.1,
+ "osm_p95_m": 6.8,
+ "osm_mirror_pct": 0.85,
+ "osm_aniso": 1.008,
+ "osm_rot_deg": 140.4,
+ "extract": {
+  "mode": "mask",
+  "n": 64200
+ },
+ "png_chamfer_pct": 0.86,
+ "png_mirror_pct": 0.87,
+ "png_aniso": 1.007,
+ "png_rot_deg": 0.0,
+ "mirror_ratio": 1.01,
+ "symmetric_shape": true,
+ "checks": {
+  "shape": true,
+  "not_mirrored": true,
+  "not_distorted": true,
+  "length": true,
+  "png_shape": true,
+  "png_not_mirrored": true,
+  "png_not_distorted": true,
+  "png_orientation": true
+ },
+ "pass": true
+}

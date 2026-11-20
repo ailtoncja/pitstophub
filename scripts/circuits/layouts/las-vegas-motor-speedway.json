@@ -6,8 +6,9 @@
   "nascar / vegas1 / 2026-03-15",
   "nascar / vegas2 / 2026-10-04"
  ],
- "status": "skipped",
- "notes": "OSM oval (way 27545411) is 2477 m, +2.6% vs 1.5 mi (outside 2%); no top-down official map found (lvms.com facility map is a small schematic). Not published.",
+ "layout_source": "https://www.lvms.com/track-info/",
+ "status": "published",
+ "notes": "Published under the 3% length tolerance (+2.61%: OSM 2476.9 m vs official 2414 m).",
  "venue": {
   "lat": 36.272,
   "lon": -115.011,
@@ -15,7 +16,10 @@
  },
  "official": {
   "length_m": 2414,
-  "length_source": "1.5-mile tri-oval (nominal; no official page read in this run)"
+  "length_source": "https://www.jayski.com/wp-content/uploads/sites/31/2026/2/6/2026-RACETRACK-SPECIFICATIONS-NCS_REVB.pdf",
+  "map_url": "https://www.lvms.com/wp-content/uploads/sites/1033/2025/09/17/LVMS-Facility-Map.pdf",
+  "map_page": "https://www.lvms.com/fans/facility-map/",
+  "map_publisher": "Las Vegas Motor Speedway"
  },
  "select": {
   "mode": "cycle",
@@ -23,9 +27,15 @@
    27545411
   ]
  },
- "extract": {},
- "verify": {},
+ "extract": {
+  "mode": "mask",
+  "max_lum": 0.4
+ },
+ "verify": {
+  "symmetric": true,
+  "notes": "Tri-oval is mirror-symmetric about the axis through start/finish; rendered directly from OSM way 27545411 without mirroring."
+ },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": 140.4
  }
 }

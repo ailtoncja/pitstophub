@@ -103,9 +103,9 @@ describe('lugares com nome parecido', () => {
     expect(image(kent, 'gtwc-america')).not.toBe('/circuits/washington-dc.png');
   });
 
-  it('a F1 em Las Vegas usa o circuito de rua, a NASCAR nao', () => {
+  it('a F1 em Las Vegas usa o circuito de rua, a NASCAR usa o oval de Las Vegas Motor Speedway', () => {
     expect(image(staticRace('f1', 'vegas'), 'f1')).toBe('/circuits/vegas.png');
-    expect(image(staticRace('nascar', 'vegas1'), 'nascar')).not.toBe('/circuits/vegas.png');
+    expect(image(staticRace('nascar', 'vegas1'), 'nascar')).toBe('/circuits/las-vegas-motor-speedway.png');
   });
 });
 
