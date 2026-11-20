@@ -1,12 +1,15 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { MOTORSPORT_DATA, type Category, type CategoryStandings, type Driver, type Race, type StandingItem } from '../types';
 import { fetchCategoryLiveData, mergeCategoryWithLiveData, type JolpicaCategoryData } from '../jolpica';
+import { fetchMotorsportsBootstrap } from '../api-motorsports';
 import {
   fetchSyncedCalendar,
   fetchSyncedStandings,
   getSyncedCategoryIds,
   mergeCategoryWithSyncedCalendar,
   mergeCategoryWithSyncedStandings,
+  seedSyncedFromBootstrap,
+  type SyncedStandingsPayload,
 } from '../synced-races';
 import {
   fetchGtwcCalendar,
@@ -16,6 +19,7 @@ import {
   mergeCategoryWithGtwcCalendar,
   mergeCategoryWithGtwcRoster,
   mergeCategoryWithGtwcStandings,
+  seedGtwcFromBootstrap,
   type GtwcRoster,
 } from '../gtwc-live';
 import {
@@ -26,6 +30,7 @@ import {
   mergeCategoryWithEbCalendar,
   mergeCategoryWithEbRoster,
   mergeCategoryWithEbStandings,
+  seedEbFromBootstrap,
   type EbRoster,
 } from '../endurance-brasil-live';
 import {
@@ -36,12 +41,13 @@ import {
   mergeCategoryWithBrasilCalendar,
   mergeCategoryWithBrasilDrivers,
   mergeCategoryWithBrasilStandings,
+  seedBrasilFromBootstrap,
 } from '../brasil-live';
 
 type ById<T> = Partial<Record<string, T | null>>;
 
 type LiveDataValue = {
-  /** As 14 categorias ja combinadas com as fontes ao vivo (catalogo estatico como base). */
+  /** As 16 categorias ja combinadas com as fontes ao vivo (catalogo estatico como base). */
   categories: Category[];
   byId: Map<string, Category>;
   /** As sincronizacoes iniciais terminaram (antes disso, algumas categorias ainda mostram o catalogo estatico). */
@@ -57,27 +63,24 @@ const TEN_MIN = 10 * 60 * 1000;
 const THIRTY_MIN = 30 * 60 * 1000;
 
 /**
- * Orquestra todas as fontes de dados (Jolpica, TheSportsDB via Supabase, api-motorsports) e entrega
- * as categorias ja mescladas. Porte do que antes vivia dentro do App.tsx.
+ * Orquestra todas as fontes de dados (Jolpica para a F1; api-motorsports via /bootstrap para as
+ * outras 15 categorias, com fallback para rotas individuais, Supabase e catalogo estatico).
  */
 export function LiveDataProvider({ children }: { children: ReactNode }) {
   const [f1Data, setF1Data] = useState<JolpicaCategoryData | null>(null);
   const [f1State, setF1State] = useState<LiveDataValue['f1State']>('loading');
   const [syncedCalendars, setSyncedCalendars] = useState<ById<Race[]>>({});
-  const [syncedStandings, setSyncedStandings] = useState<ById<StandingItem[]>>({});
-  const [syncedReady, setSyncedReady] = useState(false);
+  const [syncedStandings, setSyncedStandings] = useState<ById<SyncedStandingsPayload | StandingItem[]>>({});
   const [gtwcCalendars, setGtwcCalendars] = useState<ById<Race[]>>({});
   const [gtwcRosters, setGtwcRosters] = useState<ById<GtwcRoster>>({});
   const [gtwcStandings, setGtwcStandings] = useState<ById<CategoryStandings>>({});
-  const [gtwcReady, setGtwcReady] = useState(false);
   const [ebCalendars, setEbCalendars] = useState<ById<Race[]>>({});
   const [ebRosters, setEbRosters] = useState<ById<EbRoster>>({});
   const [ebStandings, setEbStandings] = useState<ById<CategoryStandings>>({});
-  const [ebReady, setEbReady] = useState(false);
   const [brCalendars, setBrCalendars] = useState<ById<Race[]>>({});
   const [brDrivers, setBrDrivers] = useState<ById<Driver[]>>({});
   const [brStandings, setBrStandings] = useState<ById<CategoryStandings>>({});
-  const [brReady, setBrReady] = useState(false);
+  const [othersReady, setOthersReady] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
 
   const refresh = useCallback(() => setRefreshTick((n) => n + 1), []);
@@ -113,152 +116,128 @@ export function LiveDataProvider({ children }: { children: ReactNode }) {
     };
   }, [refreshTick]);
 
-  // Categorias sincronizadas (Supabase): juntadas num unico update para evitar "saltos" de layout.
+  // Outras 15 categorias (api-motorsports via /bootstrap em 1 chamada, com fallback individual e Supabase)
   useEffect(() => {
     let mounted = true;
     const sync = async (force = false) => {
-      const results = await Promise.allSettled(
-        getSyncedCategoryIds().map(async (categoryId) => {
-          const [calendar, standings] = await Promise.all([
-            fetchSyncedCalendar(categoryId, force),
-            fetchSyncedStandings(categoryId, force),
-          ]);
-          return { categoryId, calendar, standings };
-        }),
-      );
+      // Tenta primeiro o pacote unico /bootstrap (1 request para todas as 15 categorias).
+      const bootstrap = await fetchMotorsportsBootstrap(force);
+      if (bootstrap) {
+        seedGtwcFromBootstrap(bootstrap.gtwc);
+        seedEbFromBootstrap(bootstrap.enduranceBrasil);
+        seedBrasilFromBootstrap(bootstrap.categories);
+        seedSyncedFromBootstrap(bootstrap.categories);
+      }
+      // Se o bootstrap preencheu o cache, forceIndividual fica false para ler direto do cache recem-populado;
+      // categorias que vieram null no bootstrap (nao cacheadas) rodam seu fallback normalmente.
+      const forceIndividual = force && !bootstrap;
+
+      const [syncedRes, gtwcRes, ebRes, brRes] = await Promise.all([
+        Promise.allSettled(
+          getSyncedCategoryIds().map(async (categoryId) => {
+            const [calendar, standings] = await Promise.all([
+              fetchSyncedCalendar(categoryId, forceIndividual),
+              fetchSyncedStandings(categoryId, forceIndividual),
+            ]);
+            return { categoryId, calendar, standings };
+          }),
+        ),
+        Promise.allSettled(
+          getGtwcCategoryIds().map(async (categoryId) => {
+            const [calendar, roster, standings] = await Promise.all([
+              fetchGtwcCalendar(categoryId, forceIndividual),
+              fetchGtwcRoster(categoryId, forceIndividual),
+              fetchGtwcStandings(categoryId, forceIndividual),
+            ]);
+            return { categoryId, calendar, roster, standings };
+          }),
+        ),
+        Promise.allSettled(
+          getEnduranceBrasilCategoryIds().map(async (categoryId) => {
+            const [calendar, roster, standings] = await Promise.all([
+              fetchEbCalendar(categoryId, forceIndividual),
+              fetchEbRoster(categoryId, forceIndividual),
+              fetchEbStandings(categoryId, forceIndividual),
+            ]);
+            return { categoryId, calendar, roster, standings };
+          }),
+        ),
+        Promise.allSettled(
+          getBrasilCategoryIds().map(async (categoryId) => {
+            const [calendar, drivers, standings] = await Promise.all([
+              fetchBrasilCalendar(categoryId, forceIndividual),
+              fetchBrasilDrivers(categoryId, forceIndividual),
+              fetchBrasilStandings(categoryId, forceIndividual),
+            ]);
+            return { categoryId, calendar, drivers, standings };
+          }),
+        ),
+      ]);
+
       if (!mounted) return;
+
       setSyncedCalendars((prev) => {
         const next = { ...prev };
-        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.calendar;
+        for (const r of syncedRes) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.calendar;
         return next;
       });
       setSyncedStandings((prev) => {
         const next = { ...prev };
-        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.standings;
+        for (const r of syncedRes) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.standings;
         return next;
       });
-      setSyncedReady(true);
-    };
-    void sync(refreshTick > 0);
-    const id = window.setInterval(() => void sync(true), THIRTY_MIN);
-    return () => {
-      mounted = false;
-      window.clearInterval(id);
-    };
-  }, [refreshTick]);
 
-  // GT World Challenge (api-motorsports)
-  useEffect(() => {
-    let mounted = true;
-    const sync = async (force = false) => {
-      const results = await Promise.allSettled(
-        getGtwcCategoryIds().map(async (categoryId) => {
-          const [calendar, roster, standings] = await Promise.all([
-            fetchGtwcCalendar(categoryId, force),
-            fetchGtwcRoster(categoryId, force),
-            fetchGtwcStandings(categoryId, force),
-          ]);
-          return { categoryId, calendar, roster, standings };
-        }),
-      );
-      if (!mounted) return;
       setGtwcCalendars((prev) => {
         const next = { ...prev };
-        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.calendar;
+        for (const r of gtwcRes) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.calendar;
         return next;
       });
       setGtwcRosters((prev) => {
         const next = { ...prev };
-        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.roster;
+        for (const r of gtwcRes) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.roster;
         return next;
       });
       setGtwcStandings((prev) => {
         const next = { ...prev };
-        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.standings;
+        for (const r of gtwcRes) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.standings;
         return next;
       });
-      setGtwcReady(true);
-    };
-    void sync(refreshTick > 0);
-    const id = window.setInterval(() => void sync(true), THIRTY_MIN);
-    return () => {
-      mounted = false;
-      window.clearInterval(id);
-    };
-  }, [refreshTick]);
 
-  // Endurance Brasil (api-motorsports)
-  useEffect(() => {
-    let mounted = true;
-    const sync = async (force = false) => {
-      const results = await Promise.allSettled(
-        getEnduranceBrasilCategoryIds().map(async (categoryId) => {
-          const [calendar, roster, standings] = await Promise.all([
-            fetchEbCalendar(categoryId, force),
-            fetchEbRoster(categoryId, force),
-            fetchEbStandings(categoryId, force),
-          ]);
-          return { categoryId, calendar, roster, standings };
-        }),
-      );
-      if (!mounted) return;
       setEbCalendars((prev) => {
         const next = { ...prev };
-        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.calendar;
+        for (const r of ebRes) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.calendar;
         return next;
       });
       setEbRosters((prev) => {
         const next = { ...prev };
-        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.roster;
+        for (const r of ebRes) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.roster;
         return next;
       });
       setEbStandings((prev) => {
         const next = { ...prev };
-        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.standings;
+        for (const r of ebRes) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.standings;
         return next;
       });
-      setEbReady(true);
-    };
-    void sync(refreshTick > 0);
-    const id = window.setInterval(() => void sync(true), THIRTY_MIN);
-    return () => {
-      mounted = false;
-      window.clearInterval(id);
-    };
-  }, [refreshTick]);
 
-  // NASCAR Brasil e Porsche Cup Brasil (api-motorsports)
-  useEffect(() => {
-    let mounted = true;
-    const sync = async (force = false) => {
-      const results = await Promise.allSettled(
-        getBrasilCategoryIds().map(async (categoryId) => {
-          const [calendar, drivers, standings] = await Promise.all([
-            fetchBrasilCalendar(categoryId, force),
-            fetchBrasilDrivers(categoryId, force),
-            fetchBrasilStandings(categoryId, force),
-          ]);
-          return { categoryId, calendar, drivers, standings };
-        }),
-      );
-      if (!mounted) return;
       setBrCalendars((prev) => {
         const next = { ...prev };
-        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.calendar;
+        for (const r of brRes) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.calendar;
         return next;
       });
       setBrDrivers((prev) => {
         const next = { ...prev };
-        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.drivers;
+        for (const r of brRes) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.drivers;
         return next;
       });
       setBrStandings((prev) => {
         const next = { ...prev };
-        for (const r of results) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.standings;
+        for (const r of brRes) if (r.status === 'fulfilled') next[r.value.categoryId] = r.value.standings;
         return next;
       });
-      setBrReady(true);
+
+      setOthersReady(true);
     };
+
     void sync(refreshTick > 0);
     const id = window.setInterval(() => void sync(true), THIRTY_MIN);
     return () => {
@@ -293,11 +272,11 @@ export function LiveDataProvider({ children }: { children: ReactNode }) {
     () => ({
       categories,
       byId: new Map(categories.map((category) => [category.id, category])),
-      ready: syncedReady && gtwcReady && ebReady && brReady && f1State !== 'loading',
+      ready: othersReady && f1State !== 'loading',
       f1State,
       refresh,
     }),
-    [categories, syncedReady, gtwcReady, ebReady, brReady, f1State, refresh],
+    [categories, othersReady, f1State, refresh],
   );
 
   return <LiveDataContext.Provider value={value}>{children}</LiveDataContext.Provider>;

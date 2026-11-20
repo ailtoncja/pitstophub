@@ -1,9 +1,10 @@
 import type { Category, CategoryStandings, Driver, Race, StandingItem, Team } from './types';
 import { lookupTeamAssets } from './team-bios';
+import { API_MOTORSPORTS_BASE, type MotorsportsBootstrap } from './api-motorsports';
 
 // Endurance Brasil nao usa TheSportsDB -- e a mesma API propria do GTWC
 // (api-motorsports), em /endurance-brasil. Buscamos direto no navegador.
-const API_BASE = 'https://api-motorsports.vercel.app';
+const API_BASE = API_MOTORSPORTS_BASE;
 const TIMEOUT_MS = 10000;
 const CACHE_TTL_MS = 30 * 60 * 1000;
 const CATEGORY_ID = 'endurance-brasil';
@@ -150,6 +151,68 @@ export function mergeCategoryWithEbStandings(category: Category, standings: Cate
     })),
   }));
   return { ...category, standings: { ...standings, driverClasses: withTeams } };
+}
+
+export function seedEbFromBootstrap(eb: MotorsportsBootstrap['enduranceBrasil'] | undefined): void {
+  if (!eb) return;
+  const now = Date.now();
+
+  if (eb.races.length > 0) {
+    calendarCache.set(CATEGORY_ID, {
+      expiresAt: now + CACHE_TTL_MS,
+      value: Promise.resolve(eb.races.map(toRace)),
+    });
+  }
+
+  if (eb.teams.length > 0 || eb.drivers.length > 0) {
+    const classByDriverId = new Map(eb.drivers.map((d) => [d.driverId, d.class]));
+    const teams: Team[] = eb.teams.map((apiTeam) => {
+      const teamClass = apiTeam.drivers
+        .map((d) => classByDriverId.get(d.driverId))
+        .find((value) => Boolean(value)) ?? null;
+      const assets = lookupTeamAssets(apiTeam.name);
+      return {
+        id: apiTeam.teamId,
+        name: apiTeam.name,
+        color: classColor(teamClass),
+        class: teamClass ?? undefined,
+        principal: apiTeam.teamPrincipal ?? undefined,
+        badge: assets?.badge,
+        clearart: assets?.clearart,
+      };
+    });
+    const drivers: Driver[] = eb.drivers.map((apiDriver) => ({
+      id: apiDriver.driverId,
+      name: apiDriver.name,
+      number: '',
+      nationality: 'Brasil',
+      teamId: apiDriver.teamId ?? '',
+    }));
+    rosterCache.set(`${CATEGORY_ID}:roster`, {
+      expiresAt: now + CACHE_TTL_MS,
+      value: Promise.resolve({ teams, drivers }),
+    });
+  }
+
+  const classes = (eb.standings.drivers ?? [])
+    .filter((cls) => cls.entries.length > 0)
+    .sort((a, b) => classRank(a.classLabel) - classRank(b.classLabel));
+  if (classes.length > 0) {
+    standingsCache.set(`${CATEGORY_ID}:standings`, {
+      expiresAt: now + CACHE_TTL_MS,
+      value: Promise.resolve({
+        driverClasses: classes.map((cls) => ({
+          classLabel: cls.classLabel,
+          entries: cls.entries.map((e): StandingItem => ({
+            position: e.position,
+            name: e.name,
+            points: e.points,
+            extra: e.uf ?? undefined,
+          })),
+        })),
+      }),
+    });
+  }
 }
 
 function toRace(race: ApiRace): Race {

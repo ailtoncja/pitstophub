@@ -8,17 +8,29 @@ import {
   type RaceResultRow,
   type TeamRoundPoints,
 } from '../jolpica';
+import { fetchEngineRaceResults } from '../api-motorsports';
+import { isBrasilCategory } from '../brasil-live';
+import { isCategorySynced } from '../synced-races';
 import type { Category, CategoryStandings, Race } from '../types';
 import { useAsync, type AsyncState } from './hooks';
 import { completedRacesDesc } from './season';
 
-// Dados extras que so a Jolpica entrega (F1). Para as outras categorias os hooks ficam em "idle".
+// F1 vem da Jolpica; resultados de etapa das 11 categorias do motor vem da api-motorsports.
 
 const yearOf = (category: Category) => category.calendar[0]?.date.slice(0, 4) ?? String(new Date().getFullYear());
 
 export function useRaceResults(category: Category | undefined, race: Race | undefined): AsyncState<RaceResultRow[]> {
-  const enabled = category?.id === 'f1' && race?.status === 'completed' && Boolean(race.round);
-  return useAsync(() => fetchRaceResults(race!.date.slice(0, 4), race!.round!), [category?.id, race?.id, race?.round], enabled);
+  const isF1 = category?.id === 'f1';
+  const isEngine = Boolean(category && (isCategorySynced(category.id) || isBrasilCategory(category.id)));
+  const enabled =
+    race?.status === 'completed' &&
+    ((isF1 && Boolean(race.round)) || (isEngine && Boolean(race.id)));
+
+  return useAsync(
+    () => (isF1 ? fetchRaceResults(race!.date.slice(0, 4), race!.round!) : fetchEngineRaceResults(category!.id, race!.id)),
+    [category?.id, race?.id, race?.round],
+    enabled,
+  );
 }
 
 export function useDriverSeason(category: Category | undefined, driverId: string | undefined): AsyncState<DriverResultRow[]> {

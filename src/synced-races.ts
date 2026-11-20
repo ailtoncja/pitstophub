@@ -1,10 +1,18 @@
 import { supabase } from './supabase';
-import type { Category, Race, StandingItem } from './types';
+import type { Category, CategoryStandings, Race, StandingItem, StandingsClassGroup } from './types';
+import {
+  fetchMotorsportsJson,
+  type BootstrapCategoryData,
+  type BootstrapEngineRace,
+  type BootstrapEngineStandings,
+  type BootstrapStandingsClass,
+  type MotorsportsBootstrap,
+} from './api-motorsports';
 
-// Categorias sem API propria: calendario mantido pelo job agendado em
-// scripts/sync-thesportsdb.mjs (GitHub Actions), gravado na tabela
-// public.synced_races. O job roda 1x/dia, entao um cache local generoso
-// evita bater no Supabase toda hora sem necessidade.
+// Categorias sincronizadas pelo motor do pitstophub-data e publicadas pela
+// api-motorsports (/bootstrap e /:categoryId/*), com fallback automatico para
+// leitura direta do Supabase (public.synced_races / public.synced_standings)
+// e, em ultimo caso, para o catalogo estatico local.
 const SYNCED_CATEGORY_IDS = [
   'f2', 'f3', 'f1-academy', 'wec', 'imsa', 'dtm', 'indy', 'nascar', 'wrc',
 ] as const;
@@ -32,9 +40,13 @@ type SyncedStandingRow = {
   points: number;
 };
 
+export type SyncedStandingsPayload = CategoryStandings & {
+  season?: number | null;
+};
+
 type CacheEntry<T> = { expiresAt: number; value: Promise<T> };
 const calendarCache = new Map<string, CacheEntry<Race[] | null>>();
-const standingsCache = new Map<string, CacheEntry<StandingItem[] | null>>();
+const standingsCache = new Map<string, CacheEntry<SyncedStandingsPayload | StandingItem[] | null>>();
 
 export function isCategorySynced(id: string): boolean {
   return (SYNCED_CATEGORY_IDS as readonly string[]).includes(id);
@@ -44,8 +56,115 @@ export function getSyncedCategoryIds(): string[] {
   return [...SYNCED_CATEGORY_IDS];
 }
 
+function mapApiRaceToRace(row: BootstrapEngineRace): Race {
+  return {
+    id: row.raceId,
+    name: row.name,
+    enName: row.enName ?? undefined,
+    location: row.location ?? '',
+    enLocation: row.enLocation ?? undefined,
+    circuit: row.circuit ?? '',
+    date: row.date,
+    startsAt: row.startsAt ?? undefined,
+    status: row.status,
+    winner: row.winner ?? undefined,
+    round: row.round ?? undefined,
+  };
+}
+
+function mapApiStandingsToPayload(data: BootstrapEngineStandings): SyncedStandingsPayload | null {
+  const season = data.season ?? null;
+  const toItems = (cls: BootstrapStandingsClass): StandingItem[] =>
+    cls.entries.map((entry) => ({
+      season,
+      position: entry.position,
+      name: entry.name,
+      points: entry.points,
+      team: entry.team ?? undefined,
+    }));
+
+  const driverGroups = (data.drivers ?? []).filter((c) => c.entries.length > 0);
+  const teamGroups = (data.teams ?? []).filter((c) => c.entries.length > 0);
+  if (driverGroups.length === 0 && teamGroups.length === 0) return null;
+
+  const drivers = driverGroups.length === 1 ? toItems(driverGroups[0]) : undefined;
+  const driverClasses: StandingsClassGroup[] | undefined =
+    driverGroups.length > 1
+      ? driverGroups.map((cls) => ({ classLabel: cls.classLabel, entries: toItems(cls) }))
+      : undefined;
+
+  const teams = teamGroups.length === 1 ? toItems(teamGroups[0]) : undefined;
+  const teamClasses: StandingsClassGroup[] | undefined =
+    teamGroups.length > 1
+      ? teamGroups.map((cls) => ({ classLabel: cls.classLabel, entries: toItems(cls) }))
+      : undefined;
+
+  return {
+    season,
+    drivers,
+    driverClasses,
+    teams,
+    teamClasses,
+  };
+}
+
+/**
+ * Preenche os caches locais a partir do pacote unico /bootstrap da api-motorsports.
+ * Se uma categoria vier null no bootstrap (ainda sem linhas no banco), nao grava no cache
+ * para permitir o fallback individual ou manter o catalogo estatico.
+ */
+export function seedSyncedFromBootstrap(categories: MotorsportsBootstrap['categories'] | undefined): void {
+  if (!categories) return;
+  const now = Date.now();
+  for (const categoryId of SYNCED_CATEGORY_IDS) {
+    const data: BootstrapCategoryData | null | undefined = categories[categoryId];
+    if (!data) continue;
+
+    if (data.races.length > 0) {
+      calendarCache.set(categoryId, {
+        expiresAt: now + CACHE_TTL_MS,
+        value: Promise.resolve(data.races.map(mapApiRaceToRace)),
+      });
+    }
+
+    const payload = mapApiStandingsToPayload(data.standings);
+    if (payload) {
+      standingsCache.set(categoryId, {
+        expiresAt: now + CACHE_TTL_MS,
+        value: Promise.resolve(payload),
+      });
+    }
+
+    if (data.season != null || data.asOfRound != null || data.lastUpdate != null) {
+      freshnessCache.set(categoryId, {
+        expiresAt: now + CACHE_TTL_MS,
+        value: Promise.resolve({
+          season: data.season ?? null,
+          asOfRound: data.asOfRound ?? data.standings.asOfRound ?? null,
+          lastSuccessAt: data.lastUpdate ?? null,
+          degraded: Boolean(data.degraded),
+        }),
+      });
+    }
+  }
+  for (const brId of ['nascar-brasil', 'porsche-cup']) {
+    const data = categories[brId];
+    if (data && (data.season != null || data.asOfRound != null || data.lastUpdate != null)) {
+      freshnessCache.set(brId, {
+        expiresAt: now + CACHE_TTL_MS,
+        value: Promise.resolve({
+          season: data.season ?? null,
+          asOfRound: data.asOfRound ?? data.standings.asOfRound ?? null,
+          lastSuccessAt: data.lastUpdate ?? null,
+          degraded: Boolean(data.degraded),
+        }),
+      });
+    }
+  }
+}
+
 export async function fetchSyncedCalendar(categoryId: string, force = false): Promise<Race[] | null> {
-  if (!supabase || !isCategorySynced(categoryId)) return null;
+  if (!isCategorySynced(categoryId)) return null;
 
   const now = Date.now();
   const hit = calendarCache.get(categoryId);
@@ -173,8 +292,11 @@ function normalizeText(value: string): string {
     .toLowerCase();
 }
 
-export async function fetchSyncedStandings(categoryId: string, force = false): Promise<StandingItem[] | null> {
-  if (!supabase || !isCategorySynced(categoryId)) return null;
+export async function fetchSyncedStandings(
+  categoryId: string,
+  force = false,
+): Promise<SyncedStandingsPayload | StandingItem[] | null> {
+  if (!isCategorySynced(categoryId)) return null;
 
   const now = Date.now();
   const hit = standingsCache.get(categoryId);
@@ -191,15 +313,52 @@ export async function fetchSyncedStandings(categoryId: string, force = false): P
   return value;
 }
 
-export function mergeCategoryWithSyncedStandings(category: Category, standings: StandingItem[] | null): Category {
-  if (!standings || standings.length === 0) return category;
+export function mergeCategoryWithSyncedStandings(
+  category: Category,
+  standings: SyncedStandingsPayload | StandingItem[] | null,
+): Category {
+  if (!standings) return category;
   const years = new Set(category.calendar.map((race) => Number(race.date.slice(0, 4))));
-  const matching = standings.filter((item) => item.season != null && years.size === 1 && years.has(item.season));
-  if (!matching.length) return { ...category, standings: undefined };
-  return { ...category, standings: { ...category.standings, drivers: matching } };
+
+  if (Array.isArray(standings)) {
+    if (standings.length === 0) return category;
+    const matching = standings.filter((item) => item.season != null && years.size === 1 && years.has(item.season));
+    if (!matching.length) return { ...category, standings: undefined };
+    return { ...category, standings: { ...category.standings, drivers: matching } };
+  }
+
+  const hasDrivers = Boolean(standings.drivers?.length || standings.driverClasses?.length);
+  const hasTeams = Boolean(standings.teams?.length || standings.teamClasses?.length);
+  if (!hasDrivers && !hasTeams) return category;
+
+  if (standings.season == null || years.size !== 1 || !years.has(standings.season)) {
+    return { ...category, standings: undefined };
+  }
+
+  return {
+    ...category,
+    standings: {
+      ...category.standings,
+      drivers: standings.drivers,
+      driverClasses: standings.driverClasses,
+      teams: standings.teams ?? category.standings?.teams,
+      teamClasses: standings.teamClasses ?? category.standings?.teamClasses,
+    },
+  };
 }
 
 async function loadCalendar(categoryId: string): Promise<Race[] | null> {
+  // Camada 1: api-motorsports
+  try {
+    const apiRaces = await fetchMotorsportsJson<BootstrapEngineRace[]>(`/${encodeURIComponent(categoryId)}/races`);
+    if (Array.isArray(apiRaces) && apiRaces.length > 0) {
+      return apiRaces.map(mapApiRaceToRace);
+    }
+  } catch {
+    // Fallback silencioso para o Supabase
+  }
+
+  // Camada 2: fallback direto no Supabase (public.synced_races)
   if (!supabase) return null;
 
   const fullSelect = 'race_id, name, en_name, location, en_location, circuit, date, starts_at, status, winner';
@@ -239,7 +398,19 @@ async function loadCalendar(categoryId: string): Promise<Race[] | null> {
   }));
 }
 
-async function loadStandings(categoryId: string): Promise<StandingItem[] | null> {
+async function loadStandings(categoryId: string): Promise<SyncedStandingsPayload | StandingItem[] | null> {
+  // Camada 1: api-motorsports (ja inclui standings_detail com multi-classe e equipes)
+  try {
+    const apiStandings = await fetchMotorsportsJson<BootstrapEngineStandings>(
+      `/${encodeURIComponent(categoryId)}/standings`,
+    );
+    const payload = mapApiStandingsToPayload(apiStandings);
+    if (payload) return payload;
+  } catch {
+    // Fallback silencioso para o Supabase
+  }
+
+  // Camada 2: fallback direto no Supabase (public.synced_standings)
   if (!supabase) return null;
 
   const { data, error } = await supabase
@@ -260,8 +431,8 @@ async function loadStandings(categoryId: string): Promise<StandingItem[] | null>
   }));
 }
 
-// Frescor do dado sincronizado (view public.sync_freshness, mantida pelo motor
-// do pitstophub-data): ate qual etapa a classificacao vai e quando mudou.
+// Frescor do dado sincronizado (alimentado pelo /bootstrap da api-motorsports,
+// com fallback para a view public.sync_freshness no Supabase).
 export type SyncFreshness = {
   season: number | null;
   asOfRound: number | null;
@@ -272,17 +443,18 @@ export type SyncFreshness = {
 const freshnessCache = new Map<string, CacheEntry<SyncFreshness | null>>();
 
 export async function fetchSyncFreshness(categoryId: string): Promise<SyncFreshness | null> {
-  if (!supabase || !isCategorySynced(categoryId)) return null;
+  const isEngineCat = isCategorySynced(categoryId) || categoryId === 'nascar-brasil' || categoryId === 'porsche-cup';
+  if (!isEngineCat) return null;
   const now = Date.now();
   const hit = freshnessCache.get(categoryId);
   if (hit && hit.expiresAt > now) return hit.value;
   const value = (async () => {
-    const { data, error } = await supabase!
+    if (!supabase) return null;
+    const { data, error } = await supabase
       .from('sync_freshness')
       .select('season, as_of_round, last_success_at, degraded')
       .eq('category_id', categoryId)
       .maybeSingle();
-    // View ainda nao criada (motor novo nao instalado): so nao mostra nada.
     if (error || !data) return null;
     return {
       season: data.season ?? null,

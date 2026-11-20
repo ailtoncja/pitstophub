@@ -271,12 +271,14 @@ export default function RacePage() {
               {results.status === 'loading' && <Skeleton className="h-48" />}
               {results.data && highlights && (
                 <>
-                  <FactList
-                    items={[
-                      { label: t('cir.pole'), value: [highlights.pole?.driverName, highlights.pole?.teamName].filter(Boolean).join(' · ') || '—' },
-                      { label: t('cir.fastest'), value: [highlights.fastestLap?.driverName, highlights.fastestLap?.fastestLapTime].filter(Boolean).join(' · ') || '—' },
-                    ]}
-                  />
+                  {(highlights.pole || highlights.fastestLap) && (
+                    <FactList
+                      items={[
+                        { label: t('cir.pole'), value: [highlights.pole?.driverName, highlights.pole?.teamName].filter(Boolean).join(' · ') || '—' },
+                        { label: t('cir.fastest'), value: [highlights.fastestLap?.driverName, highlights.fastestLap?.fastestLapTime].filter(Boolean).join(' · ') || '—' },
+                      ]}
+                    />
+                  )}
                   <ListGroup>
                     {results.data.slice(0, 10).map((row) => {
                       const driver = findCategoryDriver(category, row.driverName);

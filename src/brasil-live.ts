@@ -1,10 +1,11 @@
 import type { Category, CategoryStandings, Driver, Race, StandingItem } from './types';
+import { API_MOTORSPORTS_BASE, type MotorsportsBootstrap } from './api-motorsports';
 
 // NASCAR Brasil e Porsche Cup Brasil: a mesma API propria do GTWC e do
 // Endurance Brasil (api-motorsports), que publica o que o motor do Supabase ja
 // le das fontes oficiais (CBA e planilha oficial da Porsche Cup). Calendario,
 // classificacao e grid vem de la; o catalogo estatico so tem nome e regras.
-const API_BASE = 'https://api-motorsports.vercel.app';
+const API_BASE = API_MOTORSPORTS_BASE;
 const TIMEOUT_MS = 10000;
 const CACHE_TTL_MS = 30 * 60 * 1000;
 
@@ -32,7 +33,7 @@ type ApiRace = {
   sourceUrl: string | null;
 };
 
-type ApiStandingEntry = { position: number; name: string; team: string | null; points: number };
+type ApiStandingEntry = { position: number; name: string; team?: string | null; points: number };
 type ApiStandingsClass = { classLabel: string; entries: ApiStandingEntry[] };
 type ApiStandings = { season: number | null; asOfRound: number | null; drivers: ApiStandingsClass[] | null };
 type ApiDriver = { driverId: string; name: string; number: string | null; classes: string[] };
@@ -106,6 +107,56 @@ export async function fetchBrasilDrivers(categoryId: string, force = false): Pro
 export function mergeCategoryWithBrasilDrivers(category: Category, drivers: Driver[] | null): Category {
   if (!isBrasilCategory(category.id) || !drivers || drivers.length === 0) return category;
   return { ...category, drivers };
+}
+
+export function seedBrasilFromBootstrap(categories: MotorsportsBootstrap['categories'] | undefined): void {
+  if (!categories) return;
+  const now = Date.now();
+  for (const categoryId of CATEGORY_IDS) {
+    const data = categories[categoryId];
+    if (!data) continue;
+
+    if (data.races.length > 0) {
+      calendarCache.set(categoryId, {
+        expiresAt: now + CACHE_TTL_MS,
+        value: Promise.resolve(data.races.map(toRace)),
+      });
+    }
+
+    if (data.drivers.length > 0) {
+      driversCache.set(`${categoryId}:drivers`, {
+        expiresAt: now + CACHE_TTL_MS,
+        value: Promise.resolve(
+          data.drivers.map((driver) => ({
+            id: driver.driverId,
+            name: driver.name,
+            number: driver.number ?? '',
+            nationality: 'Brasil',
+            teamId: '',
+          })),
+        ),
+      });
+    }
+
+    const classes = (data.standings.drivers ?? []).filter((cls) => cls.entries.length > 0);
+    if (classes.length > 0) {
+      const toItems = (entries: ApiStandingEntry[]): StandingItem[] =>
+        entries.map((entry) => ({
+          position: entry.position,
+          name: entry.name,
+          points: entry.points,
+          team: entry.team ?? undefined,
+        }));
+      const standings: CategoryStandings =
+        classes.length === 1
+          ? { drivers: toItems(classes[0].entries) }
+          : { driverClasses: classes.map((cls) => ({ classLabel: cls.classLabel, entries: toItems(cls.entries) })) };
+      standingsCache.set(`${categoryId}:standings`, {
+        expiresAt: now + CACHE_TTL_MS,
+        value: Promise.resolve(standings),
+      });
+    }
+  }
 }
 
 function toRace(race: ApiRace): Race {

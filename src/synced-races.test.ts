@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import type { Category, Race } from './types';
-import { mergeCategoryWithSyncedCalendar, mergeCategoryWithSyncedStandings, nameFromCatalog } from './synced-races';
+import {
+  fetchSyncedCalendar,
+  fetchSyncedStandings,
+  fetchSyncFreshness,
+  mergeCategoryWithSyncedCalendar,
+  mergeCategoryWithSyncedStandings,
+  nameFromCatalog,
+  seedSyncedFromBootstrap,
+} from './synced-races';
 
 const race = (over: Partial<Race>): Race => ({ id: 'r', name: 'Rodada 1', location: '', circuit: '', date: '2026-10-18', status: 'upcoming', ...over });
 const category = (calendar: Race[]) => ({ id: 'nascar', name: 'NASCAR', calendar, teams: [], drivers: [] }) as unknown as Category;
@@ -45,5 +53,72 @@ describe('nomes de etapas sincronizadas', () => {
     const base = race({ id: 'phoenix', name: 'Phoenix', date: '2026-10-18' });
     const merged = mergeCategoryWithSyncedCalendar(category([base]), [race({ id: 'x', date: '2026-10-18' })]);
     expect(merged.calendar[0].name).toBe('Phoenix');
+  });
+});
+
+describe('bootstrap e multi-classe da api-motorsports', () => {
+  it('preenche calendario, classificacao multi-classe e frescor a partir do /bootstrap', async () => {
+    seedSyncedFromBootstrap({
+      wec: {
+        id: 'wec',
+        name: 'WEC',
+        season: 2026,
+        source: 'fiawec.com',
+        lastUpdate: '2026-10-20T12:00:00Z',
+        asOfRound: 5,
+        degraded: false,
+        races: [
+          {
+            raceId: 'r01-imola',
+            round: 1,
+            name: '6 Horas de Ímola',
+            enName: '6 Hours of Imola',
+            location: 'Ímola',
+            enLocation: 'Imola',
+            circuit: 'Autodromo Enzo e Dino Ferrari',
+            date: '2026-04-19',
+            startsAt: '2026-04-19T11:00:00Z',
+            status: 'completed',
+            winner: 'Sébastien Buemi',
+            official: true,
+            sourceUrl: 'https://www.fiawec.com',
+          },
+        ],
+        standings: {
+          season: 2026,
+          asOfRound: 5,
+          drivers: [
+            { classLabel: 'Hypercar', entries: [{ position: 1, name: 'Sébastien Buemi', team: 'Toyota', points: 112 }] },
+            { classLabel: 'LMGT3', entries: [{ position: 1, name: 'Augusto Farfus', team: 'Team WRT', points: 88 }] },
+          ],
+          teams: [
+            { classLabel: 'Hypercar', entries: [{ position: 1, name: 'Toyota Gazoo Racing', points: 140 }] },
+          ],
+        },
+        drivers: [],
+      },
+    });
+
+    const cal = await fetchSyncedCalendar('wec');
+    expect(cal).toHaveLength(1);
+    expect(cal?.[0].enName).toBe('6 Hours of Imola');
+
+    const st = await fetchSyncedStandings('wec');
+    const wecBase = { ...category([race({ date: '2026-04-19' })]), id: 'wec' };
+    const merged = mergeCategoryWithSyncedStandings(wecBase, st);
+    expect(merged.standings?.driverClasses?.map((c) => c.classLabel)).toEqual(['Hypercar', 'LMGT3']);
+    expect(merged.standings?.teams?.[0].name).toBe('Toyota Gazoo Racing');
+
+    // Rejeita classificacao multi-classe se o calendario mudar para outra temporada (2027)
+    const wec2027 = { ...category([race({ date: '2027-04-19' })]), id: 'wec' };
+    expect(mergeCategoryWithSyncedStandings(wec2027, st).standings).toBeUndefined();
+
+    const freshness = await fetchSyncFreshness('wec');
+    expect(freshness).toEqual({
+      season: 2026,
+      asOfRound: 5,
+      lastSuccessAt: '2026-10-20T12:00:00Z',
+      degraded: false,
+    });
   });
 });

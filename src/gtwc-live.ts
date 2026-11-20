@@ -1,12 +1,13 @@
 import type { Category, CategoryStandings, Driver, Race, StandingItem, StandingsClassGroup, Team } from './types';
 import { lookupTeamAssets } from './team-bios';
+import { API_MOTORSPORTS_BASE, type MotorsportsBootstrap } from './api-motorsports';
 
 // GT World Challenge (Europe/America/Asia) nao usa TheSportsDB nem o pipeline
 // de synced_races/synced_standings -- e uma API propria (api-motorsports),
 // que raspa os sites oficiais e ja guarda o grid de cada corrida
 // separadamente. Buscamos direto no navegador, no mesmo padrao do F1 em
 // jolpica.ts, em vez de duplicar isso numa tabela do Supabase daqui.
-const API_BASE = 'https://api-motorsports.vercel.app';
+const API_BASE = API_MOTORSPORTS_BASE;
 const TIMEOUT_MS = 10000;
 const CACHE_TTL_MS = 30 * 60 * 1000;
 
@@ -195,6 +196,66 @@ function toClassGroups(classes: ApiStandingsClass[] | null): StandingsClassGroup
 export function mergeCategoryWithGtwcStandings(category: Category, standings: CategoryStandings | null): Category {
   if (!standings) return category;
   return { ...category, standings };
+}
+
+export function seedGtwcFromBootstrap(gtwc: MotorsportsBootstrap['gtwc'] | undefined): void {
+  if (!gtwc) return;
+  const now = Date.now();
+  for (const [categoryId, seriesId] of Object.entries(GTWC_SERIES_BY_CATEGORY)) {
+    const data = gtwc[seriesId];
+    if (!data) continue;
+
+    if (data.races.length > 0) {
+      const races = data.races.map(toRace);
+      calendarCache.set(categoryId, { expiresAt: now + CACHE_TTL_MS, value: Promise.resolve(races) });
+    }
+
+    if (data.teams.length > 0) {
+      const teams: Team[] = [];
+      const drivers: Driver[] = [];
+      const seenDriverIds = new Set<string>();
+      for (const apiTeam of data.teams) {
+        const teamId = slugify(apiTeam.name);
+        const assets = lookupTeamAssets(apiTeam.name);
+        teams.push({
+          id: teamId,
+          name: apiTeam.name,
+          color: classColor(apiTeam.class),
+          car: apiTeam.car ?? undefined,
+          class: apiTeam.class ? toTitleCase(apiTeam.class) : undefined,
+          badge: assets?.badge,
+          clearart: assets?.clearart,
+        });
+        for (const apiDriver of apiTeam.drivers) {
+          const driverId = `${teamId}-${slugify(apiDriver.name)}`;
+          if (seenDriverIds.has(driverId)) continue;
+          seenDriverIds.add(driverId);
+          drivers.push({
+            id: driverId,
+            name: toDriverName(apiDriver.name),
+            number: apiTeam.carNumber ?? '',
+            nationality: apiDriver.nationality,
+            teamId,
+          });
+        }
+      }
+      rosterCache.set(`${categoryId}:roster`, {
+        expiresAt: now + CACHE_TTL_MS,
+        value: Promise.resolve({ teams, drivers }),
+      });
+    }
+
+    const drivers = toSingleClassEntries(data.standings.drivers);
+    const teams = toSingleClassEntries(data.standings.teams);
+    const driverClasses = drivers ? undefined : toClassGroups(data.standings.drivers);
+    const teamClasses = teams ? undefined : toClassGroups(data.standings.teams);
+    if (drivers || teams || driverClasses || teamClasses) {
+      standingsCache.set(`${categoryId}:standings`, {
+        expiresAt: now + CACHE_TTL_MS,
+        value: Promise.resolve({ drivers: drivers ?? undefined, teams: teams ?? undefined, driverClasses, teamClasses }),
+      });
+    }
+  }
 }
 
 // ─── Mapping helpers ────────────────────────────────────────────────────────
