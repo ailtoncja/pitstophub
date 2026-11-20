@@ -1173,6 +1173,17 @@ function venueLayout(venue: Venue, race: Race, haystack: string, categoryId?: st
   return (categoryId && venue.byCategory?.[categoryId]) || venue.layout;
 }
 
+// Circuitos desenhados a partir das coordenadas do OpenStreetMap em scripts/circuits/data/*.json
+// que nao tem mapa oficial plano independente na web (ou cuja ilustracao oficial nao e em escala).
+const EXTRA_OSM_CIRCUITS: Record<string, Omit<CircuitInfo, 'osm'>> = {
+  velocitta: { trackImage: '/circuits/velocitta.png', lengthKm: 3.493, corners: 14, direction: 'counterclockwise' },
+  chapeco: { trackImage: '/circuits/chapeco.png', lengthKm: 4.004 },
+  cuiaba: { trackImage: '/circuits/cuiaba.png', lengthKm: 4.488 },
+  velopark: { trackImage: '/circuits/velopark.png', lengthKm: 2.278, corners: 11 },
+  brasilia: { trackImage: '/circuits/brasilia.png', lengthKm: 5.384, direction: 'clockwise' },
+  cascavel: { trackImage: '/circuits/cascavel.png', lengthKm: 3.032, direction: 'counterclockwise' },
+};
+
 /** undefined: nenhum lugar desenhado reconhecido; null: lugar reconhecido, mas sem desenho verificado do tracado. */
 function findDrawnCircuit(race: Race, categoryId?: string): CircuitInfo | null | undefined {
   const haystack = raceHaystack({ ...race, enName: `${race.enName ?? ''} ${race.country ?? ''}` });
@@ -1180,11 +1191,18 @@ function findDrawnCircuit(race: Race, categoryId?: string): CircuitInfo | null |
     if (venue.categories && !(categoryId && venue.categories.includes(categoryId))) continue;
     if (!venue.terms.some((term) => hasTerm(haystack, term))) continue;
     if (venue.not?.some((term) => haystack.includes(term))) continue;
-    const drawn = DRAWN_CIRCUITS[venueLayout(venue, race, haystack, categoryId)];
+    const layout = venueLayout(venue, race, haystack, categoryId);
+    const drawn = DRAWN_CIRCUITS[layout];
+    if (drawn) {
+      return { trackImage: drawn.trackImage, osm: true, lengthKm: drawn.lengthKm, corners: drawn.corners, direction: drawn.direction };
+    }
+    const extra = EXTRA_OSM_CIRCUITS[layout];
+    if (extra) {
+      return { ...extra, osm: true };
+    }
     // Sem desenho verificado desse tracado: nenhum mapa, em vez do mapa de outro tracado (ex.: a
     // NASCAR em COTA usa o National Course de 2,4 milhas, nao o tracado da F1).
-    if (!drawn) return null;
-    return { trackImage: drawn.trackImage, osm: true, lengthKm: drawn.lengthKm, corners: drawn.corners, direction: drawn.direction };
+    return null;
   }
   return undefined;
 }
