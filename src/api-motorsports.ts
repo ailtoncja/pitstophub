@@ -1,4 +1,5 @@
 import type { RaceResultRow } from './jolpica';
+import type { RemoteCategoryRules } from './lib/rules';
 
 const envBase = (import.meta.env?.VITE_API_MOTORSPORTS_URL as string | undefined)?.trim().replace(/\/+$/, '');
 export const API_MOTORSPORTS_BASE = envBase || 'https://api-motorsports.vercel.app';
@@ -112,12 +113,14 @@ export type BootstrapCategoryData = {
   races: BootstrapEngineRace[];
   standings: BootstrapEngineStandings;
   drivers: BootstrapEngineDriver[];
+  rules?: RemoteCategoryRules | null;
 };
 
 export type MotorsportsBootstrap = {
   gtwc: Partial<Record<'europe' | 'america' | 'asia', BootstrapGtwcData | null>>;
   enduranceBrasil: BootstrapEbData | null;
   categories: Partial<Record<string, BootstrapCategoryData | null>>;
+  rulesByCategory?: Partial<Record<string, RemoteCategoryRules | null>>;
 };
 
 type CacheEntry<T> = { expiresAt: number; value: Promise<T> };

@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { MOTORSPORT_DATA, type Category, type CategoryStandings, type Driver, type Race, type StandingItem } from '../types';
 import { fetchCategoryLiveData, mergeCategoryWithLiveData, type JolpicaCategoryData } from '../jolpica';
 import { fetchMotorsportsBootstrap } from '../api-motorsports';
+import { resolveCategoryRules, type RemoteCategoryRules } from '../lib/rules';
 import {
   fetchSyncedCalendar,
   fetchSyncedStandings,
@@ -79,6 +80,7 @@ export function LiveDataProvider({ children }: { children: ReactNode }) {
   const [brCalendars, setBrCalendars] = useState<ById<Race[]>>({});
   const [brDrivers, setBrDrivers] = useState<ById<Driver[]>>({});
   const [brStandings, setBrStandings] = useState<ById<CategoryStandings>>({});
+  const [remoteRules, setRemoteRules] = useState<ById<RemoteCategoryRules>>({});
   const [othersReady, setOthersReady] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
 
@@ -126,6 +128,13 @@ export function LiveDataProvider({ children }: { children: ReactNode }) {
         seedEbFromBootstrap(bootstrap.enduranceBrasil);
         seedBrasilFromBootstrap(bootstrap.categories);
         seedSyncedFromBootstrap(bootstrap.categories);
+        if (mounted) {
+          const nextRules: ById<RemoteCategoryRules> = { ...(bootstrap.rulesByCategory ?? {}) };
+          for (const [catId, catData] of Object.entries(bootstrap.categories ?? {})) {
+            if (catData?.rules) nextRules[catId] = catData.rules;
+          }
+          setRemoteRules(nextRules);
+        }
       }
       // Se o bootstrap preencheu o cache, forceIndividual fica false para ler direto do cache recem-populado;
       // categorias que vieram null no bootstrap (nao cacheadas) rodam seu fallback normalmente.
@@ -264,11 +273,12 @@ export function LiveDataProvider({ children }: { children: ReactNode }) {
         const ebStandingsMerged = mergeCategoryWithEbStandings(ebRosterMerged, ebStandings[category.id] ?? null);
         const brCalendarMerged = mergeCategoryWithBrasilCalendar(ebStandingsMerged, brCalendars[category.id] ?? null);
         const brDriversMerged = mergeCategoryWithBrasilDrivers(brCalendarMerged, brDrivers[category.id] ?? null);
-        return mergeCategoryWithBrasilStandings(brDriversMerged, brStandings[category.id] ?? null);
+        const brStandingsMerged = mergeCategoryWithBrasilStandings(brDriversMerged, brStandings[category.id] ?? null);
+        return resolveCategoryRules(brStandingsMerged, remoteRules[category.id] ?? null);
       }),
     [
       f1Data, syncedCalendars, syncedStandings, gtwcCalendars, gtwcRosters, gtwcStandings,
-      ebCalendars, ebRosters, ebStandings, brCalendars, brDrivers, brStandings,
+      ebCalendars, ebRosters, ebStandings, brCalendars, brDrivers, brStandings, remoteRules,
     ],
   );
 

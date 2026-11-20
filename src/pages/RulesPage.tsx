@@ -6,7 +6,7 @@ import { EmptyState, PillStrip, Skeleton } from '../components/ui';
 import { splitBio } from '../lib/bio';
 import { useScrollTopOn } from '../lib/hooks';
 import { useT } from '../lib/i18n';
-import { ruleKind, shortRuleTitle, type RuleKind } from '../lib/rules';
+import { resolveCategoryRules, ruleKind, shortRuleTitle, type RuleKind } from '../lib/rules';
 import { cn } from '../lib/utils';
 import { useCategory, useLiveData } from '../state/live-data';
 
@@ -28,7 +28,8 @@ export default function RulesPage() {
   useScrollTopOn(categoryId ?? '');
   const { t, lang } = useT();
   const { ready } = useLiveData();
-  const category = useCategory(categoryId);
+  const rawCategory = useCategory(categoryId);
+  const category = rawCategory ? resolveCategoryRules(rawCategory) : undefined;
   const [params] = useSearchParams();
   const rules = category?.rulesFormat ?? [];
   const [current, setCurrent] = useState(0);
