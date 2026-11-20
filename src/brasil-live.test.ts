@@ -56,10 +56,17 @@ describe('circuitos das categorias brasileiras', () => {
   // ficam sem mapa, em vez de pegar o desenho de outro lugar.
   const withMap: [string, string, string][] = [
     ['porsche-cup', 'Interlagos', '/circuits/interlagos.png'],
+    ['porsche-cup', 'Velocitta', '/circuits/velocitta.png'],
+    ['porsche-cup', 'Brasília', '/circuits/brasilia.png'],
     ['porsche-cup', 'Le Mans', '/circuits/le-mans.png'],
     ['porsche-cup', 'Algarve', '/circuits/portimao.png'],
     ['nascar-brasil', 'Interlagos', '/circuits/interlagos.png'],
     ['nascar-brasil', 'Londrina', '/circuits/londrina.png'],
+    ['nascar-brasil', 'Velocitta', '/circuits/velocitta.png'],
+    ['nascar-brasil', 'Brasília', '/circuits/brasilia.png'],
+    ['nascar-brasil', 'Cascavel', '/circuits/cascavel.png'],
+    ['nascar-brasil', 'Cuiaba', '/circuits/cuiaba.png'],
+    ['nascar-brasil', 'Chapeco', '/circuits/chapeco.png'],
   ];
 
   it.each(withMap)('%s em %s usa o desenho que ja temos', (categoryId, name, image) => {
@@ -67,7 +74,7 @@ describe('circuitos das categorias brasileiras', () => {
     expect(info?.trackImage).toBe(image);
   });
 
-  it.each(['Velocitta', 'Brasília', 'Santa Cruz', 'Cascavel', 'Cuiaba', 'Curvelo', 'Chapeco'])(
+  it.each(['Santa Cruz', 'Curvelo'])(
     '%s fica sem mapa enquanto nao houver desenho conferido',
     (name) => {
       expect(getRaceCircuitInfo(race({ name, location: name, circuit: name }), 'nascar-brasil')).toBeNull();
