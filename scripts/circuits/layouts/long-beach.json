@@ -35,7 +35,7 @@
   "close": 3
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": 1.2
  },
  "notes": "SKIPPED: OSM relation 18052024 follows the 2026 course turn by turn, but fails the thresholds: 2.23% vs the IndyCar outline (limit 2.0) and 3259 m vs 1.968 mi = 3167 m (+2.90%). The other official maps (IndyCar 2026 track map, gplb.com circuit map and SVG) are schematic, not to scale. No PNG published."
 }

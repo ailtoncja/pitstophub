@@ -22,7 +22,7 @@
   ]
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": -3.8
  },
  "extract": {
   "mode": "mask",

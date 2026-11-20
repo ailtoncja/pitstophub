@@ -1196,6 +1196,14 @@ const EXTRA_OSM_CIRCUITS: Record<string, Omit<CircuitInfo, 'osm'>> = {
   bristol: { trackImage: '/circuits/bristol.png', lengthKm: 0.858 },
   'watkins-glen': { trackImage: '/circuits/watkins-glen.png', lengthKm: 5.552, direction: 'clockwise' },
   gateway: { trackImage: '/circuits/gateway.png', lengthKm: 2.012 },
+  richmond: { trackImage: '/circuits/richmond.png', lengthKm: 1.207 },
+  martinsville: { trackImage: '/circuits/martinsville.png', lengthKm: 0.847 },
+  kansas: { trackImage: '/circuits/kansas.png', lengthKm: 2.414 },
+  'long-beach': { trackImage: '/circuits/long-beach.png', lengthKm: 3.167, corners: 11 },
+  dover: { trackImage: '/circuits/dover.png', lengthKm: 1.609 },
+  norisring: { trackImage: '/circuits/norisring.png', lengthKm: 2.162, corners: 4, direction: 'counterclockwise' },
+  darlington: { trackImage: '/circuits/darlington.png', lengthKm: 2.198 },
+  'north-wilkesboro': { trackImage: '/circuits/north-wilkesboro.png', lengthKm: 1.006 },
 };
 
 /** undefined: nenhum lugar desenhado reconhecido; null: lugar reconhecido, mas sem desenho verificado do tracado. */
