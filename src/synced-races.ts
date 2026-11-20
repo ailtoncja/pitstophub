@@ -17,7 +17,7 @@ const SYNCED_CATEGORY_IDS = [
   'f2', 'f3', 'f1-academy', 'wec', 'imsa', 'dtm', 'indy', 'nascar', 'wrc',
 ] as const;
 
-const CACHE_TTL_MS = 30 * 60 * 1000;
+const CACHE_TTL_MS = 10 * 60 * 1000;
 
 type SyncedRaceRow = {
   race_id: string;

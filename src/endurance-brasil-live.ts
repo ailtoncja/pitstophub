@@ -6,7 +6,7 @@ import { API_MOTORSPORTS_BASE, type MotorsportsBootstrap } from './api-motorspor
 // (api-motorsports), em /endurance-brasil. Buscamos direto no navegador.
 const API_BASE = API_MOTORSPORTS_BASE;
 const TIMEOUT_MS = 10000;
-const CACHE_TTL_MS = 30 * 60 * 1000;
+const CACHE_TTL_MS = 10 * 60 * 1000;
 const CATEGORY_ID = 'endurance-brasil';
 
 const CLASS_ORDER = ['P1', 'P2', 'P2 Light', 'P3', 'GT3', 'GT3L', 'GT4', 'GT4L'];

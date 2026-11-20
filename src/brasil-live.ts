@@ -7,7 +7,7 @@ import { API_MOTORSPORTS_BASE, type MotorsportsBootstrap } from './api-motorspor
 // classificacao e grid vem de la; o catalogo estatico so tem nome e regras.
 const API_BASE = API_MOTORSPORTS_BASE;
 const TIMEOUT_MS = 10000;
-const CACHE_TTL_MS = 30 * 60 * 1000;
+const CACHE_TTL_MS = 10 * 60 * 1000;
 
 const CATEGORY_IDS = ['nascar-brasil', 'porsche-cup'] as const;
 

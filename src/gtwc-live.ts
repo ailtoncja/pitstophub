@@ -9,7 +9,7 @@ import { API_MOTORSPORTS_BASE, type MotorsportsBootstrap } from './api-motorspor
 // jolpica.ts, em vez de duplicar isso numa tabela do Supabase daqui.
 const API_BASE = API_MOTORSPORTS_BASE;
 const TIMEOUT_MS = 10000;
-const CACHE_TTL_MS = 30 * 60 * 1000;
+const CACHE_TTL_MS = 10 * 60 * 1000;
 
 const GTWC_SERIES_BY_CATEGORY: Record<string, 'europe' | 'america' | 'asia'> = {
   'gtwc-europe': 'europe',

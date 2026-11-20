@@ -3,7 +3,7 @@ import type { RaceResultRow } from './jolpica';
 const envBase = (import.meta.env?.VITE_API_MOTORSPORTS_URL as string | undefined)?.trim().replace(/\/+$/, '');
 export const API_MOTORSPORTS_BASE = envBase || 'https://api-motorsports.vercel.app';
 const TIMEOUT_MS = 10000;
-const CACHE_TTL_MS = 30 * 60 * 1000;
+const CACHE_TTL_MS = 10 * 60 * 1000;
 
 export type BootstrapGtwcRace = {
   seriesId: string;

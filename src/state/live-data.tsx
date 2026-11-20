@@ -60,7 +60,6 @@ type LiveDataValue = {
 const LiveDataContext = createContext<LiveDataValue | null>(null);
 
 const TEN_MIN = 10 * 60 * 1000;
-const THIRTY_MIN = 30 * 60 * 1000;
 
 /**
  * Orquestra todas as fontes de dados (Jolpica para a F1; api-motorsports via /bootstrap para as
@@ -239,10 +238,15 @@ export function LiveDataProvider({ children }: { children: ReactNode }) {
     };
 
     void sync(refreshTick > 0);
-    const id = window.setInterval(() => void sync(true), THIRTY_MIN);
+    const id = window.setInterval(() => void sync(true), TEN_MIN);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void sync(true);
+    };
+    document.addEventListener('visibilitychange', onVisible);
     return () => {
       mounted = false;
       window.clearInterval(id);
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, [refreshTick]);
 
