@@ -1184,6 +1184,11 @@ const EXTRA_OSM_CIRCUITS: Record<string, Omit<CircuitInfo, 'osm'>> = {
   cascavel: { trackImage: '/circuits/cascavel.png', lengthKm: 3.032, direction: 'counterclockwise' },
   'santa-cruz-do-sul': { trackImage: '/circuits/santa-cruz-do-sul.png', lengthKm: 3.53, direction: 'counterclockwise' },
   curvelo: { trackImage: '/circuits/curvelo.png', lengthKm: 1.25 },
+  'daytona-road': { trackImage: '/circuits/daytona-road.png', lengthKm: 5.729 },
+  'sonoma-gtwc': { trackImage: '/circuits/sonoma-gtwc.png', lengthKm: 4.056, corners: 12, direction: 'clockwise' },
+  'laguna-seca': { trackImage: '/circuits/laguna-seca.png', lengthKm: 3.602, corners: 11 },
+  sonoma: { trackImage: '/circuits/sonoma.png', lengthKm: 3.203, corners: 12, direction: 'clockwise' },
+  'road-atlanta': { trackImage: '/circuits/road-atlanta.png', lengthKm: 4.088 },
 };
 
 /** undefined: nenhum lugar desenhado reconhecido; null: lugar reconhecido, mas sem desenho verificado do tracado. */

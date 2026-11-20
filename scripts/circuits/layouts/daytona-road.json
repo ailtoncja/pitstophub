@@ -23,7 +23,7 @@
   "mode": "mask"
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": 125.6
  },
  "notes": "SKIPPED (no flat official map): the IMSA track map (imsa.com/wp-content/uploads/sites/32/2019/09/DIS_1346x916-1.png) is a 3D perspective render and the DIS facility map does not separate the road course from service roads. OSM lap 5731 m vs 3.56 mi 5729 m (+0.03 %), not verified."
 }

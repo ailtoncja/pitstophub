@@ -127,6 +127,7 @@ describe('tracado certo por categoria', () => {
     ['nascar', 'Iowa', staticRace('nascar', 'iowa'), 'iowa'],
     ['nascar', 'Nashville', staticRace('nascar', 'nashville-nascar'), 'nashville-superspeedway'],
     ['nascar', 'Homestead', staticRace('nascar', 'homestead'), 'homestead'],
+    ['nascar', 'Sonoma', staticRace('nascar', 'sonoma'), 'sonoma'],
     // NASCAR em COTA usa o National Course (sem desenho verificado): nenhum mapa, nao o da F1.
     ['nascar', 'COTA', staticRace('nascar', 'cota-nascar'), null],
     // Tolerancia de extensao de 3% (antes 2%): Charlotte, New Hampshire, Chicagoland e Atlanta.
@@ -160,12 +161,15 @@ describe('tracado certo por categoria', () => {
     ['indy', 'Markham (ao vivo)', live('Ontario Honda Dealers Indy at Markham', 'Streets of Markham', '', '2026-08-16'), 'markham'],
     ['indy', 'Washington, D.C.', staticRace('indy', 'washington'), 'washington-dc'],
     ['indy', 'Washington, D.C. (ao vivo)', live('Freedom 250 Grand Prix of Washington DC', 'Streets of Washington', '', '2026-08-23'), 'washington-dc'],
+    ['indy', 'Laguna Seca', staticRace('indy', 'laguna-seca-indy'), 'laguna-seca'],
     // IMSA
-    ['imsa', 'Rolex 24 (misto, sem desenho verificado)', staticRace('imsa', 'daytona'), null],
+    ['imsa', 'Rolex 24 (Daytona misto)', staticRace('imsa', 'daytona'), 'daytona-road'],
     ['imsa', 'Indianapolis', staticRace('imsa', 'indianapolis'), 'indianapolis-road'],
     ['imsa', 'Indianapolis RC (ao vivo)', live('Indianapolis', 'Indianapolis Motor Speedway RC'), 'indianapolis-road'],
     ['imsa', 'Detroit', staticRace('imsa', 'detroit'), 'detroit'],
+    ['imsa', 'Laguna Seca', staticRace('imsa', 'lagunaseca'), 'laguna-seca'],
     ['imsa', 'Road America', staticRace('imsa', 'roadamerica'), 'road-america'],
+    ['imsa', 'Road Atlanta (Petit Le Mans)', staticRace('imsa', 'roadatlanta'), 'road-atlanta'],
     ['imsa', 'VIR', live('VIR', 'VIRginia International Raceway'), 'vir'],
     ['imsa', 'Six Hours of The Glen (com o Boot, sem desenho verificado)', staticRace('imsa', 'watkins'), null],
     ['imsa', '12 Horas de Sebring', staticRace('imsa', 'sebring'), 'sebring'],
@@ -187,6 +191,8 @@ describe('tracado certo por categoria', () => {
     ['gtwc-europe', 'Portimao', live('Portimao', 'Portimao', 'Portugal'), 'portimao'],
     ['gtwc-america', 'Indianapolis 8 Hour', live('Indianapolis Motor Speedway', 'Indianapolis Motor Speedway', 'Estados Unidos'), 'indianapolis-road'],
     ['gtwc-america', 'Road America', live('Road America', 'Road America'), 'road-america'],
+    ['gtwc-america', 'Road Atlanta', live('Road Atlanta', 'Road Atlanta'), 'road-atlanta'],
+    ['gtwc-america', 'Sonoma', live('Sonoma Raceway', 'Sonoma Raceway'), 'sonoma-gtwc'],
     ['gtwc-america', 'Barber', live('Barber Motorsports Park', 'Barber Motorsports Park'), 'barber'],
     ['gtwc-america', 'Sebring (tracado completo)', live('Sebring International Raceway', 'Sebring International Raceway', '', '2026-05-09'), 'sebring'],
     ['gtwc-asia', 'Fuji', live('Fuji International Speedway (SRO GT PowerTour)', 'Fuji International Speedway (SRO GT PowerTour)', 'Japão'), 'fuji'],

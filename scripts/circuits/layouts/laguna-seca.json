@@ -48,7 +48,7 @@
   "close": 4
  },
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": 89.6
  },
  "notes": "SKIPPED: OSM lap 3601 m (-0.03%), not mirrored (ratio 4.6), aniso 1.03, but the shape score is just above the 2.0% limit against both official maps: INDYCAR facility map 2.27% (bridge-marker dots painted over in the cached copy laguna-seca.png), INDYCAR outline 2.41%; the circuit shop decal is stylised (4.99%)."
 }
