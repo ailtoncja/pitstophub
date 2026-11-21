@@ -216,6 +216,7 @@ describe('tracado certo por categoria', () => {
     ['gtwc-asia', 'Fuji', live('Fuji International Speedway (SRO GT PowerTour)', 'Fuji International Speedway (SRO GT PowerTour)', 'Japão'), 'fuji'],
     ['gtwc-asia', 'Okayama', live('Okayama International Circuit (SRO GT PowerTour)', 'Okayama International Circuit (SRO GT PowerTour)', 'Japão'), 'okayama'],
     ['gtwc-asia', 'Mandalika', live('Pertamina Mandalika International Circuit', 'Mandalika', 'Indonésia'), 'mandalika'],
+    ['gtwc-asia', 'Beijing', live('Beijing E-Town Street Circuit', 'Beijing Street Circuit', 'China'), 'beijing-street'],
     // Brasil (Endurance Brasil ao vivo; NASCAR Brasil e Porsche Cup em synced_races)
     ['endurance-brasil', 'Goiania', live('Etapa 8 - Três Horas de Goiânia', 'Autódromo Internacional de Goiânia', 'Autódromo Internacional de Goiânia'), 'goiania'],
     ['endurance-brasil', 'etapa 5 (nome Goiania, local Santa Cruz)', live('Etapa 5 - Três Horas de Goiânia', 'Autódromo Internacional de Santa Cruz do Sul', 'Autódromo Internacional de Santa Cruz do Sul'), 'santa-cruz-do-sul'],

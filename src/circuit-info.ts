@@ -1210,6 +1210,7 @@ const EXTRA_OSM_CIRCUITS: Record<string, Omit<CircuitInfo, 'osm'>> = {
   arlington: { trackImage: '/circuits/arlington.png', lengthKm: 4.393, corners: 14 },
   'san-diego': { trackImage: '/circuits/san-diego.png', lengthKm: 5.472, corners: 16 },
   'charlotte-roval': { trackImage: '/circuits/charlotte-roval.png', lengthKm: 3.669, corners: 17, direction: 'counterclockwise' },
+  'beijing-street': { trackImage: '/circuits/beijing-street.png', lengthKm: 4.894, corners: 12, direction: 'counterclockwise' },
 };
 
 /** undefined: nenhum lugar desenhado reconhecido; null: lugar reconhecido, mas sem desenho verificado do tracado. */
