@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, Download, LogIn, LogOut, Trophy } from 'lucide-react';
+import { ChevronRight, LogIn, LogOut, Trophy } from 'lucide-react';
 import { paths } from '../../app/paths';
 import { Sheet } from '../../components/Sheet';
 import { Segmented } from '../../components/ui';
@@ -9,16 +9,14 @@ import { useT } from '../../lib/i18n';
 import { cn } from '../../lib/utils';
 import { isIntroDisabled, setIntroDisabled } from '../../IntroGate';
 import { useAuth } from '../../state/auth-context';
-import { useInstall } from '../../state/install';
 import { useSettings } from '../../state/settings';
 import { FavoritesPicker } from '../favorites/FavoritesPicker';
 
-/** Perfil: conta, idioma, instalacao do app, abertura animada e gerenciamento de favoritos. */
+/** Perfil: conta, idioma, abertura animada e gerenciamento de favoritos. */
 export function ProfileSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useT();
   const { user, requestLogin, logout } = useAuth();
   const { language, setLanguage } = useSettings();
-  const install = useInstall();
   const [introOff, setIntroOff] = useState(isIntroDisabled);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
 
@@ -68,24 +66,6 @@ export function ProfileSheet({ open, onClose }: { open: boolean; onClose: () => 
             ]}
           />
         </section>
-
-        {/* INSTALAR */}
-        {(install.canInstall || install.iosHint) && (
-          <section className="rounded-lg bg-asphalt p-space-md">
-            <div className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center text-text-muted shrink-0"><Download className="w-5 h-5" /></span>
-              <div className="min-w-0 flex-1">
-                <p className="type-body-md font-bold text-text-primary">{t('profile.install')}</p>
-                <p className="type-body-sm text-text-muted">{install.canInstall ? t('profile.installHint') : t('profile.installIos')}</p>
-              </div>
-              {install.canInstall ? (
-                <button type="button" onClick={() => void install.install()} disabled={install.installing} className="shrink-0 px-4 h-9 rounded-full bg-white text-black type-label-badge disabled:opacity-50 active:scale-95 transition-transform">{t('profile.installAction')}</button>
-              ) : (
-                <button type="button" onClick={install.dismissIosHint} className="shrink-0 px-3 h-9 rounded-full text-text-muted hover:text-text-primary type-label-telemetry">{t('common.dismiss')}</button>
-              )}
-            </div>
-          </section>
-        )}
 
         {/* ATALHOS */}
         <Link to={paths.champions} onClick={onClose} className="flex items-center gap-3 rounded-lg bg-asphalt p-space-md hover:bg-surface-container transition-colors">

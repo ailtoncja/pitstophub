@@ -12,18 +12,6 @@ export function isPushSupported(): boolean {
   );
 }
 
-export function isIosPwaRequired(): boolean {
-  if (typeof navigator === 'undefined' || typeof window === 'undefined') return false;
-  const isIOS =
-    /iphone|ipad|ipod/i.test(navigator.userAgent) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  if (!isIOS) return false;
-  const standalone =
-    window.matchMedia('(display-mode: standalone)').matches ||
-    ('standalone' in navigator && (navigator as unknown as { standalone: boolean }).standalone === true);
-  return !standalone;
-}
-
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -35,9 +23,14 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return outputArray;
 }
 
-async function getRegistration(): Promise<ServiceWorkerRegistration | null> {
+async function getRegistration(registerIfNeeded = false): Promise<ServiceWorkerRegistration | null> {
   if (!('serviceWorker' in navigator)) return null;
   try {
+    const existing = await navigator.serviceWorker.getRegistration('/sw-push.js');
+    if (existing) return existing;
+    if (registerIfNeeded) {
+      return await navigator.serviceWorker.register('/sw-push.js');
+    }
     return await Promise.race([
       navigator.serviceWorker.ready,
       new Promise<null>((resolve) => {
@@ -62,7 +55,6 @@ export async function getExistingPushSubscription(): Promise<PushSubscription | 
 
 export async function subscribeToPush(userId: string): Promise<{ ok: boolean; reason?: 'unsupported' | 'denied' | 'error' }> {
   if (!isPushSupported() || !supabase) return { ok: false, reason: 'unsupported' };
-  if (isIosPwaRequired()) return { ok: false, reason: 'unsupported' };
 
   if (Notification.permission === 'denied') return { ok: false, reason: 'denied' };
 
@@ -70,7 +62,7 @@ export async function subscribeToPush(userId: string): Promise<{ ok: boolean; re
   if (permission !== 'granted') return { ok: false, reason: 'denied' };
 
   try {
-    const registration = await getRegistration();
+    const registration = await getRegistration(true);
     if (!registration) return { ok: false, reason: 'error' };
 
     const existing = await registration.pushManager.getSubscription();

@@ -1,7 +1,4 @@
-// Handlers de push notification. Importado dentro do service worker gerado
-// pelo vite-plugin-pwa via workbox.importScripts (ver vite.config.ts) -- o
-// generateSW ja cuida do precache, este arquivo so adiciona os eventos que
-// ele nao sabe gerar sozinho.
+// Handlers de push notification usados quando Web Push esta ativo.
 self.addEventListener('push', (event) => {
   let payload = {};
   try {

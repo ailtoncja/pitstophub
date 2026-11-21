@@ -6,11 +6,39 @@ import { ToastProvider } from './components/Toast';
 import { TributesProvider } from './features/tributes/Tributes';
 import IntroGate from './IntroGate';
 import './index.css';
-import { registerServiceWorker } from './pwa';
 import { LiveDataProvider } from './state/live-data';
 import { SettingsProvider } from './state/settings';
 
-registerServiceWorker();
+// Remove service workers e caches antigos do PWA em navegadores que ja visitaram o site.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .getRegistrations()
+    .then((registrations) => {
+      for (const registration of registrations) {
+        const scriptUrl =
+          registration.active?.scriptURL ||
+          registration.waiting?.scriptURL ||
+          registration.installing?.scriptURL ||
+          '';
+        if (scriptUrl.endsWith('/sw.js')) {
+          void registration.unregister();
+        }
+      }
+    })
+    .catch(() => {});
+}
+if ('caches' in window) {
+  caches
+    .keys()
+    .then((keys) => {
+      for (const key of keys) {
+        if (key.startsWith('workbox-')) {
+          void caches.delete(key);
+        }
+      }
+    })
+    .catch(() => {});
+}
 
 // Impede o menu nativo de "salvar imagem"/context menu ao segurar em cima de
 // fotos (toque longo no mobile ou botao direito no desktop) -- interferia com

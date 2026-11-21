@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Download, Share, X } from 'lucide-react';
 import { paths } from '../app/paths';
 import { HowItWorksCard } from '../components/pit';
 import { CategoryDataState, ListGroup, SectionTitle, Skeleton } from '../components/ui';
@@ -15,7 +14,6 @@ import { buildReel } from '../lib/reel';
 import { useNow } from '../lib/useNow';
 import { cn } from '../lib/utils';
 import { raceStartDate } from '../race-time';
-import { useInstall } from '../state/install';
 import { useLiveData } from '../state/live-data';
 import { useSettings } from '../state/settings';
 import type { Category, StandingItem } from '../types';
@@ -73,7 +71,6 @@ export default function HomePage() {
 
 function HomeAside({ active, categories, now }: { active?: Category; categories: Category[]; now: number }) {
   const { t, lang } = useT();
-  const install = useInstall();
   const tributes = useTributes();
   const leaders = active ? leadersOf(active, LEADERS) : { items: [], kind: 'driver' as const };
   const upcoming = useMemo(() => allUpcoming(categories, now).slice(0, 8), [categories, now]);
@@ -81,22 +78,6 @@ function HomeAside({ active, categories, now }: { active?: Category; categories:
 
   return (
     <aside className="px-margin lg:px-8 xl:px-6 py-8 space-y-9 xl:h-dvh xl:overflow-y-auto xl:border-l xl:border-hairline" aria-label={t('home.aside')}>
-      {(install.canInstall || install.iosHint) && (
-        <div className="flex items-center gap-3 rounded-2xl bg-asphalt border border-hairline px-4 py-3.5">
-          {install.canInstall ? <Download className="w-5 h-5 text-white shrink-0" /> : <Share className="w-5 h-5 text-white shrink-0" />}
-          <p className="type-body-sm text-silver flex-1">{install.canInstall ? t('home.installBody') : t('home.installIos')}</p>
-          {install.canInstall ? (
-            <button type="button" disabled={install.installing} onClick={() => void install.install()} className="h-9 px-4 rounded-full bg-white text-black type-label-badge active:scale-95 disabled:opacity-60">
-              {t('home.install')}
-            </button>
-          ) : (
-            <button type="button" onClick={install.dismissIosHint} aria-label={t('common.close')} className="w-9 h-9 flex items-center justify-center text-silver hover:text-white">
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      )}
-
       {active && leaders.items.length > 0 && (
         <section className="space-y-3">
           <SectionTitle right={<Link to={paths.standingsOf(active.id)}>{t('home.fullStandings')} →</Link>}>{t('home.standingsOf', { name: active.name })}</SectionTitle>

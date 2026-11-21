@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { Bell, BellOff, BellRing } from 'lucide-react';
 import { useT } from '../../lib/i18n';
 import { cn } from '../../lib/utils';
-import { getExistingPushSubscription, isIosPwaRequired, isPushSupported, sendTestNotification, subscribeToPush, unsubscribeFromPush } from '../../push';
+import { getExistingPushSubscription, isPushSupported, sendTestNotification, subscribeToPush, unsubscribeFromPush } from '../../push';
 import { useAuth } from '../../state/auth-context';
 import { useSettings, type NotifyPrefs } from '../../state/settings';
 
-type Status = 'checking' | 'unsupported' | 'ios' | 'subscribed' | 'not-subscribed' | 'busy';
+type Status = 'checking' | 'unsupported' | 'subscribed' | 'not-subscribed' | 'busy';
 
 const PREF_ROWS: { key: keyof NotifyPrefs; label: string }[] = [
   { key: 'notifyRaceDay', label: 'notif.raceDay' },
@@ -26,10 +26,6 @@ export function NotificationsPanel() {
 
   useEffect(() => {
     let mounted = true;
-    if (isIosPwaRequired()) {
-      setStatus('ios');
-      return;
-    }
     if (!isPushSupported()) {
       setStatus('unsupported');
       return;
@@ -55,7 +51,7 @@ export function NotificationsPanel() {
       setStatus('subscribed');
       return;
     }
-    setStatus(isIosPwaRequired() ? 'ios' : 'not-subscribed');
+    setStatus('not-subscribed');
     setErrorKey(result.reason === 'denied' ? 'notif.denied' : result.reason === 'unsupported' ? 'notif.unsupported' : 'notif.error');
   };
 
@@ -70,7 +66,7 @@ export function NotificationsPanel() {
     setTestKey((await sendTestNotification(lang)) ? 'notif.testSent' : 'notif.testFail');
   };
 
-  const hint = errorKey ? t(errorKey) : status === 'ios' ? t('notif.ios') : status === 'unsupported' ? t('notif.unsupported') : user ? t('notif.desc') : t('notif.needLogin');
+  const hint = errorKey ? t(errorKey) : status === 'unsupported' ? t('notif.unsupported') : user ? t('notif.desc') : t('notif.needLogin');
   const subscribed = status === 'subscribed';
 
   return (
@@ -83,7 +79,7 @@ export function NotificationsPanel() {
           <p className="type-body-md font-bold text-text-primary">{t('notif.title')}</p>
           <p className="type-body-sm text-text-muted">{hint}</p>
         </div>
-        {status === 'unsupported' || status === 'ios' ? null : subscribed ? (
+        {status === 'unsupported' ? null : subscribed ? (
           <button type="button" onClick={() => void disable()} className="shrink-0 flex items-center gap-1.5 px-3.5 h-9 rounded-full border border-white/25 text-text-secondary hover:text-signal type-label-telemetry transition-colors">
             <BellOff className="w-3.5 h-3.5" />{t('notif.disable')}
           </button>

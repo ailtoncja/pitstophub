@@ -9,15 +9,11 @@ mkdirSync(iconsDir, { recursive: true });
 
 const source = join(iconsDir, 'source.png');
 
-// Cor de fundo do app (mesma de theme_color/background_color no manifest e no
-// meta theme-color do index.html), usada onde o icone precisa ficar opaco.
+// Cor de fundo usada onde o icone precisa ficar opaco.
 const BG = { r: 10, g: 10, b: 11, alpha: 1 };
 
 await sharp(source).resize(192, 192).png().toFile(join(iconsDir, 'icon-192.png'));
 console.log('✓ icon-192.png');
-
-await sharp(source).resize(512, 512).png().toFile(join(iconsDir, 'icon-512.png'));
-console.log('✓ icon-512.png');
 
 await sharp(source).resize(48, 48).png().toFile(join(iconsDir, 'favicon-48.png'));
 console.log('✓ favicon-48.png');
@@ -30,13 +26,3 @@ await sharp(source)
   .png()
   .toFile(join(iconsDir, 'apple-touch-icon.png'));
 console.log('✓ apple-touch-icon.png');
-
-// Icone maskable: conteudo a 80% com 10% de padding de "zona segura" em cada lado
-const content = Math.round(512 * 0.8);
-const pad = Math.round((512 - content) / 2);
-await sharp(source)
-  .resize(content, content)
-  .extend({ top: pad, bottom: pad, left: pad, right: pad, background: BG })
-  .png()
-  .toFile(join(iconsDir, 'icon-512-maskable.png'));
-console.log('✓ icon-512-maskable.png');

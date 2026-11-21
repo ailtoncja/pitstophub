@@ -5,7 +5,7 @@
 web
 
 ## Users
-Fãs de automobilismo, principalmente brasileiros (interface em português e inglês), que acompanham mais de uma categoria ao mesmo tempo, não só a Fórmula 1. Abrem o site no celular (PWA instalado ou navegador) e no computador, em proporção parecida, e o produto precisa funcionar bem nos dois.
+Fãs de automobilismo, principalmente brasileiros (interface em português e inglês), que acompanham mais de uma categoria ao mesmo tempo, não só a Fórmula 1. Abrem o site no celular e no computador, em proporção parecida, e o produto precisa funcionar bem nos dois.
 
 Os trabalhos que fazem ali: saber qual é a próxima corrida de cada categoria e a que horas ela acontece no seu fuso; ver a classificação e o grid da temporada; abrir o perfil de um piloto, de uma equipe ou de uma corrida; entender como a categoria funciona (formato do fim de semana, pontuação, regras); seguir categorias, equipes e pilotos e receber avisos.
 
@@ -25,10 +25,10 @@ Cobre séries que os sites de F1 ignoram ou tratam como secundárias (Endurance 
 
 ## Capabilities and Constraints
 - Idiomas: português (padrão) e inglês. Horários mostrados no fuso do aparelho.
-- Funcionalidades confirmadas: escolha de categoria que comanda Início, Calendário, Classificação e Grid; menu de categorias; páginas de piloto, equipe, corrida (com circuito, clima e sessões), campeões da F1, busca, favoritos com prioridade, alertas, exportar corridas para a agenda (.ics), página "Como funciona" por categoria, instalação como PWA.
+- Funcionalidades confirmadas: escolha de categoria que comanda Início, Calendário, Classificação e Grid; menu de categorias; páginas de piloto, equipe, corrida (com circuito, clima e sessões), campeões da F1, busca, favoritos com prioridade, alertas, exportar corridas para a agenda (.ics), página "Como funciona" por categoria.
 - Retirado de propósito, não reintroduzir sem o dono pedir: seção de notícias; notificações push do site (as chaves se perderam; o app Android usa avisos locais); página de privacidade e exclusão de conta (guardadas em `pitstophub-playstore-arquivo` para uma futura publicação na Play Store).
 - Limites dos dados: a classificação de WEC, IMSA, IndyCar, NASCAR e F1 Academy vem do catálogo estático e pode estar desatualizada; só F1, F2, F3, DTM, WRC e as GT têm classificação ao vivo. Previsão do tempo só para corridas até uns 15 dias à frente e só quando há coordenadas (F1).
-- Técnico: React 19, Vite, Tailwind v4, React Router, Supabase JS; PWA com service worker; tipografia Archivo (uma família só). O CSP do `vercel.json` restringe scripts a `'self'` e imagens a hosts listados.
+- Técnico: React 19, Vite, Tailwind v4, React Router, Supabase JS; tipografia Archivo (uma família só). O CSP do `vercel.json` restringe scripts a `'self'` e imagens a hosts listados.
 - Easter eggs de homenagem a pessoas queridas do dono (Thata, Nay, Lucas e Brunão) são parte do produto e devem ser preservados com os mesmos gatilhos: 5 toques na foto do Hamilton, segurar essa foto por 5 s, 5 toques na marca no rodapé e 5 toques no brasão da equipe AF Corse (WEC).
 - Sem vínculo com a Fórmula 1, a FIA, equipes ou pilotos: é um projeto independente e não oficial.
 
