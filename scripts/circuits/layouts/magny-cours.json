@@ -25,7 +25,7 @@
  },
  "extract": {},
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": -75.0
  },
  "notes": "SKIPPED: no independent official map found (circuitmagnycours.com has no layout image; SRO event page has none). OSM way 63951656 (4 458 m, +1.1%) looks right but is unverified. Toolkit note: is_pitlike() drops this way because its description mentions \"karting\"."
 }

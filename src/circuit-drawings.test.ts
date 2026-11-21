@@ -152,6 +152,8 @@ describe('tracado certo por categoria', () => {
     ['nascar', 'Dover (All-Star)', staticRace('nascar', 'allstar'), 'dover'],
     ['nascar', 'Darlington', staticRace('nascar', 'darlington1'), 'darlington'],
     ['nascar', 'North Wilkesboro', staticRace('nascar', 'northwilkesboro'), 'north-wilkesboro'],
+    ['nascar', 'San Diego (Coronado)', staticRace('nascar', 'sandiego'), 'san-diego'],
+    ['nascar', 'Charlotte ROVAL (historico)', live('Bank of America ROVAL 400', 'Charlotte Motor Speedway ROVAL', '', '2025-10-12'), 'charlotte-roval'],
     // IndyCar
     ['indy', 'Indy 500', staticRace('indy', 'indy-500'), 'indianapolis-oval'],
     ['indy', 'GP de Indianapolis (misto)', staticRace('indy', 'indy-road'), 'indianapolis-road'],
@@ -159,6 +161,7 @@ describe('tracado certo por categoria', () => {
     ['indy', 'Indy 500 (ao vivo)', live('Indy 500', 'Indianapolis Motor Speedway', 'Indianapolis, Indiana'), 'indianapolis-oval'],
     ['indy', 'St. Petersburg', live('St. Petersburg', 'Streets of St. Petersburg', 'St. Petersburg, Florida'), 'st-petersburg'],
     ['indy', 'Phoenix', staticRace('indy', 'phoenix'), 'phoenix'],
+    ['indy', 'Arlington', staticRace('indy', 'arlington'), 'arlington'],
     ['indy', 'Barber', staticRace('indy', 'barber'), 'barber'],
     ['indy', 'Detroit', staticRace('indy', 'detroit-indy'), 'detroit'],
     ['indy', 'Road America', staticRace('indy', 'road-america-indy'), 'road-america'],
@@ -199,6 +202,8 @@ describe('tracado certo por categoria', () => {
     ['wec', 'Fuji', staticRace('wec', 'fuji'), 'fuji'],
     // GT World Challenge
     ['gtwc-europe', 'Brands Hatch', live('Brands Hatch', 'Brands Hatch', 'Grã-Bretanha'), 'brands-hatch'],
+    ['gtwc-europe', 'Paul Ricard', live('Circuit Paul Ricard', 'Circuit Paul Ricard', 'França'), 'paul-ricard'],
+    ['gtwc-europe', 'Magny-Cours', live('Magny-Cours', 'Circuit de Nevers Magny-Cours', 'França'), 'magny-cours'],
     ['gtwc-europe', 'Misano', live('Misano', 'Misano', 'Itália'), 'misano'],
     ['gtwc-europe', 'Nurburgring (GP)', live('Nürburgring', 'Nürburgring', 'Alemanha'), 'nurburgring-gp'],
     ['gtwc-europe', 'Portimao', live('Portimao', 'Portimao', 'Portugal'), 'portimao'],
@@ -210,6 +215,7 @@ describe('tracado certo por categoria', () => {
     ['gtwc-america', 'Sebring (tracado completo)', live('Sebring International Raceway', 'Sebring International Raceway', '', '2026-05-09'), 'sebring'],
     ['gtwc-asia', 'Fuji', live('Fuji International Speedway (SRO GT PowerTour)', 'Fuji International Speedway (SRO GT PowerTour)', 'Japão'), 'fuji'],
     ['gtwc-asia', 'Okayama', live('Okayama International Circuit (SRO GT PowerTour)', 'Okayama International Circuit (SRO GT PowerTour)', 'Japão'), 'okayama'],
+    ['gtwc-asia', 'Mandalika', live('Pertamina Mandalika International Circuit', 'Mandalika', 'Indonésia'), 'mandalika'],
     // Brasil (Endurance Brasil ao vivo; NASCAR Brasil e Porsche Cup em synced_races)
     ['endurance-brasil', 'Goiania', live('Etapa 8 - Três Horas de Goiânia', 'Autódromo Internacional de Goiânia', 'Autódromo Internacional de Goiânia'), 'goiania'],
     ['endurance-brasil', 'etapa 5 (nome Goiania, local Santa Cruz)', live('Etapa 5 - Três Horas de Goiânia', 'Autódromo Internacional de Santa Cruz do Sul', 'Autódromo Internacional de Santa Cruz do Sul'), 'santa-cruz-do-sul'],

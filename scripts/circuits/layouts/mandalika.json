@@ -23,7 +23,7 @@
  },
  "extract": {},
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": -90.0
  },
  "notes": "SKIPPED: no official map found (SRO page has no map; MotoGP/circuit sites gave none). OSM loop 4 313 m (+0.06%) unverified."
 }

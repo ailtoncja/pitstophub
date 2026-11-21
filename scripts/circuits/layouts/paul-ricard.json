@@ -23,7 +23,7 @@
  },
  "extract": {},
  "render": {
-  "rotate_deg": 0
+  "rotate_deg": 25.0
  },
  "notes": "SKIPPED: the circuit has 247 configurations (circuitpaulricard.com) and no official map of the exact 5.791 km GTWC configuration was found (SRO page shows only the venue plan; the KBYG and spotter PDFs have no track map). The OSM loop that matches 5.791 km is a combination of ways that does not form a real layout."
 }

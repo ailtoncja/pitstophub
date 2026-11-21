@@ -1204,6 +1204,12 @@ const EXTRA_OSM_CIRCUITS: Record<string, Omit<CircuitInfo, 'osm'>> = {
   norisring: { trackImage: '/circuits/norisring.png', lengthKm: 2.162, corners: 4, direction: 'counterclockwise' },
   darlington: { trackImage: '/circuits/darlington.png', lengthKm: 2.198 },
   'north-wilkesboro': { trackImage: '/circuits/north-wilkesboro.png', lengthKm: 1.006 },
+  'magny-cours': { trackImage: '/circuits/magny-cours.png', lengthKm: 4.411, direction: 'clockwise' },
+  mandalika: { trackImage: '/circuits/mandalika.png', lengthKm: 4.310, corners: 17, direction: 'clockwise' },
+  'paul-ricard': { trackImage: '/circuits/paul-ricard.png', lengthKm: 5.791, corners: 15, direction: 'clockwise' },
+  arlington: { trackImage: '/circuits/arlington.png', lengthKm: 4.393, corners: 14 },
+  'san-diego': { trackImage: '/circuits/san-diego.png', lengthKm: 5.472, corners: 16 },
+  'charlotte-roval': { trackImage: '/circuits/charlotte-roval.png', lengthKm: 3.669, corners: 17, direction: 'counterclockwise' },
 };
 
 /** undefined: nenhum lugar desenhado reconhecido; null: lugar reconhecido, mas sem desenho verificado do tracado. */
